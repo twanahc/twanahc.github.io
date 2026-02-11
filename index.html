@@ -6,10 +6,14 @@ title: Home
 <h2>Posts</h2>
 
 <ul>
-  {% for post in site.posts %}
-    <li>
+{% for post in site.posts %}
+  <article>
+    <h3>
       <a href="{{ post.url }}">{{ post.title }}</a>
-      <small> — {{ post.date | date: "%B %d, %Y" }}</small>
-    </li>
-  {% endfor %}
+    </h3>
+    <p><em>{{ post.date | date: "%B %d, %Y" }}</em></p>
+    <hr>
+  </article>
+{% endfor %}
+
 </ul>
