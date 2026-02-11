@@ -1,0 +1,4 @@
+title: Twana's Research Notes
+description: Thoughts on ML, physics, and ideas
+markdown: kramdown
+permalink: /posts/:year-:month-:day-:title/
