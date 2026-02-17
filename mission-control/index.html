@@ -6,7 +6,7 @@ layout: none
 <head>
   <meta charset="UTF-8">
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
-  <title>Mission Control - 10x News Digest</title>
+  <title>10x News Digest</title>
   <style>
     *{margin:0;padding:0;box-sizing:border-box}
     body{font-family:-apple-system,BlinkMacSystemFont,'Segoe UI',sans-serif;background:#0a0a0a;color:#e0e0e0}
@@ -15,7 +15,6 @@ layout: none
     .header{background:#111;padding:20px 30px;border-bottom:1px solid #222;display:flex;justify-content:space-between;align-items:center}
     .header h1{font-size:1.4em;color:#fff}
     .header .sub{color:#666;font-size:.85em}
-    .header .home{color:#888;font-size:.85em}
     .stats{display:flex;gap:12px;padding:20px 30px;flex-wrap:wrap}
     .stat{background:#161616;border:1px solid #222;border-radius:8px;padding:16px 20px;min-width:130px}
     .stat .v{font-size:2em;font-weight:700;color:#fff}
@@ -31,171 +30,66 @@ layout: none
     .card .title a{color:#4fc3f7}
     .card .meta{font-size:.8em;color:#666;margin-bottom:10px;display:flex;gap:12px;flex-wrap:wrap;align-items:center}
     .card .excerpt{font-size:.9em;color:#999;line-height:1.6}
-    .badge{display:inline-block;padding:2px 8px;border-radius:4px;font-size:.75em;font-weight:600}
-    .badge.critical{background:#d32f2f33;color:#ef5350}
-    .badge.important{background:#f57c0033;color:#ffa726}
-    .badge.interesting{background:#1976d233;color:#42a5f5}
-    .type-pill{display:inline-block;padding:2px 8px;border-radius:4px;font-size:.7em;font-weight:600;letter-spacing:.04em}
-    .type-pill.cluster{background:#1976d233;color:#42a5f5}
-    .type-pill.weekly{background:#00695c33;color:#4db6ac}
-    .type-pill.evolving{background:#e6511033;color:#ff8a65}
-    .sc{font-weight:700}
-    .sc.hi{color:#4caf50}.sc.md{color:#ff9800}.sc.lo{color:#666}
-    .empty{text-align:center;padding:60px;color:#444}
+    .pill{display:inline-block;padding:2px 8px;border-radius:4px;font-size:.75em;font-weight:600}
+    .pill.landscape{background:#1976d233;color:#42a5f5}
+    .pill.models{background:#7b1fa233;color:#ab47bc}
+    .pill.comparison{background:#00695c33;color:#4db6ac}
+    .pill.infrastructure{background:#f57c0033;color:#ffa726}
+    .pill.market{background:#d32f2f33;color:#ef5350}
+    .pill.architecture{background:#33691e33;color:#8bc34a}
   </style>
 </head>
 <body>
   <div class="header">
     <div>
       <h1>10x News Digest</h1>
-      <div class="sub">Mission Control</div>
+      <div class="sub">AI Video & Creative AI Intelligence</div>
     </div>
-    <div>
-      <a href="/" class="home">&larr; Back to Blog</a>
-    </div>
+    <div><a href="/" style="color:#888;font-size:.85em">&larr; Blog</a></div>
   </div>
   <div class="stats">
-    <div class="stat"><div class="v">5</div><div class="l">Blog Posts</div></div>
-    <div class="stat"><div class="v">12</div><div class="l">Topics Covered</div></div>
-    <div class="stat"><div class="v">8</div><div class="l">Action Items</div></div>
-    <div class="stat"><div class="v">3</div><div class="l">Critical</div></div>
+    <div class="stat"><div class="v">10</div><div class="l">Posts</div></div>
+    <div class="stat"><div class="v">7</div><div class="l">Models Covered</div></div>
+    <div class="stat"><div class="v">$2.5B</div><div class="l">Market Size</div></div>
+    <div class="stat"><div class="v">Feb '26</div><div class="l">Latest</div></div>
   </div>
   <div class="tabs">
-    <div class="tab active" data-tab="blog">Blog Posts</div>
-    <div class="tab" data-tab="actions">Action Items</div>
-    <div class="tab" data-tab="radar">On Your Radar</div>
+    <div class="tab active" data-tab="all">All Posts</div>
+    <div class="tab" data-tab="models">Models</div>
+    <div class="tab" data-tab="building">Building</div>
+    <div class="tab" data-tab="market">Market</div>
   </div>
   <div class="content" id="content"></div>
 
   <script>
-    let tab = 'blog';
-
-    const posts = [
-      {
-        title: "React Server Components Under Siege: CVE-2026-23864 and What It Means for Your Next.js App",
-        url: "/posts/2026-02-17-react-server-components-under-siege/",
-        date: "Feb 17, 2026",
-        urgency: "critical",
-        score: 95,
-        type: "cluster",
-        category: "security",
-        excerpt: "A CVSS 7.5 vulnerability affects every Next.js App Router deployment running Server Actions. No auth required. A single crafted HTTP request can crash your server. Third wave of React Server Component security issues in three months."
-      },
-      {
-        title: "TypeScript 6.0: The End of an Era",
-        url: "/posts/2026-02-15-typescript-6-end-of-an-era/",
-        date: "Feb 15, 2026",
-        urgency: "important",
-        score: 88,
-        type: "cluster",
-        category: "tooling",
-        excerpt: "The last TypeScript release built on JavaScript. TypeScript 7.0 will be rewritten in Go. Everything 6.0 deprecates tells you exactly what 7.0 will demand — and strict now defaults to true."
-      },
-      {
-        title: "PackageGate: npm Won't Fix Its Zero-Days",
-        url: "/posts/2026-02-13-packagegate-npm-wont-fix/",
-        date: "Feb 13, 2026",
-        urgency: "critical",
-        score: 92,
-        type: "cluster",
-        category: "security",
-        excerpt: "Six zero-day vulnerabilities across npm, pnpm, vlt, and Bun. Every recommended defense from the Shai-Hulud attack can be bypassed. pnpm, vlt, and Bun patched. npm closed the report as 'Informative.'"
-      },
-      {
-        title: "Prisma 7: The Rust Engine Is Gone (And Everything Is Faster)",
-        url: "/posts/2026-02-10-prisma-7-rust-engine-gone/",
-        date: "Feb 10, 2026",
-        urgency: "important",
-        score: 85,
-        type: "cluster",
-        category: "tooling",
-        excerpt: "Prisma removed its Rust query engine entirely. Results: 3.4x faster queries, 90% smaller bundles, 70% faster type checks. The Drizzle vs Prisma performance gap just narrowed significantly."
-      },
-      {
-        title: "February 2026 Roundup: PostgreSQL CVEs, Redis Goes AGPL, Node 18 Sunset, and Python Gets Threads",
-        url: "/posts/2026-02-08-february-roundup-postgres-redis-node18/",
-        date: "Feb 8, 2026",
-        urgency: "important",
-        score: 82,
-        type: "weekly",
-        category: "roundup",
-        excerpt: "PostgreSQL ships critical patches including a network-accessible buffer overflow. Redis reverses course with AGPL. Node.js 18 forced migration accelerates. Python 3.14 makes free-threading official."
-      }
+    let tab='all';
+    const posts=[
+      {title:"The AI Video Generation Landscape in February 2026: Who's Winning",url:"/posts/2026-02-17-ai-video-landscape-february-2026/",date:"Feb 17",cat:"landscape",excerpt:"Seven viable API options, prices down 3-5x, native audio is table stakes. The complete ranking for builders."},
+      {title:"Kling 3.0: Multi-Shot Storyboarding Changes Everything",url:"/posts/2026-02-16-kling-3-multishot-storyboarding/",date:"Feb 16",cat:"models",excerpt:"First major model with native multi-shot storyboard mode. $100M revenue. What it means for platform builders."},
+      {title:"Sora 2 vs Veo 3.1 vs Runway Gen-4.5: A Builder's Comparison",url:"/posts/2026-02-15-sora-vs-veo-vs-runway-builders-guide/",date:"Feb 15",cat:"comparison",excerpt:"Head-to-head on quality, speed, price, and audio. Plus the multi-model routing strategy that beats picking one."},
+      {title:"Ray3.14: Luma's 3x Cost Reduction and What It Means for API Pricing",url:"/posts/2026-02-14-luma-ray314-cost-collapse/",date:"Feb 14",cat:"models",excerpt:"3x cheaper, 4x faster, native 1080p. Plus the underrated start/end frame pattern for multi-shot pipelines."},
+      {title:"Building Usage-Based Billing for AI Video: The Stripe Meters Migration",url:"/posts/2026-02-13-stripe-billing-meters-ai-video/",date:"Feb 13",cat:"infrastructure",excerpt:"Stripe's legacy metered billing dies March 31. The new Billing Meters API is actually better for video platforms."},
+      {title:"Flux 2.0 and the Image Generation Arms Race",url:"/posts/2026-02-12-flux-2-image-generation-arms-race/",date:"Feb 12",cat:"models",excerpt:"Sub-second image generation. Why image gen is the backbone of video pipelines. The open-source advantage."},
+      {title:"PixVerse R1 and the Race to Real-Time Video Generation",url:"/posts/2026-02-11-pixverse-r1-realtime-video/",date:"Feb 11",cat:"models",excerpt:"Alibaba-backed, 16M MAU, $40M ARR. Real-time video generation is a different product category."},
+      {title:"Gemini 2.0 Flash Deprecation: Migrate By March 31",url:"/posts/2026-02-10-gemini-deprecation-migration-guide/",date:"Feb 10",cat:"infrastructure",excerpt:"Google is removing Gemini 2.0 Flash. If it's in your pipeline, you have six weeks."},
+      {title:"The $2.5B AI Video Market: Who's Raising, Who's Shipping",url:"/posts/2026-02-09-25b-ai-video-market/",date:"Feb 9",cat:"market",excerpt:"$900M for Luma, $100M revenue for Kling, $40M ARR for PixVerse. Where the money is going."},
+      {title:"Multi-Model Video Pipelines: Architecture Patterns",url:"/posts/2026-02-08-multi-model-video-pipeline-architecture/",date:"Feb 8",cat:"architecture",excerpt:"How to build a multi-model pipeline with routing, quality gates, fallbacks, and cost management."}
     ];
 
-    const actions = [
-      { text: "Upgrade Next.js to 14.2.35 / 15.1.12+ / 16.1.5+ for CVE-2026-23864", effort: "trivial (<30 min)", urgency: "critical" },
-      { text: "Upgrade React to 19.1.5 or 19.2.4", effort: "trivial (<30 min)", urgency: "critical" },
-      { text: "Audit npm Git dependencies for PackageGate bypass", effort: "small (<2 hours)", urgency: "critical" },
-      { text: "Migrate Node.js 18 to Node.js 22 LTS (Lambda, Docker, CI)", effort: "medium (<1 day)", urgency: "important" },
-      { text: "Plan PostgreSQL upgrade after Feb 26 out-of-cycle release", effort: "small (<2 hours)", urgency: "important" },
-      { text: "Pin all GitHub Actions to commit SHAs, not tags", effort: "small (<2 hours)", urgency: "important" },
-      { text: "Test TypeScript 6.0 beta: npm install -D typescript@beta", effort: "small (<2 hours)", urgency: "important" },
-      { text: "Evaluate Prisma 7 upgrade — bundle size and perf improvements", effort: "medium (<1 day)", urgency: "important" }
-    ];
+    const filters={all:()=>true,models:p=>['models','comparison','landscape'].includes(p.cat),building:p=>['infrastructure','architecture'].includes(p.cat),market:p=>p.cat==='market'};
 
-    const radar = [
-      { topic: "TypeScript 7.0 (Go rewrite)", detail: "Expected mid-2026. All 6.0 deprecations become errors. Start migration now.", urgency: "important" },
-      { topic: "React Flight protocol hardening", detail: "Third CVE in 3 months. Expect continued security scrutiny of Server Components.", urgency: "critical" },
-      { topic: "Node.js 20 LTS end-of-life", detail: "April 2026. Skip Node 20, go straight to 22 LTS.", urgency: "important" },
-      { topic: "Valkey vs Redis", detail: "Valkey gaining enterprise traction. AWS ElastiCache already migrating. Watch for ecosystem split.", urgency: "interesting" },
-      { topic: "Free-threaded Python ecosystem", detail: "numpy, pydantic-core need GIL-free wheels before FastAPI fully benefits.", urgency: "interesting" },
-      { topic: "npm security posture", detail: "PackageGate unpatched. Community shifting toward pnpm for security-sensitive projects.", urgency: "important" }
-    ];
-
-    function renderBlog() {
-      document.getElementById('content').innerHTML = posts.map(p => {
-        const scCls = p.score >= 70 ? 'hi' : p.score >= 40 ? 'md' : 'lo';
-        const typeLabel = p.type === 'weekly' ? 'Weekly Roundup' : 'Cluster Deep Dive';
-        return `<div class="card">
-          <div class="meta">
-            <span class="badge ${p.urgency}">${p.urgency}</span>
-            <span class="sc ${scCls}">${p.score}/100</span>
-            <span class="type-pill ${p.type}">${typeLabel}</span>
-            <span>${p.date}</span>
-          </div>
-          <div class="title"><a href="${p.url}">${p.title}</a></div>
-          <div class="excerpt">${p.excerpt}</div>
-        </div>`;
-      }).join('');
-    }
-
-    function renderActions() {
-      document.getElementById('content').innerHTML = actions.map(a =>
-        `<div class="card">
-          <div class="meta">
-            <span class="badge ${a.urgency}">${a.urgency}</span>
-            <span>${a.effort}</span>
-          </div>
-          <div class="title">${a.text}</div>
-        </div>`
+    function render(){
+      const f=posts.filter(filters[tab]);
+      document.getElementById('content').innerHTML=f.map(p=>
+        `<div class="card"><div class="meta"><span class="pill ${p.cat}">${p.cat}</span><span>${p.date}</span></div><div class="title"><a href="${p.url}">${p.title}</a></div><div class="excerpt">${p.excerpt}</div></div>`
       ).join('');
     }
 
-    function renderRadar() {
-      document.getElementById('content').innerHTML = radar.map(r =>
-        `<div class="card">
-          <div class="meta">
-            <span class="badge ${r.urgency}">${r.urgency}</span>
-          </div>
-          <div class="title">${r.topic}</div>
-          <div class="excerpt">${r.detail}</div>
-        </div>`
-      ).join('');
-    }
-
-    function load() {
-      ({ blog: renderBlog, actions: renderActions, radar: renderRadar })[tab]();
-    }
-
-    document.querySelectorAll('.tab').forEach(t => t.addEventListener('click', () => {
-      document.querySelectorAll('.tab').forEach(x => x.classList.remove('active'));
-      t.classList.add('active');
-      tab = t.dataset.tab;
-      load();
+    document.querySelectorAll('.tab').forEach(t=>t.addEventListener('click',()=>{
+      document.querySelectorAll('.tab').forEach(x=>x.classList.remove('active'));
+      t.classList.add('active');tab=t.dataset.tab;render();
     }));
-
-    load();
+    render();
   </script>
 </body>
 </html>
