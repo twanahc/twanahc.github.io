@@ -4,7 +4,12 @@ layout: default
 
 <article>
   <h2>{{ page.title }}</h2>
-  <p><em>{{ page.date | date: "%B %d, %Y" }}</em></p>
+  <p>
+    <em>{{ page.date | date: "%B %d, %Y" }}</em>
+    {% if page.urgency %} &middot; <strong style="{% if page.urgency == 'critical' %}color:#d32f2f{% elsif page.urgency == 'important' %}color:#f57c00{% else %}color:#1976d2{% endif %}">{{ page.urgency }}</strong>{% endif %}
+    {% if page.score %} &middot; Score: {{ page.score }}/100{% endif %}
+    {% if page.category %} &middot; {{ page.category }}{% endif %}
+  </p>
   <hr>
 
   {{ content }}

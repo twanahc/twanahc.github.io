@@ -4,13 +4,96 @@ body {
   margin: 40px auto;
   padding: 0 20px;
   line-height: 1.7;
+  color: #333;
 }
 
 a {
   text-decoration: none;
-  color: black;
+  color: #1a73e8;
 }
 
 a:hover {
   text-decoration: underline;
+}
+
+header nav {
+  font-family: -apple-system, sans-serif;
+  font-size: .85em;
+  margin-top: 8px;
+}
+
+header nav a {
+  color: #666;
+}
+
+h2 {
+  margin-top: 24px;
+  margin-bottom: 12px;
+}
+
+h3 {
+  margin-top: 20px;
+  margin-bottom: 8px;
+}
+
+article h3 a {
+  color: #111;
+}
+
+article p em {
+  color: #666;
+  font-size: .9em;
+}
+
+article strong {
+  font-weight: 600;
+}
+
+hr {
+  border: none;
+  border-top: 1px solid #eee;
+  margin: 16px 0;
+}
+
+code {
+  background: #f4f4f4;
+  border: 1px solid #ddd;
+  border-radius: 3px;
+  padding: 1px 5px;
+  font-size: .9em;
+  font-family: 'SF Mono', Consolas, monospace;
+}
+
+pre {
+  background: #f8f8f8;
+  border: 1px solid #ddd;
+  border-radius: 6px;
+  padding: 16px;
+  overflow-x: auto;
+  font-size: .85em;
+  line-height: 1.5;
+  margin: 16px 0;
+}
+
+pre code {
+  background: none;
+  border: none;
+  padding: 0;
+}
+
+ul, ol {
+  margin: 12px 0;
+  padding-left: 24px;
+}
+
+li {
+  margin-bottom: 6px;
+}
+
+blockquote {
+  border-left: 3px solid #ddd;
+  margin: 16px 0;
+  padding: 8px 16px;
+  color: #666;
+  font-style: italic;
 }

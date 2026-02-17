@@ -3,7 +3,10 @@ layout: default
 title: Home
 ---
 
-<h2>Posts</h2>
+<div style="display:flex;justify-content:space-between;align-items:center;margin-bottom:24px">
+  <h2>Posts</h2>
+  <a href="/mission-control/" style="font-size:.9em;padding:6px 14px;border:1px solid #ccc;border-radius:6px;">Mission Control &rarr;</a>
+</div>
 
 <ul>
 {% for post in site.posts %}
@@ -11,7 +14,10 @@ title: Home
     <h3>
       <a href="{{ post.url }}">{{ post.title }}</a>
     </h3>
-    <p><em>{{ post.date | date: "%B %d, %Y" }}</em></p>
+    <p><em>{{ post.date | date: "%B %d, %Y" }}</em>
+    {% if post.urgency %} &middot; <strong>{{ post.urgency }}</strong>{% endif %}
+    {% if post.category %} &middot; {{ post.category }}{% endif %}
+    </p>
     <hr>
   </article>
 {% endfor %}
