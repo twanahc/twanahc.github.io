@@ -4,12 +4,13 @@ body {
   margin: 40px auto;
   padding: 0 20px;
   line-height: 1.7;
-  color: #333;
+  color: #d4d4d4;
+  background: #111;
 }
 
 a {
   text-decoration: none;
-  color: #1a73e8;
+  color: #6db3f2;
 }
 
 a:hover {
@@ -23,7 +24,11 @@ header nav {
 }
 
 header nav a {
-  color: #666;
+  color: #999;
+}
+
+h1, h2, h3, h4, h5, h6 {
+  color: #e8e8e8;
 }
 
 h2 {
@@ -37,36 +42,38 @@ h3 {
 }
 
 article h3 a {
-  color: #111;
+  color: #e8e8e8;
 }
 
 article p em {
-  color: #666;
+  color: #999;
   font-size: .9em;
 }
 
 article strong {
   font-weight: 600;
+  color: #e0e0e0;
 }
 
 hr {
   border: none;
-  border-top: 1px solid #eee;
+  border-top: 1px solid #333;
   margin: 16px 0;
 }
 
 code {
-  background: #f4f4f4;
-  border: 1px solid #ddd;
+  background: #1e1e1e;
+  border: 1px solid #333;
   border-radius: 3px;
   padding: 1px 5px;
   font-size: .9em;
   font-family: 'SF Mono', Consolas, monospace;
+  color: #c9d1d9;
 }
 
 pre {
-  background: #f8f8f8;
-  border: 1px solid #ddd;
+  background: #161616;
+  border: 1px solid #333;
   border-radius: 6px;
   padding: 16px;
   overflow-x: auto;
@@ -91,10 +98,10 @@ li {
 }
 
 blockquote {
-  border-left: 3px solid #ddd;
+  border-left: 3px solid #444;
   margin: 16px 0;
   padding: 8px 16px;
-  color: #666;
+  color: #999;
   font-style: italic;
 }
 
@@ -106,18 +113,19 @@ table {
 }
 
 th, td {
-  border: 1px solid #ddd;
+  border: 1px solid #333;
   padding: 8px 12px;
   text-align: left;
 }
 
 th {
-  background: #f4f4f4;
+  background: #1e1e1e;
   font-weight: 600;
+  color: #e0e0e0;
 }
 
 tr:nth-child(even) {
-  background: #fafafa;
+  background: #1a1a1a;
 }
 
 .figure {
@@ -131,7 +139,7 @@ tr:nth-child(even) {
 
 .figure-caption {
   font-size: .85em;
-  color: #666;
+  color: #999;
   margin-top: 8px;
   font-style: italic;
 }
@@ -146,4 +154,20 @@ img {
   height: auto;
   border-radius: 6px;
   margin: 16px 0;
+}
+
+mjx-container {
+  color: #d4d4d4;
+}
+
+mjx-container svg {
+  color: #d4d4d4;
+}
+
+header h1 a {
+  color: #e8e8e8;
+}
+
+header p {
+  color: #999;
 }
