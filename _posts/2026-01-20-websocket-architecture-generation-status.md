@@ -1018,6 +1018,7 @@ export function useGenerationStatus({
 
 ### 4.5 React Component: Rendering Generation Status
 
+{% raw %}
 ```tsx
 // GenerationStatusBar.tsx
 
@@ -1154,6 +1155,7 @@ export function GenerationStatusBar({ generationId, authToken }: Props) {
   );
 }
 ```
+{% endraw %}
 
 ---
 
