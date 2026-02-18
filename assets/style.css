@@ -97,3 +97,53 @@ blockquote {
   color: #666;
   font-style: italic;
 }
+
+table {
+  border-collapse: collapse;
+  width: 100%;
+  margin: 16px 0;
+  font-size: .9em;
+}
+
+th, td {
+  border: 1px solid #ddd;
+  padding: 8px 12px;
+  text-align: left;
+}
+
+th {
+  background: #f4f4f4;
+  font-weight: 600;
+}
+
+tr:nth-child(even) {
+  background: #fafafa;
+}
+
+.figure {
+  margin: 24px 0;
+  text-align: center;
+}
+
+.figure svg {
+  max-width: 100%;
+}
+
+.figure-caption {
+  font-size: .85em;
+  color: #666;
+  margin-top: 8px;
+  font-style: italic;
+}
+
+.math-block {
+  overflow-x: auto;
+  margin: 16px 0;
+}
+
+img {
+  max-width: 100%;
+  height: auto;
+  border-radius: 6px;
+  margin: 16px 0;
+}
