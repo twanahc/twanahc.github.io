@@ -215,7 +215,7 @@ axes[0].set_xlim(-3.5, 3.5)
 axes[0].set_ylim(-3.5, 3.5)
 axes[0].set_aspect('equal')
 axes[0].grid(True, alpha=0.3)
-axes[0].set_title('Unit Circle', fontsize=14)
+axes[0].set_title(r'Unit Circle', fontsize=14)
 axes[0].axhline(y=0, color='k', linewidth=0.5)
 axes[0].axvline(x=0, color='k', linewidth=0.5)
 # Show basis vectors
@@ -223,8 +223,8 @@ axes[0].annotate('', xy=(1, 0), xytext=(0, 0),
                  arrowprops=dict(arrowstyle='->', color='red', lw=2))
 axes[0].annotate('', xy=(0, 1), xytext=(0, 0),
                  arrowprops=dict(arrowstyle='->', color='green', lw=2))
-axes[0].text(1.1, 0.1, 'e₁', fontsize=12, color='red')
-axes[0].text(0.1, 1.1, 'e₂', fontsize=12, color='green')
+axes[0].text(1.1, 0.1, r'$\mathbf{e}_1$', fontsize=12, color='red')
+axes[0].text(0.1, 1.1, r'$\mathbf{e}_2$', fontsize=12, color='green')
 
 # Transformed ellipse
 axes[1].plot(ellipse[0], ellipse[1], 'b-', linewidth=2)
@@ -232,7 +232,7 @@ axes[1].set_xlim(-3.5, 3.5)
 axes[1].set_ylim(-3.5, 3.5)
 axes[1].set_aspect('equal')
 axes[1].grid(True, alpha=0.3)
-axes[1].set_title(f'After A = [[{A[0,0]}, {A[0,1]}], [{A[1,0]}, {A[1,1]}]]', fontsize=14)
+axes[1].set_title(rf'After $A = [[{A[0,0]}, {A[0,1]}], [{A[1,0]}, {A[1,1]}]]$', fontsize=14)
 axes[1].axhline(y=0, color='k', linewidth=0.5)
 axes[1].axvline(x=0, color='k', linewidth=0.5)
 # Show transformed basis vectors
@@ -240,8 +240,8 @@ axes[1].annotate('', xy=(A[0,0], A[1,0]), xytext=(0, 0),
                  arrowprops=dict(arrowstyle='->', color='red', lw=2))
 axes[1].annotate('', xy=(A[0,1], A[1,1]), xytext=(0, 0),
                  arrowprops=dict(arrowstyle='->', color='green', lw=2))
-axes[1].text(A[0,0]+0.1, A[1,0]+0.1, 'Ae₁', fontsize=12, color='red')
-axes[1].text(A[0,1]+0.1, A[1,1]+0.1, 'Ae₂', fontsize=12, color='green')
+axes[1].text(A[0,0]+0.1, A[1,0]+0.1, r'$A\mathbf{e}_1$', fontsize=12, color='red')
+axes[1].text(A[0,1]+0.1, A[1,1]+0.1, r'$A\mathbf{e}_2$', fontsize=12, color='green')
 
 plt.tight_layout()
 plt.savefig('matrix_transform_circle.png', dpi=150, bbox_inches='tight')
@@ -350,7 +350,7 @@ for j in range(2):
     ax.annotate('', xy=(lam * ev[0], lam * ev[1]), xytext=(0, 0),
                 arrowprops=dict(arrowstyle='->', color='red', lw=3))
     ax.text(lam * ev[0] + 0.1, lam * ev[1] + 0.1,
-            f'λ={lam:.1f}', fontsize=14, color='red', fontweight='bold')
+            rf'$\lambda={lam:.1f}$', fontsize=14, color='red', fontweight='bold')
 
 ax.set_xlim(-4, 4)
 ax.set_ylim(-4, 4)
@@ -358,7 +358,7 @@ ax.set_aspect('equal')
 ax.grid(True, alpha=0.3)
 ax.axhline(y=0, color='k', linewidth=0.5)
 ax.axvline(x=0, color='k', linewidth=0.5)
-ax.set_title('Blue = original vectors, Red = transformed by A\n'
+ax.set_title('Blue = original vectors, Red = transformed by $A$\n'
              'Thick arrows: eigenvectors (direction preserved)', fontsize=13)
 plt.tight_layout()
 plt.savefig('eigenvectors_visualization.png', dpi=150, bbox_inches='tight')
@@ -499,10 +499,10 @@ for ax, k in zip(axes.flatten(), ranks):
     img_k = U[:, :k] @ np.diag(S[:k]) @ Vt[:k, :]
     compression = k * (256 + 256 + 1) / (256 * 256) * 100
     ax.imshow(img_k, cmap='gray')
-    ax.set_title(f'Rank {k} ({compression:.1f}% of original)', fontsize=13)
+    ax.set_title(rf'Rank $k={k}$ ({compression:.1f}% of original)', fontsize=13)
     ax.axis('off')
 
-plt.suptitle('SVD Image Compression at Different Ranks', fontsize=16, y=1.02)
+plt.suptitle(r'SVD Image Compression at Different Ranks', fontsize=16, y=1.02)
 plt.tight_layout()
 plt.savefig('svd_compression.png', dpi=150, bbox_inches='tight')
 plt.show()
@@ -510,14 +510,14 @@ plt.show()
 # Plot singular value spectrum
 fig, ax = plt.subplots(figsize=(10, 5))
 ax.semilogy(S, 'b-', linewidth=2)
-ax.set_xlabel('Index', fontsize=13)
-ax.set_ylabel('Singular Value (log scale)', fontsize=13)
-ax.set_title('Singular Value Spectrum', fontsize=14)
+ax.set_xlabel(r'Index $i$', fontsize=13)
+ax.set_ylabel(r'Singular Value $\sigma_i$ (log scale)', fontsize=13)
+ax.set_title(r'Singular Value Spectrum', fontsize=14)
 ax.grid(True, alpha=0.3)
 # Mark the ranks we used
 for k in ranks[:-1]:
     ax.axvline(x=k, color='red', linestyle='--', alpha=0.5)
-    ax.text(k + 1, S[0] * 0.5, f'k={k}', fontsize=10, color='red')
+    ax.text(k + 1, S[0] * 0.5, rf'$k={k}$', fontsize=10, color='red')
 plt.tight_layout()
 plt.savefig('singular_value_spectrum.png', dpi=150, bbox_inches='tight')
 plt.show()

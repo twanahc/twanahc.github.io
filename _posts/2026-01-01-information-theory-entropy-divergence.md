@@ -409,16 +409,16 @@ H = -p * np.log2(p) - (1 - p) * np.log2(1 - p)
 
 fig, ax = plt.subplots(figsize=(8, 5))
 ax.plot(p, H, 'b-', linewidth=2.5)
-ax.set_xlabel('p (probability of success)', fontsize=13)
-ax.set_ylabel('H(p) in bits', fontsize=13)
-ax.set_title('Entropy of a Bernoulli Random Variable', fontsize=14)
-ax.axhline(y=1, color='gray', linestyle='--', alpha=0.5, label='H = 1 bit')
-ax.axvline(x=0.5, color='gray', linestyle='--', alpha=0.5, label='p = 0.5')
-ax.annotate('Maximum at p=0.5\n(maximum uncertainty)',
+ax.set_xlabel(r'$p$ (probability of success)', fontsize=13)
+ax.set_ylabel(r'$H(p)$ in bits', fontsize=13)
+ax.set_title(r'Entropy of a Bernoulli Random Variable', fontsize=14)
+ax.axhline(y=1, color='gray', linestyle='--', alpha=0.5, label=r'$H = 1$ bit')
+ax.axvline(x=0.5, color='gray', linestyle='--', alpha=0.5, label=r'$p = 0.5$')
+ax.annotate(r'Maximum at $p=0.5$' + '\n(maximum uncertainty)',
             xy=(0.5, 1), xytext=(0.65, 0.7),
             fontsize=11, arrowprops=dict(arrowstyle='->', color='red'),
             color='red')
-ax.annotate('H → 0 as p → 0\n(certain outcome: always fail)',
+ax.annotate(r'$H \to 0$ as $p \to 0$' + '\n(certain outcome: always fail)',
             xy=(0.05, 0.05), xytext=(0.15, 0.3),
             fontsize=10, arrowprops=dict(arrowstyle='->', color='green'),
             color='green')
@@ -452,12 +452,12 @@ x = np.linspace(-6, 10, 500)
 fig, axes = plt.subplots(2, 3, figsize=(15, 9))
 
 cases = [
-    (0, 1, 'p = N(0,1) [same as q]'),
-    (1, 1, 'p = N(1,1) [shifted mean]'),
-    (3, 1, 'p = N(3,1) [large shift]'),
-    (0, 0.5, 'p = N(0,0.25) [narrow]'),
-    (0, 2, 'p = N(0,4) [wide]'),
-    (2, 2, 'p = N(2,4) [shifted + wide]'),
+    (0, 1, r'$p = \mathcal{N}(0,1)$ [same as $q$]'),
+    (1, 1, r'$p = \mathcal{N}(1,1)$ [shifted mean]'),
+    (3, 1, r'$p = \mathcal{N}(3,1)$ [large shift]'),
+    (0, 0.5, r'$p = \mathcal{N}(0,0.25)$ [narrow]'),
+    (0, 2, r'$p = \mathcal{N}(0,4)$ [wide]'),
+    (2, 2, r'$p = \mathcal{N}(2,4)$ [shifted + wide]'),
 ]
 
 for ax, (mu_p, sigma_p, label) in zip(axes.flatten(), cases):
@@ -466,21 +466,21 @@ for ax, (mu_p, sigma_p, label) in zip(axes.flatten(), cases):
     p_pdf = norm.pdf(x, mu_p, sigma_p)
     q_pdf = norm.pdf(x, mu_q, sigma_q)
 
-    ax.fill_between(x, p_pdf, alpha=0.3, color='blue', label='p')
-    ax.fill_between(x, q_pdf, alpha=0.3, color='red', label='q = N(0,1)')
+    ax.fill_between(x, p_pdf, alpha=0.3, color='blue', label=r'$p$')
+    ax.fill_between(x, q_pdf, alpha=0.3, color='red', label=r'$q = \mathcal{N}(0,1)$')
     ax.plot(x, p_pdf, 'b-', linewidth=2)
     ax.plot(x, q_pdf, 'r-', linewidth=2)
 
     kl_fwd = kl_gaussians(mu_p, sigma_p, mu_q, sigma_q)
     kl_rev = kl_gaussians(mu_q, sigma_q, mu_p, sigma_p)
 
-    ax.set_title(f'{label}\nKL(p||q)={kl_fwd:.3f}, KL(q||p)={kl_rev:.3f}',
+    ax.set_title(rf'{label}' + '\n' + rf'$D_{{KL}}(p\|q)={kl_fwd:.3f}$, $D_{{KL}}(q\|p)={kl_rev:.3f}$',
                  fontsize=10)
     ax.legend(fontsize=9)
     ax.set_xlim(-6, 8)
     ax.set_ylim(0, max(p_pdf.max(), q_pdf.max()) * 1.2)
 
-plt.suptitle('KL Divergence Between Gaussians (Note: KL(p||q) ≠ KL(q||p))',
+plt.suptitle(r'KL Divergence Between Gaussians (Note: $D_{KL}(p\|q) \neq D_{KL}(q\|p)$)',
              fontsize=14, y=1.02)
 plt.tight_layout()
 plt.savefig('kl_divergence_gaussians.png', dpi=150, bbox_inches='tight')
@@ -532,14 +532,14 @@ for ax, rho in zip(axes, correlations):
     mi_est = estimate_mi_binned(x, y, bins=30)
 
     ax.scatter(x, y, s=1, alpha=0.3, color='steelblue')
-    ax.set_title(f'ρ = {rho}\nMI_true = {mi_true:.3f}\nMI_est = {mi_est:.3f}',
+    ax.set_title(rf'$\rho = {rho}$' + '\n' + rf'$I_{{true}} = {mi_true:.3f}$' + '\n' + rf'$I_{{est}} = {mi_est:.3f}$',
                  fontsize=11)
     ax.set_xlim(-4, 4)
     ax.set_ylim(-4, 4)
     ax.set_aspect('equal')
     ax.grid(True, alpha=0.2)
 
-plt.suptitle('Mutual Information: How Much Does Y Tell You About X?',
+plt.suptitle(r'Mutual Information: How Much Does $Y$ Tell You About $X$?',
              fontsize=14, y=1.08)
 plt.tight_layout()
 plt.savefig('mutual_information.png', dpi=150, bbox_inches='tight')

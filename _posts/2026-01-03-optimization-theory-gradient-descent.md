@@ -409,22 +409,22 @@ def run_gd(lr, n_steps=200, start=np.array([-1.5, 2.5])):
 
 fig, axes = plt.subplots(1, 3, figsize=(16, 5))
 lrs = [0.001, 0.005, 0.02]
-titles = ['lr = 0.001 (too small)', 'lr = 0.005 (good)', 'lr = 0.02 (too large)']
+titles = [r'$\eta = 0.001$ (too small)', r'$\eta = 0.005$ (good)', r'$\eta = 0.02$ (too large)']
 
 for ax, lr, title in zip(axes, lrs, titles):
     ax.contour(X, Y, Z, levels=np.logspace(-1, 3, 20), cmap='viridis', alpha=0.6)
     path = run_gd(lr)
     ax.plot(path[:, 0], path[:, 1], 'r.-', markersize=3, linewidth=0.8, alpha=0.8)
     ax.plot(path[0, 0], path[0, 1], 'go', markersize=8, label='Start')
-    ax.plot(1, 1, 'r*', markersize=12, label='Optimum (1,1)')
+    ax.plot(1, 1, 'r*', markersize=12, label=r'Optimum $(1,1)$')
     ax.set_title(title, fontsize=11)
-    ax.set_xlabel('θ₁')
-    ax.set_ylabel('θ₂')
+    ax.set_xlabel(r'$\theta_1$')
+    ax.set_ylabel(r'$\theta_2$')
     ax.legend(fontsize=8)
     ax.set_xlim(-2, 2)
     ax.set_ylim(-1, 3)
 
-plt.suptitle('Gradient Descent: Effect of Learning Rate on Convergence', fontsize=14)
+plt.suptitle(r'Gradient Descent: Effect of Learning Rate $\eta$ on Convergence', fontsize=14)
 plt.tight_layout()
 plt.savefig('gd_learning_rate.png', dpi=150, bbox_inches='tight')
 plt.show()
@@ -497,17 +497,17 @@ path_mom = run_momentum(lr=0.002, beta=0.9)
 path_adam = run_adam(lr=0.1)
 
 ax.plot(path_gd[:, 0], path_gd[:, 1], 'r.-', markersize=2, linewidth=1,
-        label='GD (lr=0.005)', alpha=0.8)
+        label=r'GD ($\eta=0.005$)', alpha=0.8)
 ax.plot(path_mom[:, 0], path_mom[:, 1], 'b.-', markersize=2, linewidth=1,
-        label='Momentum (lr=0.002, β=0.9)', alpha=0.8)
+        label=r'Momentum ($\eta=0.002$, $\beta=0.9$)', alpha=0.8)
 ax.plot(path_adam[:, 0], path_adam[:, 1], 'g.-', markersize=2, linewidth=1,
-        label='Adam (lr=0.1)', alpha=0.8)
+        label=r'Adam ($\eta=0.1$)', alpha=0.8)
 
 ax.plot(start[0], start[1], 'ko', markersize=10, label='Start')
-ax.plot(0, 0, 'r*', markersize=15, label='Optimum')
-ax.set_xlabel('θ₁ (high curvature)')
-ax.set_ylabel('θ₂ (low curvature)')
-ax.set_title('Optimizer Comparison on Ill-Conditioned Quadratic (κ = 50)', fontsize=13)
+ax.plot(0, 0, 'r*', markersize=15, label=r'Optimum $\theta^*$')
+ax.set_xlabel(r'$\theta_1$ (high curvature)')
+ax.set_ylabel(r'$\theta_2$ (low curvature)')
+ax.set_title(r'Optimizer Comparison on Ill-Conditioned Quadratic ($\kappa = 50$)', fontsize=13)
 ax.legend(fontsize=10)
 ax.set_aspect('equal')
 plt.tight_layout()
@@ -546,11 +546,11 @@ for lr, color in zip(lrs, colors):
         if abs(x) > 10:
             break
     ax.plot(range(len(xs)), [f(xi) for xi in xs], '.-', color=color,
-            label=f'η = {lr}', markersize=4, linewidth=1)
+            label=rf'$\eta = {lr}$', markersize=4, linewidth=1)
 
-ax.set_xlabel('Iteration')
-ax.set_ylabel('f(θ)')
-ax.set_title('Convergence for Different Learning Rates')
+ax.set_xlabel(r'Iteration')
+ax.set_ylabel(r'$f(\theta)$')
+ax.set_title(r'Convergence for Different Learning Rates')
 ax.legend(fontsize=9)
 ax.set_ylim(-0.5, 10)
 ax.grid(True, alpha=0.3)
@@ -577,9 +577,9 @@ eta[cos_mask] = eta_min + 0.5*(eta_max - eta_min)*(1 + np.cos(np.pi * t_cos / T_
 
 ax2.plot(t, eta * 1000, 'b-', linewidth=1.5)  # Scale for readability
 ax2.axvline(x=T_warmup, color='r', linestyle='--', alpha=0.5, label='End of warmup')
-ax2.set_xlabel('Training Step')
-ax2.set_ylabel('Learning Rate (× 10⁻³)')
-ax2.set_title('Cosine Annealing with Warmup')
+ax2.set_xlabel(r'Training Step')
+ax2.set_ylabel(r'Learning Rate $\eta$ ($\times 10^{-3}$)')
+ax2.set_title(r'Cosine Annealing with Warmup')
 ax2.legend()
 ax2.grid(True, alpha=0.3)
 

@@ -351,15 +351,15 @@ for idx, N in enumerate([1, 3, 9, 49]):
     square = np.sign(np.sin(2 * np.pi * t))
 
     ax.plot(t, square, 'k--', alpha=0.3, label='True square wave')
-    ax.plot(t, y, 'b-', linewidth=1.5, label=f'{N+1} terms')
-    ax.set_title(f'N = {N+1} harmonic{"s" if N > 0 else ""}')
-    ax.set_xlabel('t')
-    ax.set_ylabel('f(t)')
+    ax.plot(t, y, 'b-', linewidth=1.5, label=rf'${N+1}$ terms')
+    ax.set_title(rf'$N = {N+1}$ harmonic{"s" if N > 0 else ""}')
+    ax.set_xlabel(r'$t$')
+    ax.set_ylabel(r'$f(t)$')
     ax.legend(fontsize=9)
     ax.set_ylim(-1.5, 1.5)
     ax.grid(True, alpha=0.3)
 
-plt.suptitle('Fourier Series Convergence to a Square Wave', fontsize=14)
+plt.suptitle(r'Fourier Series Convergence to a Square Wave', fontsize=14)
 plt.tight_layout()
 plt.savefig('fourier_square_wave.png', dpi=150, bbox_inches='tight')
 plt.show()
@@ -391,14 +391,14 @@ magnitude = np.log1p(np.abs(F_shifted))  # Log scale for visibility
 
 fig, axes = plt.subplots(1, 2, figsize=(12, 5))
 axes[0].imshow(img, cmap='gray')
-axes[0].set_title('Spatial Domain (Image)')
+axes[0].set_title(r'Spatial Domain (Image)')
 axes[0].axis('off')
 
 axes[1].imshow(magnitude, cmap='hot')
-axes[1].set_title('Frequency Domain (Log Magnitude)')
+axes[1].set_title(r'Frequency Domain ($\log$ Magnitude)')
 axes[1].axis('off')
 
-plt.suptitle('2D Fourier Transform of a Synthetic Image', fontsize=14)
+plt.suptitle(r'2D Fourier Transform of a Synthetic Image', fontsize=14)
 plt.tight_layout()
 plt.savefig('fourier_2d_fft.png', dpi=150, bbox_inches='tight')
 plt.show()
@@ -436,26 +436,26 @@ conv_fft = np.real(np.fft.ifft(F_product))
 fig, axes = plt.subplots(2, 2, figsize=(12, 8))
 
 axes[0, 0].plot(t, signal, 'b-', linewidth=1.5)
-axes[0, 0].set_title('Signal f(t)')
+axes[0, 0].set_title(r'Signal $f(t)$')
 axes[0, 0].grid(True, alpha=0.3)
 
 axes[0, 1].plot(t, np.roll(kernel, N//2), 'r-', linewidth=1.5)
-axes[0, 1].set_title('Kernel g(t) (Gaussian)')
+axes[0, 1].set_title(r'Kernel $g(t)$ (Gaussian)')
 axes[0, 1].grid(True, alpha=0.3)
 
-axes[1, 0].plot(t, np.abs(np.fft.fftshift(F_signal)), 'b-', alpha=0.7, label='|F{f}|')
-axes[1, 0].plot(t, np.abs(np.fft.fftshift(F_kernel)) * 50, 'r-', alpha=0.7, label='|F{g}| × 50')
-axes[1, 0].set_title('Frequency Domain (Magnitudes)')
+axes[1, 0].plot(t, np.abs(np.fft.fftshift(F_signal)), 'b-', alpha=0.7, label=r'$|\hat{f}|$')
+axes[1, 0].plot(t, np.abs(np.fft.fftshift(F_kernel)) * 50, 'r-', alpha=0.7, label=r'$|\hat{g}| \times 50$')
+axes[1, 0].set_title(r'Frequency Domain (Magnitudes)')
 axes[1, 0].legend()
 axes[1, 0].grid(True, alpha=0.3)
 
-axes[1, 1].plot(t, conv_fft, 'g-', linewidth=2, label='FFT method')
-axes[1, 1].plot(t, conv_direct, 'k--', linewidth=1, label='Direct (verify)')
-axes[1, 1].set_title('Convolution Result (f * g)')
+axes[1, 1].plot(t, conv_fft, 'g-', linewidth=2, label=r'FFT method')
+axes[1, 1].plot(t, conv_direct, 'k--', linewidth=1, label=r'Direct (verify)')
+axes[1, 1].set_title(r'Convolution Result $(f * g)$')
 axes[1, 1].legend()
 axes[1, 1].grid(True, alpha=0.3)
 
-plt.suptitle('Convolution Theorem: Spatial vs Frequency Domain', fontsize=14)
+plt.suptitle(r'Convolution Theorem: Spatial vs Frequency Domain', fontsize=14)
 plt.tight_layout()
 plt.savefig('convolution_theorem.png', dpi=150, bbox_inches='tight')
 plt.show()
@@ -478,29 +478,29 @@ fig, axes = plt.subplots(1, 3, figsize=(15, 4))
 
 sample_rates = [50, 12, 7]
 titles = [
-    f'fs = {sample_rates[0]} Hz (well above Nyquist)',
-    f'fs = {sample_rates[1]} Hz (above Nyquist)',
-    f'fs = {sample_rates[2]} Hz (BELOW Nyquist — aliasing!)'
+    rf'$f_s = {sample_rates[0]}$ Hz (well above Nyquist)',
+    rf'$f_s = {sample_rates[1]}$ Hz (above Nyquist)',
+    rf'$f_s = {sample_rates[2]}$ Hz (BELOW Nyquist — aliasing!)'
 ]
 
 for ax, fs, title in zip(axes, sample_rates, titles):
     t_sampled = np.arange(0, 1, 1/fs)
     y_sampled = np.sin(2 * np.pi * f_true * t_sampled)
 
-    ax.plot(t_fine, y_fine, 'b-', alpha=0.3, label=f'True {f_true} Hz signal')
+    ax.plot(t_fine, y_fine, 'b-', alpha=0.3, label=rf'True ${f_true}$ Hz signal')
     ax.stem(t_sampled, y_sampled, linefmt='r-', markerfmt='ro', basefmt='k-',
-            label=f'Samples at {fs} Hz')
+            label=rf'Samples at ${fs}$ Hz')
 
     # Reconstruct by fitting a sine through the samples
     # (simplified: just connect the dots for visual)
     ax.plot(t_sampled, y_sampled, 'r--', alpha=0.5)
 
     ax.set_title(title, fontsize=10)
-    ax.set_xlabel('Time (s)')
+    ax.set_xlabel(r'Time $t$ (s)')
     ax.legend(fontsize=8)
     ax.grid(True, alpha=0.3)
 
-plt.suptitle('Aliasing: What Happens When You Sample Below the Nyquist Rate', fontsize=13)
+plt.suptitle(r'Aliasing: What Happens When You Sample Below the Nyquist Rate', fontsize=13)
 plt.tight_layout()
 plt.savefig('aliasing_demo.png', dpi=150, bbox_inches='tight')
 plt.show()

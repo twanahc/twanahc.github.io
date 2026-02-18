@@ -350,17 +350,17 @@ for ax, n in zip(axes.flatten(), checkpoints):
             'b--', linewidth=1.5, alpha=0.5, label='Prior')
     # Plot posterior
     ax.plot(theta, beta.pdf(theta, a_post, b_post),
-            'r-', linewidth=2.5, label=f'Posterior (n={n})')
+            'r-', linewidth=2.5, label=rf'Posterior ($n={n}$)')
     # True value
-    ax.axvline(x=0.7, color='green', linestyle=':', linewidth=1.5, label='True p=0.7')
+    ax.axvline(x=0.7, color='green', linestyle=':', linewidth=1.5, label=r'True $p=0.7$')
 
-    ax.set_xlabel('θ (coin bias)', fontsize=11)
-    ax.set_ylabel('Density', fontsize=11)
-    ax.set_title(f'After {n} observations ({h}H, {t}T)', fontsize=12)
+    ax.set_xlabel(r'$\theta$ (coin bias)', fontsize=11)
+    ax.set_ylabel(r'Density', fontsize=11)
+    ax.set_title(rf'After ${n}$ observations (${h}$H, ${t}$T)', fontsize=12)
     ax.legend(fontsize=9)
     ax.set_xlim(0, 1)
 
-plt.suptitle('Bayesian Updating: Learning a Coin Bias', fontsize=15, y=1.02)
+plt.suptitle(r'Bayesian Updating: Learning a Coin Bias', fontsize=15, y=1.02)
 plt.tight_layout()
 plt.savefig('bayesian_updating.png', dpi=150, bbox_inches='tight')
 plt.show()
@@ -428,12 +428,12 @@ fig, axes = plt.subplots(1, 2, figsize=(14, 5))
 # Left: data histogram with MLE fit
 axes[0].hist(data, bins=20, density=True, alpha=0.6, color='steelblue', label='Data')
 axes[0].plot(x, norm.pdf(x, true_mu, true_sigma), 'g--', linewidth=2,
-             label=f'True: μ={true_mu}, σ={true_sigma}')
+             label=rf'True: $\mu={true_mu}$, $\sigma={true_sigma}$')
 axes[0].plot(x, norm.pdf(x, mu_mle, sigma_mle), 'r-', linewidth=2,
-             label=f'MLE: μ={mu_mle:.2f}, σ={sigma_mle:.2f}')
-axes[0].set_xlabel('x', fontsize=12)
-axes[0].set_ylabel('Density', fontsize=12)
-axes[0].set_title('MLE Fit to Data', fontsize=14)
+             label=rf'MLE: $\mu={mu_mle:.2f}$, $\sigma={sigma_mle:.2f}$')
+axes[0].set_xlabel(r'$x$', fontsize=12)
+axes[0].set_ylabel(r'Density', fontsize=12)
+axes[0].set_title(r'MLE Fit to Data', fontsize=14)
 axes[0].legend(fontsize=11)
 
 # Right: log-likelihood surface
@@ -446,11 +446,11 @@ for i in range(len(sigma_range)):
         LL[i, j] = np.sum(norm.logpdf(data, MU[i, j], SIGMA[i, j]))
 
 axes[1].contour(MU, SIGMA, LL, levels=30, cmap='RdYlBu_r')
-axes[1].plot(mu_mle, sigma_mle, 'r*', markersize=15, label='MLE')
-axes[1].plot(true_mu, true_sigma, 'g^', markersize=12, label='True')
-axes[1].set_xlabel('μ', fontsize=12)
-axes[1].set_ylabel('σ', fontsize=12)
-axes[1].set_title('Log-Likelihood Surface', fontsize=14)
+axes[1].plot(mu_mle, sigma_mle, 'r*', markersize=15, label=r'MLE $\hat{\theta}$')
+axes[1].plot(true_mu, true_sigma, 'g^', markersize=12, label=r'True $\theta^*$')
+axes[1].set_xlabel(r'$\mu$', fontsize=12)
+axes[1].set_ylabel(r'$\sigma$', fontsize=12)
+axes[1].set_title(r'Log-Likelihood Surface', fontsize=14)
 axes[1].legend(fontsize=11)
 
 plt.tight_layout()
@@ -519,12 +519,12 @@ for row, (dist_name, sampler) in enumerate(distributions.items()):
         ax.plot(x, norm.pdf(x, mu, sigma), 'r-', linewidth=2)
 
         if row == 0:
-            ax.set_title(f'n = {n}', fontsize=13)
+            ax.set_title(rf'$n = {n}$', fontsize=13)
         if col == 0:
             ax.set_ylabel(dist_name, fontsize=11)
         ax.set_yticks([])
 
-plt.suptitle('Central Limit Theorem: Sample Means Converge to Gaussian',
+plt.suptitle(r'Central Limit Theorem: Sample Means $\bar{X}_n$ Converge to Gaussian',
              fontsize=15, y=1.01)
 plt.tight_layout()
 plt.savefig('clt_convergence.png', dpi=150, bbox_inches='tight')

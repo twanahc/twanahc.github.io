@@ -879,9 +879,9 @@ ax = axes[0, 0]
 window = 100
 smoothed = np.convolve(losses_ot, np.ones(window)/window, mode='valid')
 ax.semilogy(smoothed, color='#1E88E5', linewidth=0.8)
-ax.set_xlabel('Training step')
-ax.set_ylabel('Loss')
-ax.set_title('OT Flow Matching: Training Loss')
+ax.set_xlabel(r'Training Step')
+ax.set_ylabel(r'Loss $\mathcal{L}$')
+ax.set_title(r'OT Flow Matching: Training Loss')
 ax.grid(True, alpha=0.3)
 
 # Panel 2: Flow trajectories (OT)
@@ -909,7 +909,7 @@ for j in range(n_traj):
 # Show target distribution
 x1_show = sample_target(500)
 ax.scatter(x1_show[:, 0], x1_show[:, 1], s=5, c='red', alpha=0.3, zorder=5)
-ax.set_title('OT Flow: Learned Trajectories')
+ax.set_title(r'OT Flow: Learned Trajectories')
 ax.set_xlim(-7, 7)
 ax.set_ylim(-7, 7)
 ax.set_aspect('equal')
@@ -923,7 +923,7 @@ for n_steps_sample, color, label in [(1, '#E53935', '1 step'),
                                       (50, '#1E88E5', '50 steps')]:
     samples, _ = sample_ode(model_ot, 800, n_steps_sample, schedule='ot')
     ax.scatter(samples[:, 0], samples[:, 1], s=3, alpha=0.4, c=color, label=label)
-ax.set_title('OT Flow: Sample Quality vs Steps')
+ax.set_title(r'OT Flow: Sample Quality vs. Steps')
 ax.set_xlim(-7, 7)
 ax.set_ylim(-7, 7)
 ax.set_aspect('equal')
@@ -936,9 +936,9 @@ ax.grid(True, alpha=0.2)
 ax = axes[1, 0]
 smoothed_vp = np.convolve(losses_vp, np.ones(window)/window, mode='valid')
 ax.semilogy(smoothed_vp, color='#E53935', linewidth=0.8)
-ax.set_xlabel('Training step')
-ax.set_ylabel('Loss')
-ax.set_title('VP-style Flow: Training Loss')
+ax.set_xlabel(r'Training Step')
+ax.set_ylabel(r'Loss $\mathcal{L}$')
+ax.set_title(r'VP-style Flow: Training Loss')
 ax.grid(True, alpha=0.3)
 
 # Panel 5: Flow trajectories (VP)
@@ -962,7 +962,7 @@ for j in range(n_traj):
                 color=colors_line[k], linewidth=0.5, alpha=0.6)
 
 ax.scatter(x1_show[:, 0], x1_show[:, 1], s=5, c='red', alpha=0.3, zorder=5)
-ax.set_title('VP-style Flow: Learned Trajectories (Curved)')
+ax.set_title(r'VP-style Flow: Learned Trajectories (Curved)')
 ax.set_xlim(-7, 7)
 ax.set_ylim(-7, 7)
 ax.set_aspect('equal')
@@ -976,7 +976,7 @@ for n_steps_sample, color, label in [(1, '#E53935', '1 step'),
                                       (50, '#1E88E5', '50 steps')]:
     samples_vp, _ = sample_ode(model_vp, 800, n_steps_sample, schedule='vp')
     ax.scatter(samples_vp[:, 0], samples_vp[:, 1], s=3, alpha=0.4, c=color, label=label)
-ax.set_title('VP-style Flow: Sample Quality vs Steps')
+ax.set_title(r'VP-style Flow: Sample Quality vs. Steps')
 ax.set_xlim(-7, 7)
 ax.set_ylim(-7, 7)
 ax.set_aspect('equal')
@@ -1045,24 +1045,24 @@ samples_reflow_1, _ = sample_ode(model_reflow, 2000, 1)
 x1_ref = sample_target(2000)
 
 ax = axes[0]
-ax.scatter(x1_ref[:, 0], x1_ref[:, 1], s=5, alpha=0.5, c='#1E88E5', label='Target')
-ax.set_title('Target Distribution')
+ax.scatter(x1_ref[:, 0], x1_ref[:, 1], s=5, alpha=0.5, c='#1E88E5', label=r'Target')
+ax.set_title(r'Target Distribution')
 ax.set_xlim(-7, 7); ax.set_ylim(-7, 7); ax.set_aspect('equal')
 ax.legend(fontsize=10); ax.grid(True, alpha=0.2)
 
 ax = axes[1]
 ax.scatter(samples_orig_1[:, 0], samples_orig_1[:, 1], s=5, alpha=0.5, c='#E53935')
-ax.set_title('Original Flow: 1 Euler Step')
+ax.set_title(r'Original Flow: 1 Euler Step')
 ax.set_xlim(-7, 7); ax.set_ylim(-7, 7); ax.set_aspect('equal')
 ax.grid(True, alpha=0.2)
 
 ax = axes[2]
 ax.scatter(samples_reflow_1[:, 0], samples_reflow_1[:, 1], s=5, alpha=0.5, c='#43A047')
-ax.set_title('After Reflow: 1 Euler Step')
+ax.set_title(r'After Reflow: 1 Euler Step')
 ax.set_xlim(-7, 7); ax.set_ylim(-7, 7); ax.set_aspect('equal')
 ax.grid(True, alpha=0.2)
 
-plt.suptitle('Reflow Straightens Paths for 1-Step Generation', fontsize=14, y=1.02)
+plt.suptitle(r'Reflow Straightens Paths for 1-Step Generation', fontsize=14, y=1.02)
 plt.tight_layout()
 plt.savefig('reflow_comparison.png', dpi=150, bbox_inches='tight')
 plt.show()

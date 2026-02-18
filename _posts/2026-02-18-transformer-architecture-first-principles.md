@@ -756,24 +756,24 @@ fig, axes = plt.subplots(1, 3, figsize=(18, 5))
 
 # 1. Raw attention scores (before softmax)
 im0 = axes[0].imshow(raw_scores, cmap="RdBu_r", aspect="equal")
-axes[0].set_title("Raw Scores (QK^T / sqrt(d_k))", fontsize=13, fontweight="bold")
+axes[0].set_title(r"Raw Scores $QK^T / \sqrt{d_k}$", fontsize=13, fontweight="bold")
 axes[0].set_xticks(range(n))
 axes[0].set_yticks(range(n))
 axes[0].set_xticklabels(tokens, fontsize=11)
 axes[0].set_yticklabels(tokens, fontsize=11)
-axes[0].set_xlabel("Key (attending to)")
-axes[0].set_ylabel("Query (attending from)")
+axes[0].set_xlabel(r"Key (attending to)")
+axes[0].set_ylabel(r"Query (attending from)")
 plt.colorbar(im0, ax=axes[0], fraction=0.046)
 
 # 2. Attention weights (after softmax)
 im1 = axes[1].imshow(weights, cmap="Blues", aspect="equal", vmin=0, vmax=1)
-axes[1].set_title("Attention Weights (after softmax)", fontsize=13, fontweight="bold")
+axes[1].set_title(r"Attention Weights (after softmax)", fontsize=13, fontweight="bold")
 axes[1].set_xticks(range(n))
 axes[1].set_yticks(range(n))
 axes[1].set_xticklabels(tokens, fontsize=11)
 axes[1].set_yticklabels(tokens, fontsize=11)
-axes[1].set_xlabel("Key (attending to)")
-axes[1].set_ylabel("Query (attending from)")
+axes[1].set_xlabel(r"Key (attending to)")
+axes[1].set_ylabel(r"Query (attending from)")
 for i in range(n):
     for j in range(n):
         axes[1].text(j, i, f"{weights[i,j]:.2f}", ha="center", va="center",
@@ -793,13 +793,13 @@ for dk in d_k_values:
     score_stds_scaled.append(np.std(dots / np.sqrt(dk)))
 
 axes[2].plot(d_k_values, score_stds_unscaled, "o-", color="#dc2626",
-             linewidth=2, markersize=8, label="Unscaled: std(q·k)")
+             linewidth=2, markersize=8, label=r"Unscaled: $\mathrm{std}(q \cdot k)$")
 axes[2].plot(d_k_values, score_stds_scaled, "s-", color="#2563eb",
-             linewidth=2, markersize=8, label="Scaled: std(q·k / sqrt(d_k))")
-axes[2].axhline(y=1.0, color="#16a34a", linestyle="--", linewidth=1.5, label="Target std = 1")
-axes[2].set_xlabel("d_k (key dimension)", fontsize=12)
-axes[2].set_ylabel("Standard deviation of scores", fontsize=12)
-axes[2].set_title("Why sqrt(d_k) Scaling Matters", fontsize=13, fontweight="bold")
+             linewidth=2, markersize=8, label=r"Scaled: $\mathrm{std}(q \cdot k / \sqrt{d_k})$")
+axes[2].axhline(y=1.0, color="#16a34a", linestyle="--", linewidth=1.5, label=r"Target $\mathrm{std} = 1$")
+axes[2].set_xlabel(r"$d_k$ (key dimension)", fontsize=12)
+axes[2].set_ylabel(r"Standard Deviation of Scores", fontsize=12)
+axes[2].set_title(r"Why $\sqrt{d_k}$ Scaling Matters", fontsize=13, fontweight="bold")
 axes[2].legend(fontsize=11)
 axes[2].set_xscale("log")
 axes[2].grid(True, alpha=0.3)
@@ -870,7 +870,7 @@ for head_idx in range(h):
             axes[head_idx].text(j, i, f"{w:.2f}", ha="center", va="center",
                                 fontsize=8, color="white" if w > 0.4 else "black")
 
-plt.suptitle("Multi-Head Attention: Each Head Learns Different Patterns",
+plt.suptitle(r"Multi-Head Attention: Each Head Learns Different Patterns",
              fontsize=14, fontweight="bold", y=1.02)
 plt.tight_layout()
 plt.savefig("multihead_demo.png", dpi=150, bbox_inches="tight")

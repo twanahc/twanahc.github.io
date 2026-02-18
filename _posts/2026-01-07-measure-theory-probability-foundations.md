@@ -385,19 +385,19 @@ xs = np.array(sorted(set(
 )))
 ys = np.array([thomae(x) for x in xs])
 ax1.scatter(xs, ys, s=0.5, c='#4488cc', alpha=0.6)
-ax1.set_title("Thomae's Function on [0, 1]", fontsize=13)
-ax1.set_xlabel("x")
-ax1.set_ylabel("f(x)")
+ax1.set_title(r"Thomae's Function on $[0, 1]$", fontsize=13)
+ax1.set_xlabel(r'$x$')
+ax1.set_ylabel(r'$f(x)$')
 ax1.set_ylim(-0.05, 1.05)
 
 # Right: Riemann upper/lower sums vs partition size
 ax2 = axes[1]
-ax2.semilogx(partition_sizes, upper_sums, 'o-', color='#cc3333', label='Upper Riemann sum', linewidth=2)
-ax2.semilogx(partition_sizes, lower_sums, 's-', color='#339933', label='Lower Riemann sum', linewidth=2)
-ax2.axhline(y=lebesgue_value, color='#cc7733', linestyle='--', linewidth=2, label=f'Lebesgue integral = {lebesgue_value}')
-ax2.set_title("Riemann Sums vs Lebesgue Integral", fontsize=13)
-ax2.set_xlabel("Number of partitions")
-ax2.set_ylabel("Integral estimate")
+ax2.semilogx(partition_sizes, upper_sums, 'o-', color='#cc3333', label=r'Upper Riemann sum', linewidth=2)
+ax2.semilogx(partition_sizes, lower_sums, 's-', color='#339933', label=r'Lower Riemann sum', linewidth=2)
+ax2.axhline(y=lebesgue_value, color='#cc7733', linestyle='--', linewidth=2, label=r'Lebesgue integral $= $' + f'{lebesgue_value}')
+ax2.set_title(r'Riemann Sums vs Lebesgue Integral', fontsize=13)
+ax2.set_xlabel(r'Number of partitions $n$')
+ax2.set_ylabel(r'Integral estimate')
 ax2.legend(fontsize=11)
 ax2.set_ylim(-0.1, 1.0)
 
@@ -537,12 +537,12 @@ for i, n in enumerate([1, 2, 3, 5, 8, 12, 20, 50]):
     # f_n(x) = min(x^2, n) -- increasing sequence converging to x^2
     fn = np.minimum(x**2, n)
     integral_n = np.trapz(fn, x)
-    ax1.plot(x, fn, color=colors[i], label=f'n={n}, ∫={integral_n:.1f}', linewidth=1.5)
+    ax1.plot(x, fn, color=colors[i], label=r'$n=$' + f'{n}' + r', $\int=$' + f'{integral_n:.1f}', linewidth=1.5)
 
-ax1.plot(x, x**2, 'k--', linewidth=2, label='$f(x) = x^2$')
-ax1.set_title('Monotone Convergence Theorem', fontsize=13)
-ax1.set_xlabel('x')
-ax1.set_ylabel('$f_n(x)$')
+ax1.plot(x, x**2, 'k--', linewidth=2, label=r'$f(x) = x^2$')
+ax1.set_title(r'Monotone Convergence Theorem', fontsize=13)
+ax1.set_xlabel(r'$x$')
+ax1.set_ylabel(r'$f_n(x)$')
 ax1.set_ylim(0, 30)
 ax1.legend(fontsize=8, loc='upper left')
 
@@ -554,13 +554,13 @@ for i, n in enumerate([1, 2, 4, 8, 16]):
     # f_n = n * indicator of [n, n + 1/n] -- integral = 1 always
     fn = np.where((x >= n) & (x <= n + 1.0/n), n, 0)
     color = colors[i] if i < len(colors) else 'black'
-    ax2.plot(x, fn, color=color, label=f'n={n}, ∫={np.trapz(fn, x):.2f}', linewidth=2)
+    ax2.plot(x, fn, color=color, label=r'$n=$' + f'{n}' + r', $\int=$' + f'{np.trapz(fn, x):.2f}', linewidth=2)
 
-ax2.set_title("Fatou's Lemma: Mass Escapes to ∞", fontsize=13)
-ax2.set_xlabel('x')
-ax2.set_ylabel('$f_n(x)$')
+ax2.set_title(r"Fatou's Lemma: Mass Escapes to $\infty$", fontsize=13)
+ax2.set_xlabel(r'$x$')
+ax2.set_ylabel(r'$f_n(x)$')
 ax2.legend(fontsize=9)
-ax2.annotate('$f_n \\to 0$ pointwise\nbut $\\int f_n = 1$ always!',
+ax2.annotate(r'$f_n \to 0$ pointwise' + '\n' + r'but $\int f_n = 1$ always!',
             xy=(10, 6), fontsize=11, color='#cc3333',
             bbox=dict(boxstyle='round', facecolor='wheat', alpha=0.5))
 
@@ -576,11 +576,11 @@ for n in ns:
     fn = np.sin(n * x) / n * np.exp(-x**2 / 2)
     integrals.append(np.trapz(fn, x))
 
-ax3.plot(ns, integrals, 'o-', color='#4488cc', markersize=3, linewidth=1.5, label='$\\int f_n \\, d\\mu$')
-ax3.axhline(y=0, color='#cc3333', linestyle='--', linewidth=2, label='$\\int \\lim f_n = 0$')
-ax3.set_title('DCT: $f_n = \\frac{\\sin(nx)}{n} e^{-x^2/2}$', fontsize=13)
-ax3.set_xlabel('n')
-ax3.set_ylabel('$\\int f_n$')
+ax3.plot(ns, integrals, 'o-', color='#4488cc', markersize=3, linewidth=1.5, label=r'$\int f_n \, d\mu$')
+ax3.axhline(y=0, color='#cc3333', linestyle='--', linewidth=2, label=r'$\int \lim f_n = 0$')
+ax3.set_title(r'DCT: $f_n = \frac{\sin(nx)}{n} e^{-x^2/2}$', fontsize=13)
+ax3.set_xlabel(r'$n$')
+ax3.set_ylabel(r'$\int f_n \, d\mu$')
 ax3.legend(fontsize=11)
 
 plt.tight_layout()

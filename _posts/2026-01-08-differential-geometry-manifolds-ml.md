@@ -339,7 +339,7 @@ ax1.plot_wireframe(xs, ys, zs, alpha=0.15, color='gray', linewidth=0.5)
 # Start point: (theta0, phi0)
 theta0, phi0 = np.pi/4, 0.0
 p0 = spherical_to_cartesian(theta0, phi0)
-ax1.scatter(*p0, color='red', s=80, zorder=5, label='Start point')
+ax1.scatter(*p0, color='red', s=80, zorder=5, label=r'Start point $p$')
 
 # Shoot geodesics in different directions
 colors = plt.cm.viridis(np.linspace(0.1, 0.9, 8))
@@ -353,7 +353,7 @@ for i, angle in enumerate(np.linspace(0, 2*np.pi, 8, endpoint=False)):
     gx, gy, gz = spherical_to_cartesian(sol.y[0], sol.y[1])
     ax1.plot(gx, gy, gz, color=colors[i], linewidth=2)
 
-ax1.set_title('Geodesics on S² from a Point', fontsize=13)
+ax1.set_title(r'Geodesics on $S^2$ from a Point', fontsize=13)
 ax1.set_xlim([-1.2, 1.2]); ax1.set_ylim([-1.2, 1.2]); ax1.set_zlim([-1.2, 1.2])
 ax1.legend(fontsize=9)
 
@@ -369,19 +369,19 @@ geodesic_dists = angular_seps  # On unit sphere, geodesic distance = angle
 euclidean_dists = 2 * np.sin(angular_seps / 2)  # Chord length
 
 ax2.plot(np.degrees(angular_seps), geodesic_dists, '-', color='#cc3333',
-         linewidth=2.5, label='Geodesic distance (arc)')
+         linewidth=2.5, label=r'Geodesic distance (arc)')
 ax2.plot(np.degrees(angular_seps), euclidean_dists, '--', color='#4488cc',
-         linewidth=2.5, label='Euclidean distance (chord)')
+         linewidth=2.5, label=r'Euclidean distance (chord)')
 ax2.fill_between(np.degrees(angular_seps), euclidean_dists, geodesic_dists,
-                 alpha=0.15, color='orange', label='Discrepancy')
-ax2.set_xlabel('Angular separation (degrees)', fontsize=12)
-ax2.set_ylabel('Distance', fontsize=12)
-ax2.set_title('Geodesic vs Euclidean Distance on S²', fontsize=13)
+                 alpha=0.15, color='orange', label=r'Discrepancy')
+ax2.set_xlabel(r'Angular separation (degrees)', fontsize=12)
+ax2.set_ylabel(r'Distance', fontsize=12)
+ax2.set_title(r'Geodesic vs Euclidean Distance on $S^2$', fontsize=13)
 ax2.legend(fontsize=11)
 ax2.grid(True, alpha=0.3)
 
 # Annotate the maximum discrepancy
-ax2.annotate('At antipodes:\ngeodesic = π ≈ 3.14\nEuclidean = 2',
+ax2.annotate(r'At antipodes:' + '\n' + r'geodesic $= \pi \approx 3.14$' + '\n' + r'Euclidean $= 2$',
             xy=(180, 2), xytext=(120, 2.6),
             arrowprops=dict(arrowstyle='->', color='black'),
             fontsize=10, bbox=dict(boxstyle='round', facecolor='wheat', alpha=0.5))
@@ -588,13 +588,13 @@ for i, r in enumerate(np.linspace(0.3, 2.5, n_rings)):
     ax1.plot(np.append(phis_exp, phis_exp[0]),
              np.append(thetas_exp, thetas_exp[0]),
              '-', color=colors_ring[i], linewidth=1.5,
-             label=f'r={r:.1f}' if i % 2 == 0 else None)
+             label=r'$r=$' + f'{r:.1f}' if i % 2 == 0 else None)
 
 # Base point
-ax1.plot(phi0, theta0, 'ro', markersize=10, zorder=5, label='Base point p')
-ax1.set_xlabel('φ (azimuthal)', fontsize=12)
-ax1.set_ylabel('θ (polar)', fontsize=12)
-ax1.set_title('Exponential Map on S²\n(concentric circles in T_pM mapped to S²)', fontsize=13)
+ax1.plot(phi0, theta0, 'ro', markersize=10, zorder=5, label=r'Base point $p$')
+ax1.set_xlabel(r'$\varphi$ (azimuthal)', fontsize=12)
+ax1.set_ylabel(r'$\theta$ (polar)', fontsize=12)
+ax1.set_title(r'Exponential Map on $S^2$' + '\n' + r'(concentric circles in $T_pM$ mapped to $S^2$)', fontsize=13)
 ax1.legend(fontsize=9)
 ax1.invert_yaxis()
 ax1.set_xlim(-1, 2*np.pi+1)
@@ -622,17 +622,17 @@ for r in radii:
     euclidean_dists.append(np.linalg.norm(p2 - p1))
 
 ax2.plot(radii, radii, '-', color='#cc3333', linewidth=2.5,
-         label='Tangent space distance (||v||)')
+         label=r'Tangent space distance $\|v\|$')
 ax2.plot(radii, radii, '--', color='#339933', linewidth=2.5,
-         label='Geodesic distance (= ||v||)', alpha=0.7)
+         label=r'Geodesic distance ($= \|v\|$)', alpha=0.7)
 ax2.plot(radii, euclidean_dists, '-.', color='#4488cc', linewidth=2.5,
-         label='Euclidean (chord) distance')
-ax2.set_xlabel('Tangent vector norm ||v||', fontsize=12)
-ax2.set_ylabel('Distance', fontsize=12)
-ax2.set_title('Tangent Space vs Geodesic vs Euclidean', fontsize=13)
+         label=r'Euclidean (chord) distance')
+ax2.set_xlabel(r'Tangent vector norm $\|v\|$', fontsize=12)
+ax2.set_ylabel(r'Distance', fontsize=12)
+ax2.set_title(r'Tangent Space vs Geodesic vs Euclidean', fontsize=13)
 ax2.legend(fontsize=11)
 ax2.grid(True, alpha=0.3)
-ax2.annotate('Exp map preserves\ngeodesic distance\nby construction',
+ax2.annotate(r'$\exp_p$ preserves' + '\n' + r'geodesic distance' + '\n' + r'by construction',
             xy=(1.5, 1.5), xytext=(2.0, 0.8),
             arrowprops=dict(arrowstyle='->', color='black'),
             fontsize=10, bbox=dict(boxstyle='round', facecolor='wheat', alpha=0.5))

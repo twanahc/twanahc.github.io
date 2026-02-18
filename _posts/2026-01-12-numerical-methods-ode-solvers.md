@@ -413,20 +413,20 @@ fig = plt.figure(figsize=(16, 6))
 
 ax1 = fig.add_subplot(131, projection='3d')
 ax1.plot(y_ref[:, 0], y_ref[:, 1], y_ref[:, 2], color='#2196F3', linewidth=0.5, alpha=0.8)
-ax1.set_title('Reference (RK4, h=0.001)', fontsize=11)
-ax1.set_xlabel('x'); ax1.set_ylabel('y'); ax1.set_zlabel('z')
+ax1.set_title(r'Reference (RK4, $h=0.001$)', fontsize=11)
+ax1.set_xlabel(r'$x$'); ax1.set_ylabel(r'$y$'); ax1.set_zlabel(r'$z$')
 
 ax2 = fig.add_subplot(132, projection='3d')
 ax2.plot(y_rk4[:, 0], y_rk4[:, 1], y_rk4[:, 2], color='#4CAF50', linewidth=0.5, alpha=0.8)
-ax2.set_title('RK4, h=0.01', fontsize=11)
-ax2.set_xlabel('x'); ax2.set_ylabel('y'); ax2.set_zlabel('z')
+ax2.set_title(r'RK4, $h=0.01$', fontsize=11)
+ax2.set_xlabel(r'$x$'); ax2.set_ylabel(r'$y$'); ax2.set_zlabel(r'$z$')
 
 ax3 = fig.add_subplot(133, projection='3d')
 ax3.plot(y_euler[:, 0], y_euler[:, 1], y_euler[:, 2], color='#F44336', linewidth=0.5, alpha=0.8)
-ax3.set_title('Euler, h=0.01', fontsize=11)
-ax3.set_xlabel('x'); ax3.set_ylabel('y'); ax3.set_zlabel('z')
+ax3.set_title(r'Euler, $h=0.01$', fontsize=11)
+ax3.set_xlabel(r'$x$'); ax3.set_ylabel(r'$y$'); ax3.set_zlabel(r'$z$')
 
-plt.suptitle('Lorenz System: Method Comparison', fontsize=14)
+plt.suptitle(r'Lorenz System: Method Comparison', fontsize=14)
 plt.tight_layout()
 plt.savefig('lorenz_comparison.png', dpi=150, bbox_inches='tight')
 plt.show()
@@ -434,12 +434,12 @@ plt.show()
 # Time series comparison (x-component)
 fig, axes = plt.subplots(2, 1, figsize=(14, 8))
 
-axes[0].plot(t_ref, y_ref[:, 0], color='#2196F3', linewidth=1, label='Reference (RK4 h=0.001)')
-axes[0].plot(t_rk4, y_rk4[:, 0], color='#4CAF50', linewidth=1, linestyle='--', label='RK4 h=0.01')
-axes[0].plot(t_euler, y_euler[:, 0], color='#F44336', linewidth=1, linestyle=':', label='Euler h=0.01')
-axes[0].set_xlabel('Time')
-axes[0].set_ylabel('x(t)')
-axes[0].set_title('Lorenz x-component: Euler diverges from true solution')
+axes[0].plot(t_ref, y_ref[:, 0], color='#2196F3', linewidth=1, label=r'Reference (RK4 $h=0.001$)')
+axes[0].plot(t_rk4, y_rk4[:, 0], color='#4CAF50', linewidth=1, linestyle='--', label=r'RK4 $h=0.01$')
+axes[0].plot(t_euler, y_euler[:, 0], color='#F44336', linewidth=1, linestyle=':', label=r'Euler $h=0.01$')
+axes[0].set_xlabel(r'Time $t$')
+axes[0].set_ylabel(r'$x(t)$')
+axes[0].set_title(r'Lorenz $x$-component: Euler diverges from true solution')
 axes[0].legend()
 axes[0].grid(True, alpha=0.3)
 
@@ -451,11 +451,11 @@ y_ref_interp = interp1d(t_ref, y_ref[:, 0])(t_common)
 error_rk4 = np.abs(y_rk4[:, 0] - y_ref_interp)
 error_euler = np.abs(y_euler[:, 0] - y_ref_interp)
 
-axes[1].semilogy(t_common, error_rk4 + 1e-16, color='#4CAF50', linewidth=1, label='RK4 h=0.01 error')
-axes[1].semilogy(t_common, error_euler + 1e-16, color='#F44336', linewidth=1, label='Euler h=0.01 error')
-axes[1].set_xlabel('Time')
-axes[1].set_ylabel('|Error| (log scale)')
-axes[1].set_title('Error Growth: Euler error grows orders of magnitude faster')
+axes[1].semilogy(t_common, error_rk4 + 1e-16, color='#4CAF50', linewidth=1, label=r'RK4 $h=0.01$ error')
+axes[1].semilogy(t_common, error_euler + 1e-16, color='#F44336', linewidth=1, label=r'Euler $h=0.01$ error')
+axes[1].set_xlabel(r'Time $t$')
+axes[1].set_ylabel(r'$|\mathrm{Error}|$ (log scale)')
+axes[1].set_title(r'Error Growth: Euler error grows orders of magnitude faster')
 axes[1].legend()
 axes[1].grid(True, alpha=0.3)
 
@@ -484,36 +484,36 @@ def plot_stability_regions():
     R_euler = np.abs(1 + Z)
     axes[0, 0].contourf(X, Y, R_euler, levels=[0, 1], colors=['#BBDEFB'], alpha=0.7)
     axes[0, 0].contour(X, Y, R_euler, levels=[1], colors=['#2196F3'], linewidths=2)
-    axes[0, 0].set_title('Forward Euler (Order 1)', fontsize=13)
+    axes[0, 0].set_title(r'Forward Euler (Order 1)', fontsize=13)
 
     # Implicit Euler: R(z) = 1/(1 - z), stable when |1-z| >= 1
     R_implicit = np.abs(1.0 / (1.0 - Z))
     axes[0, 1].contourf(X, Y, R_implicit, levels=[0, 1], colors=['#C8E6C9'], alpha=0.7)
     axes[0, 1].contour(X, Y, R_implicit, levels=[1], colors=['#4CAF50'], linewidths=2)
-    axes[0, 1].set_title('Implicit Euler (Order 1, A-stable)', fontsize=13)
+    axes[0, 1].set_title(r'Implicit Euler (Order 1, $A$-stable)', fontsize=13)
 
     # RK2 (Midpoint): R(z) = 1 + z + z^2/2
     R_rk2 = np.abs(1 + Z + Z**2/2)
     axes[1, 0].contourf(X, Y, R_rk2, levels=[0, 1], colors=['#FFE0B2'], alpha=0.7)
     axes[1, 0].contour(X, Y, R_rk2, levels=[1], colors=['#FF9800'], linewidths=2)
-    axes[1, 0].set_title('RK2 / Midpoint (Order 2)', fontsize=13)
+    axes[1, 0].set_title(r'RK2 / Midpoint (Order 2)', fontsize=13)
 
     # RK4: R(z) = 1 + z + z^2/2 + z^3/6 + z^4/24
     R_rk4 = np.abs(1 + Z + Z**2/2 + Z**3/6 + Z**4/24)
     axes[1, 1].contourf(X, Y, R_rk4, levels=[0, 1], colors=['#E1BEE7'], alpha=0.7)
     axes[1, 1].contour(X, Y, R_rk4, levels=[1], colors=['#9C27B0'], linewidths=2)
-    axes[1, 1].set_title('RK4 (Order 4)', fontsize=13)
+    axes[1, 1].set_title(r'RK4 (Order 4)', fontsize=13)
 
     for ax in axes.flat:
         ax.axhline(y=0, color='gray', linewidth=0.5)
         ax.axvline(x=0, color='gray', linewidth=0.5)
-        ax.set_xlabel('Re(hλ)', fontsize=11)
-        ax.set_ylabel('Im(hλ)', fontsize=11)
+        ax.set_xlabel(r'$\mathrm{Re}(h\lambda)$', fontsize=11)
+        ax.set_ylabel(r'$\mathrm{Im}(h\lambda)$', fontsize=11)
         ax.set_aspect('equal')
         ax.grid(True, alpha=0.2)
         ax.plot(0, 0, 'ko', markersize=3)
 
-    plt.suptitle('Stability Regions (shaded = stable)', fontsize=15, y=1.01)
+    plt.suptitle(r'Stability Regions (shaded = stable)', fontsize=15, y=1.01)
     plt.tight_layout()
     plt.savefig('stability_regions.png', dpi=150, bbox_inches='tight')
     plt.show()
@@ -578,10 +578,10 @@ fig, axes = plt.subplots(1, 2, figsize=(15, 6))
 # Left: overlaid snapshots
 colors = plt.cm.coolwarm(np.linspace(0, 1, len(snapshots)))
 for i, (snap, t) in enumerate(zip(snapshots, times)):
-    axes[0].plot(x, snap, color=colors[i], linewidth=1.5, label=f't = {t:.3f}')
-axes[0].set_xlabel('x', fontsize=12)
-axes[0].set_ylabel('u(x, t)', fontsize=12)
-axes[0].set_title('Heat Equation: Temperature Evolution', fontsize=13)
+    axes[0].plot(x, snap, color=colors[i], linewidth=1.5, label=rf'$t = {t:.3f}$')
+axes[0].set_xlabel(r'$x$', fontsize=12)
+axes[0].set_ylabel(r'$u(x, t)$', fontsize=12)
+axes[0].set_title(r'Heat Equation: Temperature Evolution', fontsize=13)
 axes[0].legend(fontsize=9)
 axes[0].grid(True, alpha=0.3)
 
@@ -611,10 +611,10 @@ t_vals = np.arange(0, len(history)) * save_every * dt
 
 im = axes[1].imshow(history.T, aspect='auto', origin='lower',
                      extent=[0, T_final, 0, L], cmap='hot')
-axes[1].set_xlabel('Time', fontsize=12)
-axes[1].set_ylabel('Position x', fontsize=12)
-axes[1].set_title('Heat Equation: Spacetime Diagram', fontsize=13)
-plt.colorbar(im, ax=axes[1], label='Temperature u(x,t)')
+axes[1].set_xlabel(r'Time $t$', fontsize=12)
+axes[1].set_ylabel(r'Position $x$', fontsize=12)
+axes[1].set_title(r'Heat Equation: Spacetime Diagram', fontsize=13)
+plt.colorbar(im, ax=axes[1], label=r'Temperature $u(x,t)$')
 
 plt.tight_layout()
 plt.savefig('heat_equation.png', dpi=150, bbox_inches='tight')
@@ -656,13 +656,13 @@ for h in step_sizes:
     y[0] = y0
     for i in range(len(t)-1):
         y[i+1] = euler_step(y[i], h, lam)
-    axes[0].plot(t, y, 'o-', markersize=3, label=f'h = {h}')
+    axes[0].plot(t, y, 'o-', markersize=3, label=rf'$h = {h}$')
 
 t_exact = np.linspace(0, T, 200)
-axes[0].plot(t_exact, exact_exponential(t_exact), 'k-', linewidth=2, label='Exact')
-axes[0].set_title("Euler Method: Effect of Step Size", fontsize=13)
-axes[0].set_xlabel('t', fontsize=12)
-axes[0].set_ylabel('y(t)', fontsize=12)
+axes[0].plot(t_exact, exact_exponential(t_exact), 'k-', linewidth=2, label=r'Exact')
+axes[0].set_title(r"Euler Method: Effect of Step Size $h$", fontsize=13)
+axes[0].set_xlabel(r'$t$', fontsize=12)
+axes[0].set_ylabel(r'$y(t)$', fontsize=12)
 axes[0].legend(fontsize=9)
 axes[0].grid(True, alpha=0.3)
 
@@ -685,17 +685,17 @@ for h in step_sizes_fine:
         y_r = rk4_step(y_r, h, lam)
     rk4_errors.append(abs(y_r - exact_exponential(T)))
 
-axes[1].loglog(step_sizes_fine, euler_errors, 'o-', color='#F44336', label='Euler (order 1)')
-axes[1].loglog(step_sizes_fine, rk4_errors, 's-', color='#4CAF50', label='RK4 (order 4)')
+axes[1].loglog(step_sizes_fine, euler_errors, 'o-', color='#F44336', label=r'Euler (order 1)')
+axes[1].loglog(step_sizes_fine, rk4_errors, 's-', color='#4CAF50', label=r'RK4 (order 4)')
 
 # Reference slopes
 h_ref = np.array([step_sizes_fine[0], step_sizes_fine[-1]])
-axes[1].loglog(h_ref, 0.5*h_ref**1, 'r--', alpha=0.5, label='slope 1')
-axes[1].loglog(h_ref, 5*h_ref**4, 'g--', alpha=0.5, label='slope 4')
+axes[1].loglog(h_ref, 0.5*h_ref**1, 'r--', alpha=0.5, label=r'Slope 1')
+axes[1].loglog(h_ref, 5*h_ref**4, 'g--', alpha=0.5, label=r'Slope 4')
 
-axes[1].set_xlabel('Step size h', fontsize=12)
-axes[1].set_ylabel('Global error at t=3', fontsize=12)
-axes[1].set_title('Convergence: Error vs Step Size', fontsize=13)
+axes[1].set_xlabel(r'Step size $h$', fontsize=12)
+axes[1].set_ylabel(r'Global error at $t=3$', fontsize=12)
+axes[1].set_title(r'Convergence: Error vs Step Size', fontsize=13)
 axes[1].legend(fontsize=10)
 axes[1].grid(True, alpha=0.3, which='both')
 

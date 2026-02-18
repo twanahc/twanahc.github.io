@@ -566,24 +566,24 @@ fig, axes = plt.subplots(1, 2, figsize=(14, 5))
 
 # Loss vs Parameters
 axes[0].loglog(N_range, L_N - L_inf, color='#4fc3f7', linewidth=2.5)
-axes[0].set_xlabel('Parameters N', fontsize=13)
-axes[0].set_ylabel('Reducible Loss  L - L∞', fontsize=13)
-axes[0].set_title('Loss vs. Model Size (Power Law)', fontsize=14)
+axes[0].set_xlabel(r'Parameters $N$', fontsize=13)
+axes[0].set_ylabel(r'Reducible Loss $L - L_\infty$', fontsize=13)
+axes[0].set_title(r'Loss vs. Model Size (Power Law)', fontsize=14)
 axes[0].grid(True, alpha=0.3, which='both')
 
 # Fit line for reference
 log_N = np.log10(N_range)
 log_L = np.log10(L_N - L_inf)
-axes[0].text(1e9, 0.5, f'slope = -α = -{alpha}', fontsize=12,
+axes[0].text(1e9, 0.5, r'slope $= -\alpha = -$' + f'{alpha}', fontsize=12,
              color='#e57373', fontweight='bold')
 
 # Loss vs Data
 axes[1].loglog(D_range, L_D - L_inf, color='#e57373', linewidth=2.5)
-axes[1].set_xlabel('Training Tokens D', fontsize=13)
-axes[1].set_ylabel('Reducible Loss  L - L∞', fontsize=13)
-axes[1].set_title('Loss vs. Dataset Size (Power Law)', fontsize=14)
+axes[1].set_xlabel(r'Training Tokens $D$', fontsize=13)
+axes[1].set_ylabel(r'Reducible Loss $L - L_\infty$', fontsize=13)
+axes[1].set_title(r'Loss vs. Dataset Size (Power Law)', fontsize=14)
 axes[1].grid(True, alpha=0.3, which='both')
-axes[1].text(1e10, 0.3, f'slope = -β = -{beta}', fontsize=12,
+axes[1].text(1e10, 0.3, r'slope $= -\beta = -$' + f'{beta}', fontsize=12,
              color='#4fc3f7', fontweight='bold')
 
 plt.tight_layout()
@@ -635,7 +635,7 @@ fig, ax = plt.subplots(figsize=(10, 8))
 loss_levels = [1.8, 1.85, 1.9, 2.0, 2.2, 2.5, 3.0, 4.0]
 CS = ax.contour(LOG_N, LOG_D, L, levels=loss_levels,
                 colors='#4fc3f7', linewidths=1.5, alpha=0.7)
-ax.clabel(CS, inline=True, fontsize=10, fmt='L=%.2f')
+ax.clabel(CS, inline=True, fontsize=10, fmt=r'$L=%.2f$')
 
 # Compute budget lines (C = 6ND, so log D = log(C/6) - log N)
 C_budgets = [1e19, 1e21, 1e23, 1e25]
@@ -648,30 +648,30 @@ for C_b in C_budgets:
     idx = np.argmin(np.abs(log_d_line - 11))
     if mask[idx]:
         ax.text(log_N[idx], log_d_line[idx] + 0.2,
-                f'C=10^{int(np.log10(C_b))}',
+                r'$C=10^{' + str(int(np.log10(C_b))) + r'}$',
                 fontsize=9, color='#666', ha='center')
 
 # Chinchilla optimal frontier
 mask_opt = (np.log10(N_opt) >= 7) & (np.log10(N_opt) <= 12) & \
            (np.log10(D_opt) >= 8) & (np.log10(D_opt) <= 14)
 ax.plot(np.log10(N_opt[mask_opt]), np.log10(D_opt[mask_opt]),
-        color='#e57373', linewidth=3, label='Chinchilla optimal frontier')
+        color='#e57373', linewidth=3, label=r'Chinchilla optimal frontier')
 
 # Reference point: Chinchilla itself (70B params, 1.4T tokens)
 ax.plot(np.log10(7e10), np.log10(1.4e12), 'o', color='#66bb6a',
-        markersize=12, zorder=5, label='Chinchilla (70B, 1.4T)')
+        markersize=12, zorder=5, label=r'Chinchilla (70B, 1.4T)')
 
 # Reference point: GPT-3 (175B params, 300B tokens)
 ax.plot(np.log10(1.75e11), np.log10(3e11), 's', color='#ab47bc',
-        markersize=12, zorder=5, label='GPT-3 (175B, 300B)')
+        markersize=12, zorder=5, label=r'GPT-3 (175B, 300B)')
 
 # Reference point: Llama 3 8B (8B params, 15T tokens)
 ax.plot(np.log10(8e9), np.log10(1.5e13), '^', color='#ff9800',
-        markersize=12, zorder=5, label='Llama 3 8B (8B, 15T)')
+        markersize=12, zorder=5, label=r'Llama 3 8B (8B, 15T)')
 
-ax.set_xlabel('log₁₀(Parameters N)', fontsize=14)
-ax.set_ylabel('log₁₀(Training Tokens D)', fontsize=14)
-ax.set_title('Chinchilla Optimal Frontier with Iso-Loss Contours', fontsize=15)
+ax.set_xlabel(r'$\log_{10}(N)$ (Parameters)', fontsize=14)
+ax.set_ylabel(r'$\log_{10}(D)$ (Training Tokens)', fontsize=14)
+ax.set_title(r'Chinchilla Optimal Frontier with Iso-Loss Contours', fontsize=15)
 ax.legend(fontsize=11, loc='upper left')
 ax.grid(True, alpha=0.2)
 ax.set_xlim(7, 12)
@@ -719,17 +719,17 @@ for r in key_reductions:
                     fontsize=11, fontweight='bold',
                     arrowprops=dict(arrowstyle='->', color='#333'))
 
-ax.set_xlabel('Reduction in Reducible Loss (%)', fontsize=14)
-ax.set_ylabel('Compute Multiplier Required (C_new / C_old)', fontsize=14)
-ax.set_title('The Brutal Economics of Scaling: Cost to Improve', fontsize=15)
+ax.set_xlabel(r'Reduction in Reducible Loss (\%)', fontsize=14)
+ax.set_ylabel(r'Compute Multiplier Required ($C_{\mathrm{new}} / C_{\mathrm{old}}$)', fontsize=14)
+ax.set_title(r'The Brutal Economics of Scaling: Cost to Improve', fontsize=15)
 ax.grid(True, alpha=0.3, which='both')
 ax.set_xlim(0, 62)
 ax.set_ylim(1, 1e8)
 
 # Add a shaded "feasible" region
-ax.axhspan(1, 100, alpha=0.1, color='#66bb6a', label='Feasible (< 100x)')
-ax.axhspan(100, 1e4, alpha=0.1, color='#ff9800', label='Expensive (100-10,000x)')
-ax.axhspan(1e4, 1e8, alpha=0.1, color='#e57373', label='Prohibitive (> 10,000x)')
+ax.axhspan(1, 100, alpha=0.1, color='#66bb6a', label=r'Feasible ($< 100\times$)')
+ax.axhspan(100, 1e4, alpha=0.1, color='#ff9800', label=r'Expensive ($100$--$10{,}000\times$)')
+ax.axhspan(1e4, 1e8, alpha=0.1, color='#e57373', label=r'Prohibitive ($> 10{,}000\times$)')
 ax.legend(fontsize=11, loc='upper left')
 
 plt.tight_layout()
@@ -762,29 +762,29 @@ fig, axes = plt.subplots(1, 2, figsize=(14, 5))
 
 # Panel 1: N and D vs C
 axes[0].loglog(C_range, N_kaplan, '--', color='#4fc3f7', linewidth=2,
-               label='N (Kaplan)')
+               label=r'$N$ (Kaplan)')
 axes[0].loglog(C_range, D_kaplan, '--', color='#e57373', linewidth=2,
-               label='D (Kaplan)')
+               label=r'$D$ (Kaplan)')
 axes[0].loglog(C_range, N_chinchilla, '-', color='#4fc3f7', linewidth=2.5,
-               label='N (Chinchilla)')
+               label=r'$N$ (Chinchilla)')
 axes[0].loglog(C_range, D_chinchilla, '-', color='#e57373', linewidth=2.5,
-               label='D (Chinchilla)')
-axes[0].set_xlabel('Compute Budget C (FLOPs)', fontsize=13)
-axes[0].set_ylabel('Optimal N or D', fontsize=13)
-axes[0].set_title('Compute Allocation: Kaplan vs Chinchilla', fontsize=14)
+               label=r'$D$ (Chinchilla)')
+axes[0].set_xlabel(r'Compute Budget $C$ (FLOPs)', fontsize=13)
+axes[0].set_ylabel(r'Optimal $N$ or $D$', fontsize=13)
+axes[0].set_title(r'Compute Allocation: Kaplan vs. Chinchilla', fontsize=14)
 axes[0].legend(fontsize=10)
 axes[0].grid(True, alpha=0.3, which='both')
 
 # Panel 2: Token-to-parameter ratio
 axes[1].semilogx(C_range, ratio_kaplan, '--', color='#ab47bc', linewidth=2,
-                 label='D/N (Kaplan)')
+                 label=r'$D/N$ (Kaplan)')
 axes[1].semilogx(C_range, ratio_chinchilla, '-', color='#ab47bc',
-                 linewidth=2.5, label='D/N (Chinchilla)')
+                 linewidth=2.5, label=r'$D/N$ (Chinchilla)')
 axes[1].axhline(y=20, color='#66bb6a', linewidth=1.5, linestyle=':',
-                label='Chinchilla rule: D/N ≈ 20')
-axes[1].set_xlabel('Compute Budget C (FLOPs)', fontsize=13)
-axes[1].set_ylabel('Tokens per Parameter (D/N)', fontsize=13)
-axes[1].set_title('Tokens per Parameter at Optimal Allocation', fontsize=14)
+                label=r'Chinchilla rule: $D/N \approx 20$')
+axes[1].set_xlabel(r'Compute Budget $C$ (FLOPs)', fontsize=13)
+axes[1].set_ylabel(r'Tokens per Parameter ($D/N$)', fontsize=13)
+axes[1].set_title(r'Tokens per Parameter at Optimal Allocation', fontsize=14)
 axes[1].legend(fontsize=10)
 axes[1].grid(True, alpha=0.3, which='both')
 axes[1].set_ylim(0, 100)

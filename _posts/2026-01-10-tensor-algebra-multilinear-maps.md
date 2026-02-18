@@ -360,18 +360,18 @@ fig, axes = plt.subplots(1, 3, figsize=(14, 4))
 # The two vectors
 axes[0].barh(range(3), u, color='#2196F3')
 axes[0].set_yticks(range(3))
-axes[0].set_yticklabels(['u1', 'u2', 'u3'])
-axes[0].set_title('Vector u')
+axes[0].set_yticklabels([r'$u^1$', r'$u^2$', r'$u^3$'])
+axes[0].set_title(r'Vector $\mathbf{u}$')
 axes[0].invert_yaxis()
 
 axes[1].bar(range(3), w, color='#F44336')
 axes[1].set_xticks(range(3))
-axes[1].set_xticklabels(['w1', 'w2', 'w3'])
-axes[1].set_title('Vector w')
+axes[1].set_xticklabels([r'$w^1$', r'$w^2$', r'$w^3$'])
+axes[1].set_title(r'Vector $\mathbf{w}$')
 
 # The outer product
 im = axes[2].imshow(outer, cmap='Purples', aspect='equal')
-axes[2].set_title('Outer Product u ⊗ w')
+axes[2].set_title(r'Outer Product $\mathbf{u} \otimes \mathbf{w}$')
 for i in range(3):
     for j in range(3):
         axes[2].text(j, i, f'{outer[i,j]}', ha='center', va='center', fontsize=12)
@@ -511,10 +511,10 @@ for r in ranks:
 # Plot reconstruction error vs rank
 fig, ax = plt.subplots(figsize=(8, 5))
 ax.plot(ranks, errors, 'o-', color='#9C27B0', linewidth=2, markersize=8)
-ax.axvline(x=true_rank, color='red', linestyle='--', alpha=0.7, label=f'True rank = {true_rank}')
-ax.set_xlabel('CP Rank', fontsize=12)
-ax.set_ylabel('Relative Reconstruction Error', fontsize=12)
-ax.set_title('CP Decomposition: Error vs Rank', fontsize=14)
+ax.axvline(x=true_rank, color='red', linestyle='--', alpha=0.7, label=r'True rank $R = $' + f'{true_rank}')
+ax.set_xlabel(r'CP Rank $R$', fontsize=12)
+ax.set_ylabel(r'Relative Reconstruction Error', fontsize=12)
+ax.set_title(r'CP Decomposition: Error vs Rank', fontsize=14)
 ax.legend(fontsize=11)
 ax.grid(True, alpha=0.3)
 
@@ -585,15 +585,15 @@ for idx, rank in enumerate([1, 2, 3]):
 
     # Plot original slice and reconstruction at t=0
     axes[0, idx].imshow(data[:, :, 0], cmap='RdBu_r', aspect='auto')
-    axes[0, idx].set_title(f'Original (t=0)', fontsize=11)
+    axes[0, idx].set_title(r'Original ($t=0$)', fontsize=11)
     axes[1, idx].imshow(recon[:, :, 0], cmap='RdBu_r', aspect='auto')
-    axes[1, idx].set_title(f'CP Rank-{rank} (error={error:.3f})', fontsize=11)
+    axes[1, idx].set_title(r'CP Rank-' + f'{rank} (error={error:.3f})', fontsize=11)
 
 for ax in axes.flat:
-    ax.set_xlabel('Longitude')
-    ax.set_ylabel('Latitude')
+    ax.set_xlabel(r'Longitude $\lambda$')
+    ax.set_ylabel(r'Latitude $\varphi$')
 
-plt.suptitle('Low-Rank Tensor Approximation of Spatiotemporal Data', fontsize=14)
+plt.suptitle(r'Low-Rank Tensor Approximation of Spatiotemporal Data', fontsize=14)
 plt.tight_layout()
 plt.savefig('tensor_approximation.png', dpi=150, bbox_inches='tight')
 plt.show()

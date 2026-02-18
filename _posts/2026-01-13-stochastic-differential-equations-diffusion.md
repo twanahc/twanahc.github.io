@@ -415,11 +415,11 @@ for i in range(n_paths):
 
 # Standard deviation envelope
 axes[0, 0].fill_between(t, -2*np.sqrt(t), 2*np.sqrt(t), alpha=0.1, color='red')
-axes[0, 0].plot(t, np.sqrt(t), 'r--', linewidth=1, label='±√t (std dev)')
+axes[0, 0].plot(t, np.sqrt(t), 'r--', linewidth=1, label=r'$\pm\sqrt{t}$ (std dev)')
 axes[0, 0].plot(t, -np.sqrt(t), 'r--', linewidth=1)
-axes[0, 0].set_xlabel('Time t')
-axes[0, 0].set_ylabel('W(t)')
-axes[0, 0].set_title('Brownian Motion: Sample Paths')
+axes[0, 0].set_xlabel(r'Time $t$')
+axes[0, 0].set_ylabel(r'$W(t)$')
+axes[0, 0].set_title(r'Brownian Motion: Sample Paths')
 axes[0, 0].legend()
 axes[0, 0].grid(True, alpha=0.3)
 
@@ -433,15 +433,15 @@ for idx, ti in enumerate(time_indices):
     time_val = t[ti]
     samples = W_all[:, ti]
     axes[0, 1].hist(samples, bins=60, density=True, alpha=0.4, color=colors[idx],
-                     label=f't = {time_val:.1f}')
+                     label=rf'$t = {time_val:.1f}$')
     # Theoretical density
     x_range = np.linspace(-4, 4, 200)
     theoretical = np.exp(-x_range**2 / (2*time_val)) / np.sqrt(2*np.pi*time_val)
     axes[0, 1].plot(x_range, theoretical, color=colors[idx], linewidth=2)
 
-axes[0, 1].set_xlabel('W(t)')
-axes[0, 1].set_ylabel('Probability density')
-axes[0, 1].set_title('Distribution of W(t) ~ N(0, t)')
+axes[0, 1].set_xlabel(r'$W(t)$')
+axes[0, 1].set_ylabel(r'Probability density')
+axes[0, 1].set_title(r'Distribution of $W(t) \sim \mathcal{N}(0, t)$')
 axes[0, 1].legend()
 axes[0, 1].grid(True, alpha=0.3)
 
@@ -459,18 +459,18 @@ for n_part in partitions:
     qv_estimates.append(qv)
 
 axes[1, 0].semilogx(partitions, qv_estimates, 'o-', color='#9C27B0', linewidth=2, markersize=8)
-axes[1, 0].axhline(y=T, color='red', linestyle='--', linewidth=1.5, label=f'[W]_T = T = {T}')
-axes[1, 0].set_xlabel('Number of partition points')
-axes[1, 0].set_ylabel('Quadratic variation estimate')
-axes[1, 0].set_title('Quadratic Variation: Σ(ΔW)² → T')
+axes[1, 0].axhline(y=T, color='red', linestyle='--', linewidth=1.5, label=rf'$[W]_T = T = {T}$')
+axes[1, 0].set_xlabel(r'Number of partition points')
+axes[1, 0].set_ylabel(r'Quadratic variation estimate')
+axes[1, 0].set_title(r'Quadratic Variation: $\sum (\Delta W)^2 \to T$')
 axes[1, 0].legend()
 axes[1, 0].grid(True, alpha=0.3)
 
 # Panel 4: Nowhere differentiability (zoom into path)
 axes[1, 1].plot(t[:500], W_one[:500], linewidth=0.8, color='#2196F3')
-axes[1, 1].set_xlabel('Time t')
-axes[1, 1].set_ylabel('W(t)')
-axes[1, 1].set_title('Brownian Motion Close-Up: Jagged at Every Scale')
+axes[1, 1].set_xlabel(r'Time $t$')
+axes[1, 1].set_ylabel(r'$W(t)$')
+axes[1, 1].set_title(r'Brownian Motion Close-Up: Jagged at Every Scale')
 axes[1, 1].grid(True, alpha=0.3)
 
 # Inset: zoom further
@@ -527,9 +527,9 @@ snapshots, times, alpha_bars = forward_diffusion_1d(x0, T=200)
 fig, axes = plt.subplots(2, 3, figsize=(15, 8))
 axes = axes.flatten()
 
-titles = ['t = 0\n(Data)', f't = {times[1]}\n(Light noise)',
-          f't = {times[2]}\n(Moderate)', f't = {times[3]}\n(Heavy)',
-          f't = {times[4]}\n(Nearly destroyed)', f't = {times[5]}\n(Pure noise)']
+titles = [r'$t = 0$' + '\n(Data)', rf'$t = {times[1]}$' + '\n(Light noise)',
+          rf'$t = {times[2]}$' + '\n(Moderate)', rf'$t = {times[3]}$' + '\n(Heavy)',
+          rf'$t = {times[4]}$' + '\n(Nearly destroyed)', rf'$t = {times[5]}$' + '\n(Pure noise)']
 
 for i, (snap, title) in enumerate(zip(snapshots, titles)):
     axes[i].hist(snap, bins=80, density=True, alpha=0.7, color='#2196F3', edgecolor='none')
@@ -538,16 +538,16 @@ for i, (snap, title) in enumerate(zip(snapshots, titles)):
     axes[i].set_title(title, fontsize=11)
     axes[i].grid(True, alpha=0.2)
     if i >= 3:
-        axes[i].set_xlabel('x')
+        axes[i].set_xlabel(r'$x$')
 
     # Overlay Gaussian for reference
     x_plot = np.linspace(-8, 8, 200)
     gaussian = np.exp(-x_plot**2/2) / np.sqrt(2*np.pi)
-    axes[i].plot(x_plot, gaussian, 'r--', alpha=0.5, linewidth=1, label='N(0,1)')
+    axes[i].plot(x_plot, gaussian, 'r--', alpha=0.5, linewidth=1, label=r'$\mathcal{N}(0,1)$')
     if i == 0:
         axes[i].legend(fontsize=9)
 
-plt.suptitle('Forward Diffusion Process: Data → Noise', fontsize=14, y=1.01)
+plt.suptitle(r'Forward Diffusion Process: Data $\to$ Noise', fontsize=14, y=1.01)
 plt.tight_layout()
 plt.savefig('forward_diffusion.png', dpi=150, bbox_inches='tight')
 plt.show()
@@ -559,13 +559,13 @@ signal = np.sqrt(alpha_bars)
 noise = np.sqrt(1 - alpha_bars)
 snr = signal / noise
 
-ax.plot(t_range, signal, label='Signal: √ᾱ_t', color='#2196F3', linewidth=2)
-ax.plot(t_range, noise, label='Noise: √(1-ᾱ_t)', color='#F44336', linewidth=2)
-ax.plot(t_range, snr, label='SNR', color='#4CAF50', linewidth=2, linestyle='--')
+ax.plot(t_range, signal, label=r'Signal: $\sqrt{\bar{\alpha}_t}$', color='#2196F3', linewidth=2)
+ax.plot(t_range, noise, label=r'Noise: $\sqrt{1-\bar{\alpha}_t}$', color='#F44336', linewidth=2)
+ax.plot(t_range, snr, label=r'SNR', color='#4CAF50', linewidth=2, linestyle='--')
 ax.axhline(y=1, color='gray', linestyle=':', alpha=0.5)
-ax.set_xlabel('Diffusion step t', fontsize=12)
-ax.set_ylabel('Coefficient', fontsize=12)
-ax.set_title('Signal vs Noise in the Forward Diffusion Process', fontsize=13)
+ax.set_xlabel(r'Diffusion step $t$', fontsize=12)
+ax.set_ylabel(r'Coefficient', fontsize=12)
+ax.set_title(r'Signal vs Noise in the Forward Diffusion Process', fontsize=13)
 ax.legend(fontsize=11)
 ax.grid(True, alpha=0.3)
 plt.tight_layout()
@@ -610,14 +610,14 @@ starting_points = [-3, -1, 0, 1, 3]
 colors = plt.cm.viridis(np.linspace(0, 1, len(starting_points)))
 for x0, color in zip(starting_points, colors):
     t, X = simulate_ou(x0, theta, sigma, T, dt, n_paths=1)
-    axes[0].plot(t, X[0], linewidth=0.7, alpha=0.8, color=color, label=f'x₀ = {x0}')
+    axes[0].plot(t, X[0], linewidth=0.7, alpha=0.8, color=color, label=rf'$x_0 = {x0}$')
 
 axes[0].axhline(y=0, color='red', linestyle='--', alpha=0.5, linewidth=1)
 axes[0].fill_between(np.linspace(0, T, 100), -2*stat_std, 2*stat_std,
-                      alpha=0.1, color='red', label=f'±2σ_stat = ±{2*stat_std:.2f}')
-axes[0].set_xlabel('Time t', fontsize=12)
-axes[0].set_ylabel('X(t)', fontsize=12)
-axes[0].set_title('OU Paths: Mean Reversion', fontsize=13)
+                      alpha=0.1, color='red', label=rf'$\pm 2\sigma_\mathrm{{stat}} = \pm{2*stat_std:.2f}$')
+axes[0].set_xlabel(r'Time $t$', fontsize=12)
+axes[0].set_ylabel(r'$X(t)$', fontsize=12)
+axes[0].set_title(r'OU Paths: Mean Reversion', fontsize=13)
 axes[0].legend(fontsize=9)
 axes[0].grid(True, alpha=0.3)
 
@@ -638,11 +638,11 @@ for ti, color in zip(time_slices, colors2):
     if var_t > 0:
         x_range = np.linspace(-3, 5, 200)
         pdf = np.exp(-(x_range - mean_t)**2 / (2*var_t)) / np.sqrt(2*np.pi*var_t)
-        axes[1].plot(x_range, pdf, color=color, linewidth=2, label=f't = {time_val:.1f}')
+        axes[1].plot(x_range, pdf, color=color, linewidth=2, label=rf'$t = {time_val:.1f}$')
 
-axes[1].set_xlabel('X', fontsize=12)
-axes[1].set_ylabel('Density', fontsize=12)
-axes[1].set_title('OU: Convergence to Stationary Distribution', fontsize=13)
+axes[1].set_xlabel(r'$X$', fontsize=12)
+axes[1].set_ylabel(r'Density', fontsize=12)
+axes[1].set_title(r'OU: Convergence to Stationary Distribution', fontsize=13)
 axes[1].legend(fontsize=9)
 axes[1].grid(True, alpha=0.3)
 
@@ -655,14 +655,14 @@ mean_sim = np.mean(X, axis=0)
 var_sim = np.var(X, axis=0)
 t_sim = np.linspace(0, T, X.shape[1])
 
-axes[2].plot(t_theory, mean_theory, 'b-', linewidth=2, label='E[X(t)] theory')
-axes[2].plot(t_sim[::100], mean_sim[::100], 'b.', markersize=3, alpha=0.5, label='E[X(t)] sim')
-axes[2].plot(t_theory, var_theory, 'r-', linewidth=2, label='Var[X(t)] theory')
-axes[2].plot(t_sim[::100], var_sim[::100], 'r.', markersize=3, alpha=0.5, label='Var[X(t)] sim')
-axes[2].axhline(y=stat_var, color='red', linestyle='--', alpha=0.5, label=f'σ²/(2θ) = {stat_var:.3f}')
-axes[2].set_xlabel('Time t', fontsize=12)
-axes[2].set_ylabel('Value', fontsize=12)
-axes[2].set_title('OU: Mean and Variance vs Theory', fontsize=13)
+axes[2].plot(t_theory, mean_theory, 'b-', linewidth=2, label=r'$\mathbb{E}[X(t)]$ theory')
+axes[2].plot(t_sim[::100], mean_sim[::100], 'b.', markersize=3, alpha=0.5, label=r'$\mathbb{E}[X(t)]$ sim')
+axes[2].plot(t_theory, var_theory, 'r-', linewidth=2, label=r'$\mathrm{Var}[X(t)]$ theory')
+axes[2].plot(t_sim[::100], var_sim[::100], 'r.', markersize=3, alpha=0.5, label=r'$\mathrm{Var}[X(t)]$ sim')
+axes[2].axhline(y=stat_var, color='red', linestyle='--', alpha=0.5, label=rf'$\sigma^2/(2\theta) = {stat_var:.3f}$')
+axes[2].set_xlabel(r'Time $t$', fontsize=12)
+axes[2].set_ylabel(r'Value', fontsize=12)
+axes[2].set_title(r'OU: Mean and Variance vs Theory', fontsize=13)
 axes[2].legend(fontsize=9)
 axes[2].grid(True, alpha=0.3)
 
@@ -785,9 +785,9 @@ def score_matching_1d():
 
     # Training loss
     axes[0, 0].semilogy(losses[::10], color='#2196F3', linewidth=0.5)
-    axes[0, 0].set_xlabel('Epoch (x10)')
-    axes[0, 0].set_ylabel('Loss')
-    axes[0, 0].set_title('Denoising Score Matching Loss')
+    axes[0, 0].set_xlabel(r'Epoch ($\times 10$)')
+    axes[0, 0].set_ylabel(r'Loss')
+    axes[0, 0].set_title(r'Denoising Score Matching Loss')
     axes[0, 0].grid(True, alpha=0.3)
 
     # Learned score function vs true score
@@ -807,11 +807,11 @@ def score_matching_1d():
     sigma_eval = np.ones(500) * 0.1
     learned_score, _ = forward(x_eval, sigma_eval)
 
-    axes[0, 1].plot(x_eval, true_score(x_eval), 'b-', linewidth=2, label='True score')
-    axes[0, 1].plot(x_eval, learned_score, 'r--', linewidth=2, label='Learned score')
-    axes[0, 1].set_xlabel('x')
-    axes[0, 1].set_ylabel('∇log p(x)')
-    axes[0, 1].set_title('Score Function: True vs Learned')
+    axes[0, 1].plot(x_eval, true_score(x_eval), 'b-', linewidth=2, label=r'True score')
+    axes[0, 1].plot(x_eval, learned_score, 'r--', linewidth=2, label=r'Learned score')
+    axes[0, 1].set_xlabel(r'$x$')
+    axes[0, 1].set_ylabel(r'$\nabla_x \log p(x)$')
+    axes[0, 1].set_title(r'Score Function: True vs Learned')
     axes[0, 1].legend()
     axes[0, 1].set_ylim(-30, 30)
     axes[0, 1].grid(True, alpha=0.3)
@@ -819,20 +819,20 @@ def score_matching_1d():
     # True density
     axes[1, 0].plot(x_eval, true_density(x_eval), 'b-', linewidth=2)
     axes[1, 0].fill_between(x_eval, true_density(x_eval), alpha=0.3, color='#2196F3')
-    axes[1, 0].set_xlabel('x')
-    axes[1, 0].set_ylabel('p(x)')
-    axes[1, 0].set_title('Target Distribution')
+    axes[1, 0].set_xlabel(r'$x$')
+    axes[1, 0].set_ylabel(r'$p(x)$')
+    axes[1, 0].set_title(r'Target Distribution')
     axes[1, 0].grid(True, alpha=0.3)
 
     # Generated samples
     print("Generating samples via Langevin dynamics...")
     generated = langevin_sample(5000, n_steps=2000, step_size=0.005)
     axes[1, 1].hist(generated, bins=80, density=True, alpha=0.7, color='#F44336',
-                     edgecolor='none', label='Generated')
-    axes[1, 1].plot(x_eval, true_density(x_eval), 'b-', linewidth=2, label='True')
-    axes[1, 1].set_xlabel('x')
-    axes[1, 1].set_ylabel('Density')
-    axes[1, 1].set_title('Generated Samples vs True Distribution')
+                     edgecolor='none', label=r'Generated')
+    axes[1, 1].plot(x_eval, true_density(x_eval), 'b-', linewidth=2, label=r'True')
+    axes[1, 1].set_xlabel(r'$x$')
+    axes[1, 1].set_ylabel(r'Density')
+    axes[1, 1].set_title(r'Generated Samples vs True Distribution')
     axes[1, 1].legend()
     axes[1, 1].grid(True, alpha=0.3)
 

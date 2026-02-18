@@ -10,9 +10,21 @@
 ## Mathematical Content
 - Use LaTeX via MathJax (inline: `$...$`, display: `$$...$$`)
 - Include rigorous derivations from first principles
-- Add Python code simulations/plots (matplotlib) where they help build intuition
 - Use SVG diagrams for geometric and conceptual illustrations
 - Include a Table of Contents for long posts
+
+## Python Code & Figures
+- Use numpy for all numerical computation
+- Use matplotlib for all plots and figures
+- ALL figures with math must use proper LaTeX formatting in labels, titles, annotations, and legends
+  - Enable with `plt.rcParams['text.usetex'] = False` and use matplotlib's built-in mathtext: `r'$\alpha$'`, `r'$\nabla f(x)$'`, etc.
+  - Axis labels: e.g., `r'Loss $L(N)$'`, `r'Parameters $N$'`
+  - Titles: e.g., `r'Convergence of $\mathbb{E}[X_n]$ to $\mu$'`
+  - Legends: e.g., `r'$\eta = 0.01$'`
+  - Annotations: use `ax.annotate(r'$x^* = \arg\min f$', ...)`
+- Use a clean, publication-quality style: `plt.style.use('default')` with dark backgrounds where appropriate
+- Label every axis, include legends when multiple lines are plotted
+- Use `fig, ax = plt.subplots()` pattern (not `plt.plot()` directly)
 
 ## Post Format
 - Front matter: `layout: post`, `title`, `date`, `category`

@@ -458,9 +458,9 @@ ax1.plot(np.linspace(0, y_end, 100),
          '-.', color='#339933', linewidth=1.5, label='Power law comparison')
 
 ax1.invert_yaxis()
-ax1.set_xlabel('Horizontal distance y', fontsize=12)
-ax1.set_ylabel('Depth x (gravity direction ↓)', fontsize=12)
-ax1.set_title('Brachistochrone: Fastest Descent Curve', fontsize=13)
+ax1.set_xlabel(r'Horizontal distance $y$', fontsize=12)
+ax1.set_ylabel(r'Depth $x$ (gravity direction $\downarrow$)', fontsize=12)
+ax1.set_title(r'Brachistochrone: Fastest Descent Curve', fontsize=13)
 ax1.legend(fontsize=10)
 ax1.grid(True, alpha=0.3)
 
@@ -476,8 +476,8 @@ curves = ['Cycloid\n(optimal)', 'Numerical\noptimum', 'Straight\nline']
 times = [T_opt * 0.99, T_opt, T_straight]  # cycloid is slightly better
 colors = ['#cc3333', '#4488cc', 'gray']
 bars = ax2.bar(curves, times, color=colors, edgecolor='black', linewidth=1)
-ax2.set_ylabel('Travel time (seconds)', fontsize=12)
-ax2.set_title('Travel Time Comparison', fontsize=13)
+ax2.set_ylabel(r'Travel time $T$ (seconds)', fontsize=12)
+ax2.set_title(r'Travel Time Comparison', fontsize=13)
 for bar, t in zip(bars, times):
     ax2.text(bar.get_x() + bar.get_width()/2, bar.get_height() + 0.005,
              f'{t:.4f}s', ha='center', fontsize=11, fontweight='bold')
@@ -598,8 +598,8 @@ fig, axes = plt.subplots(2, 2, figsize=(13, 11))
 ax1 = axes[0, 0]
 ax1.scatter(data[:, 0].numpy(), data[:, 1].numpy(), c=labels, cmap='tab10',
            s=3, alpha=0.5)
-ax1.set_title('Original Data', fontsize=13)
-ax1.set_xlabel('$x_1$'); ax1.set_ylabel('$x_2$')
+ax1.set_title(r'Original Data', fontsize=13)
+ax1.set_xlabel(r'$x_1$'); ax1.set_ylabel(r'$x_2$')
 ax1.set_aspect('equal')
 
 # Top-right: Latent space
@@ -608,8 +608,8 @@ with torch.no_grad():
     mu_all, _ = model.encode(data)
 ax2.scatter(mu_all[:, 0].numpy(), mu_all[:, 1].numpy(), c=labels, cmap='tab10',
            s=3, alpha=0.5)
-ax2.set_title('Latent Space (encoder means)', fontsize=13)
-ax2.set_xlabel('$z_1$'); ax2.set_ylabel('$z_2$')
+ax2.set_title(r'Latent Space (encoder means $\mu_\phi$)', fontsize=13)
+ax2.set_xlabel(r'$z_1$'); ax2.set_ylabel(r'$z_2$')
 ax2.set_aspect('equal')
 
 # Bottom-left: Generated samples
@@ -618,21 +618,21 @@ with torch.no_grad():
     z_sample = torch.randn(2000, 2)
     x_gen = model.decode(z_sample).numpy()
 ax3.scatter(x_gen[:, 0], x_gen[:, 1], s=3, alpha=0.5, c='#4488cc')
-ax3.set_title('Generated Samples (z ~ N(0,I))', fontsize=13)
-ax3.set_xlabel('$x_1$'); ax3.set_ylabel('$x_2$')
+ax3.set_title(r'Generated Samples ($z \sim \mathcal{N}(0, I)$)', fontsize=13)
+ax3.set_xlabel(r'$x_1$'); ax3.set_ylabel(r'$x_2$')
 ax3.set_aspect('equal')
 
 # Bottom-right: ELBO decomposition during training
 ax4 = axes[1, 1]
 epochs = np.arange(1, n_epochs + 1)
-ax4.plot(epochs, elbo_history, '-', color='#333', linewidth=2, label='ELBO')
+ax4.plot(epochs, elbo_history, '-', color='#333', linewidth=2, label=r'ELBO')
 ax4.plot(epochs, [-r for r in recon_history], '--', color='#4488cc', linewidth=1.5,
-         label='-Reconstruction loss')
+         label=r'$-\mathcal{L}_{\mathrm{recon}}$')
 ax4.plot(epochs, [-k for k in kl_history], ':', color='#cc3333', linewidth=1.5,
-         label='-KL divergence')
-ax4.set_xlabel('Epoch', fontsize=12)
-ax4.set_ylabel('Value', fontsize=12)
-ax4.set_title('ELBO Decomposition During Training', fontsize=13)
+         label=r'$-D_{\mathrm{KL}}(q_\phi \| p)$')
+ax4.set_xlabel(r'Epoch', fontsize=12)
+ax4.set_ylabel(r'Value', fontsize=12)
+ax4.set_title(r'ELBO Decomposition During Training', fontsize=13)
 ax4.legend(fontsize=10)
 ax4.grid(True, alpha=0.3)
 

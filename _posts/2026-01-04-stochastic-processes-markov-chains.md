@@ -406,12 +406,12 @@ for i in range(n_walks):
 
 # Plot ±sqrt(t) envelope
 t = np.arange(1, n_steps + 1)
-ax.plot(t, np.sqrt(t), 'k--', linewidth=1.5, label='±√t')
+ax.plot(t, np.sqrt(t), 'k--', linewidth=1.5, label=r'$\pm\sqrt{t}$')
 ax.plot(t, -np.sqrt(t), 'k--', linewidth=1.5)
 ax.fill_between(t, -np.sqrt(t), np.sqrt(t), alpha=0.1, color='gray')
-ax.set_xlabel('Time step')
-ax.set_ylabel('Position')
-ax.set_title('1D Random Walk (5 trajectories)')
+ax.set_xlabel(r'Time step $t$')
+ax.set_ylabel(r'Position $X_t$')
+ax.set_title(r'1D Random Walk (5 trajectories)')
 ax.legend()
 ax.grid(True, alpha=0.3)
 
@@ -430,9 +430,9 @@ for i in range(3):
     ax2.plot(x[0], y[0], 'go', markersize=6)
     ax2.plot(x[-1], y[-1], 'rs', markersize=6)
 
-ax2.set_xlabel('x')
-ax2.set_ylabel('y')
-ax2.set_title('2D Random Walk (3 trajectories, 5000 steps)')
+ax2.set_xlabel(r'$x$')
+ax2.set_ylabel(r'$y$')
+ax2.set_title(r'2D Random Walk (3 trajectories, 5000 steps)')
 ax2.set_aspect('equal')
 ax2.grid(True, alpha=0.3)
 
@@ -488,10 +488,10 @@ for pi0, color, label in zip(initial_dists, colors, labels):
             linewidth=1.5, label=label)
 
 ax.axhline(y=pi_stationary[0], color='black', linestyle='--',
-           label=f'π₁ = {pi_stationary[0]:.3f}')
-ax.set_xlabel('Time step')
-ax.set_ylabel('P(state 1)')
-ax.set_title('Convergence to Stationary Distribution (State 1)')
+           label=r'$\pi_1 = $' + f'{pi_stationary[0]:.3f}')
+ax.set_xlabel(r'Time step $t$')
+ax.set_ylabel(r'$P(\text{state } 1)$')
+ax.set_title(r'Convergence to Stationary Distribution (State 1)')
 ax.legend(fontsize=9)
 ax.grid(True, alpha=0.3)
 
@@ -508,9 +508,9 @@ for pi0, color, label in zip(initial_dists, colors, labels):
     ax2.semilogy(range(1, n_steps + 1), tv_distances, '-', color=color,
                  linewidth=1.5, label=label)
 
-ax2.set_xlabel('Time step')
-ax2.set_ylabel('Total Variation Distance')
-ax2.set_title('Convergence Rate (Log Scale)')
+ax2.set_xlabel(r'Time step $t$')
+ax2.set_ylabel(r'Total Variation Distance $d(t)$')
+ax2.set_title(r'Convergence Rate (Log Scale)')
 ax2.legend(fontsize=9)
 ax2.grid(True, alpha=0.3)
 
@@ -581,14 +581,14 @@ for ax, std, tsuf in zip(axes, proposal_stds, titles_suffix):
 
     ax.contour(Xg, Yg, Zg, levels=10, cmap='Blues', alpha=0.5)
     ax.plot(samples[:2000, 0], samples[:2000, 1], 'r.', markersize=0.5, alpha=0.3)
-    ax.set_title(f'σ = {std} ({tsuf})\nAccept rate: {acc_rate:.1%}', fontsize=11)
-    ax.set_xlabel('x₁')
-    ax.set_ylabel('x₂')
+    ax.set_title(r'$\sigma = $' + f'{std} ({tsuf})' + f'\nAccept rate: {acc_rate:.1%}', fontsize=11)
+    ax.set_xlabel(r'$x_1$')
+    ax.set_ylabel(r'$x_2$')
     ax.set_xlim(-5, 5)
     ax.set_ylim(-5, 6)
     ax.set_aspect('equal')
 
-plt.suptitle('Metropolis-Hastings: Effect of Proposal Scale', fontsize=14)
+plt.suptitle(r'Metropolis-Hastings: Effect of Proposal Scale $\sigma$', fontsize=14)
 plt.tight_layout()
 plt.savefig('metropolis_hastings.png', dpi=150, bbox_inches='tight')
 plt.show()
@@ -627,11 +627,11 @@ for eps, color in zip(epsilons, colors):
         tv_distances.append(tv)
 
     ax.semilogy(range(1, n_steps + 1), tv_distances, color=color,
-                linewidth=1.5, label=f'ε = {eps}, gap = {2*eps:.2f}')
+                linewidth=1.5, label=r'$\varepsilon = $' + f'{eps}, gap = {2*eps:.2f}')
 
-ax.set_xlabel('Time step')
-ax.set_ylabel('Total Variation Distance')
-ax.set_title('Mixing Time vs Spectral Gap')
+ax.set_xlabel(r'Time step $t$')
+ax.set_ylabel(r'Total Variation Distance $d(t)$')
+ax.set_title(r'Mixing Time vs Spectral Gap $\gamma$')
 ax.legend()
 ax.grid(True, alpha=0.3)
 
@@ -653,13 +653,13 @@ for t, alpha_val in zip(n_sim_steps, [0.3, 0.6, 1.0]):
 
     frac_state1 = np.mean(states == 1)
     ax2.bar([f't={t}'], [1 - frac_state1], color='#2563eb', alpha=alpha_val,
-            label=f't={t}: P(state 0) = {1-frac_state1:.2f}' if t == n_sim_steps[0] else None)
+            label=r'$t=$' + f'{t}: ' + r'$P(\mathrm{state}\;0) = $' + f'{1-frac_state1:.2f}' if t == n_sim_steps[0] else None)
     ax2.bar([f't={t}'], [frac_state1], bottom=[1-frac_state1], color='#dc2626',
             alpha=alpha_val)
 
-ax2.axhline(y=0.5, color='black', linestyle='--', label='Stationary (0.5)')
-ax2.set_ylabel('Fraction of chains')
-ax2.set_title(f'Distribution Over {n_chains} Chains (ε = {eps})')
+ax2.axhline(y=0.5, color='black', linestyle='--', label=r'Stationary ($\pi = 0.5$)')
+ax2.set_ylabel(r'Fraction of chains')
+ax2.set_title(r'Distribution Over ' + f'{n_chains}' + r' Chains ($\varepsilon = $' + f'{eps})')
 ax2.legend(fontsize=9)
 
 plt.tight_layout()
