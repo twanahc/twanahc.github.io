@@ -2,3 +2,4 @@ title: Twana's Brainrot
 description: AI video, creative AI, and things that keep me up at night
 markdown: kramdown
 permalink: /posts/:year-:month-:day-:title/
+future: true
