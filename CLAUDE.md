@@ -8,7 +8,10 @@
 - Treat derivations as narratives — walk through each step, explain what's happening and why
 
 ## Mathematical Content
-- Use LaTeX via MathJax (inline: `$...$`, display: `$$...$$`)
+- Use LaTeX via MathJax (inline: `\(...\)`, display: `$$...$$`)
+- NEVER use `$...$` for inline math — it conflicts with currency dollar signs
+- Use plain `$` for currency (e.g., `$100M`, `$0.05/sec`) — MathJax won't touch it
+- For posts with NO math at all, add `mathjax: false` to front matter
 - Include rigorous derivations from first principles
 - Use SVG diagrams for geometric and conceptual illustrations
 - Include a Table of Contents for long posts
