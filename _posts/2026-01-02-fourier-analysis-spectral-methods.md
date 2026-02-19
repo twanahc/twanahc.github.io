@@ -28,11 +28,11 @@ This post builds the entire theory of Fourier analysis from scratch. We start wi
 
 ## Periodic Functions and Why They Matter
 
-A function $f(t)$ is **periodic** with period $T$ if $f(t + T) = f(t)$ for all $t$. The simplest periodic functions are sines and cosines:
+A function \(f(t)\) is **periodic** with period \(T\) if \(f(t + T) = f(t)\) for all \(t\). The simplest periodic functions are sines and cosines:
 
 $$f(t) = A\sin(2\pi f_0 t + \phi)$$
 
-where $A$ is the **amplitude** (how tall the wave is), $f_0$ is the **frequency** (how many complete cycles per second, measured in Hertz), and $\phi$ is the **phase** (where in the cycle the wave starts).
+where \(A\) is the **amplitude** (how tall the wave is), \(f_0\) is the **frequency** (how many complete cycles per second, measured in Hertz), and \(\phi\) is the **phase** (where in the cycle the wave starts).
 
 Why do periodic functions deserve special treatment? Three reasons.
 
@@ -40,7 +40,7 @@ Why do periodic functions deserve special treatment? Three reasons.
 
 **Reason 2: Linearity.** Most physical systems and many computational systems are approximately **linear** --- the response to a sum of inputs equals the sum of responses to each input individually. If you decompose an arbitrary input into simple periodic components, you can analyze the system's response to each component independently and then add the responses back together. This turns hard problems into collections of trivial ones.
 
-**Reason 3: Eigenfunction property.** Sines and cosines (or equivalently, complex exponentials $e^{i\omega t}$) are **eigenfunctions** of linear time-invariant (LTI) systems. What does this mean? If you feed a sine wave at frequency $\omega$ into an LTI system, you get out a sine wave at the same frequency $\omega$, just scaled in amplitude and shifted in phase. The system cannot create new frequencies. This property is what makes frequency-domain analysis so powerful --- each frequency component passes through the system independently.
+**Reason 3: Eigenfunction property.** Sines and cosines (or equivalently, complex exponentials \(e^{i\omega t}\)) are **eigenfunctions** of linear time-invariant (LTI) systems. What does this mean? If you feed a sine wave at frequency \(\omega\) into an LTI system, you get out a sine wave at the same frequency \(\omega\), just scaled in amplitude and shifted in phase. The system cannot create new frequencies. This property is what makes frequency-domain analysis so powerful --- each frequency component passes through the system independently.
 
 ---
 
@@ -84,21 +84,21 @@ Now extend this idea: it is not just musical instruments. **Any** periodic funct
 
 ## Fourier Series: Deriving the Coefficients
 
-Now let us formalize this. Given a periodic function $f(t)$ with period $T$, we claim it can be written as:
+Now let us formalize this. Given a periodic function \(f(t)\) with period \(T\), we claim it can be written as:
 
 $$f(t) = \frac{a_0}{2} + \sum_{n=1}^{\infty}\left[a_n \cos\left(\frac{2\pi n t}{T}\right) + b_n \sin\left(\frac{2\pi n t}{T}\right)\right]$$
 
-The question is: how do we find the coefficients $a_n$ and $b_n$? The answer comes from **orthogonality**.
+The question is: how do we find the coefficients \(a_n\) and \(b_n\)? The answer comes from **orthogonality**.
 
 ### Orthogonality of Trigonometric Functions
 
-Two functions $g(t)$ and $h(t)$ are **orthogonal** over an interval $[0, T]$ if their **inner product** is zero:
+Two functions \(g(t)\) and \(h(t)\) are **orthogonal** over an interval \([0, T]\) if their **inner product** is zero:
 
 $$\langle g, h \rangle = \int_0^T g(t) \, h(t) \, dt = 0$$
 
-This is exactly analogous to orthogonal vectors in linear algebra, where $\vec{u} \cdot \vec{v} = 0$. Just as orthogonal vectors point in independent directions, orthogonal functions represent independent "directions" in function space.
+This is exactly analogous to orthogonal vectors in linear algebra, where \(\vec{u} \cdot \vec{v} = 0\). Just as orthogonal vectors point in independent directions, orthogonal functions represent independent "directions" in function space.
 
-The trigonometric functions satisfy these orthogonality relations (all integrals over one full period $[0, T]$):
+The trigonometric functions satisfy these orthogonality relations (all integrals over one full period \([0, T]\)):
 
 $$\int_0^T \cos\left(\frac{2\pi m t}{T}\right) \cos\left(\frac{2\pi n t}{T}\right) dt = \begin{cases} T & \text{if } m = n = 0 \\ T/2 & \text{if } m = n \neq 0 \\ 0 & \text{if } m \neq n \end{cases}$$
 
@@ -106,15 +106,15 @@ $$\int_0^T \sin\left(\frac{2\pi m t}{T}\right) \sin\left(\frac{2\pi n t}{T}\righ
 
 $$\int_0^T \cos\left(\frac{2\pi m t}{T}\right) \sin\left(\frac{2\pi n t}{T}\right) dt = 0 \quad \text{for all } m, n$$
 
-Why are these true? The product-to-sum identities. For example, $\cos(A)\cos(B) = \frac{1}{2}[\cos(A-B) + \cos(A+B)]$. When $m \neq n$, both $\cos(A-B)$ and $\cos(A+B)$ oscillate an integer number of times over the period and integrate to zero. When $m = n$, the $\cos(A-B) = \cos(0) = 1$ term survives, contributing $T/2$.
+Why are these true? The product-to-sum identities. For example, \(\cos(A)\cos(B) = \frac{1}{2}[\cos(A-B) + \cos(A+B)]\). When \(m \neq n\), both \(\cos(A-B)\) and \(\cos(A+B)\) oscillate an integer number of times over the period and integrate to zero. When \(m = n\), the \(\cos(A-B) = \cos(0) = 1\) term survives, contributing \(T/2\).
 
 ### Extracting the Coefficients
 
-Now the derivation of the coefficients becomes elegant. To find $a_m$, multiply both sides of the Fourier series by $\cos(2\pi m t / T)$ and integrate over one period:
+Now the derivation of the coefficients becomes elegant. To find \(a_m\), multiply both sides of the Fourier series by \(\cos(2\pi m t / T)\) and integrate over one period:
 
 $$\int_0^T f(t) \cos\left(\frac{2\pi m t}{T}\right) dt = \int_0^T \left[\frac{a_0}{2} + \sum_{n=1}^{\infty} a_n \cos\left(\frac{2\pi n t}{T}\right) + b_n \sin\left(\frac{2\pi n t}{T}\right)\right] \cos\left(\frac{2\pi m t}{T}\right) dt$$
 
-By orthogonality, every term on the right vanishes except the one where $n = m$ in the cosine sum. The sine terms all vanish because cosine is orthogonal to sine. We get:
+By orthogonality, every term on the right vanishes except the one where \(n = m\) in the cosine sum. The sine terms all vanish because cosine is orthogonal to sine. We get:
 
 $$\int_0^T f(t) \cos\left(\frac{2\pi m t}{T}\right) dt = a_m \cdot \frac{T}{2}$$
 
@@ -122,21 +122,21 @@ Solving:
 
 $$\boxed{a_n = \frac{2}{T}\int_0^T f(t) \cos\left(\frac{2\pi n t}{T}\right) dt}$$
 
-By the same argument, multiplying by $\sin(2\pi m t / T)$ and integrating:
+By the same argument, multiplying by \(\sin(2\pi m t / T)\) and integrating:
 
 $$\boxed{b_n = \frac{2}{T}\int_0^T f(t) \sin\left(\frac{2\pi n t}{T}\right) dt}$$
 
-And for $a_0$ (the constant / DC component):
+And for \(a_0\) (the constant / DC component):
 
 $$a_0 = \frac{2}{T}\int_0^T f(t) \, dt$$
 
-This is the average value of $f(t)$ over one period, multiplied by 2 (but divided by 2 in the series, so the DC component is just the average).
+This is the average value of \(f(t)\) over one period, multiplied by 2 (but divided by 2 in the series, so the DC component is just the average).
 
-What is happening conceptually? We are **projecting** the function $f(t)$ onto each basis function, exactly as we project a vector onto a coordinate axis using the dot product. The Fourier coefficients are the "coordinates" of $f$ in the trigonometric basis.
+What is happening conceptually? We are **projecting** the function \(f(t)\) onto each basis function, exactly as we project a vector onto a coordinate axis using the dot product. The Fourier coefficients are the "coordinates" of \(f\) in the trigonometric basis.
 
 ### Complex Exponential Form
 
-It is often cleaner to use complex exponentials. Using Euler's formula, $e^{i\theta} = \cos\theta + i\sin\theta$, we can write:
+It is often cleaner to use complex exponentials. Using Euler's formula, \(e^{i\theta} = \cos\theta + i\sin\theta\), we can write:
 
 $$f(t) = \sum_{n=-\infty}^{\infty} c_n \, e^{i 2\pi n t / T}$$
 
@@ -144,7 +144,7 @@ where the complex coefficients are:
 
 $$c_n = \frac{1}{T}\int_0^T f(t) \, e^{-i 2\pi n t / T} \, dt$$
 
-The relationship is $c_0 = a_0/2$, and for $n > 0$: $c_n = (a_n - ib_n)/2$, $c_{-n} = (a_n + ib_n)/2$. This form is compact and will lead naturally to the Fourier transform.
+The relationship is \(c_0 = a_0/2\), and for \(n > 0\): \(c_n = (a_n - ib_n)/2\), \(c_{-n} = (a_n + ib_n)/2\). This form is compact and will lead naturally to the Fourier transform.
 
 ---
 
@@ -154,11 +154,11 @@ The Fourier series works for periodic functions. But most real signals are not p
 
 The key insight: **a non-periodic function is the limit of a periodic function whose period goes to infinity.**
 
-Let us make this precise. Start with the complex Fourier series of a function with period $T$:
+Let us make this precise. Start with the complex Fourier series of a function with period \(T\):
 
 $$f(t) = \sum_{n=-\infty}^{\infty} c_n \, e^{i 2\pi n t / T}, \qquad c_n = \frac{1}{T}\int_{-T/2}^{T/2} f(t) \, e^{-i 2\pi n t / T} \, dt$$
 
-Define the frequency spacing $\Delta f = 1/T$ and the $n$-th frequency as $f_n = n \Delta f = n/T$. Substituting back:
+Define the frequency spacing \(\Delta f = 1/T\) and the \(n\)-th frequency as \(f_n = n \Delta f = n/T\). Substituting back:
 
 $$f(t) = \sum_{n=-\infty}^{\infty} \left[\frac{1}{T}\int_{-T/2}^{T/2} f(t') \, e^{-i 2\pi f_n t'} \, dt'\right] e^{i 2\pi f_n t}$$
 
@@ -166,7 +166,7 @@ Rewrite this as:
 
 $$f(t) = \sum_{n=-\infty}^{\infty} \underbrace{\left[\int_{-T/2}^{T/2} f(t') \, e^{-i 2\pi f_n t'} \, dt'\right]}_{\text{call this } \hat{f}(f_n)} e^{i 2\pi f_n t} \, \Delta f$$
 
-Now take $T \to \infty$. The spacing $\Delta f \to 0$, the discrete frequencies $f_n$ become a continuous variable $\xi$, the sum becomes an integral, and the limits of the inner integral extend to $\pm\infty$:
+Now take \(T \to \infty\). The spacing \(\Delta f \to 0\), the discrete frequencies \(f_n\) become a continuous variable \(\xi\), the sum becomes an integral, and the limits of the inner integral extend to \(\pm\infty\):
 
 $$\boxed{f(t) = \int_{-\infty}^{\infty} \hat{f}(\xi) \, e^{i 2\pi \xi t} \, d\xi}$$
 
@@ -174,15 +174,15 @@ where
 
 $$\boxed{\hat{f}(\xi) = \int_{-\infty}^{\infty} f(t) \, e^{-i 2\pi \xi t} \, dt}$$
 
-The first equation is the **inverse Fourier transform** (synthesis --- building the function from its frequencies). The second is the **Fourier transform** (analysis --- decomposing the function into its frequencies). Together, they form a transform pair: $f(t) \leftrightarrow \hat{f}(\xi)$.
+The first equation is the **inverse Fourier transform** (synthesis --- building the function from its frequencies). The second is the **Fourier transform** (analysis --- decomposing the function into its frequencies). Together, they form a transform pair: \(f(t) \leftrightarrow \hat{f}(\xi)\).
 
-The variable $\xi$ is a **continuous frequency**. The function $\hat{f}(\xi)$ tells you the amplitude and phase of the frequency-$\xi$ component in $f(t)$. A periodic function has a discrete spectrum (spikes at the harmonics). A non-periodic function has a continuous spectrum (energy spread across all frequencies).
+The variable \(\xi\) is a **continuous frequency**. The function \(\hat{f}(\xi)\) tells you the amplitude and phase of the frequency-\(\xi\) component in \(f(t)\). A periodic function has a discrete spectrum (spikes at the harmonics). A non-periodic function has a continuous spectrum (energy spread across all frequencies).
 
 ---
 
 ## The DFT and FFT: The Discrete Case
 
-In practice, we never have continuous functions. We have sampled data: $N$ values $x_0, x_1, \ldots, x_{N-1}$ taken at uniform intervals. The **Discrete Fourier Transform (DFT)** is the version of the Fourier transform for this setting.
+In practice, we never have continuous functions. We have sampled data: \(N\) values \(x_0, x_1, \ldots, x_{N-1}\) taken at uniform intervals. The **Discrete Fourier Transform (DFT)** is the version of the Fourier transform for this setting.
 
 ### Definition
 
@@ -192,27 +192,27 @@ The inverse:
 
 $$x_n = \frac{1}{N}\sum_{k=0}^{N-1} X_k \, e^{i 2\pi k n / N}, \qquad n = 0, 1, \ldots, N-1$$
 
-$X_k$ is the complex amplitude of the $k$-th frequency component. The magnitude $|X_k|$ gives the amplitude; the argument $\arg(X_k)$ gives the phase.
+\(X_k\) is the complex amplitude of the \(k\)-th frequency component. The magnitude \(|X_k|\) gives the amplitude; the argument \(\arg(X_k)\) gives the phase.
 
 ### Computational Complexity
 
-Computing the DFT naively requires $N$ multiplications for each of $N$ output values, giving $O(N^2)$ complexity. For a 1-megapixel image ($N \approx 10^6$), this is $10^{12}$ operations --- impractical.
+Computing the DFT naively requires \(N\) multiplications for each of \(N\) output values, giving \(O(N^2)\) complexity. For a 1-megapixel image (\(N \approx 10^6\)), this is \(10^{12}\) operations --- impractical.
 
-The **Fast Fourier Transform (FFT)**, discovered by Cooley and Tukey in 1965 (though Gauss had a version in 1805), reduces this to $O(N \log N)$. The idea is divide-and-conquer: split the DFT into even-indexed and odd-indexed terms.
+The **Fast Fourier Transform (FFT)**, discovered by Cooley and Tukey in 1965 (though Gauss had a version in 1805), reduces this to \(O(N \log N)\). The idea is divide-and-conquer: split the DFT into even-indexed and odd-indexed terms.
 
 $$X_k = \sum_{m=0}^{N/2-1} x_{2m} \, e^{-i 2\pi k (2m) / N} + \sum_{m=0}^{N/2-1} x_{2m+1} \, e^{-i 2\pi k (2m+1) / N}$$
 
 $$= \underbrace{\sum_{m=0}^{N/2-1} x_{2m} \, e^{-i 2\pi k m / (N/2)}}_{E_k} + e^{-i 2\pi k / N} \underbrace{\sum_{m=0}^{N/2-1} x_{2m+1} \, e^{-i 2\pi k m / (N/2)}}_{O_k}$$
 
-Both $E_k$ and $O_k$ are DFTs of size $N/2$. So we have reduced one DFT of size $N$ to two DFTs of size $N/2$ plus $O(N)$ work for the combination. The recurrence $T(N) = 2T(N/2) + O(N)$ solves to $T(N) = O(N \log N)$.
+Both \(E_k\) and \(O_k\) are DFTs of size \(N/2\). So we have reduced one DFT of size \(N\) to two DFTs of size \(N/2\) plus \(O(N)\) work for the combination. The recurrence \(T(N) = 2T(N/2) + O(N)\) solves to \(T(N) = O(N \log N)\).
 
-For our 1-megapixel image, this is $10^6 \times 20 = 2 \times 10^7$ operations --- a speedup of 50,000x. This is why the FFT has been called "the most important numerical algorithm of our lifetime."
+For our 1-megapixel image, this is \(10^6 \times 20 = 2 \times 10^7\) operations --- a speedup of 50,000x. This is why the FFT has been called "the most important numerical algorithm of our lifetime."
 
 ### The Nyquist-Shannon Sampling Theorem and Aliasing
 
-When you sample a continuous signal at rate $f_s$ (samples per second), you can only faithfully represent frequencies up to $f_s / 2$, called the **Nyquist frequency**. Frequencies above $f_s / 2$ get "folded back" into the range $[0, f_s/2]$, appearing as lower-frequency imposters. This is **aliasing**.
+When you sample a continuous signal at rate \(f_s\) (samples per second), you can only faithfully represent frequencies up to \(f_s / 2\), called the **Nyquist frequency**. Frequencies above \(f_s / 2\) get "folded back" into the range \([0, f_s/2]\), appearing as lower-frequency imposters. This is **aliasing**.
 
-A concrete example: if you sample a 900 Hz sine wave at 1000 Hz, it looks identical to a 100 Hz sine wave. The 900 Hz signal has aliased to 100 Hz because $900 = 1000 - 100$.
+A concrete example: if you sample a 900 Hz sine wave at 1000 Hz, it looks identical to a 100 Hz sine wave. The 900 Hz signal has aliased to 100 Hz because \(900 = 1000 - 100\).
 
 In video, aliasing shows up as the wagon-wheel effect (spoked wheels appearing to rotate backward), moire patterns on fine textures, and staircase artifacts on diagonal lines. Video models must deal with these artifacts both in their training data and in their generated outputs.
 
@@ -230,15 +230,15 @@ Let us define convolution and then prove this.
 
 ### Convolution
 
-The convolution of two functions $f$ and $g$ is:
+The convolution of two functions \(f\) and \(g\) is:
 
 $$(f * g)(t) = \int_{-\infty}^{\infty} f(\tau) \, g(t - \tau) \, d\tau$$
 
-Operationally: you slide $g$ across $f$, multiply them pointwise at each position, and integrate. Convolution computes a weighted running average. In neural networks, convolutional layers compute discrete versions of exactly this operation.
+Operationally: you slide \(g\) across \(f\), multiply them pointwise at each position, and integrate. Convolution computes a weighted running average. In neural networks, convolutional layers compute discrete versions of exactly this operation.
 
 ### Proof of the Convolution Theorem
 
-We want to show that $\widehat{f * g}(\xi) = \hat{f}(\xi) \cdot \hat{g}(\xi)$.
+We want to show that \(\widehat{f * g}(\xi) = \hat{f}(\xi) \cdot \hat{g}(\xi)\).
 
 Start by taking the Fourier transform of the convolution:
 
@@ -248,13 +248,13 @@ Swap the order of integration (justified by Fubini's theorem when both functions
 
 $$= \int_{-\infty}^{\infty} f(\tau) \left[\int_{-\infty}^{\infty} g(t-\tau) \, e^{-i2\pi\xi t} \, dt\right] d\tau$$
 
-In the inner integral, substitute $u = t - \tau$, so $t = u + \tau$ and $dt = du$:
+In the inner integral, substitute \(u = t - \tau\), so \(t = u + \tau\) and \(dt = du\):
 
 $$= \int_{-\infty}^{\infty} f(\tau) \left[\int_{-\infty}^{\infty} g(u) \, e^{-i2\pi\xi(u+\tau)} \, du\right] d\tau$$
 
 $$= \int_{-\infty}^{\infty} f(\tau) \, e^{-i2\pi\xi\tau} \left[\int_{-\infty}^{\infty} g(u) \, e^{-i2\pi\xi u} \, du\right] d\tau$$
 
-The inner integral is $\hat{g}(\xi)$ --- it does not depend on $\tau$, so it factors out:
+The inner integral is \(\hat{g}(\xi)\) --- it does not depend on \(\tau\), so it factors out:
 
 $$= \hat{g}(\xi) \int_{-\infty}^{\infty} f(\tau) \, e^{-i2\pi\xi\tau} \, d\tau = \hat{g}(\xi) \cdot \hat{f}(\xi)$$
 
@@ -262,7 +262,7 @@ $$\boxed{\widehat{f * g}(\xi) = \hat{f}(\xi) \cdot \hat{g}(\xi)} \quad \blacksqu
 
 ### Why This Matters Computationally
 
-Direct convolution of two signals of length $N$ takes $O(N^2)$ operations. Using the convolution theorem: take the FFT of both signals ($O(N\log N)$ each), multiply elementwise ($O(N)$), and take the inverse FFT ($O(N\log N)$). Total: $O(N\log N)$.
+Direct convolution of two signals of length \(N\) takes \(O(N^2)\) operations. Using the convolution theorem: take the FFT of both signals (\(O(N\log N)\) each), multiply elementwise (\(O(N)\)), and take the inverse FFT (\(O(N\log N)\)). Total: \(O(N\log N)\).
 
 For large kernels or signals, this is a dramatic speedup. In deep learning, some implementations of convolutional layers use FFT-based convolution for exactly this reason, particularly when the kernel size is large.
 
@@ -280,9 +280,9 @@ This is the squared magnitude of the Fourier transform. The phase information is
 
 Several important spectral shapes appear throughout science and engineering:
 
-- **White noise**: $S(\xi) = \text{constant}$. Equal power at all frequencies. Random pixel noise in images.
-- **Pink noise** ($1/f$ noise): $S(\xi) \propto 1/|\xi|$. Equal power per octave. Natural images approximately follow this.
-- **Brownian noise** ($1/f^2$ noise): $S(\xi) \propto 1/|\xi|^2$. Smoother, more correlated fluctuations.
+- **White noise**: \(S(\xi) = \text{constant}\). Equal power at all frequencies. Random pixel noise in images.
+- **Pink noise** ($1/f$ noise): \(S(\xi) \propto 1/|\xi|\). Equal power per octave. Natural images approximately follow this.
+- **Brownian noise** (\(1/f^2\) noise): \(S(\xi) \propto 1/|\xi|^2\). Smoother, more correlated fluctuations.
 
 The observation that natural images have approximately $1/f$ power spectra has deep implications. It means natural images have a specific statistical structure that encoders and decoders in generative models implicitly learn to exploit.
 
@@ -296,7 +296,7 @@ Images are 2D signals, so we need the 2D Fourier transform:
 
 $$\hat{I}(\xi_x, \xi_y) = \int\int I(x, y) \, e^{-i2\pi(\xi_x x + \xi_y y)} \, dx \, dy$$
 
-Now $\xi_x$ and $\xi_y$ are spatial frequencies --- oscillations per unit distance in the $x$ and $y$ directions. The 2D Fourier transform decomposes an image into sinusoidal gratings (2D sine waves) at every combination of horizontal and vertical frequency.
+Now \(\xi_x\) and \(\xi_y\) are spatial frequencies --- oscillations per unit distance in the \(x\) and \(y\) directions. The 2D Fourier transform decomposes an image into sinusoidal gratings (2D sine waves) at every combination of horizontal and vertical frequency.
 
 The 2D DFT is separable: you can compute it by doing 1D FFTs along all rows, then along all columns (or vice versa). This is efficient and is exactly what `numpy.fft.fft2` does.
 
@@ -365,7 +365,7 @@ plt.savefig('fourier_square_wave.png', dpi=150, bbox_inches='tight')
 plt.show()
 ```
 
-This simulation shows the Gibbs phenomenon: even with many terms, the Fourier partial sums overshoot near the discontinuity by about 9% (approximately $\frac{1}{2}\int_0^\pi \frac{\sin t}{t}dt - \frac{\pi}{4} \approx 0.0895\pi$). This overshoot never disappears as you add more terms --- it just gets narrower but stays the same height. A beautiful and counterintuitive result.
+This simulation shows the Gibbs phenomenon: even with many terms, the Fourier partial sums overshoot near the discontinuity by about 9% (approximately \(\frac{1}{2}\int_0^\pi \frac{\sin t}{t}dt - \frac{\pi}{4} \approx 0.0895\pi\)). This overshoot never disappears as you add more terms --- it just gets narrower but stays the same height. A beautiful and counterintuitive result.
 
 ### Simulation 2: 2D FFT of an Image
 
@@ -506,7 +506,7 @@ plt.savefig('aliasing_demo.png', dpi=150, bbox_inches='tight')
 plt.show()
 ```
 
-At $f_s = 7$ Hz, the Nyquist frequency is 3.5 Hz, which is below the signal's 5 Hz. The samples can be fit perfectly by a 2 Hz sine wave ($5 - 7 = -2$, and $|-2| = 2$). The 5 Hz signal has aliased to 2 Hz --- information is irrecoverably lost.
+At \(f_s = 7\) Hz, the Nyquist frequency is 3.5 Hz, which is below the signal's 5 Hz. The samples can be fit perfectly by a 2 Hz sine wave (\(5 - 7 = -2\), and \(|-2| = 2\)). The 5 Hz signal has aliased to 2 Hz --- information is irrecoverably lost.
 
 ---
 
@@ -516,7 +516,7 @@ Fourier analysis is not just a mathematical curiosity --- it is the lens through
 
 1. **Any function decomposes into sinusoidal components**, with coefficients determined by inner products (projections onto the orthogonal trigonometric basis).
 2. **The Fourier transform** extends this from periodic to non-periodic functions by taking the period to infinity.
-3. **The FFT** makes this computationally feasible, reducing $O(N^2)$ to $O(N\log N)$.
+3. **The FFT** makes this computationally feasible, reducing \(O(N^2)\) to \(O(N\log N)\).
 4. **The convolution theorem** converts convolution (expensive) to multiplication (cheap) in the frequency domain.
 5. **The Nyquist theorem** tells us the sampling rate must be at least twice the highest frequency present --- violating this causes aliasing.
 6. **Images and video** are 2D and 3D signals where blurring is low-pass filtering, edges are high-frequency content, and many generation architectures implicitly work in a frequency-aware manner.

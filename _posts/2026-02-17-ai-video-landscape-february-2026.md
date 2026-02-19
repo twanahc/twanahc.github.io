@@ -36,7 +36,7 @@ Let us enumerate every model that matters as of February 2026, organized by tier
 
 **Google Veo 3.1** is the current technical leader in combined audio-visual generation. Released in stages through late 2025 and early 2026, Veo 3.1 generates video at resolutions up to 4K (3840x2160) with native synchronized audio including dialogue, sound effects, and ambient sound. The audio system is based on SoundStorm, Google DeepMind's parallel audio generation architecture. Available through both the Gemini API and Vertex AI, Veo 3.1 represents Google's most aggressive push into generative media.
 
-**Runway Gen-4.5** holds the #1 position on the Artificial Analysis Text-to-Video benchmark at 1,247 Elo. It ships in two tiers: Turbo (optimized for speed, ~$0.05/sec) and Aleph (optimized for quality, ~$0.15/sec). Gen-4.5 does not generate native audio, which is becoming an increasingly conspicuous gap. Runway has focused on visual fidelity, physics simulation, and cinematic motion quality. Their API uses a credit-based system with REST endpoints.
+**Runway Gen-4.5** holds the #1 position on the Artificial Analysis Text-to-Video benchmark at 1,247 Elo. It ships in two tiers: Turbo (optimized for speed, ~\(0.05/sec) and Aleph (optimized for quality, ~\)0.15/sec). Gen-4.5 does not generate native audio, which is becoming an increasingly conspicuous gap. Runway has focused on visual fidelity, physics simulation, and cinematic motion quality. Their API uses a credit-based system with REST endpoints.
 
 **OpenAI Sora 2** launched with significant fanfare and then immediately stumbled with capacity issues that took weeks to resolve. Once stabilized, Sora 2 delivers solid quality at $0.10/sec for 720p output with native audio. The "Characters" feature --- upload a video to create a persistent character identity --- is architecturally unique among the major models. Sora 2 killed its free tier in January 2026, restricting access to $20+/month subscribers.
 
@@ -70,25 +70,25 @@ The majority of current video generation models are built on the Diffusion Trans
 
 The standard DiT video generation pipeline works as follows:
 
-1. **Encoding**: Input frames (or noise) are encoded into a latent space via a Variational Autoencoder (VAE). For a video of $T$ frames at resolution $H \times W$, the latent representation has shape $(T, h, w, c)$ where $h = H/f$, $w = W/f$, $f$ is the spatial downsampling factor (typically 8), and $c$ is the latent channel dimension (typically 4-16).
+1. **Encoding**: Input frames (or noise) are encoded into a latent space via a Variational Autoencoder (VAE). For a video of \(T\) frames at resolution \(H \times W\), the latent representation has shape \((T, h, w, c)\) where \(h = H/f\), \(w = W/f\), \(f\) is the spatial downsampling factor (typically 8), and \(c\) is the latent channel dimension (typically 4-16).
 
-2. **Patchification**: The latent volume is divided into spacetime patches. For spatial patch size $p_s$ and temporal patch size $p_t$, the number of tokens is:
+2. **Patchification**: The latent volume is divided into spacetime patches. For spatial patch size \(p_s\) and temporal patch size \(p_t\), the number of tokens is:
 
 $$N = \frac{T}{p_t} \times \frac{h}{p_s} \times \frac{w}{p_s}$$
 
-For a 5-second video at 24fps (120 frames), 720p resolution ($h=90, w=160$ in latent space with $f=8$), $p_s=2$, $p_t=2$:
+For a 5-second video at 24fps (120 frames), 720p resolution (\(h=90, w=160\) in latent space with \(f=8\)), \(p_s=2\), \(p_t=2\):
 
 $$N = \frac{120}{2} \times \frac{90}{2} \times \frac{160}{2} = 60 \times 45 \times 80 = 216{,}000 \text{ tokens}$$
 
-This is the fundamental computational challenge: the token count scales as $O(T \times H \times W)$, and self-attention over all tokens scales as $O(N^2)$ --- meaning a naive implementation for our 5-second 720p example would require attention over $216{,}000^2 \approx 4.7 \times 10^{10}$ pairs.
+This is the fundamental computational challenge: the token count scales as \(O(T \times H \times W)\), and self-attention over all tokens scales as \(O(N^2)\) --- meaning a naive implementation for our 5-second 720p example would require attention over \(216{,}000^2 \approx 4.7 \times 10^{10}\) pairs.
 
 3. **Factored attention**: To make this tractable, all production models use some form of factored attention. The most common approach separates spatial and temporal attention:
 
 $$\text{Attention}(Q, K, V) = \text{SpatialAttn}(Q_s, K_s, V_s) + \text{TemporalAttn}(Q_t, K_t, V_t)$$
 
-Spatial attention operates over the $h/p_s \times w/p_s$ tokens within each frame, and temporal attention operates over the $T/p_t$ tokens at each spatial position. This reduces the attention cost from $O(N^2)$ to $O(N \times \max(S, T'))$ where $S = (h/p_s)(w/p_s)$ is the spatial token count per frame and $T' = T/p_t$ is the temporal token count.
+Spatial attention operates over the \(h/p_s \times w/p_s\) tokens within each frame, and temporal attention operates over the \(T/p_t\) tokens at each spatial position. This reduces the attention cost from \(O(N^2)\) to \(O(N \times \max(S, T'))\) where \(S = (h/p_s)(w/p_s)\) is the spatial token count per frame and \(T' = T/p_t\) is the temporal token count.
 
-For our example: spatial attention per frame is $45 \times 80 = 3{,}600$ tokens, temporal attention per position is 60 tokens. The total attention cost is proportional to $216{,}000 \times 3{,}600 + 216{,}000 \times 60 \approx 7.9 \times 10^8$, roughly 60x cheaper than full self-attention.
+For our example: spatial attention per frame is \(45 \times 80 = 3{,}600\) tokens, temporal attention per position is 60 tokens. The total attention cost is proportional to \(216{,}000 \times 3{,}600 + 216{,}000 \times 60 \approx 7.9 \times 10^8\), roughly 60x cheaper than full self-attention.
 
 4. **Denoising**: The transformer predicts the noise (or velocity) at each diffusion timestep. Typical production models use 30-100 denoising steps, with various distillation techniques to reduce this.
 
@@ -129,7 +129,7 @@ Sora 2 uses OpenAI's "spacetime patches" architecture, first described in the or
 
 **Flexible resolution and duration**: Sora's patchification operates on arbitrary video dimensions. Rather than training on fixed resolutions, the model was trained on diverse aspect ratios and durations. This allows a single model to generate at multiple resolutions without separate training runs.
 
-**Joint spatial-temporal patches**: Unlike models that factorize spatial and temporal attention, Sora uses joint spacetime patches --- each token represents a small 3D volume of the video. The reported patch sizes are on the order of $2 \times 16 \times 16$ (2 frames, 16x16 pixels in latent space).
+**Joint spatial-temporal patches**: Unlike models that factorize spatial and temporal attention, Sora uses joint spacetime patches --- each token represents a small 3D volume of the video. The reported patch sizes are on the order of \(2 \times 16 \times 16\) (2 frames, 16x16 pixels in latent space).
 
 The token count for a 5-second 720p video:
 
@@ -166,7 +166,7 @@ These conditioning signals are concatenated in the cross-attention layers of the
 
 $$\text{CrossAttn}(Q_{video}, K_{cond}, V_{cond})$$
 
-where $K_{cond}$ and $V_{cond}$ are formed by concatenating embeddings from all input modalities.
+where \(K_{cond}\) and \(V_{cond}\) are formed by concatenating embeddings from all input modalities.
 
 **Storyboard mode**: The multi-shot capability works by introducing scene boundary tokens into the temporal sequence. Each scene has its own conditioning (shot description, camera, framing) while sharing a global context (characters, setting, style). The model maintains a persistent latent representation across scene boundaries, which is how it achieves character consistency without explicit reference images:
 
@@ -189,9 +189,9 @@ Hailuo 2.3 uses a Mixture-of-Experts (MoE) architecture in its transformer backb
 
 $$\text{MoE}(x) = \sum_{i=1}^{E} g_i(x) \cdot \text{Expert}_i(x)$$
 
-where $g_i(x)$ is the gating weight for expert $i$ (typically sparse --- only top-$k$ experts are activated) and $E$ is the total number of experts.
+where \(g_i(x)\) is the gating weight for expert \(i\) (typically sparse --- only top-\(k\) experts are activated) and \(E\) is the total number of experts.
 
-The advantage of MoE is efficiency: a model can have large total parameter counts (for capacity) while only activating a fraction of parameters per token (for speed). If Hailuo has 32 experts and activates 4 per token, the active parameter count is $\frac{4}{32} = 12.5\%$ of total parameters, but the model has the knowledge capacity of the full parameter set.
+The advantage of MoE is efficiency: a model can have large total parameter counts (for capacity) while only activating a fraction of parameters per token (for speed). If Hailuo has 32 experts and activates 4 per token, the active parameter count is \(\frac{4}{32} = 12.5\%\) of total parameters, but the model has the knowledge capacity of the full parameter set.
 
 This explains Hailuo's speed advantage --- 6-second clips in under 30 seconds --- because it processes fewer FLOPs per token despite having a large model.
 
@@ -199,7 +199,7 @@ This explains Hailuo's speed advantage --- 6-second clips in under 30 seconds --
 
 PixVerse R1 represents a fundamentally different architecture from the batch generation models. Real-time generation at 1080p requires:
 
-**Latency budget**: At 24fps, each frame must be generated in $\frac{1000}{24} \approx 41.7$ms. Even with temporal batching (generating frames in groups), the per-frame budget is extremely tight.
+**Latency budget**: At 24fps, each frame must be generated in \(\frac{1000}{24} \approx 41.7\)ms. Even with temporal batching (generating frames in groups), the per-frame budget is extremely tight.
 
 **Speculative generation**: R1 likely uses a speculative execution approach --- generating multiple frames ahead based on predicted user input, then discarding or adjusting frames based on actual input. This is architecturally similar to speculative decoding in LLMs.
 
@@ -238,24 +238,24 @@ Understanding per-second pricing requires decomposing it into its component cost
 
 ### Cost Components
 
-For a cloud-hosted video generation service, the cost of generating one second of video at resolution $R$ with $S$ denoising steps has these components:
+For a cloud-hosted video generation service, the cost of generating one second of video at resolution \(R\) with \(S\) denoising steps has these components:
 
 $$C_{total} = C_{compute} + C_{storage} + C_{egress} + C_{overhead}$$
 
-**Compute cost** dominates. For a DiT model with $P$ parameters, $S$ denoising steps, and $N$ tokens per step:
+**Compute cost** dominates. For a DiT model with \(P\) parameters, \(S\) denoising steps, and \(N\) tokens per step:
 
 $$C_{compute} = S \times N \times 2P \times C_{FLOP}$$
 
-where $2P$ is the approximate FLOPs per token per forward pass (each parameter is used in one multiply and one add), and $C_{FLOP}$ is the cost per FLOP on the provider's hardware.
+where $2P$ is the approximate FLOPs per token per forward pass (each parameter is used in one multiply and one add), and \(C_{FLOP}\) is the cost per FLOP on the provider's hardware.
 
 For an NVIDIA H100 at cloud rates (~$2.50/hour), the cost per FLOP is:
 
 $$C_{FLOP} = \frac{\$2.50/\text{hr}}{990 \times 10^{12} \text{ FLOPS (bf16)}} \approx 2.5 \times 10^{-15} \text{ \$/FLOP}$$
 
 **Worked example for Veo 3.1 (estimated)**:
-- Estimated parameters: $P \approx 30 \times 10^9$ (30B)
-- Denoising steps: $S \approx 50$
-- Tokens for 1 second of 720p video (24 frames): $N \approx \frac{24}{2} \times \frac{90}{2} \times \frac{160}{2} = 12 \times 45 \times 80 = 43{,}200$
+- Estimated parameters: \(P \approx 30 \times 10^9\) (30B)
+- Denoising steps: \(S \approx 50\)
+- Tokens for 1 second of 720p video (24 frames): \(N \approx \frac{24}{2} \times \frac{90}{2} \times \frac{160}{2} = 12 \times 45 \times 80 = 43{,}200\)
 
 $$C_{compute/sec} = 50 \times 43{,}200 \times 2 \times 30 \times 10^9 \times 2.5 \times 10^{-15}$$
 $$= 50 \times 43{,}200 \times 60 \times 10^9 \times 2.5 \times 10^{-15}$$
@@ -266,9 +266,9 @@ $$= \$0.324 \text{ per second of video}$$
 This raw compute cost of ~$0.32/sec aligns remarkably well with Veo 3.1's standard pricing of $0.35-0.50/sec, suggesting a margin of 10-50% at the standard tier.
 
 **For Runway Gen-4.5 Turbo** (estimated):
-- Estimated parameters: $P \approx 15 \times 10^9$ (smaller, distilled)
-- Denoising steps: $S \approx 12$ (aggressive distillation)
-- Tokens: same resolution assumptions, $N \approx 43{,}200$
+- Estimated parameters: \(P \approx 15 \times 10^9\) (smaller, distilled)
+- Denoising steps: \(S \approx 12\) (aggressive distillation)
+- Tokens: same resolution assumptions, \(N \approx 43{,}200\)
 
 $$C_{compute/sec} = 12 \times 43{,}200 \times 2 \times 15 \times 10^9 \times 2.5 \times 10^{-15}$$
 $$= 12 \times 43{,}200 \times 7.5 \times 10^{-5}$$
@@ -295,9 +295,9 @@ These margins are thin by software standards but typical for compute-heavy API s
 
 At scale, the economics shift meaningfully. Consider a platform generating 10,000 five-second clips per day:
 
-**Daily generation volume**: 10,000 clips $\times$ 5 seconds = 50,000 seconds of video per day.
+**Daily generation volume**: 10,000 clips \(\times\) 5 seconds = 50,000 seconds of video per day.
 
-**Monthly volume**: 50,000 $\times$ 30 = 1,500,000 seconds per month.
+**Monthly volume**: 50,000 \(\times\) 30 = 1,500,000 seconds per month.
 
 | Model | $/sec | Monthly Cost | Annual Cost |
 |-------|-------|-------------|-------------|
@@ -340,9 +340,9 @@ Fitting an exponential decay to these price points:
 
 $$P(t) = P_0 \cdot e^{-\lambda t}$$
 
-where $t$ is months since February 2024, $P_0$ is the initial price, and $\lambda$ is the decay constant.
+where \(t\) is months since February 2024, \(P_0\) is the initial price, and \(\lambda\) is the decay constant.
 
-Using the endpoints: $P(0) = \$1.20$, $P(24) = \$0.04$:
+Using the endpoints: \(P(0) = \\)1.20\(, \(P(24) = \\)0.04\):
 
 $$0.04 = 1.20 \cdot e^{-24\lambda}$$
 $$\frac{0.04}{1.20} = e^{-24\lambda}$$
@@ -350,7 +350,7 @@ $$\ln(0.0333) = -24\lambda$$
 $$-3.40 = -24\lambda$$
 $$\lambda = 0.142 \text{ per month}$$
 
-This means prices are halving approximately every $\frac{\ln 2}{0.142} \approx 4.9$ months.
+This means prices are halving approximately every \(\frac{\ln 2}{0.142} \approx 4.9\) months.
 
 **Projection**: If this trend continues:
 - August 2026: ~$0.01/sec
@@ -386,7 +386,7 @@ The price decline is driven by three compounding factors:
 
 3. **Competitive pressure**: With 7+ viable models, no provider can maintain high margins. The market is racing to a cost-plus pricing equilibrium.
 
-The multiplicative effect: algorithmic (4x in 2 years) $\times$ hardware (2x in 2 years) $\times$ competition (1.5x margin compression) = ~12x total price reduction, which matches the observed ~30x reduction from $1.20 to $0.04 (the additional factor comes from architectural improvements like MoE and better VAEs).
+The multiplicative effect: algorithmic (4x in 2 years) \(\times\) hardware (2x in 2 years) \(\times\) competition (1.5x margin compression) = ~12x total price reduction, which matches the observed ~30x reduction from $1.20 to $0.04 (the additional factor comes from architectural improvements like MoE and better VAEs).
 
 ---
 
@@ -400,7 +400,7 @@ FVD is the video analog of Frechet Inception Distance (FID) used for images. It 
 
 $$\text{FVD} = \|\mu_r - \mu_g\|^2 + \text{Tr}\left(\Sigma_r + \Sigma_g - 2(\Sigma_r \Sigma_g)^{1/2}\right)$$
 
-where $(\mu_r, \Sigma_r)$ and $(\mu_g, \Sigma_g)$ are the mean and covariance of the feature distributions for real and generated videos, respectively.
+where \((\mu_r, \Sigma_r)\) and \((\mu_g, \Sigma_g)\) are the mean and covariance of the feature distributions for real and generated videos, respectively.
 
 **Limitations of FVD**:
 - Sensitive to the feature extractor used (I3D vs VideoMAE vs CLIP)
@@ -465,7 +465,7 @@ No single metric captures "quality." A weighted composite is more useful:
 
 $$Q_{composite} = w_1 \cdot \text{Elo}_{norm} + w_2 \cdot \text{FVD}_{norm} + w_3 \cdot \text{CLIP}_{norm} + w_4 \cdot \text{Temporal}_{norm}$$
 
-Using equal weights ($w_i = 0.25$) and normalizing each metric to [0, 1]:
+Using equal weights (\(w_i = 0.25\)) and normalizing each metric to [0, 1]:
 
 | Model | Elo (norm) | FVD (norm) | CLIP (norm) | Temporal (est.) | Composite |
 |-------|-----------|-----------|------------|----------------|-----------|
@@ -539,11 +539,11 @@ The cost savings are significant. A rough estimate of the multi-step audio pipel
 | Audio mixing/sync | $0.01 | Compute cost |
 | **Total** | **$0.62** | |
 
-Versus native audio with Veo 3.1 at $0.15/sec for 5 seconds: **$0.75** total. The native approach is actually slightly more expensive at Veo's standard pricing, but at Veo Fast pricing ($0.15/sec, so $0.75 for 5s) --- wait, let me recalculate.
+Versus native audio with Veo 3.1 at \(0.15/sec for 5 seconds: **\)0.75** total. The native approach is actually slightly more expensive at Veo's standard pricing, but at Veo Fast pricing ($0.15/sec, so $0.75 for 5s) --- wait, let me recalculate.
 
-At Veo 3.1 Fast: $0.15/sec $\times$ 5s = $0.75. At Sora 2: $0.10/sec $\times$ 5s = $0.50.
+At Veo 3.1 Fast: $0.15/sec \(\times\) 5s = $0.75. At Sora 2: $0.10/sec \(\times\) 5s = $0.50.
 
-So native audio at Sora 2 pricing ($0.50) is cheaper than the multi-step pipeline ($0.62), and eliminates all the synchronization issues. At Veo 3.1 Fast pricing ($0.75), you pay a 20% premium for significantly better audio quality and perfect synchronization.
+So native audio at Sora 2 pricing (\(0.50) is cheaper than the multi-step pipeline (\)0.62), and eliminates all the synchronization issues. At Veo 3.1 Fast pricing ($0.75), you pay a 20% premium for significantly better audio quality and perfect synchronization.
 
 The economic argument for native audio gets stronger at scale because it eliminates the engineering cost of building and maintaining the multi-step pipeline.
 
@@ -707,14 +707,14 @@ This is competitive with Ray3.14's $0.04/sec, but you bear the operational overh
 
 $$V_{monthly} \times C_{API} > C_{hardware} + C_{ops}$$
 
-where $V$ is monthly volume (seconds), $C_{API}$ is the API price per second, $C_{hardware}$ is the monthly hardware cost, and $C_{ops}$ is the monthly operational cost (engineering time, monitoring, etc.).
+where \(V\) is monthly volume (seconds), \(C_{API}\) is the API price per second, \(C_{hardware}\) is the monthly hardware cost, and \(C_{ops}\) is the monthly operational cost (engineering time, monitoring, etc.).
 
 For a single H100 at $2,500/mo with $1,500/mo operational overhead:
 
 $$V \times 0.10 > 4{,}000$$
 $$V > 40{,}000 \text{ seconds/month}$$
 
-At Sora 2 pricing ($0.10/sec), self-hosting breaks even at ~40,000 seconds/month (about 1,333 five-second clips per month, or 44/day). At Ray3.14 pricing ($0.04/sec), the break-even is:
+At Sora 2 pricing (\(0.10/sec), self-hosting breaks even at ~40,000 seconds/month (about 1,333 five-second clips per month, or 44/day). At Ray3.14 pricing (\)0.04/sec), the break-even is:
 
 $$V \times 0.04 > 4{,}000$$
 $$V > 100{,}000 \text{ seconds/month}$$
@@ -731,12 +731,12 @@ The AI video generation market is seeing unprecedented capital deployment. Under
 
 | Company | Total Funding | Latest Round | Est. Revenue (Annual) | Profitable? |
 |---------|-------------|-------------|---------------------|------------|
-| Runway | $308M+ | Series D, Nov 2024 | ~$100M ARR | No |
-| Luma | $900M+ | Series C, Nov 2025 | ~$30M ARR | No |
-| Pika | $135M+ | Series B, Apr 2025 | ~$20M ARR | No |
-| PixVerse | $60M+ | Series A, Feb 2026 | ~$40M ARR | No |
+| Runway | \(308M+ | Series D, Nov 2024 | ~\)100M ARR | No |
+| Luma | \(900M+ | Series C, Nov 2025 | ~\)30M ARR | No |
+| Pika | \(135M+ | Series B, Apr 2025 | ~\)20M ARR | No |
+| PixVerse | \(60M+ | Series A, Feb 2026 | ~\)40M ARR | No |
 | Kuaishou (Kling) | Public company | N/A | ~$130M (Kling only) | Kling: No; Kuaishou: Yes |
-| MiniMax | $600M+ | Series B, Sep 2024 | ~$70M ARR | No |
+| MiniMax | \(600M+ | Series B, Sep 2024 | ~\)70M ARR | No |
 | OpenAI (Sora) | $40B+ | Various | Part of larger business | No (company-wide) |
 | Google (Veo) | N/A | N/A | Part of larger business | N/A |
 
@@ -749,7 +749,7 @@ For a platform builder choosing API dependencies, the survival probability of ea
 - OpenAI (Sora): $40B+ in funding, essential to competitive position.
 
 **High (85-95%)**:
-- Runway: $308M+ raised, ~$100M ARR, clear market position. Could be acquired.
+- Runway: \(308M+ raised, ~\)100M ARR, clear market position. Could be acquired.
 - Kuaishou (Kling): Public company with profitable core business. Kling is strategic.
 - MiniMax: $600M+ raised, diversified product line.
 
@@ -822,11 +822,11 @@ Assuming a platform with 1,000 paying users, each generating 10 videos per day (
 $$\text{Daily volume} = 1{,}000 \times 10 \times 5 = 50{,}000 \text{ seconds}$$
 
 With assumed routing distribution:
-- 40% previews (Gen-4.5 Turbo): 20,000s $\times$ $0.05 = $1,000
-- 20% final visual (Gen-4.5 Aleph): 10,000s $\times$ $0.15 = $1,500
-- 15% final audio (Veo 3.1 Fast): 7,500s $\times$ $0.15 = $1,125
-- 10% multi-shot (Kling 3.0): 5,000s $\times$ $0.12 = $600
-- 15% budget (Ray3.14): 7,500s $\times$ $0.04 = $300
+- 40% previews (Gen-4.5 Turbo): 20,000s \(\times\) $0.05 = $1,000
+- 20% final visual (Gen-4.5 Aleph): 10,000s \(\times\) $0.15 = $1,500
+- 15% final audio (Veo 3.1 Fast): 7,500s \(\times\) $0.15 = $1,125
+- 10% multi-shot (Kling 3.0): 5,000s \(\times\) $0.12 = $600
+- 15% budget (Ray3.14): 7,500s \(\times\) $0.04 = $300
 
 **Daily generation cost**: $4,525
 **Monthly generation cost**: $135,750

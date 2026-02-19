@@ -1963,7 +1963,7 @@ For a SaaS platform builder, the revenue opportunity in post-production is struc
 | Tier 3 (pro editing) | 3% | 300 | $35 | $10,500 |
 | **Total incremental** | | | | **$25,500/mo** |
 
-At $25,500/month in incremental revenue from post-production features, with operating costs of ~$10,000/month (the hybrid approach from earlier), the net margin on post-production is approximately $15,500/month or 61%.
+At \(25,500/month in incremental revenue from post-production features, with operating costs of ~\)10,000/month (the hybrid approach from earlier), the net margin on post-production is approximately $15,500/month or 61%.
 
 This is why Adobe can afford to bundle these features into Creative Cloud -- the retention and upsell value exceeds the compute cost by an order of magnitude. The same economics apply to any platform with a generation revenue base.
 

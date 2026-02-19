@@ -102,9 +102,9 @@ The challenge in video inpainting --- the thing that separates it from image inp
 
 ## The Mathematical Formulation
 
-Let $V = \{I_1, I_2, \ldots, I_T\}$ be a video consisting of $T$ frames, where each frame $I_t \in \mathbb{R}^{H \times W \times 3}$. Let $M = \{M_1, M_2, \ldots, M_T\}$ be the corresponding mask sequence, where $M_t \in \{0, 1\}^{H \times W}$ with $M_t(i,j) = 1$ indicating that pixel $(i,j)$ in frame $t$ should be inpainted.
+Let \(V = \{I_1, I_2, \ldots, I_T\}\) be a video consisting of \(T\) frames, where each frame \(I_t \in \mathbb{R}^{H \times W \times 3}\). Let \(M = \{M_1, M_2, \ldots, M_T\}\) be the corresponding mask sequence, where \(M_t \in \{0, 1\}^{H \times W}\) with \(M_t(i,j) = 1\) indicating that pixel \((i,j)\) in frame \(t\) should be inpainted.
 
-Optionally, we have a conditioning signal $c$ (a text prompt describing what should fill the masked region, or nothing for pure removal).
+Optionally, we have a conditioning signal \(c\) (a text prompt describing what should fill the masked region, or nothing for pure removal).
 
 The video inpainting problem is:
 
@@ -126,7 +126,7 @@ The inpainted region must blend seamlessly with the surrounding content in each 
 
 $$\|I'_t(i,j) - \text{warp}(I'_{t-1}, F_{t-1 \to t})(i,j)\| \text{ is small } \forall (i,j) \in M_t$$
 
-where $F_{t-1 \to t}$ is the optical flow field from frame $t-1$ to $t$. In words: the inpainted content should follow the same motion patterns as the rest of the video. If the camera is panning left, the background fill should also pan left.
+where \(F_{t-1 \to t}\) is the optical flow field from frame \(t-1\) to \(t\). In words: the inpainted content should follow the same motion patterns as the rest of the video. If the camera is panning left, the background fill should also pan left.
 
 **Constraint 4 --- Semantic Coherence (if prompted):**
 
@@ -138,7 +138,7 @@ We can write the optimization objective compactly as:
 
 $$V'^* = \arg\min_{V'} \left[ \lambda_s \mathcal{L}_\text{spatial}(V') + \lambda_t \mathcal{L}_\text{temporal}(V') + \lambda_c \mathcal{L}_\text{condition}(V', c) \right] \quad \text{s.t.} \quad V'_{\bar{M}} = V_{\bar{M}}$$
 
-where $\bar{M}$ denotes the complement of the mask (the unmasked region), and $\lambda_s, \lambda_t, \lambda_c$ are weights balancing spatial quality, temporal consistency, and prompt adherence.
+where \(\bar{M}\) denotes the complement of the mask (the unmasked region), and \(\lambda_s, \lambda_t, \lambda_c\) are weights balancing spatial quality, temporal consistency, and prompt adherence.
 
 ---
 
@@ -148,25 +148,25 @@ Before tackling video, we need to understand how diffusion-based image inpaintin
 
 ### The Standard Diffusion Training Loss
 
-A diffusion model $\epsilon_\theta$ is trained to predict the noise added to a clean image $x_0$:
+A diffusion model \(\epsilon_\theta\) is trained to predict the noise added to a clean image \(x_0\):
 
 $$L = \mathbb{E}_{t, x_0, \epsilon \sim \mathcal{N}(0,I)} \left[ \|\epsilon - \epsilon_\theta(x_t, t, c)\|^2 \right]$$
 
-where $x_t = \sqrt{\bar{\alpha}_t} x_0 + \sqrt{1 - \bar{\alpha}_t} \epsilon$ is the noised image at timestep $t$, and $\bar{\alpha}_t = \prod_{s=1}^{t} \alpha_s$ is the cumulative noise schedule.
+where \(x_t = \sqrt{\bar{\alpha}_t} x_0 + \sqrt{1 - \bar{\alpha}_t} \epsilon\) is the noised image at timestep \(t\), and \(\bar{\alpha}_t = \prod_{s=1}^{t} \alpha_s\) is the cumulative noise schedule.
 
 ### Inpainting by Conditioning on the Unmasked Region
 
 The key insight for diffusion inpainting: during the reverse process (denoising), at each step, we replace the unmasked region with the appropriately noised version of the original image. The model only generates content for the masked region, but it can "see" the surrounding context and use it to guide generation.
 
-At each denoising step $t$, the update becomes:
+At each denoising step \(t\), the update becomes:
 
 $$x_{t-1} = M \odot \hat{x}_{t-1}^\text{gen} + (1 - M) \odot \hat{x}_{t-1}^\text{orig}$$
 
 where:
-- $\hat{x}_{t-1}^\text{gen}$ is the denoised prediction from the model
-- $\hat{x}_{t-1}^\text{orig} = \sqrt{\bar{\alpha}_{t-1}} x_0 + \sqrt{1 - \bar{\alpha}_{t-1}} \epsilon$ is the original image re-noised to timestep $t-1$
-- $M$ is the binary mask ($1$ = inpaint, $0$ = keep original)
-- $\odot$ denotes element-wise multiplication
+- \(\hat{x}_{t-1}^\text{gen}\) is the denoised prediction from the model
+- \(\hat{x}_{t-1}^\text{orig} = \sqrt{\bar{\alpha}_{t-1}} x_0 + \sqrt{1 - \bar{\alpha}_{t-1}} \epsilon\) is the original image re-noised to timestep \(t-1\)
+- \(M\) is the binary mask ($1$ = inpaint, $0$ = keep original)
+- \(\odot\) denotes element-wise multiplication
 
 This is called **repaint-style** inpainting (from the RePaint paper by Lugmayr et al., 2022). The model denoises freely in the masked region while being anchored to the original content in the unmasked region.
 
@@ -180,15 +180,15 @@ Let us break down every term:
 
 | Symbol | Meaning |
 |--------|---------|
-| $\epsilon$ | The noise sampled from $\mathcal{N}(0, I)$ |
-| $\epsilon_\theta$ | The neural network predicting the noise |
-| $\sqrt{\bar{\alpha}_t}$ | Signal scaling factor at timestep $t$ |
-| $x_0$ | The clean original image |
-| $\sqrt{1 - \bar{\alpha}_t}$ | Noise scaling factor at timestep $t$ |
-| $t$ | The diffusion timestep |
-| $c$ | The text conditioning (prompt) |
-| $M \odot x_0$ | The masked image (only unmasked pixels visible) |
-| $M$ | The binary mask itself (as a spatial channel) |
+| \(\epsilon\) | The noise sampled from \(\mathcal{N}(0, I)\) |
+| \(\epsilon_\theta\) | The neural network predicting the noise |
+| \(\sqrt{\bar{\alpha}_t}\) | Signal scaling factor at timestep \(t\) |
+| \(x_0\) | The clean original image |
+| \(\sqrt{1 - \bar{\alpha}_t}\) | Noise scaling factor at timestep \(t\) |
+| \(t\) | The diffusion timestep |
+| \(c\) | The text conditioning (prompt) |
+| \(M \odot x_0\) | The masked image (only unmasked pixels visible) |
+| \(M\) | The binary mask itself (as a spatial channel) |
 
 The model receives the noisy image, the timestep, the text prompt, the visible (unmasked) region of the original, and the mask as a spatial channel. This gives it explicit information about what is known and what needs to be generated.
 
@@ -260,23 +260,23 @@ Solutions include:
 
 1. **Blurred masks**: Instead of a binary mask, use a soft mask with Gaussian-blurred edges. The transition zone blends generated and original content smoothly.
 
-2. **RePaint resampling**: Jump back to a higher noise level periodically during denoising, re-noising the entire image and then re-replacing the unmasked region. This gives the model multiple chances to harmonize the boundary. Formally, instead of going $t \to t-1$ monotonically, the schedule includes jumps $t-1 \to t-1+j$ (re-noise) followed by $t-1+j \to t-1$ (denoise again), repeated $r$ times.
+2. **RePaint resampling**: Jump back to a higher noise level periodically during denoising, re-noising the entire image and then re-replacing the unmasked region. This gives the model multiple chances to harmonize the boundary. Formally, instead of going \(t \to t-1\) monotonically, the schedule includes jumps \(t-1 \to t-1+j\) (re-noise) followed by \(t-1+j \to t-1\) (denoise again), repeated \(r\) times.
 
 3. **Gradient-guided harmonization**: Add a gradient penalty that encourages the pixel gradients across the mask boundary to be smooth:
 
 $$\mathcal{L}_\text{boundary} = \sum_{(i,j) \in \partial M} \|\nabla I'(i,j) - \nabla I(i,j)\|^2$$
 
-where $\partial M$ is the set of pixels at the mask boundary.
+where \(\partial M\) is the set of pixels at the mask boundary.
 
 ---
 
 ## From Images to Video: The Temporal Consistency Problem
 
-Applying image inpainting independently to each frame of a video produces results that look plausible in still frames but flicker catastrophically when played as a sequence. The reason is that diffusion is stochastic: each frame's inpainted region is sampled independently from the conditional distribution, and there is no mechanism ensuring that frame $t$'s sample is consistent with frame $t-1$'s sample.
+Applying image inpainting independently to each frame of a video produces results that look plausible in still frames but flicker catastrophically when played as a sequence. The reason is that diffusion is stochastic: each frame's inpainted region is sampled independently from the conditional distribution, and there is no mechanism ensuring that frame \(t\)'s sample is consistent with frame \(t-1\)'s sample.
 
 Consider a simple example: inpainting a grass region across 30 frames. Each frame independently generates plausible grass texture. But the grass texture is different in every frame --- different blade positions, different shading, different color distributions. When played back, the region appears to "boil" or "shimmer" with random noise. This is immediately perceptible and unacceptable.
 
-The temporal consistency problem can be formalized using optical flow. Let $F_{t \to t+1}: \mathbb{R}^{H \times W \times 2}$ be the optical flow field from frame $t$ to $t+1$. Define the warping operator:
+The temporal consistency problem can be formalized using optical flow. Let \(F_{t \to t+1}: \mathbb{R}^{H \times W \times 2}\) be the optical flow field from frame \(t\) to \(t+1\). Define the warping operator:
 
 $$\text{warp}(I_t, F_{t \to t+1})(i,j) = I_t\left(i + F_{t \to t+1}^x(i,j), \; j + F_{t \to t+1}^y(i,j)\right)$$
 
@@ -284,7 +284,7 @@ Temporal consistency requires:
 
 $$\mathcal{L}_\text{temporal} = \sum_{t=1}^{T-1} \sum_{(i,j) \in M_t \cap M_{t+1}} \|I'_{t+1}(i,j) - \text{warp}(I'_t, F_{t \to t+1})(i,j)\|^2$$
 
-This says: for every pixel in the inpainted region, the content at frame $t+1$ should match what you would get by warping frame $t$'s content forward according to the optical flow. In other words, the inpainted content should move the same way as everything else in the video.
+This says: for every pixel in the inpainted region, the content at frame \(t+1\) should match what you would get by warping frame \(t\)'s content forward according to the optical flow. In other words, the inpainted content should move the same way as everything else in the video.
 
 ---
 
@@ -306,13 +306,13 @@ Apply a temporal filter to the inpainted regions. Common approaches include:
 
 $$\hat{I}'_t(i,j) = \frac{1}{2k+1} \sum_{s=t-k}^{t+k} \text{warp}(I'_s, F_{s \to t})(i,j) \quad \forall (i,j) \in M_t$$
 
-This warps $k$ neighboring frames to the current frame's coordinate system and averages them. The optical flow alignment is critical --- without it, you would simply blur the content.
+This warps \(k\) neighboring frames to the current frame's coordinate system and averages them. The optical flow alignment is critical --- without it, you would simply blur the content.
 
 **Temporal bilateral filter**: Weight the contributions by both temporal distance and color similarity:
 
 $$\hat{I}'_t(i,j) = \frac{\sum_{s=t-k}^{t+k} w_s \cdot \text{warp}(I'_s, F_{s \to t})(i,j)}{\sum_{s=t-k}^{t+k} w_s}$$
 
-where $w_s = \exp\left(-\frac{(s-t)^2}{2\sigma_t^2}\right) \cdot \exp\left(-\frac{\|I'_s - I'_t\|^2}{2\sigma_c^2}\right)$
+where \(w_s = \exp\left(-\frac{(s-t)^2}{2\sigma_t^2}\right) \cdot \exp\left(-\frac{\|I'_s - I'_t\|^2}{2\sigma_c^2}\right)\)
 
 ### Pros and Cons
 
@@ -333,23 +333,23 @@ The correct approach: treat the video as a 3D spatiotemporal volume and inpaint 
 
 ### 3D Diffusion for Video Inpainting
 
-A video diffusion model operates on the full spatiotemporal tensor $V \in \mathbb{R}^{T \times H \times W \times 3}$. The model's architecture includes temporal attention layers that allow each frame to attend to other frames, ensuring consistency.
+A video diffusion model operates on the full spatiotemporal tensor \(V \in \mathbb{R}^{T \times H \times W \times 3}\). The model's architecture includes temporal attention layers that allow each frame to attend to other frames, ensuring consistency.
 
 The inpainting formulation extends naturally to 3D:
 
 $$V_{t-1} = M_\text{3D} \odot \hat{V}_{t-1}^\text{gen} + (1 - M_\text{3D}) \odot \hat{V}_{t-1}^\text{orig}$$
 
-where $M_\text{3D} \in \{0,1\}^{T \times H \times W}$ is the 3D spatiotemporal mask, and the replacement happens at each diffusion denoising step across all frames simultaneously.
+where \(M_\text{3D} \in \{0,1\}^{T \times H \times W}\) is the 3D spatiotemporal mask, and the replacement happens at each diffusion denoising step across all frames simultaneously.
 
 The training loss for a video inpainting model is:
 
 $$L = \mathbb{E}_{t, V_0, \epsilon, M_\text{3D}} \left[ \left\| \epsilon - \epsilon_\theta\left(\sqrt{\bar{\alpha}_t} V_0 + \sqrt{1 - \bar{\alpha}_t} \epsilon, \; t, \; c, \; (1-M_\text{3D}) \odot V_0, \; M_\text{3D}\right) \right\|^2 \right]$$
 
-where now $\epsilon \in \mathbb{R}^{T \times H \times W \times 3}$ is spatiotemporal noise.
+where now \(\epsilon \in \mathbb{R}^{T \times H \times W \times 3}\) is spatiotemporal noise.
 
 ### Temporal Attention Mechanism
 
-The critical component is temporal self-attention. For a feature map at spatial position $(i,j)$, the model computes attention across the temporal dimension:
+The critical component is temporal self-attention. For a feature map at spatial position \((i,j)\), the model computes attention across the temporal dimension:
 
 $$\text{TemporalAttn}(Q, K, V) = \text{softmax}\left(\frac{Q K^T}{\sqrt{d_k}}\right) V$$
 
@@ -357,16 +357,16 @@ where the queries, keys, and values are computed from features at the same spati
 
 $$Q = W_Q h_{:,i,j}, \quad K = W_K h_{:,i,j}, \quad V = W_V h_{:,i,j}$$
 
-with $h_{:,i,j} \in \mathbb{R}^{T \times d}$ being the feature vector at position $(i,j)$ across all $T$ frames.
+with \(h_{:,i,j} \in \mathbb{R}^{T \times d}\) being the feature vector at position \((i,j)\) across all \(T\) frames.
 
-This allows the model to directly enforce temporal consistency: when generating frame $t$'s content in the masked region, it can attend to what it has generated (or is generating) in frames $t-1, t+1, t-2, t+2, \ldots$
+This allows the model to directly enforce temporal consistency: when generating frame \(t\)'s content in the masked region, it can attend to what it has generated (or is generating) in frames \(t-1, t+1, t-2, t+2, \ldots\)
 
 ### Computational Cost
 
-The downside is compute. Joint spatiotemporal processing scales as $O(T^2 H W)$ for temporal attention (quadratic in the number of frames). For a 5-second, 30fps, 1080p video, this is $T=150$ frames at $1920 \times 1080$. Even in latent space (downsampled by 8x), this is computationally demanding.
+The downside is compute. Joint spatiotemporal processing scales as \(O(T^2 H W)\) for temporal attention (quadratic in the number of frames). For a 5-second, 30fps, 1080p video, this is \(T=150\) frames at \(1920 \times 1080\). Even in latent space (downsampled by 8x), this is computationally demanding.
 
 Practical solutions:
-- **Sliding window**: Process chunks of $k$ frames (typically 16--32) with overlap, blending the overlapping regions.
+- **Sliding window**: Process chunks of \(k\) frames (typically 16--32) with overlap, blending the overlapping regions.
 - **Sparse temporal attention**: Attend to a subset of frames (e.g., every 4th frame plus the immediate neighbors) instead of all frames.
 - **Latent space processing**: Encode the video to latent space first, reducing spatial dimensions by 8x.
 
@@ -455,7 +455,7 @@ $$\hat{F}_{t \to t+1} = \text{FlowComplete}(F_{t \to t+1}, M_t, M_{t+1})$$
 
 **Step 3: Propagate known pixels.**
 
-Using the completed flow, propagate pixels from unmasked regions in neighboring frames into the masked region of the current frame. For each masked pixel $(i,j)$ at frame $t$, look for the nearest frame where that pixel's corresponding location (according to flow) is unmasked:
+Using the completed flow, propagate pixels from unmasked regions in neighboring frames into the masked region of the current frame. For each masked pixel \((i,j)\) at frame \(t\), look for the nearest frame where that pixel's corresponding location (according to flow) is unmasked:
 
 $$I'_t(i,j) = I_{t+\Delta t}\left(i + \sum_{s=t}^{t+\Delta t - 1} \hat{F}_{s \to s+1}^x(i,j), \; j + \sum_{s=t}^{t+\Delta t - 1} \hat{F}_{s \to s+1}^y(i,j)\right)$$
 
@@ -682,13 +682,13 @@ Regardless of how the mask is generated, post-processing improves inpainting qua
 
 $$M' = M \oplus B_r$$
 
-where $B_r$ is a disk structuring element of radius $r$.
+where \(B_r\) is a disk structuring element of radius \(r\).
 
 2. **Gaussian blur**: Apply a Gaussian blur to the dilated mask edges to create a soft transition zone:
 
 $$M'' = G_\sigma * M'$$
 
-where $G_\sigma$ is a Gaussian kernel with standard deviation $\sigma$, typically 3--7 pixels.
+where \(G_\sigma\) is a Gaussian kernel with standard deviation \(\sigma\), typically 3--7 pixels.
 
 3. **Temporal smoothing**: Ensure the mask does not jitter frame-to-frame. Apply a 1D Gaussian filter along the temporal axis for each pixel:
 
@@ -756,7 +756,7 @@ The final composite combines the inpainted region with the original video. Using
 
 $$I'_\text{final}(i,j) = M''(i,j) \cdot I'_\text{inpainted}(i,j) + (1 - M''(i,j)) \cdot I_\text{original}(i,j)$$
 
-where $M''$ is the blurred soft mask. The soft edges create a smooth gradient transition rather than a hard boundary.
+where \(M''\) is the blurred soft mask. The soft edges create a smooth gradient transition rather than a hard boundary.
 
 For additional boundary harmonization, apply Poisson blending (Perez et al., 2003), which matches the gradients at the boundary while allowing the color to shift:
 
@@ -884,11 +884,11 @@ How do you know if the inpainting succeeded? There are three dimensions to evalu
 
 ### 1. Temporal Consistency: Warping Error
 
-The most important metric for video inpainting. Compute the optical flow between consecutive frames, warp frame $t$ to align with frame $t+1$, and measure the difference in the inpainted region:
+The most important metric for video inpainting. Compute the optical flow between consecutive frames, warp frame \(t\) to align with frame \(t+1\), and measure the difference in the inpainted region:
 
 $$E_\text{warp} = \frac{1}{|\Omega|} \sum_{t=1}^{T-1} \sum_{(i,j) \in \Omega_t} \|I'_{t+1}(i,j) - \text{warp}(I'_t, F_{t \to t+1})(i,j)\|^2$$
 
-where $\Omega_t = M_t \cap M_{t+1}$ is the set of pixels that are inpainted in both frames, and $|\Omega| = \sum_t |\Omega_t|$ is the total count.
+where \(\Omega_t = M_t \cap M_{t+1}\) is the set of pixels that are inpainted in both frames, and \(|\Omega| = \sum_t |\Omega_t|\) is the total count.
 
 Lower warping error = better temporal consistency.
 
@@ -898,13 +898,13 @@ Lower warping error = better temporal consistency.
 
 $$\text{FID} = \|\mu_r - \mu_g\|^2 + \text{Tr}\left(\Sigma_r + \Sigma_g - 2(\Sigma_r \Sigma_g)^{1/2}\right)$$
 
-where $(\mu_r, \Sigma_r)$ and $(\mu_g, \Sigma_g)$ are the mean and covariance of Inception features from real and generated crops, respectively.
+where \((\mu_r, \Sigma_r)\) and \((\mu_g, \Sigma_g)\) are the mean and covariance of Inception features from real and generated crops, respectively.
 
 **LPIPS (Learned Perceptual Image Patch Similarity)** measures perceptual difference between the inpainted result and a reference (if available):
 
 $$\text{LPIPS}(x, x') = \sum_l \frac{1}{H_l W_l} \sum_{i,j} \|w_l \odot (\hat{y}_{l}^{x}(i,j) - \hat{y}_{l}^{x'}(i,j))\|^2$$
 
-where $\hat{y}_l^x$ are normalized activations from layer $l$ of a pretrained VGG network, and $w_l$ are learned weights.
+where \(\hat{y}_l^x\) are normalized activations from layer \(l\) of a pretrained VGG network, and \(w_l\) are learned weights.
 
 ### 3. Boundary Quality: Gradient Analysis
 
@@ -912,7 +912,7 @@ Check for visible seams at the mask boundary. Compute the gradient magnitude at 
 
 $$E_\text{boundary} = \frac{1}{|\partial M|} \sum_{(i,j) \in \partial M} \left| \|\nabla I'(i,j)\| - \mathbb{E}[\|\nabla I(i,j)\| \mid (i,j) \in \mathcal{N}(\partial M)] \right|$$
 
-where $\mathcal{N}(\partial M)$ is a neighborhood of the mask boundary in the unmasked region. A high boundary error indicates visible seams; a low value indicates smooth blending.
+where \(\mathcal{N}(\partial M)\) is a neighborhood of the mask boundary in the unmasked region. A high boundary error indicates visible seams; a low value indicates smooth blending.
 
 ### Combined Quality Score
 
@@ -920,7 +920,7 @@ For a production system, combine the metrics into a single quality gate:
 
 $$Q = w_1 \cdot (1 - \hat{E}_\text{warp}) + w_2 \cdot (1 - \hat{\text{FID}}) + w_3 \cdot (1 - \hat{E}_\text{boundary})$$
 
-where $\hat{\cdot}$ denotes normalization to $[0, 1]$ and $w_1 + w_2 + w_3 = 1$. Typical weights: $w_1 = 0.5$ (temporal consistency matters most), $w_2 = 0.3$ (visual quality), $w_3 = 0.2$ (boundary artifacts).
+where \(\hat{\cdot}\) denotes normalization to \([0, 1]\) and \(w_1 + w_2 + w_3 = 1\). Typical weights: \(w_1 = 0.5\) (temporal consistency matters most), \(w_2 = 0.3\) (visual quality), \(w_3 = 0.2\) (boundary artifacts).
 
 ---
 

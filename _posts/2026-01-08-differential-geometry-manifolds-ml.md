@@ -5,7 +5,7 @@ date: 2026-01-08
 category: math
 ---
 
-Most of machine learning assumes the world is flat. Data points live in $\mathbb{R}^n$, distances are Euclidean, and optimization happens by moving along straight lines (gradient descent). This works surprisingly well for many problems. But it is fundamentally wrong for many others.
+Most of machine learning assumes the world is flat. Data points live in \(\mathbb{R}^n\), distances are Euclidean, and optimization happens by moving along straight lines (gradient descent). This works surprisingly well for many problems. But it is fundamentally wrong for many others.
 
 The Earth is not flat, and neither is the space of probability distributions, the space of positive-definite matrices, the latent space of a generative model, or the parameter space of a neural network. These are all **curved spaces** --- manifolds --- and using flat-space intuition leads to real problems: geodesic distances differ dramatically from Euclidean distances, straight-line interpolation leaves the space entirely, and the "steepest descent" direction depends on the geometry.
 
@@ -31,25 +31,25 @@ This post builds the mathematical framework of differential geometry from scratc
 
 ## What Is a Manifold?
 
-A **manifold** is a space that is curved globally but looks flat locally. The canonical example is the surface of the Earth. If you stand in a field, the ground looks flat --- locally, it is well-approximated by a flat plane $\mathbb{R}^2$. But globally, it is a sphere $S^2$, and flat-Earth geometry gives wrong answers at large scales. A straight line on a flat map is not the shortest path between two cities on a sphere.
+A **manifold** is a space that is curved globally but looks flat locally. The canonical example is the surface of the Earth. If you stand in a field, the ground looks flat --- locally, it is well-approximated by a flat plane \(\mathbb{R}^2\). But globally, it is a sphere \(S^2\), and flat-Earth geometry gives wrong answers at large scales. A straight line on a flat map is not the shortest path between two cities on a sphere.
 
-Formally, a **topological manifold** of dimension $n$ is a topological space $M$ such that:
+Formally, a **topological manifold** of dimension \(n\) is a topological space \(M\) such that:
 
-1. **Locally Euclidean:** Every point $p \in M$ has a neighborhood that is homeomorphic (continuously deformable, with a continuous inverse) to an open subset of $\mathbb{R}^n$.
+1. **Locally Euclidean:** Every point \(p \in M\) has a neighborhood that is homeomorphic (continuously deformable, with a continuous inverse) to an open subset of \(\mathbb{R}^n\).
 2. **Hausdorff:** Any two distinct points have disjoint neighborhoods (no pathological point-identification).
 3. **Second countable:** The topology has a countable basis (a technical condition that prevents the manifold from being "too large").
 
-The key word is **locally Euclidean**. A manifold is a space where, if you zoom in enough, it looks like ordinary flat $\mathbb{R}^n$. The dimension $n$ is the number of coordinates you need locally.
+The key word is **locally Euclidean**. A manifold is a space where, if you zoom in enough, it looks like ordinary flat \(\mathbb{R}^n\). The dimension \(n\) is the number of coordinates you need locally.
 
 ### Examples
 
-**The circle $S^1$:** A 1-dimensional manifold. Locally, each small arc looks like a line segment (a piece of $\mathbb{R}^1$). Globally, it is closed and curved --- you can walk forever without hitting a boundary.
+**The circle \(S^1\):** A 1-dimensional manifold. Locally, each small arc looks like a line segment (a piece of \(\mathbb{R}^1\)). Globally, it is closed and curved --- you can walk forever without hitting a boundary.
 
-**The sphere $S^2$:** A 2-dimensional manifold embedded in $\mathbb{R}^3$. Each small patch looks like a piece of the plane $\mathbb{R}^2$. This is what maps exploit: a small-enough map of your city is approximately correct.
+**The sphere \(S^2\):** A 2-dimensional manifold embedded in \(\mathbb{R}^3\). Each small patch looks like a piece of the plane \(\mathbb{R}^2\). This is what maps exploit: a small-enough map of your city is approximately correct.
 
-**The space of unit vectors in $\mathbb{R}^n$:** This is the sphere $S^{n-1}$, an $(n-1)$-dimensional manifold. Normalized word embeddings live here.
+**The space of unit vectors in \(\mathbb{R}^n\):** This is the sphere \(S^{n-1}\), an \((n-1)\)-dimensional manifold. Normalized word embeddings live here.
 
-**The space of $n \times n$ positive definite matrices:** This is a manifold of dimension $n(n+1)/2$ (the number of unique entries in a symmetric matrix). Covariance matrices live here, and this space has rich non-Euclidean geometry.
+**The space of \(n \times n\) positive definite matrices:** This is a manifold of dimension \(n(n+1)/2\) (the number of unique entries in a symmetric matrix). Covariance matrices live here, and this space has rich non-Euclidean geometry.
 
 **What is NOT a manifold:** A figure-eight is not a manifold because at the crossing point, no neighborhood looks like a line. A cone tip is not a manifold because the tip has no flat neighborhood.
 
@@ -59,29 +59,29 @@ The key word is **locally Euclidean**. A manifold is a space where, if you zoom 
 
 The "locally Euclidean" condition means we can put coordinates on small patches of a manifold. But different patches need different coordinate systems, and we need them to be compatible where they overlap.
 
-A **chart** on a manifold $M$ is a pair $(U, \varphi)$ where:
-- $U \subseteq M$ is an open set (a patch of the manifold).
-- $\varphi: U \to \varphi(U) \subseteq \mathbb{R}^n$ is a homeomorphism (a continuous bijection with continuous inverse).
+A **chart** on a manifold \(M\) is a pair \((U, \varphi)\) where:
+- \(U \subseteq M\) is an open set (a patch of the manifold).
+- \(\varphi: U \to \varphi(U) \subseteq \mathbb{R}^n\) is a homeomorphism (a continuous bijection with continuous inverse).
 
-The function $\varphi$ assigns coordinates to each point in the patch $U$. If $p \in U$, then $\varphi(p) = (x^1, x^2, \ldots, x^n) \in \mathbb{R}^n$ are the **local coordinates** of $p$ in this chart.
+The function \(\varphi\) assigns coordinates to each point in the patch \(U\). If \(p \in U\), then \(\varphi(p) = (x^1, x^2, \ldots, x^n) \in \mathbb{R}^n\) are the **local coordinates** of \(p\) in this chart.
 
-An **atlas** is a collection of charts $\{(U_\alpha, \varphi_\alpha)\}$ that cover the entire manifold: $\bigcup_\alpha U_\alpha = M$.
+An **atlas** is a collection of charts \(\{(U_\alpha, \varphi_\alpha)\}\) that cover the entire manifold: \(\bigcup_\alpha U_\alpha = M\).
 
-When two charts $(U_\alpha, \varphi_\alpha)$ and $(U_\beta, \varphi_\beta)$ overlap (i.e., $U_\alpha \cap U_\beta \neq \emptyset$), we get a **transition map**:
+When two charts \((U_\alpha, \varphi_\alpha)\) and \((U_\beta, \varphi_\beta)\) overlap (i.e., \(U_\alpha \cap U_\beta \neq \emptyset\)), we get a **transition map**:
 
 $$\varphi_\beta \circ \varphi_\alpha^{-1}: \varphi_\alpha(U_\alpha \cap U_\beta) \to \varphi_\beta(U_\alpha \cap U_\beta)$$
 
-This is a map from $\mathbb{R}^n$ to $\mathbb{R}^n$ --- it tells you how to translate coordinates from one chart to another. A **smooth manifold** requires all transition maps to be smooth ($C^\infty$).
+This is a map from \(\mathbb{R}^n\) to \(\mathbb{R}^n\) --- it tells you how to translate coordinates from one chart to another. A **smooth manifold** requires all transition maps to be smooth (\(C^\infty\)).
 
 ### Example: The Sphere Needs Multiple Charts
 
-Consider $S^2$ (the 2-sphere). Can we cover it with a single chart? No. A single chart would be a homeomorphism from $S^2$ to an open subset of $\mathbb{R}^2$, and $S^2$ is compact while open subsets of $\mathbb{R}^2$ are not. More intuitively: you cannot make a perfectly flat map of the entire Earth without tearing it.
+Consider \(S^2\) (the 2-sphere). Can we cover it with a single chart? No. A single chart would be a homeomorphism from \(S^2\) to an open subset of \(\mathbb{R}^2\), and \(S^2\) is compact while open subsets of \(\mathbb{R}^2\) are not. More intuitively: you cannot make a perfectly flat map of the entire Earth without tearing it.
 
-The standard atlas for $S^2$ uses **stereographic projection** from two charts:
+The standard atlas for \(S^2\) uses **stereographic projection** from two charts:
 - Project from the North Pole onto the plane tangent to the South Pole. This covers everything except the North Pole itself.
 - Project from the South Pole onto the plane tangent to the North Pole. This covers everything except the South Pole.
 
-Together, they cover all of $S^2$.
+Together, they cover all of \(S^2\).
 
 <svg viewBox="0 0 700 380" xmlns="http://www.w3.org/2000/svg" style="max-width: 700px; display: block; margin: 2em auto;">
   <text x="350" y="25" text-anchor="middle" font-size="15" font-weight="bold" fill="#d4d4d4">Stereographic Projection: A Chart on S²</text>
@@ -140,31 +140,31 @@ Together, they cover all of $S^2$.
 
 ## Tangent Spaces: Velocity Vectors on Curved Surfaces
 
-On flat $\mathbb{R}^n$, vectors are simple: they are arrows pointing from one point to another. On a curved manifold, this does not work. There is no global notion of "direction" because the space is curved --- a vector at one point cannot be directly compared to a vector at another point without additional structure.
+On flat \(\mathbb{R}^n\), vectors are simple: they are arrows pointing from one point to another. On a curved manifold, this does not work. There is no global notion of "direction" because the space is curved --- a vector at one point cannot be directly compared to a vector at another point without additional structure.
 
-The **tangent space** $T_pM$ at a point $p \in M$ is the set of all "velocity vectors" of curves passing through $p$. It is a vector space of the same dimension as $M$, and it represents all the directions you can move from $p$.
+The **tangent space** \(T_pM\) at a point \(p \in M\) is the set of all "velocity vectors" of curves passing through \(p\). It is a vector space of the same dimension as \(M\), and it represents all the directions you can move from \(p\).
 
 ### Rigorous Definition
 
 There are three equivalent ways to define tangent vectors. Here is the most intuitive one.
 
-**Definition via curves:** Let $\gamma: (-\epsilon, \epsilon) \to M$ be a smooth curve with $\gamma(0) = p$. The **tangent vector** to $\gamma$ at $p$ is the "velocity" $\gamma'(0)$.
+**Definition via curves:** Let \(\gamma: (-\epsilon, \epsilon) \to M\) be a smooth curve with \(\gamma(0) = p\). The **tangent vector** to \(\gamma\) at \(p\) is the "velocity" \(\gamma'(0)\).
 
-But what does $\gamma'(0)$ mean on a manifold? We need coordinates. Choose a chart $(U, \varphi)$ around $p$. In local coordinates, $\gamma$ becomes $\varphi \circ \gamma: (-\epsilon, \epsilon) \to \mathbb{R}^n$, which is an ordinary curve in $\mathbb{R}^n$. Its derivative at 0 is an ordinary vector in $\mathbb{R}^n$:
+But what does \(\gamma'(0)\) mean on a manifold? We need coordinates. Choose a chart \((U, \varphi)\) around \(p\). In local coordinates, \(\gamma\) becomes \(\varphi \circ \gamma: (-\epsilon, \epsilon) \to \mathbb{R}^n\), which is an ordinary curve in \(\mathbb{R}^n\). Its derivative at 0 is an ordinary vector in \(\mathbb{R}^n\):
 
 $$\left.\frac{d}{dt}\right|_{t=0} (\varphi \circ \gamma)(t) = \left(\dot{\gamma}^1(0), \dot{\gamma}^2(0), \ldots, \dot{\gamma}^n(0)\right)$$
 
-Two curves $\gamma_1$ and $\gamma_2$ with $\gamma_1(0) = \gamma_2(0) = p$ define the **same** tangent vector if and only if they have the same derivative in local coordinates:
+Two curves \(\gamma_1\) and \(\gamma_2\) with \(\gamma_1(0) = \gamma_2(0) = p\) define the **same** tangent vector if and only if they have the same derivative in local coordinates:
 
 $$\left.\frac{d}{dt}\right|_{t=0} (\varphi \circ \gamma_1)(t) = \left.\frac{d}{dt}\right|_{t=0} (\varphi \circ \gamma_2)(t)$$
 
 This is chart-independent (thanks to the chain rule and smooth transition maps).
 
-The tangent space $T_pM$ is the set of all equivalence classes of curves through $p$, where two curves are equivalent if they have the same velocity. It is a vector space of dimension $n$ (the same as the manifold), and in local coordinates $(x^1, \ldots, x^n)$, a basis is:
+The tangent space \(T_pM\) is the set of all equivalence classes of curves through \(p\), where two curves are equivalent if they have the same velocity. It is a vector space of dimension \(n\) (the same as the manifold), and in local coordinates \((x^1, \ldots, x^n)\), a basis is:
 
 $$\left\{\frac{\partial}{\partial x^1}\bigg|_p, \frac{\partial}{\partial x^2}\bigg|_p, \ldots, \frac{\partial}{\partial x^n}\bigg|_p\right\}$$
 
-Any tangent vector $v \in T_pM$ can be written as $v = v^i \frac{\partial}{\partial x^i}\bigg|_p$ (using Einstein summation convention: repeated indices are summed).
+Any tangent vector \(v \in T_pM\) can be written as \(v = v^i \frac{\partial}{\partial x^i}\bigg|_p\) (using Einstein summation convention: repeated indices are summed).
 
 <svg viewBox="0 0 700 380" xmlns="http://www.w3.org/2000/svg" style="max-width: 700px; display: block; margin: 2em auto;">
   <text x="350" y="25" text-anchor="middle" font-size="15" font-weight="bold" fill="#d4d4d4">Tangent Plane to S² at Point p</text>
@@ -214,15 +214,15 @@ Any tangent vector $v \in T_pM$ can be written as $v = v^i \frac{\partial}{\part
 
 ## The Tangent Bundle
 
-The **tangent bundle** $TM$ of a manifold $M$ is the disjoint union of all tangent spaces:
+The **tangent bundle** \(TM\) of a manifold \(M\) is the disjoint union of all tangent spaces:
 
 $$TM = \bigsqcup_{p \in M} T_pM = \{(p, v) : p \in M, \, v \in T_pM\}$$
 
-This is itself a manifold of dimension $2n$ (if $M$ has dimension $n$): you need $n$ coordinates to specify the point $p$ and $n$ more to specify the tangent vector $v$ at $p$.
+This is itself a manifold of dimension $2n$ (if \(M\) has dimension \(n\)): you need \(n\) coordinates to specify the point \(p\) and \(n\) more to specify the tangent vector \(v\) at \(p\).
 
-The tangent bundle is the natural setting for dynamics. A point in $TM$ specifies both a **position** and a **velocity** --- exactly the information you need to describe the state of a physical system (or the state of an optimization algorithm on a manifold).
+The tangent bundle is the natural setting for dynamics. A point in \(TM\) specifies both a **position** and a **velocity** --- exactly the information you need to describe the state of a physical system (or the state of an optimization algorithm on a manifold).
 
-A **vector field** is a smooth assignment of a tangent vector to each point: a smooth map $X: M \to TM$ with $X(p) \in T_pM$ for each $p$. Gradient fields, velocity fields, and the "directions of steepest descent" in optimization are all vector fields.
+A **vector field** is a smooth assignment of a tangent vector to each point: a smooth map \(X: M \to TM\) with \(X(p) \in T_pM\) for each \(p\). Gradient fields, velocity fields, and the "directions of steepest descent" in optimization are all vector fields.
 
 ---
 
@@ -230,35 +230,35 @@ A **vector field** is a smooth assignment of a tangent vector to each point: a s
 
 A bare manifold has topology (which points are "near" which) but no notion of distance, angle, or length. To measure things, we need additional structure: a **Riemannian metric**.
 
-A **Riemannian metric** $g$ on a smooth manifold $M$ is a smoothly varying inner product on each tangent space. That is, for each point $p \in M$, $g_p: T_pM \times T_pM \to \mathbb{R}$ is:
+A **Riemannian metric** \(g\) on a smooth manifold \(M\) is a smoothly varying inner product on each tangent space. That is, for each point \(p \in M\), \(g_p: T_pM \times T_pM \to \mathbb{R}\) is:
 
-1. **Bilinear:** $g_p(\alpha u + \beta v, w) = \alpha g_p(u, w) + \beta g_p(v, w)$.
-2. **Symmetric:** $g_p(u, v) = g_p(v, u)$.
-3. **Positive definite:** $g_p(v, v) > 0$ for $v \neq 0$.
+1. **Bilinear:** \(g_p(\alpha u + \beta v, w) = \alpha g_p(u, w) + \beta g_p(v, w)\).
+2. **Symmetric:** \(g_p(u, v) = g_p(v, u)\).
+3. **Positive definite:** \(g_p(v, v) > 0\) for \(v \neq 0\).
 
-In local coordinates $(x^1, \ldots, x^n)$, the metric is specified by the **metric tensor** $g_{ij}(p)$:
+In local coordinates \((x^1, \ldots, x^n)\), the metric is specified by the **metric tensor** \(g_{ij}(p)\):
 
 $$g_p\left(\frac{\partial}{\partial x^i}, \frac{\partial}{\partial x^j}\right) = g_{ij}(p)$$
 
-The metric tensor is a symmetric positive definite $n \times n$ matrix at each point. For two tangent vectors $u = u^i \frac{\partial}{\partial x^i}$ and $v = v^j \frac{\partial}{\partial x^j}$:
+The metric tensor is a symmetric positive definite \(n \times n\) matrix at each point. For two tangent vectors \(u = u^i \frac{\partial}{\partial x^i}\) and \(v = v^j \frac{\partial}{\partial x^j}\):
 
 $$g_p(u, v) = g_{ij}(p) \, u^i v^j$$
 
 ### What the Metric Gives You
 
-**Length of a curve:** If $\gamma: [a, b] \to M$ is a smooth curve, its length is:
+**Length of a curve:** If \(\gamma: [a, b] \to M\) is a smooth curve, its length is:
 
 $$L(\gamma) = \int_a^b \sqrt{g_{\gamma(t)}(\dot{\gamma}(t), \dot{\gamma}(t))} \, dt = \int_a^b \sqrt{g_{ij} \dot{\gamma}^i \dot{\gamma}^j} \, dt$$
 
-**Distance between points:** $d(p, q) = \inf_\gamma L(\gamma)$, where the infimum is over all smooth curves from $p$ to $q$.
+**Distance between points:** \(d(p, q) = \inf_\gamma L(\gamma)\), where the infimum is over all smooth curves from \(p\) to \(q\).
 
-**Angle between vectors:** $\cos \theta = \frac{g_p(u, v)}{\sqrt{g_p(u, u)} \sqrt{g_p(v, v)}}$.
+**Angle between vectors:** \(\cos \theta = \frac{g_p(u, v)}{\sqrt{g_p(u, u)} \sqrt{g_p(v, v)}}\).
 
-**Volume:** $dV = \sqrt{\det g} \, dx^1 \wedge \cdots \wedge dx^n$.
+**Volume:** \(dV = \sqrt{\det g} \, dx^1 \wedge \cdots \wedge dx^n\).
 
 ### Example: The Sphere
 
-For the unit sphere $S^2$ with spherical coordinates $(\theta, \phi)$ (where $\theta \in [0, \pi]$ is the polar angle from the North Pole and $\phi \in [0, 2\pi)$ is the azimuthal angle):
+For the unit sphere \(S^2\) with spherical coordinates \((\theta, \phi)\) (where \(\theta \in [0, \pi]\) is the polar angle from the North Pole and \(\phi \in [0, 2\pi)\) is the azimuthal angle):
 
 $$ds^2 = d\theta^2 + \sin^2\theta \, d\phi^2$$
 
@@ -266,11 +266,11 @@ The metric tensor is:
 
 $$g = \begin{pmatrix} 1 & 0 \\ 0 & \sin^2\theta \end{pmatrix}$$
 
-Notice: the metric depends on position. Near the poles ($\theta \approx 0$ or $\pi$), the $\phi$ direction is "squished" ($\sin^2\theta \approx 0$), reflecting the fact that lines of longitude converge at the poles. This is the curvature of the sphere encoded in the metric.
+Notice: the metric depends on position. Near the poles (\(\theta \approx 0\) or \(\pi\)), the \(\phi\) direction is "squished" (\(\sin^2\theta \approx 0\)), reflecting the fact that lines of longitude converge at the poles. This is the curvature of the sphere encoded in the metric.
 
 ### Example: Flat Space
 
-In $\mathbb{R}^n$ with standard Cartesian coordinates, $g_{ij} = \delta_{ij}$ (the identity matrix). The metric is the same everywhere, and everything reduces to the familiar Euclidean geometry: $ds^2 = dx_1^2 + dx_2^2 + \cdots + dx_n^2$.
+In \(\mathbb{R}^n\) with standard Cartesian coordinates, \(g_{ij} = \delta_{ij}\) (the identity matrix). The metric is the same everywhere, and everything reduces to the familiar Euclidean geometry: \(ds^2 = dx_1^2 + dx_2^2 + \cdots + dx_n^2\).
 
 ---
 
@@ -284,19 +284,19 @@ We find geodesics by **variational calculus** --- minimizing the length function
 
 $$E(\gamma) = \frac{1}{2} \int_a^b g_{ij}(\gamma(t)) \dot{\gamma}^i(t) \dot{\gamma}^j(t) \, dt$$
 
-We want to find the curve $\gamma$ that minimizes $E(\gamma)$ with fixed endpoints $\gamma(a) = p$, $\gamma(b) = q$.
+We want to find the curve \(\gamma\) that minimizes \(E(\gamma)\) with fixed endpoints \(\gamma(a) = p\), \(\gamma(b) = q\).
 
 Applying the Euler-Lagrange equations (which we will derive in full in the next post), we get the **geodesic equation**:
 
 $$\ddot{\gamma}^k + \Gamma^k_{ij} \dot{\gamma}^i \dot{\gamma}^j = 0$$
 
-where $\Gamma^k_{ij}$ are the **Christoffel symbols**:
+where \(\Gamma^k_{ij}\) are the **Christoffel symbols**:
 
 $$\Gamma^k_{ij} = \frac{1}{2} g^{kl}\left(\frac{\partial g_{il}}{\partial x^j} + \frac{\partial g_{jl}}{\partial x^i} - \frac{\partial g_{ij}}{\partial x^l}\right)$$
 
-The Christoffel symbols encode how the coordinate basis vectors change from point to point. In flat space with Cartesian coordinates, all $\Gamma^k_{ij} = 0$, and the geodesic equation reduces to $\ddot{\gamma}^k = 0$ --- straight lines.
+The Christoffel symbols encode how the coordinate basis vectors change from point to point. In flat space with Cartesian coordinates, all \(\Gamma^k_{ij} = 0\), and the geodesic equation reduces to \(\ddot{\gamma}^k = 0\) --- straight lines.
 
-On curved spaces, the $\Gamma^k_{ij} \dot{\gamma}^i \dot{\gamma}^j$ term acts like a "fictitious force" that curves the path. This is exactly analogous to how objects in a rotating reference frame experience Coriolis and centrifugal forces, which are really just Christoffel symbols in disguise.
+On curved spaces, the \(\Gamma^k_{ij} \dot{\gamma}^i \dot{\gamma}^j\) term acts like a "fictitious force" that curves the path. This is exactly analogous to how objects in a rotating reference frame experience Coriolis and centrifugal forces, which are really just Christoffel symbols in disguise.
 
 ### Python: Geodesics on the Sphere
 
@@ -399,21 +399,21 @@ Curvature quantifies how a space deviates from being flat. There are several not
 
 ### Gaussian Curvature
 
-For a 2-dimensional surface embedded in $\mathbb{R}^3$, the **Gaussian curvature** $K$ at a point $p$ is the product of the two **principal curvatures** $\kappa_1$ and $\kappa_2$:
+For a 2-dimensional surface embedded in \(\mathbb{R}^3\), the **Gaussian curvature** \(K\) at a point \(p\) is the product of the two **principal curvatures** \(\kappa_1\) and \(\kappa_2\):
 
 $$K = \kappa_1 \cdot \kappa_2$$
 
-The principal curvatures are the maximum and minimum curvatures of curves on the surface passing through $p$. Intuitively:
+The principal curvatures are the maximum and minimum curvatures of curves on the surface passing through \(p\). Intuitively:
 
-- $K > 0$: The surface curves the same way in all directions (like a sphere). A small circle on the surface has circumference **less** than $2\pi r$.
-- $K = 0$: The surface is flat (locally isometric to $\mathbb{R}^2$). A cylinder has $K = 0$ everywhere because you can unroll it flat.
-- $K < 0$: The surface curves in opposite directions (like a saddle or a Pringle chip). A small circle has circumference **greater** than $2\pi r$.
+- \(K > 0\): The surface curves the same way in all directions (like a sphere). A small circle on the surface has circumference **less** than \(2\pi r\).
+- \(K = 0\): The surface is flat (locally isometric to \(\mathbb{R}^2\)). A cylinder has \(K = 0\) everywhere because you can unroll it flat.
+- \(K < 0\): The surface curves in opposite directions (like a saddle or a Pringle chip). A small circle has circumference **greater** than \(2\pi r\).
 
-Gauss's Theorema Egregium ("remarkable theorem") states that Gaussian curvature depends only on the metric tensor $g_{ij}$ --- it is an **intrinsic** property of the surface. A being living on the surface could measure $K$ without knowing about the ambient 3D space. This is why it matters: curvature is not about how the manifold sits inside a bigger space, but about the geometry of the manifold itself.
+Gauss's Theorema Egregium ("remarkable theorem") states that Gaussian curvature depends only on the metric tensor \(g_{ij}\) --- it is an **intrinsic** property of the surface. A being living on the surface could measure \(K\) without knowing about the ambient 3D space. This is why it matters: curvature is not about how the manifold sits inside a bigger space, but about the geometry of the manifold itself.
 
 ### The Riemann Curvature Tensor
 
-For manifolds of dimension $n > 2$, the full curvature is captured by the **Riemann curvature tensor** $R^l_{\ ijk}$, a rank-4 tensor defined by:
+For manifolds of dimension \(n > 2\), the full curvature is captured by the **Riemann curvature tensor** \(R^l_{\ ijk}\), a rank-4 tensor defined by:
 
 $$R^l_{\ ijk} = \frac{\partial \Gamma^l_{jk}}{\partial x^i} - \frac{\partial \Gamma^l_{ik}}{\partial x^j} + \Gamma^l_{im}\Gamma^m_{jk} - \Gamma^l_{jm}\Gamma^m_{ik}$$
 
@@ -435,15 +435,15 @@ Positive Ricci curvature means volumes are **smaller** than Euclidean (the space
 
 ## Parallel Transport
 
-On flat $\mathbb{R}^n$, you can compare vectors at different points directly: just slide one vector to the other point without changing it. On a curved manifold, there is no canonical way to do this. You must **transport** vectors along a specific path, keeping them "as constant as possible" --- this is **parallel transport**.
+On flat \(\mathbb{R}^n\), you can compare vectors at different points directly: just slide one vector to the other point without changing it. On a curved manifold, there is no canonical way to do this. You must **transport** vectors along a specific path, keeping them "as constant as possible" --- this is **parallel transport**.
 
-A vector field $V(t)$ along a curve $\gamma(t)$ is **parallel** if:
+A vector field \(V(t)\) along a curve \(\gamma(t)\) is **parallel** if:
 
 $$\frac{DV^k}{dt} = \frac{dV^k}{dt} + \Gamma^k_{ij} \dot{\gamma}^i V^j = 0$$
 
-The operator $D/dt$ is the **covariant derivative** along the curve. It adjusts the ordinary derivative by the Christoffel terms to account for the curvature of the space.
+The operator \(D/dt\) is the **covariant derivative** along the curve. It adjusts the ordinary derivative by the Christoffel terms to account for the curvature of the space.
 
-The key property of parallel transport on a curved manifold: **the result depends on the path.** If you parallel transport a vector from $A$ to $B$ along two different paths, you may get different results. The difference is exactly measured by the Riemann curvature tensor.
+The key property of parallel transport on a curved manifold: **the result depends on the path.** If you parallel transport a vector from \(A\) to \(B\) along two different paths, you may get different results. The difference is exactly measured by the Riemann curvature tensor.
 
 <svg viewBox="0 0 700 350" xmlns="http://www.w3.org/2000/svg" style="max-width: 700px; display: block; margin: 2em auto;">
   <text x="350" y="25" text-anchor="middle" font-size="15" font-weight="bold" fill="#d4d4d4">Parallel Transport on S²: Path Dependence</text>
@@ -511,15 +511,15 @@ This is perhaps the most striking consequence of curvature. On a flat surface, p
 
 ## The Exponential Map
 
-The **exponential map** $\exp_p: T_pM \to M$ "shoots" a geodesic from $p$ in the direction $v \in T_pM$ for unit time:
+The **exponential map** \(\exp_p: T_pM \to M\) "shoots" a geodesic from \(p\) in the direction \(v \in T_pM\) for unit time:
 
 $$\exp_p(v) = \gamma(1)$$
 
-where $\gamma$ is the unique geodesic with $\gamma(0) = p$ and $\dot{\gamma}(0) = v$.
+where \(\gamma\) is the unique geodesic with \(\gamma(0) = p\) and \(\dot{\gamma}(0) = v\).
 
-More generally, $\exp_p(tv)$ walks along the geodesic in direction $v$ for time $t$. The length of the geodesic from $p$ to $\exp_p(v)$ is $\|v\|_g = \sqrt{g_p(v, v)}$.
+More generally, \(\exp_p(tv)\) walks along the geodesic in direction \(v\) for time \(t\). The length of the geodesic from \(p\) to \(\exp_p(v)\) is \(\|v\|_g = \sqrt{g_p(v, v)}\).
 
-The exponential map has a crucial property: it is a **local diffeomorphism** near the origin. For small enough $v$, $\exp_p$ is a smooth bijection from a neighborhood of $0 \in T_pM$ to a neighborhood of $p \in M$. This gives us **normal coordinates** (also called geodesic coordinates or Riemann normal coordinates) centered at $p$.
+The exponential map has a crucial property: it is a **local diffeomorphism** near the origin. For small enough \(v\), \(\exp_p\) is a smooth bijection from a neighborhood of \(0 \in T_pM\) to a neighborhood of \(p \in M\). This gives us **normal coordinates** (also called geodesic coordinates or Riemann normal coordinates) centered at \(p\).
 
 In normal coordinates, the metric is Euclidean to first order:
 
@@ -529,11 +529,11 @@ This is the precise mathematical statement that a curved manifold looks flat loc
 
 ### The Logarithmic Map
 
-The inverse of the exponential map (where it exists) is the **logarithmic map** $\log_p: M \to T_pM$:
+The inverse of the exponential map (where it exists) is the **logarithmic map** \(\log_p: M \to T_pM\):
 
 $$\log_p(q) = v \quad \text{where} \quad \exp_p(v) = q$$
 
-The logarithmic map finds the initial velocity of the geodesic from $p$ to $q$. This is the key operation for doing "arithmetic" on manifolds: to compute $q - p$ on a manifold, you compute $\log_p(q)$, which gives you a vector in $T_pM$.
+The logarithmic map finds the initial velocity of the geodesic from \(p\) to \(q\). This is the key operation for doing "arithmetic" on manifolds: to compute \(q - p\) on a manifold, you compute \(\log_p(q)\), which gives you a vector in \(T_pM\).
 
 ### Python: Exponential Map Visualization
 
@@ -652,11 +652,11 @@ The geometry described above is not abstract mathematics disconnected from pract
 
 The **manifold hypothesis** states that high-dimensional data (images, text embeddings, molecular structures) lies near a low-dimensional manifold embedded in the ambient space. Techniques like t-SNE, UMAP, and autoencoders attempt to learn this manifold structure. The latent space of a VAE is an explicit parameterization of the data manifold.
 
-The key implication: **Euclidean distance in the ambient space is a poor measure of similarity.** Two points might be close in $\mathbb{R}^D$ but far apart along the manifold (imagine two points on opposite sides of a thin spiral). Geodesic distance along the manifold is the right metric.
+The key implication: **Euclidean distance in the ambient space is a poor measure of similarity.** Two points might be close in \(\mathbb{R}^D\) but far apart along the manifold (imagine two points on opposite sides of a thin spiral). Geodesic distance along the manifold is the right metric.
 
 ### Natural Gradient Descent
 
-Standard gradient descent updates parameters by $\theta \leftarrow \theta - \eta \nabla_\theta L$. But this treats the parameter space as flat $\mathbb{R}^n$, which it is not. Different parameterizations of the same model lead to different gradient directions, even though the underlying function is the same.
+Standard gradient descent updates parameters by \(\theta \leftarrow \theta - \eta \nabla_\theta L\). But this treats the parameter space as flat \(\mathbb{R}^n\), which it is not. Different parameterizations of the same model lead to different gradient directions, even though the underlying function is the same.
 
 **Natural gradient descent** (Amari, 1998) fixes this by using the **Fisher information metric** as a Riemannian metric on the space of probability distributions. The Fisher information matrix is:
 
@@ -668,7 +668,7 @@ $$\tilde{\nabla}_\theta L = F^{-1}(\theta) \nabla_\theta L$$
 
 This is the steepest descent direction measured in the Fisher metric --- it is the direction that decreases the loss fastest per unit of KL divergence in parameter space, rather than per unit of Euclidean distance.
 
-In practice, computing $F^{-1}$ is expensive for large models. Approximations like K-FAC (Kronecker-Factored Approximate Curvature) approximate the Fisher information to make natural gradient tractable. Adam and other adaptive optimizers can be interpreted as diagonal approximations to the natural gradient.
+In practice, computing \(F^{-1}\) is expensive for large models. Approximations like K-FAC (Kronecker-Factored Approximate Curvature) approximate the Fisher information to make natural gradient tractable. Adam and other adaptive optimizers can be interpreted as diagonal approximations to the natural gradient.
 
 ### Riemannian Optimization
 
@@ -688,11 +688,11 @@ This is more principled and often more efficient than projecting back onto the c
 
 ### Why Euclidean Distance Fails in Latent Spaces
 
-Consider a VAE with a Gaussian encoder $q(z|x) = \mathcal{N}(\mu(x), \sigma^2(x)I)$. The latent space $\mathbb{R}^d$ has a non-trivial geometry induced by the decoder: the "natural" metric is the pullback of some metric on the data space through the decoder.
+Consider a VAE with a Gaussian encoder \(q(z|x) = \mathcal{N}(\mu(x), \sigma^2(x)I)\). The latent space \(\mathbb{R}^d\) has a non-trivial geometry induced by the decoder: the "natural" metric is the pullback of some metric on the data space through the decoder.
 
-Two latent codes $z_1$ and $z_2$ may be close in Euclidean distance but decode to very different outputs if they lie on opposite sides of a "fold" in the decoder's mapping. Conversely, two codes far apart in Euclidean distance might decode to similar outputs if the decoder is nearly constant in some region.
+Two latent codes \(z_1\) and \(z_2\) may be close in Euclidean distance but decode to very different outputs if they lie on opposite sides of a "fold" in the decoder's mapping. Conversely, two codes far apart in Euclidean distance might decode to similar outputs if the decoder is nearly constant in some region.
 
-The right approach: define a Riemannian metric on the latent space using the Jacobian of the decoder $J = \frac{\partial D(z)}{\partial z}$:
+The right approach: define a Riemannian metric on the latent space using the Jacobian of the decoder \(J = \frac{\partial D(z)}{\partial z}\):
 
 $$g_{ij}(z) = J^T J = \sum_k \frac{\partial D_k}{\partial z_i} \frac{\partial D_k}{\partial z_j}$$
 

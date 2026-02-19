@@ -521,20 +521,20 @@ A storyboard isn't just a list of scenes -- it's a **directed graph** where node
 
 ### Formal Definition
 
-A scene graph $G = (V, E)$ where:
+A scene graph \(G = (V, E)\) where:
 
-- $V = \{s_1, s_2, \ldots, s_n\}$ is the set of scenes
-- $E \subseteq V \times V$ is the set of directed edges representing transitions
+- \(V = \{s_1, s_2, \ldots, s_n\}\) is the set of scenes
+- \(E \subseteq V \times V\) is the set of directed edges representing transitions
 
-Each edge $e_{ij} = (s_i, s_j)$ has attributes:
-- **Transition type** $\tau(e_{ij}) \in \{\text{cut}, \text{dissolve}, \text{fade}, \text{wipe}, \text{match-cut}\}$
-- **Transition duration** $\delta(e_{ij}) \in \mathbb{R}^+$
+Each edge \(e_{ij} = (s_i, s_j)\) has attributes:
+- **Transition type** \(\tau(e_{ij}) \in \{\text{cut}, \text{dissolve}, \text{fade}, \text{wipe}, \text{match-cut}\}\)
+- **Transition duration** \(\delta(e_{ij}) \in \mathbb{R}^+\)
 
 The total video duration is:
 
 $$T = \sum_{i=1}^{n} d(s_i) + \sum_{(i,j) \in E} \delta(e_{ij}) \cdot \mathbb{1}[\tau(e_{ij}) \neq \text{cut}]$$
 
-where $d(s_i)$ is the duration of scene $i$. Cuts have zero transition time; dissolves and fades overlap adjacent scenes.
+where \(d(s_i)\) is the duration of scene \(i\). Cuts have zero transition time; dissolves and fades overlap adjacent scenes.
 
 ### Shared Entity Edges
 
@@ -934,15 +934,15 @@ Good pacing isn't uniform -- it follows a rhythm. Action scenes use shorter shot
 
 $$d(s_i) = d_{\text{base}}(\text{type}(s_i)) \cdot \rho(i, n)$$
 
-where $d_{\text{base}}$ is the base duration for the content type, and $\rho(i, n)$ is a pacing modifier based on the scene's position $i$ in a storyboard of $n$ total scenes:
+where \(d_{\text{base}}\) is the base duration for the content type, and \(\rho(i, n)\) is a pacing modifier based on the scene's position \(i\) in a storyboard of \(n\) total scenes:
 
 $$\rho(i, n) = 1 + \alpha \cdot \sin\left(\frac{\pi \cdot i}{n}\right)$$
 
-This creates an arc: slightly longer shots at the beginning (setup), building through the middle, and tapering at the end. The parameter $\alpha$ controls how much the pacing varies (typically $\alpha \in [0.1, 0.3]$).
+This creates an arc: slightly longer shots at the beginning (setup), building through the middle, and tapering at the end. The parameter \(\alpha\) controls how much the pacing varies (typically \(\alpha \in [0.1, 0.3]\)).
 
-For a 7-scene storyboard with $\alpha = 0.2$ and all base durations of 4 seconds:
+For a 7-scene storyboard with \(\alpha = 0.2\) and all base durations of 4 seconds:
 
-| Scene | Position $i/n$ | $\sin(\pi i / n)$ | $\rho$ | Duration |
+| Scene | Position \(i/n\) | \(\sin(\pi i / n)\) | \(\rho\) | Duration |
 |---|---|---|---|---|
 | 1 | 0.14 | 0.43 | 1.09 | 4.3s |
 | 2 | 0.29 | 0.78 | 1.16 | 4.6s |
@@ -1001,23 +1001,23 @@ function estimateDurations(
 
 ## Parallel Generation Planning {#parallel-generation-planning}
 
-Given a storyboard with $N$ scenes and $M$ available model instances, how do we schedule generation to minimize total wall-clock time? This is a variant of the **makespan minimization** problem on parallel machines, which is NP-hard in general but admits good heuristics for our specific constraints.
+Given a storyboard with \(N\) scenes and \(M\) available model instances, how do we schedule generation to minimize total wall-clock time? This is a variant of the **makespan minimization** problem on parallel machines, which is NP-hard in general but admits good heuristics for our specific constraints.
 
 ### Problem Formulation
 
 We have:
-- $N$ scenes (jobs) $J = \{j_1, \ldots, j_N\}$
-- $M$ model instances (machines) $P = \{p_1, \ldots, p_M\}$
-- Processing time $t_{ij}$ for scene $j_i$ on machine $p_j$ (varies by model)
+- \(N\) scenes (jobs) \(J = \{j_1, \ldots, j_N\}\)
+- \(M\) model instances (machines) \(P = \{p_1, \ldots, p_M\}\)
+- Processing time \(t_{ij}\) for scene \(j_i\) on machine \(p_j\) (varies by model)
 - Precedence constraints from the scene graph's consistency edges
 
-The objective is to minimize the **makespan** $C_{\max}$:
+The objective is to minimize the **makespan** \(C_{\max}\):
 
 $$\min C_{\max} = \min \max_{k \in P} \sum_{j \in S_k} t_{kj}$$
 
-where $S_k$ is the set of scenes assigned to machine $k$.
+where \(S_k\) is the set of scenes assigned to machine \(k\).
 
-Subject to precedence constraints: if scene $j_a$ must generate before scene $j_b$ (because $j_b$ uses the last frame of $j_a$ as its start frame for consistency), then $\text{finish}(j_a) \leq \text{start}(j_b)$.
+Subject to precedence constraints: if scene \(j_a\) must generate before scene \(j_b\) (because \(j_b\) uses the last frame of \(j_a\) as its start frame for consistency), then \(\text{finish}(j_a) \leq \text{start}(j_b)\).
 
 ### Which Scenes Can Run in Parallel?
 
@@ -1026,14 +1026,14 @@ Two scenes can generate simultaneously if and only if:
 2. They don't both need the same model instance (resource constraint)
 
 In practice, most scenes *can* run in parallel. The exceptions are:
-- **Frame-chained scenes**: Scene $i+1$ starts from the last frame of scene $i$
+- **Frame-chained scenes**: Scene \(i+1\) starts from the last frame of scene \(i\)
 - **Same-character first appearances**: The first scene containing a character should generate first to establish the reference
 
 ### The LPT Heuristic
 
 The **Longest Processing Time first** (LPT) heuristic is simple and effective: sort scenes by expected generation time (descending), then assign each scene to the machine with the earliest available time.
 
-For identical machines, LPT guarantees a makespan within $\frac{4}{3}$ of optimal:
+For identical machines, LPT guarantees a makespan within \(\frac{4}{3}\) of optimal:
 
 $$C_{\max}^{\text{LPT}} \leq \frac{4}{3} \cdot C_{\max}^{\text{OPT}}$$
 
@@ -1279,17 +1279,17 @@ For each scene, we evaluate a **value score** that balances quality and cost:
 
 $$V(s, m) = \frac{Q(s, m)}{C(s, m)}$$
 
-where $Q(s, m)$ is the expected quality of scene $s$ on model $m$, and $C(s, m)$ is the cost.
+where \(Q(s, m)\) is the expected quality of scene \(s\) on model \(m\), and \(C(s, m)\) is the cost.
 
 Quality is estimated from the scene's requirements and the model's capability profile:
 
 $$Q(s, m) = w_{\text{visual}} \cdot q_{\text{visual}}(m) + w_{\text{audio}} \cdot q_{\text{audio}}(s, m) + w_{\text{consistency}} \cdot q_{\text{consistency}}(m) + w_{\text{priority}} \cdot p(s)$$
 
 where:
-- $q_{\text{visual}}(m)$ is the model's visual quality score (from benchmarks or internal metrics)
-- $q_{\text{audio}}(s, m)$ is 0 if the scene has no dialogue requirement, or the model's audio quality if it does
-- $q_{\text{consistency}}(m)$ measures how well the model handles reference image conditioning
-- $p(s) \in \{1.0, 0.6, 0.3\}$ for hero, supporting, and filler priority levels
+- \(q_{\text{visual}}(m)\) is the model's visual quality score (from benchmarks or internal metrics)
+- \(q_{\text{audio}}(s, m)\) is 0 if the scene has no dialogue requirement, or the model's audio quality if it does
+- \(q_{\text{consistency}}(m)\) measures how well the model handles reference image conditioning
+- \(p(s) \in \{1.0, 0.6, 0.3\}\) for hero, supporting, and filler priority levels
 
 ### Routing Table
 

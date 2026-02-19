@@ -7,7 +7,7 @@ category: math
 
 Probability theory, at first glance, seems like it should be simple. You have events, you assign numbers between 0 and 1 to them, and those numbers obey certain rules. But the moment you try to make this rigorous --- the moment you ask "which events can we assign probabilities to?" and "what exactly is an expectation?" --- you run headfirst into measure theory.
 
-This is not an accident. Measure theory is not some unnecessary abstraction bolted onto probability. It is the **only** known way to build a consistent, general theory of probability. Without it, you cannot rigorously define continuous random variables, prove convergence theorems that underpin machine learning, or even state what a "density function" really is. Every time you write $\mathbb{E}[f(X)]$ or invoke the law of large numbers, you are implicitly relying on measure theory.
+This is not an accident. Measure theory is not some unnecessary abstraction bolted onto probability. It is the **only** known way to build a consistent, general theory of probability. Without it, you cannot rigorously define continuous random variables, prove convergence theorems that underpin machine learning, or even state what a "density function" really is. Every time you write \(\mathbb{E}[f(X)]\) or invoke the law of large numbers, you are implicitly relying on measure theory.
 
 This post builds measure theory from scratch, motivated at every step by the question: why do we need this?
 
@@ -34,41 +34,41 @@ This post builds measure theory from scratch, motivated at every step by the que
 
 Here is a question that seems like it should have an obvious answer: can we assign a "length" to every subset of the real line?
 
-Length, here, means a function $\lambda$ that takes a subset $A \subseteq \mathbb{R}$ and returns a number $\lambda(A) \geq 0$ satisfying three intuitive properties:
+Length, here, means a function \(\lambda\) that takes a subset \(A \subseteq \mathbb{R}\) and returns a number \(\lambda(A) \geq 0\) satisfying three intuitive properties:
 
-1. **Intervals have the right length:** $\lambda([a, b]) = b - a$.
-2. **Translation invariance:** shifting a set does not change its length: $\lambda(A + x) = \lambda(A)$ for all $x \in \mathbb{R}$.
-3. **Countable additivity:** if $A_1, A_2, A_3, \ldots$ are pairwise disjoint sets, then $\lambda\left(\bigcup_{i=1}^{\infty} A_i\right) = \sum_{i=1}^{\infty} \lambda(A_i)$.
+1. **Intervals have the right length:** \(\lambda([a, b]) = b - a\).
+2. **Translation invariance:** shifting a set does not change its length: \(\lambda(A + x) = \lambda(A)\) for all \(x \in \mathbb{R}\).
+3. **Countable additivity:** if \(A_1, A_2, A_3, \ldots\) are pairwise disjoint sets, then \(\lambda\left(\bigcup_{i=1}^{\infty} A_i\right) = \sum_{i=1}^{\infty} \lambda(A_i)\).
 
-These seem completely reasonable. Surely every subset of $\mathbb{R}$ can be measured with these rules?
+These seem completely reasonable. Surely every subset of \(\mathbb{R}\) can be measured with these rules?
 
 No. The answer is no, and the proof is one of the most important results in all of analysis.
 
 ### The Vitali Set
 
-The construction, due to Giuseppe Vitali (1905), goes like this. Define an equivalence relation on $[0, 1]$: two numbers $x$ and $y$ are equivalent if $x - y$ is rational. That is, $x \sim y$ if and only if $x - y \in \mathbb{Q}$.
+The construction, due to Giuseppe Vitali (1905), goes like this. Define an equivalence relation on \([0, 1]\): two numbers \(x\) and \(y\) are equivalent if \(x - y\) is rational. That is, \(x \sim y\) if and only if \(x - y \in \mathbb{Q}\).
 
-This partitions $[0, 1]$ into equivalence classes. For example, all the rationals in $[0, 1]$ form one class. The number $\sqrt{2}/2$ belongs to a different class, along with $\sqrt{2}/2 + 1/3$, $\sqrt{2}/2 - 1/7$, and so on.
+This partitions \([0, 1]\) into equivalence classes. For example, all the rationals in \([0, 1]\) form one class. The number \(\sqrt{2}/2\) belongs to a different class, along with \(\sqrt{2}/2 + 1/3\), \(\sqrt{2}/2 - 1/7\), and so on.
 
-Now, using the **Axiom of Choice**, pick exactly one representative from each equivalence class. Call this collection $V$. This is the Vitali set.
+Now, using the **Axiom of Choice**, pick exactly one representative from each equivalence class. Call this collection \(V\). This is the Vitali set.
 
-Now consider the translates $V_q = \{v + q \pmod{1} : v \in V\}$ for each rational $q \in \mathbb{Q} \cap [0, 1)$. Since every real number in $[0, 1]$ belongs to exactly one equivalence class, and $V$ contains exactly one representative from each class, the translates $\{V_q\}$ form a partition of $[0, 1]$:
+Now consider the translates \(V_q = \{v + q \pmod{1} : v \in V\}\) for each rational \(q \in \mathbb{Q} \cap [0, 1)\). Since every real number in \([0, 1]\) belongs to exactly one equivalence class, and \(V\) contains exactly one representative from each class, the translates \(\{V_q\}\) form a partition of \([0, 1]\):
 
 $$[0, 1] = \bigcup_{q \in \mathbb{Q} \cap [0,1)} V_q$$
 
-These are countably many disjoint sets (since $\mathbb{Q}$ is countable). By countable additivity:
+These are countably many disjoint sets (since \(\mathbb{Q}\) is countable). By countable additivity:
 
 $$\lambda([0, 1]) = \sum_{q \in \mathbb{Q} \cap [0,1)} \lambda(V_q)$$
 
-By translation invariance, all $\lambda(V_q)$ are equal. Call this value $c$. Then:
+By translation invariance, all \(\lambda(V_q)\) are equal. Call this value \(c\). Then:
 
 $$1 = \sum_{q \in \mathbb{Q} \cap [0,1)} c$$
 
-If $c = 0$, the right side is $0$. If $c > 0$, the right side is $\infty$. Either way, we get a contradiction.
+If \(c = 0\), the right side is $0$. If \(c > 0\), the right side is \(\infty\). Either way, we get a contradiction.
 
-**The conclusion is inescapable: the Vitali set cannot be assigned a length.** No value of $\lambda(V)$ is consistent with the three properties above. The set is **non-measurable**.
+**The conclusion is inescapable: the Vitali set cannot be assigned a length.** No value of \(\lambda(V)\) is consistent with the three properties above. The set is **non-measurable**.
 
-This is not a pathological curiosity. It is telling us something fundamental: if we want a consistent notion of "size" (or probability), we **cannot** apply it to all subsets of $\mathbb{R}$. We need to be careful about which sets we are allowed to measure.
+This is not a pathological curiosity. It is telling us something fundamental: if we want a consistent notion of "size" (or probability), we **cannot** apply it to all subsets of \(\mathbb{R}\). We need to be careful about which sets we are allowed to measure.
 
 This is why we need sigma-algebras.
 
@@ -76,34 +76,34 @@ This is why we need sigma-algebras.
 
 ## Sigma-Algebras: The Sets We Can Measure
 
-A **sigma-algebra** (also written $\sigma$-algebra) on a set $\Omega$ is a collection $\mathcal{F}$ of subsets of $\Omega$ that satisfies three properties:
+A **sigma-algebra** (also written \(\sigma\)-algebra) on a set \(\Omega\) is a collection \(\mathcal{F}\) of subsets of \(\Omega\) that satisfies three properties:
 
-1. **Contains the whole space:** $\Omega \in \mathcal{F}$.
-2. **Closed under complements:** If $A \in \mathcal{F}$, then $A^c = \Omega \setminus A \in \mathcal{F}$.
-3. **Closed under countable unions:** If $A_1, A_2, A_3, \ldots \in \mathcal{F}$, then $\bigcup_{i=1}^{\infty} A_i \in \mathcal{F}$.
+1. **Contains the whole space:** \(\Omega \in \mathcal{F}\).
+2. **Closed under complements:** If \(A \in \mathcal{F}\), then \(A^c = \Omega \setminus A \in \mathcal{F}\).
+3. **Closed under countable unions:** If \(A_1, A_2, A_3, \ldots \in \mathcal{F}\), then \(\bigcup_{i=1}^{\infty} A_i \in \mathcal{F}\).
 
-The pair $(\Omega, \mathcal{F})$ is called a **measurable space**. The sets in $\mathcal{F}$ are called **measurable sets** --- these are the sets we are allowed to measure.
+The pair \((\Omega, \mathcal{F})\) is called a **measurable space**. The sets in \(\mathcal{F}\) are called **measurable sets** --- these are the sets we are allowed to measure.
 
 Note what follows from the axioms:
-- $\emptyset \in \mathcal{F}$ (take the complement of $\Omega$).
-- $\mathcal{F}$ is closed under countable intersections (by De Morgan's law: $\bigcap A_i = (\bigcup A_i^c)^c$).
-- $\mathcal{F}$ is closed under set differences (since $A \setminus B = A \cap B^c$).
+- \(\emptyset \in \mathcal{F}\) (take the complement of \(\Omega\)).
+- \(\mathcal{F}\) is closed under countable intersections (by De Morgan's law: \(\bigcap A_i = (\bigcup A_i^c)^c\)).
+- \(\mathcal{F}\) is closed under set differences (since \(A \setminus B = A \cap B^c\)).
 
 The sigma-algebra is the bookkeeping device that tells us which sets we are allowed to ask "how big is this?" The whole point is to **exclude** pathological sets like the Vitali set while keeping all the sets we actually care about.
 
 ### Examples
 
-**The trivial sigma-algebra:** $\mathcal{F} = \{\emptyset, \Omega\}$. This is the smallest sigma-algebra on $\Omega$. You can only measure "everything" or "nothing." Useless for most purposes, but technically valid.
+**The trivial sigma-algebra:** \(\mathcal{F} = \{\emptyset, \Omega\}\). This is the smallest sigma-algebra on \(\Omega\). You can only measure "everything" or "nothing." Useless for most purposes, but technically valid.
 
-**The power set:** $\mathcal{F} = 2^\Omega$ (all subsets of $\Omega$). This is the largest sigma-algebra. When $\Omega$ is finite or countable, you can get away with this. When $\Omega = \mathbb{R}$, the Vitali argument shows you cannot.
+**The power set:** \(\mathcal{F} = 2^\Omega\) (all subsets of \(\Omega\)). This is the largest sigma-algebra. When \(\Omega\) is finite or countable, you can get away with this. When \(\Omega = \mathbb{R}\), the Vitali argument shows you cannot.
 
-**The Borel sigma-algebra on $\mathbb{R}$:** This is the most important sigma-algebra in practice. It is defined as the smallest sigma-algebra containing all open intervals $(a, b)$. We denote it $\mathcal{B}(\mathbb{R})$.
+**The Borel sigma-algebra on \(\mathbb{R}\):** This is the most important sigma-algebra in practice. It is defined as the smallest sigma-algebra containing all open intervals \((a, b)\). We denote it \(\mathcal{B}(\mathbb{R})\).
 
 The Borel sigma-algebra contains:
 - All open sets (unions of open intervals).
 - All closed sets (complements of open sets).
-- All countable intersections of open sets ($G_\delta$ sets).
-- All countable unions of closed sets ($F_\sigma$ sets).
+- All countable intersections of open sets (\(G_\delta\) sets).
+- All countable unions of closed sets (\(F_\sigma\) sets).
 - And so on, through a transfinite hierarchy.
 
 It contains every set you will ever encounter in practice. It does **not** contain the Vitali set. Problem solved.
@@ -139,36 +139,36 @@ It contains every set you will ever encounter in practice. It does **not** conta
 
 ## Measures: Assigning Sizes to Sets
 
-Now that we know which sets we are allowed to measure (those in a sigma-algebra $\mathcal{F}$), we can define a **measure**: the function that assigns sizes.
+Now that we know which sets we are allowed to measure (those in a sigma-algebra \(\mathcal{F}\)), we can define a **measure**: the function that assigns sizes.
 
-A **measure** on a measurable space $(\Omega, \mathcal{F})$ is a function $\mu: \mathcal{F} \to [0, \infty]$ satisfying:
+A **measure** on a measurable space \((\Omega, \mathcal{F})\) is a function \(\mu: \mathcal{F} \to [0, \infty]\) satisfying:
 
-1. **Non-negativity:** $\mu(A) \geq 0$ for all $A \in \mathcal{F}$.
-2. **Null empty set:** $\mu(\emptyset) = 0$.
-3. **Countable additivity ($\sigma$-additivity):** If $A_1, A_2, \ldots$ are pairwise disjoint sets in $\mathcal{F}$, then:
+1. **Non-negativity:** \(\mu(A) \geq 0\) for all \(A \in \mathcal{F}\).
+2. **Null empty set:** \(\mu(\emptyset) = 0\).
+3. **Countable additivity (\(\sigma\)-additivity):** If \(A_1, A_2, \ldots\) are pairwise disjoint sets in \(\mathcal{F}\), then:
 
 $$\mu\left(\bigcup_{i=1}^{\infty} A_i\right) = \sum_{i=1}^{\infty} \mu(A_i)$$
 
-The triple $(\Omega, \mathcal{F}, \mu)$ is called a **measure space**.
+The triple \((\Omega, \mathcal{F}, \mu)\) is called a **measure space**.
 
 ### Key Examples
 
-**Counting measure:** $\Omega = \mathbb{N}$ (or any countable set), $\mathcal{F} = 2^\Omega$, and $\mu(A) = |A|$ (the number of elements in $A$). This is the simplest non-trivial measure and it is exactly what it sounds like: you count elements.
+**Counting measure:** \(\Omega = \mathbb{N}\) (or any countable set), \(\mathcal{F} = 2^\Omega\), and \(\mu(A) = |A|\) (the number of elements in \(A\)). This is the simplest non-trivial measure and it is exactly what it sounds like: you count elements.
 
-**Lebesgue measure:** $\Omega = \mathbb{R}$, $\mathcal{F} = \mathcal{B}(\mathbb{R})$ (Borel sigma-algebra, extended slightly to the Lebesgue sigma-algebra), and $\lambda$ assigns to each set its "length" in the intuitive sense. For intervals: $\lambda([a, b]) = b - a$. For more complicated sets, the definition involves careful limiting constructions with covers of intervals.
+**Lebesgue measure:** \(\Omega = \mathbb{R}\), \(\mathcal{F} = \mathcal{B}(\mathbb{R})\) (Borel sigma-algebra, extended slightly to the Lebesgue sigma-algebra), and \(\lambda\) assigns to each set its "length" in the intuitive sense. For intervals: \(\lambda([a, b]) = b - a\). For more complicated sets, the definition involves careful limiting constructions with covers of intervals.
 
 The Lebesgue measure is the rigorous version of "length" that avoids the Vitali paradox --- by restricting to measurable sets, we dodge the contradiction entirely.
 
-**Dirac (point mass) measure:** $\delta_x(A) = 1$ if $x \in A$, $0$ otherwise. All the measure is concentrated at a single point. This is what lets us treat discrete and continuous distributions in one framework.
+**Dirac (point mass) measure:** \(\delta_x(A) = 1\) if \(x \in A\), $0$ otherwise. All the measure is concentrated at a single point. This is what lets us treat discrete and continuous distributions in one framework.
 
 ### Important Properties
 
 From the axioms, one can prove:
 
-- **Monotonicity:** If $A \subseteq B$, then $\mu(A) \leq \mu(B)$.
-- **Continuity from below:** If $A_1 \subseteq A_2 \subseteq \cdots$, then $\mu\left(\bigcup A_n\right) = \lim_{n \to \infty} \mu(A_n)$.
-- **Continuity from above:** If $A_1 \supseteq A_2 \supseteq \cdots$ and $\mu(A_1) < \infty$, then $\mu\left(\bigcap A_n\right) = \lim_{n \to \infty} \mu(A_n)$.
-- **Subadditivity:** $\mu\left(\bigcup A_n\right) \leq \sum \mu(A_n)$ (for not necessarily disjoint sets).
+- **Monotonicity:** If \(A \subseteq B\), then \(\mu(A) \leq \mu(B)\).
+- **Continuity from below:** If \(A_1 \subseteq A_2 \subseteq \cdots\), then \(\mu\left(\bigcup A_n\right) = \lim_{n \to \infty} \mu(A_n)\).
+- **Continuity from above:** If \(A_1 \supseteq A_2 \supseteq \cdots\) and \(\mu(A_1) < \infty\), then \(\mu\left(\bigcap A_n\right) = \lim_{n \to \infty} \mu(A_n)\).
+- **Subadditivity:** \(\mu\left(\bigcup A_n\right) \leq \sum \mu(A_n)\) (for not necessarily disjoint sets).
 
 ---
 
@@ -176,19 +176,19 @@ From the axioms, one can prove:
 
 We need one more piece before we can integrate: **measurable functions**. These are functions that are "compatible" with the sigma-algebras on the domain and codomain.
 
-Let $(\Omega, \mathcal{F})$ and $(S, \mathcal{S})$ be measurable spaces. A function $f: \Omega \to S$ is **$(\mathcal{F}, \mathcal{S})$-measurable** if for every $B \in \mathcal{S}$:
+Let \((\Omega, \mathcal{F})\) and \((S, \mathcal{S})\) be measurable spaces. A function \(f: \Omega \to S\) is **\((\mathcal{F}, \mathcal{S})\)-measurable** if for every \(B \in \mathcal{S}\):
 
 $$f^{-1}(B) = \{\omega \in \Omega : f(\omega) \in B\} \in \mathcal{F}$$
 
 In words: the preimage of every measurable set in the codomain is a measurable set in the domain.
 
-When $S = \mathbb{R}$ with the Borel sigma-algebra, we call $f$ a **Borel measurable function**. A convenient equivalent condition: $f: \Omega \to \mathbb{R}$ is measurable if and only if for every $a \in \mathbb{R}$:
+When \(S = \mathbb{R}\) with the Borel sigma-algebra, we call \(f\) a **Borel measurable function**. A convenient equivalent condition: \(f: \Omega \to \mathbb{R}\) is measurable if and only if for every \(a \in \mathbb{R}\):
 
 $$\{\omega \in \Omega : f(\omega) \leq a\} \in \mathcal{F}$$
 
-This single condition (for all $a$) is enough because the sets $(-\infty, a]$ generate the Borel sigma-algebra.
+This single condition (for all \(a\)) is enough because the sets \((-\infty, a]\) generate the Borel sigma-algebra.
 
-Why do we care about measurability? Because we want to integrate $f$ with respect to a measure, and integration requires us to compute things like $\mu(\{f > a\})$. If the set $\{f > a\}$ is not in $\mathcal{F}$, we cannot compute its measure, and the integral is undefined. Measurability is the condition that makes integration possible.
+Why do we care about measurability? Because we want to integrate \(f\) with respect to a measure, and integration requires us to compute things like \(\mu(\{f > a\})\). If the set \(\{f > a\}\) is not in \(\mathcal{F}\), we cannot compute its measure, and the integral is undefined. Measurability is the condition that makes integration possible.
 
 The good news: almost every function you will ever encounter is measurable. Continuous functions, piecewise continuous functions, limits of measurable functions, sums, products, compositions --- all measurable. You essentially have to use the Axiom of Choice to construct a non-measurable function.
 
@@ -196,19 +196,19 @@ The good news: almost every function you will ever encounter is measurable. Cont
 
 ## The Lebesgue Integral: A Better Way to Integrate
 
-The Riemann integral, the one from calculus, works by slicing the **domain** (the $x$-axis) into small intervals and summing the function values times interval widths:
+The Riemann integral, the one from calculus, works by slicing the **domain** (the \(x\)-axis) into small intervals and summing the function values times interval widths:
 
 $$\int_a^b f(x) \, dx \approx \sum_{i} f(x_i^*) \cdot \Delta x_i$$
 
 This works beautifully for continuous functions and even for functions with finitely many discontinuities. But it fails for highly discontinuous functions, and more importantly, it does not interact well with limits.
 
-The **Lebesgue integral** takes a fundamentally different approach: it slices the **range** (the $y$-axis) instead.
+The **Lebesgue integral** takes a fundamentally different approach: it slices the **range** (the \(y\)-axis) instead.
 
 ### The Idea
 
-Consider a non-negative measurable function $f: \Omega \to [0, \infty)$. Instead of asking "what is the function value at each point?", we ask "how much of the domain does the function spend at each height?"
+Consider a non-negative measurable function \(f: \Omega \to [0, \infty)\). Instead of asking "what is the function value at each point?", we ask "how much of the domain does the function spend at each height?"
 
-For each height $y$, we look at the set $\{x : f(x) > y\}$ --- the region where the function is above $y$ --- and measure its size. The integral is then:
+For each height \(y\), we look at the set \(\{x : f(x) > y\}\) --- the region where the function is above \(y\) --- and measure its size. The integral is then:
 
 $$\int f \, d\mu = \int_0^\infty \mu(\{x : f(x) > y\}) \, dy$$
 
@@ -312,19 +312,19 @@ The formal construction builds up in stages:
 
 $$s = \sum_{i=1}^{n} a_i \cdot \mathbf{1}_{A_i}$$
 
-where $a_i \geq 0$ and $A_i \in \mathcal{F}$. Its integral is defined as:
+where \(a_i \geq 0\) and \(A_i \in \mathcal{F}\). Its integral is defined as:
 
 $$\int s \, d\mu = \sum_{i=1}^{n} a_i \cdot \mu(A_i)$$
 
-**Step 2: Non-negative measurable functions.** For any non-negative measurable function $f \geq 0$, there exists a sequence of simple functions $0 \leq s_1 \leq s_2 \leq \cdots$ with $s_n \uparrow f$ pointwise. The integral is defined as:
+**Step 2: Non-negative measurable functions.** For any non-negative measurable function \(f \geq 0\), there exists a sequence of simple functions \(0 \leq s_1 \leq s_2 \leq \cdots\) with \(s_n \uparrow f\) pointwise. The integral is defined as:
 
 $$\int f \, d\mu = \sup_n \int s_n \, d\mu = \lim_{n \to \infty} \int s_n \, d\mu$$
 
-**Step 3: General measurable functions.** Write $f = f^+ - f^-$ where $f^+ = \max(f, 0)$ and $f^- = \max(-f, 0)$. Both are non-negative. Define:
+**Step 3: General measurable functions.** Write \(f = f^+ - f^-\) where \(f^+ = \max(f, 0)\) and \(f^- = \max(-f, 0)\). Both are non-negative. Define:
 
 $$\int f \, d\mu = \int f^+ \, d\mu - \int f^- \, d\mu$$
 
-provided at least one of the two integrals is finite. If both are finite, $f$ is called **integrable** (or $L^1$).
+provided at least one of the two integrals is finite. If both are finite, \(f\) is called **integrable** (or \(L^1\)).
 
 ### Python: Lebesgue vs Riemann on a Pathological Function
 
@@ -406,81 +406,81 @@ plt.savefig("lebesgue_vs_riemann.png", dpi=150, bbox_inches='tight')
 plt.show()
 ```
 
-Thomae's function is Riemann integrable (the upper and lower sums do converge, though slowly). But the Dirichlet function $\mathbf{1}_\mathbb{Q}$ is **not** Riemann integrable: the upper sum is always 1 and the lower sum is always 0, regardless of partition size. The Lebesgue integral handles it effortlessly: $\int \mathbf{1}_\mathbb{Q} \, d\lambda = 1 \cdot \lambda(\mathbb{Q}) + 0 \cdot \lambda(\mathbb{Q}^c) = 0$.
+Thomae's function is Riemann integrable (the upper and lower sums do converge, though slowly). But the Dirichlet function \(\mathbf{1}_\mathbb{Q}\) is **not** Riemann integrable: the upper sum is always 1 and the lower sum is always 0, regardless of partition size. The Lebesgue integral handles it effortlessly: \(\int \mathbf{1}_\mathbb{Q} \, d\lambda = 1 \cdot \lambda(\mathbb{Q}) + 0 \cdot \lambda(\mathbb{Q}^c) = 0\).
 
 ---
 
 ## Probability Spaces as Measure Spaces
 
-A **probability space** is simply a measure space $(\Omega, \mathcal{F}, P)$ where the measure $P$ satisfies $P(\Omega) = 1$. That is it. The entire edifice of probability theory is a special case of measure theory with a normalized measure.
+A **probability space** is simply a measure space \((\Omega, \mathcal{F}, P)\) where the measure \(P\) satisfies \(P(\Omega) = 1\). That is it. The entire edifice of probability theory is a special case of measure theory with a normalized measure.
 
-- $\Omega$ is the **sample space**: the set of all possible outcomes.
-- $\mathcal{F}$ is the **event space**: a sigma-algebra of subsets of $\Omega$. Events are the sets we can assign probabilities to.
-- $P$ is the **probability measure**: a measure with $P(\Omega) = 1$.
+- \(\Omega\) is the **sample space**: the set of all possible outcomes.
+- \(\mathcal{F}\) is the **event space**: a sigma-algebra of subsets of \(\Omega\). Events are the sets we can assign probabilities to.
+- \(P\) is the **probability measure**: a measure with \(P(\Omega) = 1\).
 
 Every property of measures carries over:
 
 | Measure theory | Probability theory |
 |---|---|
-| Measure space $(\Omega, \mathcal{F}, \mu)$ | Probability space $(\Omega, \mathcal{F}, P)$ |
-| Measurable set $A \in \mathcal{F}$ | Event |
-| $\mu(A)$ | $P(A)$ (probability) |
-| $\mu(\Omega) = 1$ | Normalization axiom |
-| Countable additivity | $P(A \cup B) = P(A) + P(B)$ for disjoint events |
+| Measure space \((\Omega, \mathcal{F}, \mu)\) | Probability space \((\Omega, \mathcal{F}, P)\) |
+| Measurable set \(A \in \mathcal{F}\) | Event |
+| \(\mu(A)\) | \(P(A)\) (probability) |
+| \(\mu(\Omega) = 1\) | Normalization axiom |
+| Countable additivity | \(P(A \cup B) = P(A) + P(B)\) for disjoint events |
 | Measurable function | Random variable |
-| Integral $\int f \, d\mu$ | Expectation $\mathbb{E}[X]$ |
+| Integral \(\int f \, d\mu\) | Expectation \(\mathbb{E}[X]\) |
 
 This unification is powerful. It means every theorem from measure theory automatically applies to probability. We do not need separate proofs for the probabilistic versions.
 
 ### Example: A Coin Flip
 
-$\Omega = \{H, T\}$, $\mathcal{F} = \{\emptyset, \{H\}, \{T\}, \{H, T\}\}$ (the power set), $P(\{H\}) = p$, $P(\{T\}) = 1 - p$. Simple, and the sigma-algebra is just the power set because $\Omega$ is finite.
+\(\Omega = \{H, T\}\), \(\mathcal{F} = \{\emptyset, \{H\}, \{T\}, \{H, T\}\}\) (the power set), \(P(\{H\}) = p\), \(P(\{T\}) = 1 - p\). Simple, and the sigma-algebra is just the power set because \(\Omega\) is finite.
 
-### Example: A Uniform Random Variable on $[0, 1]$
+### Example: A Uniform Random Variable on \([0, 1]\)
 
-$\Omega = [0, 1]$, $\mathcal{F} = \mathcal{B}([0,1])$ (Borel sigma-algebra restricted to $[0,1]$), $P = \lambda$ (Lebesgue measure). This is where the Vitali argument bites: we cannot use the power set as $\mathcal{F}$ because there exist non-measurable subsets. The Borel sigma-algebra is the right choice.
+\(\Omega = [0, 1]\), \(\mathcal{F} = \mathcal{B}([0,1])\) (Borel sigma-algebra restricted to \([0,1]\)), \(P = \lambda\) (Lebesgue measure). This is where the Vitali argument bites: we cannot use the power set as \(\mathcal{F}\) because there exist non-measurable subsets. The Borel sigma-algebra is the right choice.
 
 ---
 
 ## Random Variables as Measurable Functions
 
-A **random variable** $X$ on a probability space $(\Omega, \mathcal{F}, P)$ is a measurable function $X: \Omega \to \mathbb{R}$. That is, $X$ is $(\mathcal{F}, \mathcal{B}(\mathbb{R}))$-measurable:
+A **random variable** \(X\) on a probability space \((\Omega, \mathcal{F}, P)\) is a measurable function \(X: \Omega \to \mathbb{R}\). That is, \(X\) is \((\mathcal{F}, \mathcal{B}(\mathbb{R}))\)-measurable:
 
 $$\{X \leq a\} := \{\omega \in \Omega : X(\omega) \leq a\} \in \mathcal{F} \quad \text{for all } a \in \mathbb{R}$$
 
-Why do we need measurability? Because we want to compute $P(X \leq a) = P(\{\omega : X(\omega) \leq a\})$. For this to be defined, the set $\{X \leq a\}$ must be in $\mathcal{F}$ --- it must be an event that $P$ can evaluate. Measurability guarantees this.
+Why do we need measurability? Because we want to compute \(P(X \leq a) = P(\{\omega : X(\omega) \leq a\})\). For this to be defined, the set \(\{X \leq a\}\) must be in \(\mathcal{F}\) --- it must be an event that \(P\) can evaluate. Measurability guarantees this.
 
 The **cumulative distribution function (CDF)** is then:
 
 $$F_X(a) = P(X \leq a) = P(X^{-1}((-\infty, a]))$$
 
-This is just the pushforward of $P$ through $X$. The **distribution** (or **law**) of $X$ is the probability measure $\mu_X$ on $(\mathbb{R}, \mathcal{B}(\mathbb{R}))$ defined by:
+This is just the pushforward of \(P\) through \(X\). The **distribution** (or **law**) of \(X\) is the probability measure \(\mu_X\) on \((\mathbb{R}, \mathcal{B}(\mathbb{R}))\) defined by:
 
 $$\mu_X(B) = P(X^{-1}(B)) = P(X \in B)$$
 
-This is where the distinction between a random variable (a function) and its distribution (a measure on $\mathbb{R}$) becomes important and precise.
+This is where the distinction between a random variable (a function) and its distribution (a measure on \(\mathbb{R}\)) becomes important and precise.
 
 ---
 
 ## Expectation as Lebesgue Integration
 
-The **expectation** of a random variable $X$ is its Lebesgue integral with respect to $P$:
+The **expectation** of a random variable \(X\) is its Lebesgue integral with respect to \(P\):
 
 $$\mathbb{E}[X] = \int_\Omega X(\omega) \, dP(\omega)$$
 
 This is the most general definition of expectation. It unifies discrete and continuous cases:
 
-- **Discrete case:** If $X$ takes values $x_1, x_2, \ldots$ with probabilities $p_1, p_2, \ldots$, then $P$ is a sum of point masses and the integral reduces to $\mathbb{E}[X] = \sum_i x_i p_i$.
+- **Discrete case:** If \(X\) takes values \(x_1, x_2, \ldots\) with probabilities \(p_1, p_2, \ldots\), then \(P\) is a sum of point masses and the integral reduces to \(\mathbb{E}[X] = \sum_i x_i p_i\).
 
-- **Continuous case:** If $X$ has a density $f$ (more on this below), then the integral reduces to $\mathbb{E}[X] = \int_{-\infty}^{\infty} x \, f(x) \, dx$.
+- **Continuous case:** If \(X\) has a density \(f\) (more on this below), then the integral reduces to \(\mathbb{E}[X] = \int_{-\infty}^{\infty} x \, f(x) \, dx\).
 
-- **Mixed case:** $X$ could have a distribution that is partly discrete and partly continuous. The Lebesgue integral handles this seamlessly; the Riemann integral cannot.
+- **Mixed case:** \(X\) could have a distribution that is partly discrete and partly continuous. The Lebesgue integral handles this seamlessly; the Riemann integral cannot.
 
-More generally, for any measurable function $g$:
+More generally, for any measurable function \(g\):
 
 $$\mathbb{E}[g(X)] = \int_\Omega g(X(\omega)) \, dP(\omega) = \int_\mathbb{R} g(x) \, d\mu_X(x)$$
 
-The second equality is the **change of variables formula** (also called the law of the unconscious statistician in probability). It says we can compute the expectation either by integrating over the original sample space $\Omega$ or by integrating over $\mathbb{R}$ with respect to the distribution of $X$.
+The second equality is the **change of variables formula** (also called the law of the unconscious statistician in probability). It says we can compute the expectation either by integrating over the original sample space \(\Omega\) or by integrating over \(\mathbb{R}\) with respect to the distribution of \(X\).
 
 ---
 
@@ -490,7 +490,7 @@ The real payoff of measure-theoretic integration is the convergence theorems. Th
 
 ### Monotone Convergence Theorem (MCT)
 
-**Statement:** Let $f_1 \leq f_2 \leq f_3 \leq \cdots$ be a sequence of non-negative measurable functions with $f_n \uparrow f$ pointwise. Then:
+**Statement:** Let \(f_1 \leq f_2 \leq f_3 \leq \cdots\) be a sequence of non-negative measurable functions with \(f_n \uparrow f\) pointwise. Then:
 
 $$\lim_{n \to \infty} \int f_n \, d\mu = \int \lim_{n \to \infty} f_n \, d\mu = \int f \, d\mu$$
 
@@ -500,7 +500,7 @@ In words: for an increasing sequence of non-negative functions, you can swap the
 
 ### Fatou's Lemma
 
-**Statement:** For non-negative measurable functions $f_n$:
+**Statement:** For non-negative measurable functions \(f_n\):
 
 $$\int \liminf_{n \to \infty} f_n \, d\mu \leq \liminf_{n \to \infty} \int f_n \, d\mu$$
 
@@ -508,17 +508,17 @@ The integral of the limit is at most the limit of the integrals. Equality may no
 
 ### Dominated Convergence Theorem (DCT)
 
-**Statement:** Let $f_n \to f$ pointwise, and suppose there exists an integrable function $g$ (called the **dominating function**) with $|f_n| \leq g$ for all $n$ and $\int g \, d\mu < \infty$. Then:
+**Statement:** Let \(f_n \to f\) pointwise, and suppose there exists an integrable function \(g\) (called the **dominating function**) with \(|f_n| \leq g\) for all \(n\) and \(\int g \, d\mu < \infty\). Then:
 
 $$\lim_{n \to \infty} \int f_n \, d\mu = \int f \, d\mu$$
 
-and moreover $\int |f_n - f| \, d\mu \to 0$.
+and moreover \(\int |f_n - f| \, d\mu \to 0\).
 
 **Why it matters for ML:** DCT is the workhorse. Every time you differentiate under an expectation --- which is what happens when you compute gradients of loss functions that involve expectations (policy gradients, variational inference, score matching) --- you need DCT to justify swapping the derivative and integral:
 
 $$\frac{d}{d\theta} \mathbb{E}[f(X; \theta)] = \frac{d}{d\theta} \int f(x; \theta) \, d\mu(x) \stackrel{\text{DCT}}{=} \int \frac{\partial f}{\partial \theta}(x; \theta) \, d\mu(x) = \mathbb{E}\left[\frac{\partial f}{\partial \theta}(X; \theta)\right]$$
 
-This interchange is valid when $|\partial f / \partial \theta|$ is bounded by an integrable function --- exactly the DCT hypothesis. Without this theorem, gradient-based optimization of expected losses would have no rigorous foundation.
+This interchange is valid when \(|\partial f / \partial \theta|\) is bounded by an integrable function --- exactly the DCT hypothesis. Without this theorem, gradient-based optimization of expected losses would have no rigorous foundation.
 
 ### Python: Convergence Theorems in Action
 
@@ -594,77 +594,77 @@ plt.show()
 
 Here is a question that arises constantly: what is a probability density function, really?
 
-We say a continuous random variable $X$ has density $f$ if:
+We say a continuous random variable \(X\) has density \(f\) if:
 
 $$P(X \in A) = \int_A f(x) \, dx$$
 
-But what is $f$ in terms of the underlying measures? The answer is the **Radon-Nikodym theorem**, which is one of the deepest results in measure theory.
+But what is \(f\) in terms of the underlying measures? The answer is the **Radon-Nikodym theorem**, which is one of the deepest results in measure theory.
 
 ### Absolute Continuity
 
-Let $\mu$ and $\nu$ be two measures on $(\Omega, \mathcal{F})$. We say $\nu$ is **absolutely continuous** with respect to $\mu$, written $\nu \ll \mu$, if:
+Let \(\mu\) and \(\nu\) be two measures on \((\Omega, \mathcal{F})\). We say \(\nu\) is **absolutely continuous** with respect to \(\mu\), written \(\nu \ll \mu\), if:
 
 $$\mu(A) = 0 \implies \nu(A) = 0 \quad \text{for all } A \in \mathcal{F}$$
 
-In words: every set that is "invisible" to $\mu$ is also "invisible" to $\nu$. The measure $\nu$ does not put mass on sets that $\mu$ considers to have zero size.
+In words: every set that is "invisible" to \(\mu\) is also "invisible" to \(\nu\). The measure \(\nu\) does not put mass on sets that \(\mu\) considers to have zero size.
 
 ### The Theorem
 
-**Radon-Nikodym Theorem:** If $\nu \ll \mu$ and both are $\sigma$-finite measures, then there exists a non-negative measurable function $f$ such that:
+**Radon-Nikodym Theorem:** If \(\nu \ll \mu\) and both are \(\sigma\)-finite measures, then there exists a non-negative measurable function \(f\) such that:
 
 $$\nu(A) = \int_A f \, d\mu \quad \text{for all } A \in \mathcal{F}$$
 
-This function $f$ is called the **Radon-Nikodym derivative** of $\nu$ with respect to $\mu$, written:
+This function \(f\) is called the **Radon-Nikodym derivative** of \(\nu\) with respect to \(\mu\), written:
 
 $$f = \frac{d\nu}{d\mu}$$
 
-The notation is deliberate: it is a derivative of one measure with respect to another, analogous to how $dy/dx$ is a derivative of one function with respect to another.
+The notation is deliberate: it is a derivative of one measure with respect to another, analogous to how \(dy/dx\) is a derivative of one function with respect to another.
 
 ### Why This Matters
 
-**Density functions are Radon-Nikodym derivatives.** If $X$ is a continuous random variable with distribution $\mu_X$ and the Lebesgue measure is $\lambda$, and if $\mu_X \ll \lambda$ (the distribution does not concentrate mass at single points), then the density function $f$ is:
+**Density functions are Radon-Nikodym derivatives.** If \(X\) is a continuous random variable with distribution \(\mu_X\) and the Lebesgue measure is \(\lambda\), and if \(\mu_X \ll \lambda\) (the distribution does not concentrate mass at single points), then the density function \(f\) is:
 
 $$f = \frac{d\mu_X}{d\lambda}$$
 
 The PDF is literally the derivative of the probability measure with respect to Lebesgue measure. This is why density values can be greater than 1 --- they are not probabilities, they are rates of change.
 
-**KL divergence uses the Radon-Nikodym derivative.** The Kullback-Leibler divergence between two distributions $P$ and $Q$ with $P \ll Q$ is:
+**KL divergence uses the Radon-Nikodym derivative.** The Kullback-Leibler divergence between two distributions \(P\) and \(Q\) with \(P \ll Q\) is:
 
 $$D_{\text{KL}}(P \| Q) = \int \log \frac{dP}{dQ} \, dP = \mathbb{E}_P\left[\log \frac{dP}{dQ}\right]$$
 
-When both have densities $p$ and $q$ with respect to Lebesgue measure, the Radon-Nikodym derivative $dP/dQ = p/q$, and this reduces to the familiar:
+When both have densities \(p\) and \(q\) with respect to Lebesgue measure, the Radon-Nikodym derivative \(dP/dQ = p/q\), and this reduces to the familiar:
 
 $$D_{\text{KL}}(P \| Q) = \int p(x) \log \frac{p(x)}{q(x)} \, dx$$
 
-But the measure-theoretic version is more general: it works even when $P$ and $Q$ do not have densities (e.g., for discrete distributions, or mixtures of discrete and continuous).
+But the measure-theoretic version is more general: it works even when \(P\) and \(Q\) do not have densities (e.g., for discrete distributions, or mixtures of discrete and continuous).
 
 **Importance sampling.** In ML, importance sampling reweights samples from one distribution to estimate expectations under another:
 
 $$\mathbb{E}_P[f(X)] = \mathbb{E}_Q\left[f(X) \cdot \frac{dP}{dQ}(X)\right]$$
 
-The importance weight $dP/dQ$ is the Radon-Nikodym derivative. This is the rigorous basis for techniques like off-policy reinforcement learning and variational inference.
+The importance weight \(dP/dQ\) is the Radon-Nikodym derivative. This is the rigorous basis for techniques like off-policy reinforcement learning and variational inference.
 
 ---
 
 ## Product Measures and Fubini's Theorem
 
-In machine learning, we constantly deal with joint distributions of multiple random variables: $(X, Y)$, datasets $\{(x_i, y_i)\}_{i=1}^n$, latent variables and observations $(z, x)$. Product measures are the measure-theoretic foundation for joint distributions.
+In machine learning, we constantly deal with joint distributions of multiple random variables: \((X, Y)\), datasets \(\{(x_i, y_i)\}_{i=1}^n\), latent variables and observations \((z, x)\). Product measures are the measure-theoretic foundation for joint distributions.
 
 ### Product Sigma-Algebras
 
-Given measurable spaces $(\Omega_1, \mathcal{F}_1)$ and $(\Omega_2, \mathcal{F}_2)$, the **product sigma-algebra** $\mathcal{F}_1 \otimes \mathcal{F}_2$ on $\Omega_1 \times \Omega_2$ is the sigma-algebra generated by all "rectangles" $A \times B$ where $A \in \mathcal{F}_1$ and $B \in \mathcal{F}_2$.
+Given measurable spaces \((\Omega_1, \mathcal{F}_1)\) and \((\Omega_2, \mathcal{F}_2)\), the **product sigma-algebra** \(\mathcal{F}_1 \otimes \mathcal{F}_2\) on \(\Omega_1 \times \Omega_2\) is the sigma-algebra generated by all "rectangles" \(A \times B\) where \(A \in \mathcal{F}_1\) and \(B \in \mathcal{F}_2\).
 
 ### Product Measures
 
-Given measures $\mu_1$ on $(\Omega_1, \mathcal{F}_1)$ and $\mu_2$ on $(\Omega_2, \mathcal{F}_2)$, the **product measure** $\mu_1 \otimes \mu_2$ is the unique measure on $(\Omega_1 \times \Omega_2, \mathcal{F}_1 \otimes \mathcal{F}_2)$ satisfying:
+Given measures \(\mu_1\) on \((\Omega_1, \mathcal{F}_1)\) and \(\mu_2\) on \((\Omega_2, \mathcal{F}_2)\), the **product measure** \(\mu_1 \otimes \mu_2\) is the unique measure on \((\Omega_1 \times \Omega_2, \mathcal{F}_1 \otimes \mathcal{F}_2)\) satisfying:
 
 $$(\mu_1 \otimes \mu_2)(A \times B) = \mu_1(A) \cdot \mu_2(B)$$
 
-For probability, this is exactly the joint distribution of **independent** random variables: $P(X \in A, Y \in B) = P(X \in A) \cdot P(Y \in B)$ when $X$ and $Y$ are independent.
+For probability, this is exactly the joint distribution of **independent** random variables: \(P(X \in A, Y \in B) = P(X \in A) \cdot P(Y \in B)\) when \(X\) and \(Y\) are independent.
 
 ### Fubini's Theorem
 
-**Statement:** Let $f$ be a measurable function on $(\Omega_1 \times \Omega_2, \mathcal{F}_1 \otimes \mathcal{F}_2, \mu_1 \otimes \mu_2)$. If $f \geq 0$ or $\int |f| \, d(\mu_1 \otimes \mu_2) < \infty$, then:
+**Statement:** Let \(f\) be a measurable function on \((\Omega_1 \times \Omega_2, \mathcal{F}_1 \otimes \mathcal{F}_2, \mu_1 \otimes \mu_2)\). If \(f \geq 0\) or \(\int |f| \, d(\mu_1 \otimes \mu_2) < \infty\), then:
 
 $$\int_{\Omega_1 \times \Omega_2} f \, d(\mu_1 \otimes \mu_2) = \int_{\Omega_1} \left(\int_{\Omega_2} f(\omega_1, \omega_2) \, d\mu_2(\omega_2)\right) d\mu_1(\omega_1)$$
 
@@ -674,10 +674,10 @@ In words: **you can compute a double integral by doing iterated single integrals
 
 **Why this matters for ML:**
 
-- **Computing marginal distributions:** $p(x) = \int p(x, z) \, dz$ is justified by Fubini.
+- **Computing marginal distributions:** \(p(x) = \int p(x, z) \, dz\) is justified by Fubini.
 - **The ELBO derivation** in variational inference involves swapping integration order.
-- **Expectations of functions of multiple random variables** reduce to iterated expectations: $\mathbb{E}[g(X, Y)] = \mathbb{E}_X[\mathbb{E}_Y[g(X, Y) \mid X]]$ when $X, Y$ are independent.
-- **Monte Carlo estimation:** the law of large numbers, which justifies estimating $\mathbb{E}[f(X)]$ with $\frac{1}{n}\sum f(X_i)$, ultimately relies on Fubini applied to the product measure of $n$ independent copies.
+- **Expectations of functions of multiple random variables** reduce to iterated expectations: \(\mathbb{E}[g(X, Y)] = \mathbb{E}_X[\mathbb{E}_Y[g(X, Y) \mid X]]\) when \(X, Y\) are independent.
+- **Monte Carlo estimation:** the law of large numbers, which justifies estimating \(\mathbb{E}[f(X)]\) with \(\frac{1}{n}\sum f(X_i)\), ultimately relies on Fubini applied to the product measure of \(n\) independent copies.
 
 ---
 
@@ -687,7 +687,7 @@ Measure theory is not an abstraction imposed on probability from the outside. It
 
 The chain of reasoning is clean:
 
-1. Not all subsets of $\mathbb{R}$ can be consistently measured (Vitali set).
+1. Not all subsets of \(\mathbb{R}\) can be consistently measured (Vitali set).
 2. Therefore, we restrict to a sigma-algebra of measurable sets.
 3. A measure assigns sizes to these sets; a probability measure is one normalized to 1.
 4. Random variables are measurable functions; expectation is the Lebesgue integral.
@@ -695,4 +695,4 @@ The chain of reasoning is clean:
 6. Density functions are Radon-Nikodym derivatives --- rates of change of one measure with respect to another.
 7. Joint distributions arise from product measures; Fubini's theorem lets us do iterated integration.
 
-Every time you write a loss function involving $\mathbb{E}$, differentiate through an expectation, compute a KL divergence, or invoke the law of large numbers, you are standing on this foundation. Understanding it does not change your code. But it tells you exactly when your code is mathematically justified --- and when it is not.
+Every time you write a loss function involving \(\mathbb{E}\), differentiate through an expectation, compute a KL divergence, or invoke the law of large numbers, you are standing on this foundation. Understanding it does not change your code. But it tells you exactly when your code is mathematically justified --- and when it is not.

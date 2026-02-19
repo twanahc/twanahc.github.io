@@ -125,7 +125,7 @@ For real-time video generation to feel truly interactive, the total pipeline lat
 
 $$t_{\text{response}} = t_{\text{input}} + t_{\text{processing}} + n \cdot t_{\text{frame}}$$
 
-where $n$ is the number of pipeline stages between input capture and frame display. For $t_{\text{response}} < 100\text{ms}$ with $t_{\text{frame}} = 33.3\text{ms}$:
+where \(n\) is the number of pipeline stages between input capture and frame display. For \(t_{\text{response}} < 100\text{ms}\) with \(t_{\text{frame}} = 33.3\text{ms}\):
 
 $$n < \frac{100 - t_{\text{input}} - t_{\text{processing}}}{33.3}$$
 
@@ -196,21 +196,21 @@ This architecture is remarkably similar to how game engines work:
 | Component | Game Engine | PixVerse R1 (World Model) |
 |---|---|---|
 | Scene state | Scene graph (meshes, materials, lights, positions) | Learned latent state vector |
-| State update | Physics simulation, game logic | Neural state transition function $g(S_t, u_t)$ |
-| Rendering | Rasterization / ray tracing | Neural rendering function $h(S_{t+1})$ |
+| State update | Physics simulation, game logic | Neural state transition function \(g(S_t, u_t)\) |
+| Rendering | Rasterization / ray tracing | Neural rendering function \(h(S_{t+1})\) |
 | Input | Controller, keyboard, mouse | Text commands, UI controls |
 | Frame budget | 16.67ms (60fps) or 33.33ms (30fps) | 33.33ms (30fps) |
 | Temporal coherence | Guaranteed by deterministic physics | Guaranteed by continuous state evolution |
 
 The key insight: game engines achieve real-time performance because they separate *state management* from *rendering*. The state update is cheap (physics is simple math). The rendering is the expensive part, but it only needs to produce a single frame from a known state, not reconstruct the entire scene from scratch.
 
-World models apply the same principle with neural networks. The state transition function $g$ is a small, fast network. The rendering function $h$ is larger but still much cheaper than a full diffusion process because it doesn't iterate --- it produces a frame in a single forward pass (or very few steps).
+World models apply the same principle with neural networks. The state transition function \(g\) is a small, fast network. The rendering function \(h\) is larger but still much cheaper than a full diffusion process because it doesn't iterate --- it produces a frame in a single forward pass (or very few steps).
 
 ### Architectural Details (Inferred)
 
 While PixVerse hasn't published the full R1 architecture, we can infer key design choices from the behavior and from related published research (GAIA-1 from Wayve, GameNGen from Google DeepMind, Genie from Google DeepMind):
 
-**State Representation**: The scene state $S_t$ is likely a learned latent vector in $\mathbb{R}^d$ where $d$ is on the order of 4096-16384 dimensions. This state encodes:
+**State Representation**: The scene state \(S_t\) is likely a learned latent vector in \(\mathbb{R}^d\) where \(d\) is on the order of 4096-16384 dimensions. This state encodes:
 - Scene geometry and layout
 - Object positions and identities
 - Lighting conditions
@@ -218,20 +218,20 @@ While PixVerse hasn't published the full R1 architecture, we can infer key desig
 - Visual style and texture information
 - Temporal context (what has happened recently)
 
-**State Transition Network**: The function $g: \mathbb{R}^d \times \mathcal{U} \rightarrow \mathbb{R}^d$ maps the current state and user input to the next state. This is likely a transformer-based network with:
+**State Transition Network**: The function \(g: \mathbb{R}^d \times \mathcal{U} \rightarrow \mathbb{R}^d\) maps the current state and user input to the next state. This is likely a transformer-based network with:
 - Cross-attention between state tokens and input tokens
 - Self-attention within state tokens
 - Relatively small parameter count (~100M-500M) for fast inference
-- Residual connection: $S_{t+1} = S_t + \Delta g(S_t, u_t)$ to ensure smooth state evolution
+- Residual connection: \(S_{t+1} = S_t + \Delta g(S_t, u_t)\) to ensure smooth state evolution
 
-**Frame Renderer**: The function $h: \mathbb{R}^d \rightarrow \mathbb{R}^{H \times W \times 3}$ renders the current state into a pixel frame. Likely architecture:
+**Frame Renderer**: The function \(h: \mathbb{R}^d \rightarrow \mathbb{R}^{H \times W \times 3}\) renders the current state into a pixel frame. Likely architecture:
 - State decoding through a series of upsampling blocks (similar to a VAE decoder or the decoder half of a U-Net)
-- For 1080p output: $1920 \times 1080 \times 3 \approx 6.2M$ pixel values
+- For 1080p output: \(1920 \times 1080 \times 3 \approx 6.2M\) pixel values
 - May use a 1-4 step consistency distillation approach instead of zero-shot to improve quality
 - Parameter count: ~500M-2B
 
 **Training**: The world model is likely trained on massive amounts of video data with:
-- Next-frame prediction loss: $\mathcal{L} = \|x_{t+1} - h(g(S_t, u_t))\|^2$
+- Next-frame prediction loss: \(\mathcal{L} = \|x_{t+1} - h(g(S_t, u_t))\|^2\)
 - Perceptual loss (LPIPS) for visual quality
 - Adversarial loss (GAN discriminator) for sharpness
 - Temporal consistency loss across frame sequences
@@ -290,18 +290,18 @@ For a cloud-based service, this input arrives via WebSocket or WebRTC data chann
 
 ### Stage 2: State Update (~3ms)
 
-The state transition network $g(S_t, u_t)$ runs:
+The state transition network \(g(S_t, u_t)\) runs:
 
-- Load current state $S_t$ from GPU memory (already resident, so just pointer access)
-- Encode user input $u_t$ into embedding space: ~0.5ms
+- Load current state \(S_t\) from GPU memory (already resident, so just pointer access)
+- Encode user input \(u_t\) into embedding space: ~0.5ms
 - Forward pass through state transition network: ~2ms
-- Write updated state $S_{t+1}$ back to GPU memory: ~0.5ms
+- Write updated state \(S_{t+1}\) back to GPU memory: ~0.5ms
 
 For a ~200M parameter state transition network on an H100:
 
 $$t_{\text{state}} = \frac{P_{\text{state}} \times \text{FLOPs per param}}{F_{\text{GPU}}}$$
 
-With $P_{\text{state}} = 2 \times 10^8$, 2 FLOPs per parameter (multiply-add), and $F_{\text{GPU}} = 1.98 \times 10^{15}$ FLOPs/s (H100 FP16):
+With \(P_{\text{state}} = 2 \times 10^8\), 2 FLOPs per parameter (multiply-add), and \(F_{\text{GPU}} = 1.98 \times 10^{15}\) FLOPs/s (H100 FP16):
 
 $$t_{\text{state}} = \frac{2 \times 10^8 \times 2}{1.98 \times 10^{15}} \approx 0.2\text{ms}$$
 
@@ -309,11 +309,11 @@ The 3ms budget includes overhead for memory access patterns, attention computati
 
 ### Stage 3: Frame Generation (~18ms)
 
-This is the expensive step. The rendering network $h(S_{t+1})$ generates a 1080p frame:
+This is the expensive step. The rendering network \(h(S_{t+1})\) generates a 1080p frame:
 
-**Architecture assumption**: A decoder network with ~1B parameters, taking a latent state and upsampling through 6-8 blocks to produce a $1920 \times 1080 \times 3$ output.
+**Architecture assumption**: A decoder network with ~1B parameters, taking a latent state and upsampling through 6-8 blocks to produce a \(1920 \times 1080 \times 3\) output.
 
-If using a latent space approach (generate in $240 \times 135$ latent space, then decode):
+If using a latent space approach (generate in \(240 \times 135\) latent space, then decode):
 
 - Neural upsampling from state to latent: ~8ms
 - Latent-to-pixel decoding (VAE decoder): ~6ms
@@ -323,12 +323,12 @@ If using a latent space approach (generate in $240 \times 135$ latent space, the
 
 $$t_{\text{render}} = \frac{P_{\text{render}} \times 2}{F_{\text{GPU}} \times \eta}$$
 
-where $\eta$ is GPU utilization efficiency (typically 0.3-0.5 for inference due to memory bandwidth limits):
+where \(\eta\) is GPU utilization efficiency (typically 0.3-0.5 for inference due to memory bandwidth limits):
 
 $$t_{\text{render}} = \frac{10^9 \times 2}{1.98 \times 10^{15} \times 0.4} \approx 2.5\text{ms}$$
 
 But this is just the raw matrix multiplications. The actual time is dominated by:
-- **Memory bandwidth**: Loading 1B parameters from VRAM at ~3.35 TB/s (H100 HBM3) takes $\frac{10^9 \times 2\text{ bytes}}{3.35 \times 10^{12}} \approx 0.6\text{ms}$ per pass. With multiple passes through different layers, this adds up to 5-10ms.
+- **Memory bandwidth**: Loading 1B parameters from VRAM at ~3.35 TB/s (H100 HBM3) takes \(\frac{10^9 \times 2\text{ bytes}}{3.35 \times 10^{12}} \approx 0.6\text{ms}\) per pass. With multiple passes through different layers, this adds up to 5-10ms.
 - **Activation memory**: Intermediate activations for 1080p resolution consume significant VRAM and bandwidth.
 - **Attention mechanisms**: Any spatial attention at high resolution is quadratic in the number of tokens.
 
@@ -379,7 +379,7 @@ That 0.33ms margin is terrifyingly thin. In practice, real-time systems need to 
 
 1. **Frame dropping**: If a frame misses its deadline, skip it and start the next one. At 30fps, a single dropped frame is barely perceptible.
 2. **Adaptive quality**: If the pipeline is consistently running over budget, reduce resolution or detail level dynamically.
-3. **Pipeline parallelism**: While frame $N$ is being post-processed and encoded, frame $N+1$'s state update and generation can begin.
+3. **Pipeline parallelism**: While frame \(N\) is being post-processed and encoded, frame \(N+1\)'s state update and generation can begin.
 
 ---
 
@@ -387,15 +387,15 @@ That 0.33ms margin is terrifyingly thin. In practice, real-time systems need to 
 
 ### The Diminishing Returns Curve
 
-In diffusion models, output quality improves with more denoising steps, but with sharply diminishing returns. Let $Q(n)$ represent the quality (measured by negative FID, so higher is better) after $n$ denoising steps. Empirically, this follows a logarithmic curve:
+In diffusion models, output quality improves with more denoising steps, but with sharply diminishing returns. Let \(Q(n)\) represent the quality (measured by negative FID, so higher is better) after \(n\) denoising steps. Empirically, this follows a logarithmic curve:
 
 $$Q(n) = Q_{\max} \cdot \left(1 - e^{-\alpha n}\right)$$
 
-where $Q_{\max}$ is the asymptotic quality limit and $\alpha$ is a rate constant that depends on the model architecture and noise schedule.
+where \(Q_{\max}\) is the asymptotic quality limit and \(\alpha\) is a rate constant that depends on the model architecture and noise schedule.
 
 For a typical diffusion model:
 
-| Steps ($n$) | Quality $Q(n) / Q_{\max}$ | Latency (ms) | Quality per ms |
+| Steps (\(n\)) | Quality \(Q(n) / Q_{\max}\) | Latency (ms) | Quality per ms |
 |---|---|---|---|
 | 1 | 0.632 | 25 | 0.0253 |
 | 2 | 0.865 | 50 | 0.0173 |
@@ -404,7 +404,7 @@ For a typical diffusion model:
 | 16 | ~1.000 | 400 | 0.0025 |
 | 50 | ~1.000 | 1250 | 0.0008 |
 
-*(Assuming 25ms per denoising step, $\alpha = 1.0$)*
+*(Assuming 25ms per denoising step, \(\alpha = 1.0\))*
 
 The key insight: **the first step captures 63% of the quality. The first 4 steps capture 98%. The remaining 46 steps (in a 50-step process) contribute only 2% of the quality.**
 
@@ -428,13 +428,13 @@ The temporal consistency gap is notably small. This is because world models inhe
 
 ### Mathematical Analysis: Optimal Operating Point
 
-Suppose you have a compute budget $C$ (in FLOPS per second) and you want to maximize perceived quality over time. You can choose to spend $C$ on:
+Suppose you have a compute budget \(C\) (in FLOPS per second) and you want to maximize perceived quality over time. You can choose to spend \(C\) on:
 
 **Option A**: Generate frames at high quality with few frames per second
 
 $$\text{fps}_A = \frac{C}{c_{\text{frame}} \cdot n_{\text{steps}}}$$
 
-where $c_{\text{frame}}$ is the compute per denoising step and $n_{\text{steps}}$ is the number of steps.
+where \(c_{\text{frame}}\) is the compute per denoising step and \(n_{\text{steps}}\) is the number of steps.
 
 **Option B**: Generate frames at lower quality but higher frame rate
 
@@ -444,15 +444,15 @@ The perceived quality over time is approximately:
 
 $$Q_{\text{perceived}} = Q(n_{\text{steps}}) \cdot f(\text{fps})$$
 
-where $f(\text{fps})$ is a perception function that penalizes low frame rates:
+where \(f(\text{fps})\) is a perception function that penalizes low frame rates:
 
 $$f(\text{fps}) = \min\left(1, \frac{\text{fps}}{\text{fps}_{\text{target}}}\right)$$
 
-For a target of 30 fps, $f$ equals 1.0 when fps $\geq$ 30 and drops linearly below that.
+For a target of 30 fps, \(f\) equals 1.0 when fps \(\geq\) 30 and drops linearly below that.
 
-**Example calculation** with a compute budget of $C = 2 \times 10^{15}$ FLOPS/s (approximately one H100) and $c_{\text{frame}} = 10^{12}$ FLOPS per step:
+**Example calculation** with a compute budget of \(C = 2 \times 10^{15}\) FLOPS/s (approximately one H100) and \(c_{\text{frame}} = 10^{12}\) FLOPS per step:
 
-| Steps | Quality $Q(n)/Q_{\max}$ | FPS | $f(\text{fps})$ | Perceived Quality |
+| Steps | Quality \(Q(n)/Q_{\max}\) | FPS | \(f(\text{fps})\) | Perceived Quality |
 |---|---|---|---|---|
 | 1 | 0.632 | 2000 | 1.000 | 0.632 |
 | 2 | 0.865 | 1000 | 1.000 | 0.865 |
@@ -477,25 +477,25 @@ Little's Law is one of the most fundamental results in queueing theory. It state
 $$L = \lambda \cdot W$$
 
 where:
-- $L$ = average number of items in the system (e.g., video generation requests being processed)
-- $\lambda$ = average arrival rate (requests per second)
-- $W$ = average time each item spends in the system (seconds)
+- \(L\) = average number of items in the system (e.g., video generation requests being processed)
+- \(\lambda\) = average arrival rate (requests per second)
+- \(W\) = average time each item spends in the system (seconds)
 
 For a video generation service, this means:
 
 $$\text{concurrent requests} = \text{request rate} \times \text{average generation time}$$
 
-**Batch generation example**: If a batch model takes $W = 30$ seconds per video and you want to handle $\lambda = 100$ requests per second:
+**Batch generation example**: If a batch model takes \(W = 30\) seconds per video and you want to handle \(\lambda = 100\) requests per second:
 
 $$L = 100 \times 30 = 3000 \text{ concurrent requests}$$
 
 You need enough GPU capacity to process 3000 concurrent generation jobs. At ~1 H100 per concurrent generation, that's 3000 H100s.
 
-**Real-time generation example**: If a real-time model continuously generates frames for $\lambda = 1000$ concurrent users, each user's stream consuming one GPU stream:
+**Real-time generation example**: If a real-time model continuously generates frames for \(\lambda = 1000\) concurrent users, each user's stream consuming one GPU stream:
 
 $$L = 1000 \text{ concurrent streams}$$
 
-Each stream generates 30 frames per second. The total throughput is $1000 \times 30 = 30000$ frames per second.
+Each stream generates 30 frames per second. The total throughput is \(1000 \times 30 = 30000\) frames per second.
 
 ### Batch vs. Real-Time: The Throughput Analysis
 
@@ -506,7 +506,7 @@ Let's compare throughput per GPU:
 **Batch model (Sora-class)**:
 - Generates a 4-second clip at 30fps = 120 frames
 - Generation time: ~30 seconds
-- Throughput: $\frac{120 \text{ frames}}{30 \text{ seconds}} = 4$ frames/second per GPU
+- Throughput: \(\frac{120 \text{ frames}}{30 \text{ seconds}} = 4\) frames/second per GPU
 - But: all 120 frames are delivered at once after 30 seconds (latency = 30s)
 
 **Real-time model (PixVerse R1-class)**:
@@ -532,17 +532,17 @@ At batch size 16, the throughput gap closes. But the latency gap remains: the ba
 
 ### Queueing Dynamics: M/M/c Model
 
-For a cloud video generation service, we can model the system as an M/M/c queue (Markovian arrivals, Markovian service times, $c$ servers):
+For a cloud video generation service, we can model the system as an M/M/c queue (Markovian arrivals, Markovian service times, \(c\) servers):
 
-- Arrival rate: $\lambda$ requests per second
-- Service rate per server: $\mu$ (generations per second per GPU)
-- Number of servers (GPUs): $c$
+- Arrival rate: \(\lambda\) requests per second
+- Service rate per server: \(\mu\) (generations per second per GPU)
+- Number of servers (GPUs): \(c\)
 
 The utilization factor is:
 
 $$\rho = \frac{\lambda}{c \cdot \mu}$$
 
-The system is stable when $\rho < 1$.
+The system is stable when \(\rho < 1\).
 
 The probability that an arriving request has to wait (Erlang C formula):
 
@@ -559,27 +559,27 @@ $$W = W_q + \frac{1}{\mu}$$
 **Worked example for batch generation**:
 
 Parameters:
-- $\lambda = 10$ requests/second (peak hour)
-- $\mu = 1/30$ generations/second per GPU (30-second generation)
-- $c = 400$ GPUs
+- \(\lambda = 10\) requests/second (peak hour)
+- \(\mu = 1/30\) generations/second per GPU (30-second generation)
+- \(c = 400\) GPUs
 
 Then:
-- $\rho = \frac{10}{400 \times (1/30)} = \frac{10}{13.33} = 0.75$
-- $P_{\text{wait}} \approx 0.31$ (31% of requests wait)
-- $W_q \approx 9.3$ seconds average wait
-- $W = 9.3 + 30 = 39.3$ seconds total
+- \(\rho = \frac{10}{400 \times (1/30)} = \frac{10}{13.33} = 0.75\)
+- \(P_{\text{wait}} \approx 0.31\) (31% of requests wait)
+- \(W_q \approx 9.3\) seconds average wait
+- \(W = 9.3 + 30 = 39.3\) seconds total
 
 **Worked example for real-time generation**:
 
 Parameters:
-- $\lambda = 10$ new session starts/second
+- \(\lambda = 10\) new session starts/second
 - Session duration: average 5 minutes = 300 seconds
 - Each session requires a dedicated GPU stream
-- Total concurrent sessions (by Little's Law): $L = 10 \times 300 = 3000$
-- Available GPU streams: $c = 3200$
+- Total concurrent sessions (by Little's Law): \(L = 10 \times 300 = 3000\)
+- Available GPU streams: \(c = 3200\)
 
 Then:
-- $\rho = 3000 / 3200 = 0.9375$
+- \(\rho = 3000 / 3200 = 0.9375\)
 - At this utilization, queueing delays for session start are significant
 - But once a session starts, frame latency is a constant 33ms (no queueing per frame)
 
@@ -642,7 +642,7 @@ The H100 has 3.35 TB/s of HBM3 bandwidth. Each frame requires:
 
 Total bandwidth per frame: ~10.7 GB
 
-At 30 fps: $10.7 \times 30 = 321$ GB/s per stream
+At 30 fps: \(10.7 \times 30 = 321\) GB/s per stream
 
 Maximum concurrent streams (bandwidth-limited):
 
@@ -729,7 +729,7 @@ For a company at this scale, the major costs are:
 | Other (legal, admin, etc.) | $0.13M | 4% | |
 | **Total costs** | **$3.33M** | **100%** | |
 
-At $3.33M/month revenue and ~$3.33M/month costs, PixVerse is approximately breakeven --- which is unusual for a high-growth AI startup. The Alibaba backing likely provides compute at below-market rates, which is the equivalent of a hidden subsidy.
+At \(3.33M/month revenue and ~\)3.33M/month costs, PixVerse is approximately breakeven --- which is unusual for a high-growth AI startup. The Alibaba backing likely provides compute at below-market rates, which is the equivalent of a hidden subsidy.
 
 **Gross margin analysis**:
 
@@ -757,7 +757,7 @@ Going from 16M MAU to 200M registered users (not MAU --- registered users is a w
 - Pre-installed integrations in Alibaba apps could drive 100M+ signups
 - Registration != active use (a 10-20% MAU/registered ratio would mean 20-40M MAU)
 
-The revenue trajectory matters more. If PixVerse reaches $200M ARR target (which would imply ~$100M ARR from the 200M user expansion), they'd need:
+The revenue trajectory matters more. If PixVerse reaches \(200M ARR target (which would imply ~\)100M ARR from the 200M user expansion), they'd need:
 
 $$\text{Required ARPU} = \frac{\$200M / 12}{40M \text{ MAU}} = \$0.42/\text{user/month}$$
 
@@ -1031,8 +1031,8 @@ Let's model the cost of using real-time preview to improve batch generation effi
 - Batch generation: $0.10 per 5-second clip
 - User reviews, dislikes result: 60% rejection rate on first try
 - Average iterations to satisfaction: 3.5
-- Cost per satisfactory clip: $0.10 $\times$ 3.5 = $0.35
-- Time per satisfactory clip: 30s $\times$ 3.5 = 105 seconds
+- Cost per satisfactory clip: $0.10 \(\times\) 3.5 = $0.35
+- Time per satisfactory clip: 30s \(\times\) 3.5 = 105 seconds
 
 **With real-time preview** (hybrid workflow):
 - User starts real-time session: $0.02 per minute (GPU cost for preview stream)
@@ -1041,8 +1041,8 @@ Let's model the cost of using real-time preview to improve batch generation effi
 - Batch generation: $0.10 per 5-second clip
 - Rejection rate after preview: 15% (user already validated the scene)
 - Average iterations: 1.18
-- Cost per satisfactory clip: $0.04 + ($0.10 $\times$ 1.18) = $0.158
-- Time per satisfactory clip: 120s preview + (30s $\times$ 1.18) = 155 seconds
+- Cost per satisfactory clip: \(0.04 + (\)0.10 \(\times\) 1.18) = $0.158
+- Time per satisfactory clip: 120s preview + (30s \(\times\) 1.18) = 155 seconds
 
 | Metric | Without Preview | With Preview | Improvement |
 |---|---|---|---|
@@ -1077,7 +1077,7 @@ The gap is halving roughly every 12-14 months. Extrapolating:
 
 $$\text{Gap}(t) = 0.92 \times 0.5^{(t - 2025) / 1.25}$$
 
-Setting $\text{Gap}(t) = 0.1$ (perceptually negligible):
+Setting \(\text{Gap}(t) = 0.1\) (perceptually negligible):
 
 $$0.1 = 0.92 \times 0.5^{(t - 2025) / 1.25}$$
 
@@ -1135,13 +1135,13 @@ $$t_{\text{input}} + t_{\text{state}} + t_{\text{render}} + t_{\text{post}} + t_
 
 $$\Theta_{\text{batch}} = \frac{B \cdot F}{T_{\text{gen}}}$$
 
-where $B$ is batch size, $F$ is frames per clip, and $T_{\text{gen}}$ is generation time.
+where \(B\) is batch size, \(F\) is frames per clip, and \(T_{\text{gen}}\) is generation time.
 
 **Throughput per GPU** (real-time):
 
 $$\Theta_{\text{realtime}} = S \cdot \text{fps}$$
 
-where $S$ is concurrent streams per GPU.
+where \(S\) is concurrent streams per GPU.
 
 **Little's Law**:
 
@@ -1155,7 +1155,7 @@ $$Q(n) = Q_{\max}(1 - e^{-\alpha n})$$
 
 $$\Delta Q(t) = \Delta Q_0 \cdot 2^{-(t - t_0) / \tau}$$
 
-where $\tau \approx 1.25$ years is the gap halving time.
+where \(\tau \approx 1.25\) years is the gap halving time.
 
 ---
 

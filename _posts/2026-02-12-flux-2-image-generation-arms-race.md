@@ -25,7 +25,7 @@ NVIDIA partnered with Black Forest Labs — Flux models are foundation models fo
 
 If you're building an AI video platform, you're using image generation more than you might think:
 
-**Storyboard keyframes**: Before generating expensive video clips ($0.05-0.40/second), generate static keyframes for user review ($0.002-0.01 per image). This 50-100x cost difference means storyboard iteration is essentially free.
+**Storyboard keyframes**: Before generating expensive video clips (\(0.05-0.40/second), generate static keyframes for user review (\)0.002-0.01 per image). This 50-100x cost difference means storyboard iteration is essentially free.
 
 **Character reference sheets**: Generate consistent character images from multiple angles to feed as reference to video models. The more reference images, the better the character consistency across video shots.
 

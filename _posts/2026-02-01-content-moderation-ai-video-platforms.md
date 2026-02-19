@@ -459,16 +459,16 @@ We implement the full queue system in the [Production Implementation](#productio
 
 ## The Mathematics of Moderation Thresholds
 
-Every moderation classifier outputs a confidence score between 0 and 1. You choose a threshold $t$: scores above $t$ are blocked, scores below pass. The threshold determines your false positive rate (safe content blocked) and false negative rate (harmful content passed).
+Every moderation classifier outputs a confidence score between 0 and 1. You choose a threshold \(t\): scores above \(t\) are blocked, scores below pass. The threshold determines your false positive rate (safe content blocked) and false negative rate (harmful content passed).
 
 ### Definitions
 
-Let $Y \in \{0, 1\}$ be the true label (0 = safe, 1 = harmful) and $\hat{S} \in [0, 1]$ be the classifier's score.
+Let \(Y \in \{0, 1\}\) be the true label (0 = safe, 1 = harmful) and \(\hat{S} \in [0, 1]\) be the classifier's score.
 
-- **True Positive (TP)**: $Y = 1$ and $\hat{S} \geq t$ (harmful, correctly blocked)
-- **False Positive (FP)**: $Y = 0$ and $\hat{S} \geq t$ (safe, incorrectly blocked)
-- **True Negative (TN)**: $Y = 0$ and $\hat{S} < t$ (safe, correctly passed)
-- **False Negative (FN)**: $Y = 1$ and $\hat{S} < t$ (harmful, incorrectly passed)
+- **True Positive (TP)**: \(Y = 1\) and \(\hat{S} \geq t\) (harmful, correctly blocked)
+- **False Positive (FP)**: \(Y = 0\) and \(\hat{S} \geq t\) (safe, incorrectly blocked)
+- **True Negative (TN)**: \(Y = 0\) and \(\hat{S} < t\) (safe, correctly passed)
+- **False Negative (FN)**: \(Y = 1\) and \(\hat{S} < t\) (harmful, incorrectly passed)
 
 From these we derive:
 
@@ -484,13 +484,13 @@ $$\text{FPR} = \frac{FP}{FP + TN} = P(\hat{S} \geq t \mid Y=0)$$
 
 For an AI video platform, false positives and false negatives have asymmetric costs:
 
-**False positive costs** ($C_{FP}$):
+**False positive costs** (\(C_{FP}\)):
 - User frustration: blocked generation, wasted time
 - Lost revenue: user churns or downgrades
 - Support load: user contacts support to appeal
 - Estimated cost: $0.50--$5.00 per false positive (depending on user LTV)
 
-**False negative costs** ($C_{FN}$):
+**False negative costs** (\(C_{FN}\)):
 - Trust/safety incident: harmful content reaches the user or public
 - Legal liability: CSAM, defamation, copyright
 - Platform reputation: press coverage, advertiser flight
@@ -501,27 +501,27 @@ The asymmetry is stark. A single CSAM false negative can cost millions in legal 
 
 ### Optimal Threshold Derivation
 
-We want to find the threshold $t^*$ that minimizes expected cost:
+We want to find the threshold \(t^*\) that minimizes expected cost:
 
 $$t^* = \arg\min_t \; \mathbb{E}[\text{Cost}(t)]$$
 
-The expected cost at threshold $t$ is:
+The expected cost at threshold \(t\) is:
 
 $$\mathbb{E}[\text{Cost}(t)] = C_{FP} \cdot \mathbb{E}[FP(t)] + C_{FN} \cdot \mathbb{E}[FN(t)]$$
 
-Let $N$ be the total number of items, $\pi = P(Y=1)$ be the base rate of harmful content, and $f_0(s)$, $f_1(s)$ be the score distributions for safe and harmful items respectively.
+Let \(N\) be the total number of items, \(\pi = P(Y=1)\) be the base rate of harmful content, and \(f_0(s)\), \(f_1(s)\) be the score distributions for safe and harmful items respectively.
 
 $$\mathbb{E}[FP(t)] = N(1 - \pi) \int_t^1 f_0(s) \, ds = N(1-\pi)(1 - F_0(t))$$
 
 $$\mathbb{E}[FN(t)] = N\pi \int_0^t f_1(s) \, ds = N\pi \cdot F_1(t)$$
 
-where $F_0$ and $F_1$ are the CDFs of the score distributions for safe and harmful items.
+where \(F_0\) and \(F_1\) are the CDFs of the score distributions for safe and harmful items.
 
 Substituting:
 
 $$\mathbb{E}[\text{Cost}(t)] = N \left[ C_{FP}(1-\pi)(1 - F_0(t)) + C_{FN} \pi F_1(t) \right]$$
 
-Taking the derivative with respect to $t$ and setting to zero:
+Taking the derivative with respect to \(t\) and setting to zero:
 
 $$\frac{d}{dt}\mathbb{E}[\text{Cost}(t)] = N \left[ -C_{FP}(1-\pi)f_0(t) + C_{FN} \pi f_1(t) \right] = 0$$
 
@@ -536,14 +536,14 @@ This is a **likelihood ratio test**. The optimal threshold is where the likeliho
 ### Worked Numerical Example
 
 Suppose we are tuning a moderation classifier for an AI video platform with:
-- $\pi = 0.02$ (2% of prompts are actually harmful -- typical for a consumer platform)
-- $C_{FP} = \$2.00$ (average lost revenue per false positive)
-- $C_{FN} = \$500$ (average cost per false negative, blending minor and major incidents)
+- \(\pi = 0.02\) (2% of prompts are actually harmful -- typical for a consumer platform)
+- \(C_{FP} = \\)2.00$ (average lost revenue per false positive)
+- \(C_{FN} = \\)500$ (average cost per false negative, blending minor and major incidents)
 - 10,000 generations per day
 
 We need score distributions. Assume the classifier scores follow Beta distributions (common for bounded classifiers):
-- Safe items: $\hat{S} \mid Y=0 \sim \text{Beta}(2, 20)$ (concentrated near 0)
-- Harmful items: $\hat{S} \mid Y=1 \sim \text{Beta}(15, 3)$ (concentrated near 1)
+- Safe items: \(\hat{S} \mid Y=0 \sim \text{Beta}(2, 20)\) (concentrated near 0)
+- Harmful items: \(\hat{S} \mid Y=1 \sim \text{Beta}(15, 3)\) (concentrated near 1)
 
 The likelihood ratio condition:
 
@@ -553,7 +553,7 @@ Since the harmful distribution is concentrated at high scores and the safe distr
 
 Computing numerically (Beta PDF evaluation):
 
-| Threshold $t$ | $f_0(t)$ | $f_1(t)$ | LR = $f_1/f_0$ | E[FP]/day | E[FN]/day | E[Cost]/day |
+| Threshold \(t\) | \(f_0(t)\) | \(f_1(t)\) | LR = \(f_1/f_0\) | E[FP]/day | E[FN]/day | E[Cost]/day |
 |--------|----------|----------|--------|----------|----------|------------|
 | 0.20 | 2.84 | 0.003 | 0.001 | 1,568 | 0.04 | $3,156 |
 | 0.30 | 0.89 | 0.06 | 0.067 | 392 | 0.22 | $894 |
@@ -562,7 +562,7 @@ Computing numerically (Beta PDF evaluation):
 | 0.50 | 0.03 | 1.93 | 64.3 | 16 | 1.56 | $812 |
 | 0.60 | 0.003 | 4.62 | 1540 | 3 | 3.12 | $1,566 |
 
-The minimum expected cost occurs around $t^* \approx 0.38$. At this threshold:
+The minimum expected cost occurs around \(t^* \approx 0.38\). At this threshold:
 - We block ~156 safe items per day (false positives) -- costing $312/day
 - We miss ~0.4 harmful items per day (false negatives) -- costing $190/day
 - Total expected cost: ~$502/day
@@ -573,9 +573,9 @@ Compare this to a naive threshold of 0.50 (equal error rate): total cost is $812
 
 ### Threshold by Category
 
-Different content categories warrant different thresholds because $C_{FN}$ varies dramatically:
+Different content categories warrant different thresholds because \(C_{FN}\) varies dramatically:
 
-| Category | $C_{FN}$ Estimate | Optimal $t$ | Rationale |
+| Category | \(C_{FN}\) Estimate | Optimal \(t\) | Rationale |
 |----------|-------------------|-------------|-----------|
 | CSAM | $1,000,000+ | 0.15 | Zero tolerance. Block aggressively, human review everything. |
 | Non-consensual deepfake | $100,000 | 0.25 | Legal liability, reputation damage |
@@ -586,15 +586,15 @@ Different content categories warrant different thresholds because $C_{FN}$ varie
 
 ### The F-beta Score: Encoding Cost Asymmetry
 
-When the cost ratio $C_{FN}/C_{FP}$ is known, use the $F_\beta$ score instead of $F_1$:
+When the cost ratio \(C_{FN}/C_{FP}\) is known, use the \(F_\beta\) score instead of \(F_1\):
 
 $$F_\beta = (1 + \beta^2) \cdot \frac{\text{Precision} \cdot \text{Recall}}{\beta^2 \cdot \text{Precision} + \text{Recall}}$$
 
-where $\beta^2 = C_{FN} / C_{FP}$. For our example ($C_{FN}/C_{FP} = 250$):
+where \(\beta^2 = C_{FN} / C_{FP}\). For our example (\(C_{FN}/C_{FP} = 250\)):
 
 $$F_{250} \text{ heavily penalizes false negatives.}$$
 
-In practice, $\beta$ values of 2--5 are common for content moderation (weighting recall 2--5x higher than precision). A $\beta$ of 250 makes precision nearly irrelevant, which matches intuition: for CSAM, you block everything remotely suspicious and deal with false positives through human review.
+In practice, \(\beta\) values of 2--5 are common for content moderation (weighting recall 2--5x higher than precision). A \(\beta\) of 250 makes precision nearly irrelevant, which matches intuition: for CSAM, you block everything remotely suspicious and deal with false positives through human review.
 
 ---
 

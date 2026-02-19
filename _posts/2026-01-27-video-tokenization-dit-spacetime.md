@@ -29,15 +29,15 @@ This post is a complete mathematical treatment of how video tokenization works: 
 
 ### Counting the Numbers
 
-A digital video is a 4D tensor: height $\times$ width $\times$ time $\times$ channels. Let us calculate the exact size of a typical AI-generated video clip.
+A digital video is a 4D tensor: height \(\times\) width \(\times\) time \(\times\) channels. Let us calculate the exact size of a typical AI-generated video clip.
 
 **Parameters:**
 - Duration: 5 seconds
 - Frame rate: 30 fps
-- Resolution: 1080p (1080 $\times$ 1920)
+- Resolution: 1080p (1080 \(\times\) 1920)
 - Color channels: 3 (RGB)
 
-**Total values (pixels $\times$ channels $\times$ frames):**
+**Total values (pixels \(\times\) channels \(\times\) frames):**
 
 $$
 N_{\text{values}} = T \times H \times W \times C = 150 \times 1080 \times 1920 \times 3
@@ -65,8 +65,8 @@ Each value needs to be stored as a floating-point number. The memory requirement
 
 | Precision | Bytes/Value | Total Memory | Notes |
 |-----------|-------------|-------------|-------|
-| FP32 (float32) | 4 bytes | $933{,}120{,}000 \times 4 = 3{,}732{,}480{,}000$ bytes = **3.73 GB** | Full precision training |
-| FP16 (float16) | 2 bytes | $933{,}120{,}000 \times 2 = 1{,}866{,}240{,}000$ bytes = **1.87 GB** | Mixed precision training |
+| FP32 (float32) | 4 bytes | \(933{,}120{,}000 \times 4 = 3{,}732{,}480{,}000\) bytes = **3.73 GB** | Full precision training |
+| FP16 (float16) | 2 bytes | \(933{,}120{,}000 \times 2 = 1{,}866{,}240{,}000\) bytes = **1.87 GB** | Mixed precision training |
 | BF16 (bfloat16) | 2 bytes | **1.87 GB** | Same size as FP16, better dynamic range |
 | INT8 (quantized) | 1 byte | **933 MB** | Inference only |
 
@@ -86,25 +86,25 @@ $$
 \text{Attention cost} = O(N^2 \cdot d)
 $$
 
-where $d$ is the embedding dimension (typically 1024-4096). For 311 million tokens:
+where \(d\) is the embedding dimension (typically 1024-4096). For 311 million tokens:
 
 $$
 N^2 = (3.11 \times 10^8)^2 = 9.67 \times 10^{16}
 $$
 
-That is $9.67 \times 10^{16}$ multiply-accumulate operations per attention layer. With $d = 2048$:
+That is \(9.67 \times 10^{16}\) multiply-accumulate operations per attention layer. With \(d = 2048\):
 
 $$
 \text{FLOPs per layer} = 2 \times N^2 \times d = 2 \times 9.67 \times 10^{16} \times 2048 \approx 3.96 \times 10^{20} \text{ FLOPs}
 $$
 
-An H100 GPU performs approximately $10^{15}$ FLOPs per second (1 PFLOP/s at FP16). A single attention layer would take:
+An H100 GPU performs approximately \(10^{15}\) FLOPs per second (1 PFLOP/s at FP16). A single attention layer would take:
 
 $$
 t = \frac{3.96 \times 10^{20}}{10^{15}} = 3.96 \times 10^5 \text{ seconds} \approx 4.6 \text{ days}
 $$
 
-**4.6 days for one attention layer on one clip.** A DiT with 28 layers, 50 denoising steps? That would be $4.6 \times 28 \times 50 = 6{,}440$ days $\approx$ **17.6 years**.
+**4.6 days for one attention layer on one clip.** A DiT with 28 layers, 50 denoising steps? That would be \(4.6 \times 28 \times 50 = 6{,}440\) days \(\approx\) **17.6 years**.
 
 This is why tokenization is not optional. It is the fundamental enabler of video generation.
 
@@ -142,8 +142,8 @@ A Variational Autoencoder (VAE) learns to compress high-dimensional data (video 
 
 The VAE consists of two networks:
 
-- **Encoder** $\mathcal{E}$: Maps raw video $\mathbf{x} \in \mathbb{R}^{T \times H \times W \times 3}$ to a latent representation $\mathbf{z} \in \mathbb{R}^{T' \times H' \times W' \times C_l}$
-- **Decoder** $\mathcal{D}$: Maps the latent representation back to pixel space: $\hat{\mathbf{x}} = \mathcal{D}(\mathbf{z})$
+- **Encoder** \(\mathcal{E}\): Maps raw video \(\mathbf{x} \in \mathbb{R}^{T \times H \times W \times 3}\) to a latent representation \(\mathbf{z} \in \mathbb{R}^{T' \times H' \times W' \times C_l}\)
+- **Decoder** \(\mathcal{D}\): Maps the latent representation back to pixel space: \(\hat{\mathbf{x}} = \mathcal{D}(\mathbf{z})\)
 
 The training objective balances reconstruction fidelity with latent space regularity:
 
@@ -154,21 +154,21 @@ $$
 where:
 
 - The **reconstruction loss** measures pixel-level accuracy.
-- The **KL divergence** regularizes the latent distribution toward a standard normal $p(\mathbf{z}) = \mathcal{N}(0, I)$, ensuring the latent space is smooth and continuous.
+- The **KL divergence** regularizes the latent distribution toward a standard normal \(p(\mathbf{z}) = \mathcal{N}(0, I)\), ensuring the latent space is smooth and continuous.
 - The **perceptual loss** (LPIPS) measures similarity in feature space (typically VGG features), penalizing perceptually visible artifacts that pixel-level loss might miss.
 - The **adversarial loss** uses a discriminator network to push reconstructions toward the manifold of realistic videos.
 
-The weight $\beta$ on the KL term controls the reconstruction-regularity tradeoff. Video VAEs typically use very small $\beta$ (0.001 or less) because high-fidelity reconstruction is more important than perfectly regular latent spaces.
+The weight \(\beta\) on the KL term controls the reconstruction-regularity tradeoff. Video VAEs typically use very small \(\beta\) (0.001 or less) because high-fidelity reconstruction is more important than perfectly regular latent spaces.
 
 ### 3D Convolutional Architecture
 
-The encoder uses 3D convolutions that operate simultaneously over the spatial (H, W) and temporal (T) dimensions. A 3D convolution with kernel size $(k_t, k_h, k_w)$ processes a local spatiotemporal volume:
+The encoder uses 3D convolutions that operate simultaneously over the spatial (H, W) and temporal (T) dimensions. A 3D convolution with kernel size \((k_t, k_h, k_w)\) processes a local spatiotemporal volume:
 
 $$
 \text{Conv3D}(\mathbf{x})_{t,h,w,c_{\text{out}}} = \sum_{c_{\text{in}}} \sum_{i=0}^{k_t-1} \sum_{j=0}^{k_h-1} \sum_{k=0}^{k_w-1} \mathbf{W}_{c_{\text{out}}, c_{\text{in}}, i, j, k} \cdot \mathbf{x}_{t+i, h+j, w+k, c_{\text{in}}} + b_{c_{\text{out}}}
 $$
 
-**Compression is achieved through strided convolutions** (or equivalently, convolution followed by downsampling). A stride of $(s_t, s_h, s_w)$ reduces each dimension:
+**Compression is achieved through strided convolutions** (or equivalently, convolution followed by downsampling). A stride of \((s_t, s_h, s_w)\) reduces each dimension:
 
 $$
 T' = \left\lfloor \frac{T}{s_t} \right\rfloor, \quad H' = \left\lfloor \frac{H}{s_h} \right\rfloor, \quad W' = \left\lfloor \frac{W}{s_w} \right\rfloor
@@ -180,10 +180,10 @@ Most video VAEs apply multiple strided convolution layers to achieve the followi
 
 | Dimension | Raw Size | Compression Factor | Latent Size | How |
 |-----------|---------|-------------------|-------------|-----|
-| Temporal ($T$) | 150 frames | 4x | 38 | Two stride-2 temporal convolutions ($2 \times 2 = 4$) |
-| Height ($H$) | 1080 pixels | 8x | 135 | Three stride-2 spatial convolutions ($2^3 = 8$) |
-| Width ($W$) | 1920 pixels | 8x | 240 | Three stride-2 spatial convolutions ($2^3 = 8$) |
-| Channels ($C$) | 3 (RGB) | 3 $\to$ $C_l$ | 4-16 | Learned channel projection |
+| Temporal (\(T\)) | 150 frames | 4x | 38 | Two stride-2 temporal convolutions (\(2 \times 2 = 4\)) |
+| Height (\(H\)) | 1080 pixels | 8x | 135 | Three stride-2 spatial convolutions (\(2^3 = 8\)) |
+| Width (\(W\)) | 1920 pixels | 8x | 240 | Three stride-2 spatial convolutions (\(2^3 = 8\)) |
+| Channels (\(C\)) | 3 (RGB) | 3 \(\to\) \(C_l\) | 4-16 | Learned channel projection |
 
 **Note on temporal compression:** The first frame is often compressed differently. Some architectures (e.g., CogVideoX's 3D causal VAE) use causal temporal convolutions that only look backward in time, preserving the first frame at full spatial resolution for image-to-video conditioning.
 
@@ -191,7 +191,7 @@ Most video VAEs apply multiple strided convolution layers to achieve the followi
 
 Let us trace the exact dimensions through a typical 3D VAE encoder for our 5-second 1080p video.
 
-**Input**: $\mathbf{x} \in \mathbb{R}^{150 \times 1080 \times 1920 \times 3}$
+**Input**: \(\mathbf{x} \in \mathbb{R}^{150 \times 1080 \times 1920 \times 3}\)
 
 **Encoder architecture** (simplified):
 
@@ -304,13 +304,13 @@ $$
 \text{MSE} = 10^{-\text{PSNR}/10} = 10^{-3.5} \approx 3.16 \times 10^{-4}
 $$
 
-For pixel values normalized to $[0, 1]$, this corresponds to an average per-pixel error of:
+For pixel values normalized to \([0, 1]\), this corresponds to an average per-pixel error of:
 
 $$
 \text{RMSE} = \sqrt{3.16 \times 10^{-4}} \approx 0.0178
 $$
 
-On a 0-255 scale, that is approximately $0.0178 \times 255 \approx 4.5$ intensity levels -- barely perceptible to the human eye for most content.
+On a 0-255 scale, that is approximately \(0.0178 \times 255 \approx 4.5\) intensity levels -- barely perceptible to the human eye for most content.
 
 ---
 
@@ -318,11 +318,11 @@ On a 0-255 scale, that is approximately $0.0178 \times 255 \approx 4.5$ intensit
 
 ### From Latent Volume to Token Sequence
 
-The 3D VAE gives us a compressed latent volume $\mathbf{z} \in \mathbb{R}^{T' \times H' \times W' \times C_l}$. This is still a 4D tensor. A transformer operates on a 1D sequence of tokens. The next step is **patchification**: dividing the latent volume into non-overlapping patches and flattening each patch into a token vector.
+The 3D VAE gives us a compressed latent volume \(\mathbf{z} \in \mathbb{R}^{T' \times H' \times W' \times C_l}\). This is still a 4D tensor. A transformer operates on a 1D sequence of tokens. The next step is **patchification**: dividing the latent volume into non-overlapping patches and flattening each patch into a token vector.
 
 ### The Patchification Process
 
-Given a latent volume of size $(T', H', W', C_l)$ and a patch size of $(p_t, p_h, p_w)$ (where $p_t$ is the temporal patch size and $p_h, p_w$ are spatial patch sizes):
+Given a latent volume of size \((T', H', W', C_l)\) and a patch size of \((p_t, p_h, p_w)\) (where \(p_t\) is the temporal patch size and \(p_h, p_w\) are spatial patch sizes):
 
 **Step 1: Divide into patches.**
 
@@ -340,29 +340,29 @@ $$
 
 **Step 3: Token dimension.**
 
-Each patch is a sub-volume of size $(p_t, p_h, p_w, C_l)$. Flattened, this becomes a vector of dimension:
+Each patch is a sub-volume of size \((p_t, p_h, p_w, C_l)\). Flattened, this becomes a vector of dimension:
 
 $$
 d_{\text{patch}} = p_t \times p_h \times p_w \times C_l
 $$
 
-This is then linearly projected to the model's hidden dimension $D$ (typically 1024, 2048, or 4096):
+This is then linearly projected to the model's hidden dimension \(D\) (typically 1024, 2048, or 4096):
 
 $$
 \mathbf{t}_i = \mathbf{W}_{\text{proj}} \cdot \text{flatten}(\text{patch}_i) + \mathbf{b}_{\text{proj}}
 $$
 
-where $\mathbf{W}_{\text{proj}} \in \mathbb{R}^{D \times d_{\text{patch}}}$.
+where \(\mathbf{W}_{\text{proj}} \in \mathbb{R}^{D \times d_{\text{patch}}}\).
 
 ### Worked Example
 
-Using our running example ($T' = 38$, $H' = 135$, $W' = 240$, $C_l = 4$) with spatial patch size $p_h = p_w = 2$ and temporal patch size $p_t = 1$:
+Using our running example (\(T' = 38\), \(H' = 135\), \(W' = 240\), \(C_l = 4\)) with spatial patch size \(p_h = p_w = 2\) and temporal patch size \(p_t = 1\):
 
 $$
 n_t = \frac{38}{1} = 38, \quad n_h = \frac{135}{2} = 67.5 \to 67, \quad n_w = \frac{240}{2} = 120
 $$
 
-(Note: When dimensions are not evenly divisible, the latent is typically padded. For simplicity, assume $H' = 136$ after padding.)
+(Note: When dimensions are not evenly divisible, the latent is typically padded. For simplicity, assume \(H' = 136\) after padding.)
 
 $$
 n_h = \frac{136}{2} = 68
@@ -378,7 +378,7 @@ $$
 d_{\text{patch}} = 1 \times 2 \times 2 \times 4 = 16
 $$
 
-This is projected to the model dimension $D = 2048$:
+This is projected to the model dimension \(D = 2048\):
 
 $$
 \mathbf{W}_{\text{proj}} \in \mathbb{R}^{2048 \times 16}
@@ -388,9 +388,9 @@ So our 5-second 1080p video, after VAE encoding and patchification, becomes a se
 
 ### Spacetime Patches (Sora's Approach)
 
-Sora's key innovation (described in OpenAI's technical report) is **spacetime patches**: patches that span both spatial and temporal dimensions simultaneously. Instead of treating each latent frame independently ($p_t = 1$), Sora uses $p_t > 1$.
+Sora's key innovation (described in OpenAI's technical report) is **spacetime patches**: patches that span both spatial and temporal dimensions simultaneously. Instead of treating each latent frame independently (\(p_t = 1\)), Sora uses \(p_t > 1\).
 
-With $p_t = 2$:
+With \(p_t = 2\):
 
 $$
 n_t = \frac{38}{2} = 19
@@ -410,7 +410,7 @@ This is a fundamental tradeoff: **larger temporal patches reduce token count (an
 
 ### Comparison of Patch Strategies
 
-| Strategy | $p_t$ | $p_h$ | $p_w$ | $N_{\text{tokens}}$ | $d_{\text{patch}}$ | Attention Cost | Temporal Granularity |
+| Strategy | \(p_t\) | \(p_h\) | \(p_w\) | \(N_{\text{tokens}}\) | \(d_{\text{patch}}\) | Attention Cost | Temporal Granularity |
 |----------|-------|-------|-------|---------------------|--------------------|----|------|
 | Spatial-only | 1 | 2 | 2 | 309,840 | 16 | Very High | Per-latent-frame |
 | Spacetime (Sora) | 2 | 2 | 2 | 154,920 | 32 | High | Every 2 latent frames |
@@ -513,29 +513,29 @@ With spacetime patches (p_t=2): 2 groups x 16 patches = 32 tokens
 
 ### The Problem: Tokens Have No Inherent Position
 
-After patchification, we have a flat sequence of $N$ tokens. The transformer's self-attention mechanism is **permutation-invariant** -- it does not inherently know which token came from which spatial location or which point in time. We must inject positional information.
+After patchification, we have a flat sequence of \(N\) tokens. The transformer's self-attention mechanism is **permutation-invariant** -- it does not inherently know which token came from which spatial location or which point in time. We must inject positional information.
 
-For video, position is three-dimensional: $(x, y, t)$. Each token has a spatial position within its frame and a temporal position within the video.
+For video, position is three-dimensional: \((x, y, t)\). Each token has a spatial position within its frame and a temporal position within the video.
 
 ### Sinusoidal Positional Encoding (3D Extension)
 
-The original sinusoidal encoding from "Attention Is All You Need" can be extended to three dimensions. For a token at position $(x, y, t)$:
+The original sinusoidal encoding from "Attention Is All You Need" can be extended to three dimensions. For a token at position \((x, y, t)\):
 
 $$
 \text{PE}(x, y, t) = \text{PE}_x(x) \oplus \text{PE}_y(y) \oplus \text{PE}_t(t)
 $$
 
-where $\oplus$ denotes concatenation and each component uses the standard sinusoidal formula. For dimension $i$ of the encoding:
+where \(\oplus\) denotes concatenation and each component uses the standard sinusoidal formula. For dimension \(i\) of the encoding:
 
 $$
 \text{PE}_x(x, 2i) = \sin\left(\frac{x}{10000^{2i/d_x}}\right), \quad \text{PE}_x(x, 2i+1) = \cos\left(\frac{x}{10000^{2i/d_x}}\right)
 $$
 
-where $d_x$ is the number of dimensions allocated to the x-component (typically $D/3$, splitting the model dimension evenly among the three axes).
+where \(d_x\) is the number of dimensions allocated to the x-component (typically \(D/3\), splitting the model dimension evenly among the three axes).
 
-**Worked example**: With $D = 2048$ and $d_x = d_y = d_t = 682$ (approximately $2048/3$, with 2 leftover dimensions padded or allocated to one axis), the positional encoding for a token at position $(5, 12, 3)$ contains:
+**Worked example**: With \(D = 2048\) and \(d_x = d_y = d_t = 682\) (approximately $2048/3$, with 2 leftover dimensions padded or allocated to one axis), the positional encoding for a token at position \((5, 12, 3)\) contains:
 
-For the $x$-component, dimension $i = 0$:
+For the \(x\)-component, dimension \(i = 0\):
 
 $$
 \text{PE}_x(5, 0) = \sin\left(\frac{5}{10000^{0/682}}\right) = \sin\left(\frac{5}{1}\right) = \sin(5) \approx -0.959
@@ -545,7 +545,7 @@ $$
 \text{PE}_x(5, 1) = \cos(5) \approx 0.284
 $$
 
-For dimension $i = 100$:
+For dimension \(i = 100\):
 
 $$
 \text{PE}_x(5, 200) = \sin\left(\frac{5}{10000^{200/682}}\right) = \sin\left(\frac{5}{10000^{0.293}}\right) = \sin\left(\frac{5}{19.31}\right) = \sin(0.259) \approx 0.256
@@ -561,7 +561,7 @@ $$
 \text{PE}(x, y, t) = \mathbf{E}_x[x] + \mathbf{E}_y[y] + \mathbf{E}_t[t]
 $$
 
-where $\mathbf{E}_x \in \mathbb{R}^{n_w \times D}$, $\mathbf{E}_y \in \mathbb{R}^{n_h \times D}$, and $\mathbf{E}_t \in \mathbb{R}^{n_t \times D}$ are learnable embedding tables.
+where \(\mathbf{E}_x \in \mathbb{R}^{n_w \times D}\), \(\mathbf{E}_y \in \mathbb{R}^{n_h \times D}\), and \(\mathbf{E}_t \in \mathbb{R}^{n_t \times D}\) are learnable embedding tables.
 
 **Advantages**: Can learn arbitrary positional relationships.
 **Disadvantages**: Cannot generalize to positions unseen during training. If trained on 5-second videos (38 temporal positions), cannot generate 10-second videos without interpolation or extrapolation of the temporal embeddings.
@@ -570,13 +570,13 @@ where $\mathbf{E}_x \in \mathbb{R}^{n_w \times D}$, $\mathbf{E}_y \in \mathbb{R}
 
 RoPE has become the preferred positional encoding in modern video DiTs (including architectures used in Wan 2.2 and related models). Instead of adding positional information to the token embeddings, RoPE applies **rotation matrices** to the query and key vectors in attention.
 
-For a 1D position $m$, RoPE rotates pairs of dimensions by angles proportional to $m$:
+For a 1D position \(m\), RoPE rotates pairs of dimensions by angles proportional to \(m\):
 
 $$
 \text{RoPE}(\mathbf{q}, m) = \begin{pmatrix} q_0 \\ q_1 \\ q_2 \\ q_3 \\ \vdots \end{pmatrix} \odot \begin{pmatrix} \cos(m\theta_0) \\ \cos(m\theta_0) \\ \cos(m\theta_1) \\ \cos(m\theta_1) \\ \vdots \end{pmatrix} + \begin{pmatrix} -q_1 \\ q_0 \\ -q_3 \\ q_2 \\ \vdots \end{pmatrix} \odot \begin{pmatrix} \sin(m\theta_0) \\ \sin(m\theta_0) \\ \sin(m\theta_1) \\ \sin(m\theta_1) \\ \vdots \end{pmatrix}
 $$
 
-where $\theta_i = 10000^{-2i/d}$ and $\odot$ is element-wise multiplication.
+where \(\theta_i = 10000^{-2i/d}\) and \(\odot\) is element-wise multiplication.
 
 **For 3D video positions**, RoPE is extended by partitioning the embedding dimensions among the three axes:
 
@@ -584,7 +584,7 @@ $$
 d = d_x + d_y + d_t
 $$
 
-Dimensions $[0, d_x)$ are rotated by the $x$-position, dimensions $[d_x, d_x + d_y)$ by the $y$-position, and dimensions $[d_x + d_y, d)$ by the $t$-position.
+Dimensions \([0, d_x)\) are rotated by the \(x\)-position, dimensions \([d_x, d_x + d_y)\) by the \(y\)-position, and dimensions \([d_x + d_y, d)\) by the \(t\)-position.
 
 The critical property of RoPE for video generation: the attention score between two tokens depends only on their **relative** position, not their absolute position:
 
@@ -694,13 +694,13 @@ $$
 \text{Attention}(\mathbf{Q}, \mathbf{K}, \mathbf{V}) = \text{softmax}\left(\frac{\mathbf{Q}\mathbf{K}^T}{\sqrt{d_k}}\right) \mathbf{V}
 $$
 
-where $\mathbf{Q}, \mathbf{K}, \mathbf{V} \in \mathbb{R}^{N \times d_k}$ (for a single head).
+where \(\mathbf{Q}, \mathbf{K}, \mathbf{V} \in \mathbb{R}^{N \times d_k}\) (for a single head).
 
 The computational cost breaks down as:
 
-1. **QK^T computation**: $O(N^2 \cdot d_k)$ FLOPs
-2. **Softmax**: $O(N^2)$ FLOPs
-3. **Attention $\times$ V**: $O(N^2 \cdot d_k)$ FLOPs
+1. **QK^T computation**: \(O(N^2 \cdot d_k)\) FLOPs
+2. **Softmax**: \(O(N^2)\) FLOPs
+3. **Attention \(\times\) V**: \(O(N^2 \cdot d_k)\) FLOPs
 
 Total per attention layer (all heads):
 
@@ -708,7 +708,7 @@ $$
 \text{FLOPs}_{\text{attention}} = 4 \cdot N^2 \cdot d_k \cdot n_{\text{heads}} = 4 \cdot N^2 \cdot D
 $$
 
-where $D = d_k \cdot n_{\text{heads}}$ is the total model dimension.
+where \(D = d_k \cdot n_{\text{heads}}\) is the total model dimension.
 
 The **memory** for the attention matrix is:
 
@@ -721,13 +721,13 @@ $$
 Let us compute the exact attention cost for our running example at different tokenization strategies.
 
 **Setup:**
-- Model dimension: $D = 2048$
-- Number of attention heads: $n_h = 16$
-- Head dimension: $d_k = D / n_h = 128$
-- Number of DiT layers: $L = 28$
-- Number of denoising steps: $S = 50$
+- Model dimension: \(D = 2048\)
+- Number of attention heads: \(n_h = 16\)
+- Head dimension: \(d_k = D / n_h = 128\)
+- Number of DiT layers: \(L = 28\)
+- Number of denoising steps: \(S = 50\)
 
-#### Case 1: Spatial-Only Patches ($p_t=1, p_h=2, p_w=2$)
+#### Case 1: Spatial-Only Patches (\(p_t=1, p_h=2, p_w=2\))
 
 $$
 N = 38 \times 68 \times 120 = 309{,}840 \text{ tokens}
@@ -745,9 +745,9 @@ $$
 96 \times 10^9 \times 2 \text{ bytes} = 192 \text{ GB per head}
 $$
 
-With 16 heads: $192 \times 16 = 3{,}072$ GB. **This does not fit on any single GPU or even a typical multi-GPU node.** Full self-attention at this token count is infeasible.
+With 16 heads: \(192 \times 16 = 3{,}072\) GB. **This does not fit on any single GPU or even a typical multi-GPU node.** Full self-attention at this token count is infeasible.
 
-#### Case 2: Spacetime Patches ($p_t=2, p_h=2, p_w=2$)
+#### Case 2: Spacetime Patches (\(p_t=2, p_h=2, p_w=2\))
 
 $$
 N = 19 \times 68 \times 120 = 154{,}920 \text{ tokens}
@@ -757,20 +757,20 @@ $$
 N^2 = 154{,}920^2 = 2.40 \times 10^{10} \approx 24 \text{ billion entries}
 $$
 
-**Memory**: $24 \times 10^9 \times 2 \times 16 = 768$ GB. Still infeasible for full attention.
+**Memory**: \(24 \times 10^9 \times 2 \times 16 = 768\) GB. Still infeasible for full attention.
 
 #### Case 3: Aggressive Compression + Smaller Resolution
 
-Let us consider a more typical production setting: 720p resolution ($720 \times 1280$), 5 seconds at 24fps.
+Let us consider a more typical production setting: 720p resolution (\(720 \times 1280\)), 5 seconds at 24fps.
 
 | Dimension | Raw | After VAE (8x spatial, 4x temporal) | Latent |
 |-----------|-----|-------------------------------------|--------|
-| T | 120 | $\div 4$ | 30 |
-| H | 720 | $\div 8$ | 90 |
-| W | 1280 | $\div 8$ | 160 |
-| C | 3 | $\to$ | 4 |
+| T | 120 | \(\div 4\) | 30 |
+| H | 720 | \(\div 8\) | 90 |
+| W | 1280 | \(\div 8\) | 160 |
+| C | 3 | \(\to\) | 4 |
 
-With spacetime patches $p_t = 2, p_h = 2, p_w = 2$:
+With spacetime patches \(p_t = 2, p_h = 2, p_w = 2\):
 
 $$
 N = \frac{30}{2} \times \frac{90}{2} \times \frac{160}{2} = 15 \times 45 \times 80 = 54{,}000 \text{ tokens}
@@ -782,7 +782,7 @@ $$
 54{,}000^2 \times 16 \times 2 = 2{,}916{,}000{,}000 \times 32 = 93.3 \text{ GB}
 $$
 
-Still large, but with FlashAttention (which computes attention without materializing the full $N \times N$ matrix), this is feasible on a multi-GPU setup.
+Still large, but with FlashAttention (which computes attention without materializing the full \(N \times N\) matrix), this is feasible on a multi-GPU setup.
 
 **FLOPs per attention layer:**
 
@@ -830,12 +830,12 @@ Generation Time (seconds)
 
 | Token Count | Attention FLOPs/Layer | Gen Time (est.) | Quality Trade-off |
 |-------------|----------------------|-----------------|-------------------|
-| 10,000 | $8.2 \times 10^{11}$ | ~3 sec | Low res / short, limited detail |
-| 30,000 | $7.4 \times 10^{12}$ | ~12 sec | 480p quality, acceptable for previews |
-| 54,000 | $2.4 \times 10^{13}$ | ~35 sec | 720p quality, production usable |
-| 100,000 | $8.2 \times 10^{13}$ | ~90 sec | 1080p quality, high detail |
-| 200,000 | $3.3 \times 10^{14}$ | ~300 sec | High resolution, max quality |
-| 300,000 | $7.4 \times 10^{14}$ | ~600 sec | Approaching compute limits |
+| 10,000 | \(8.2 \times 10^{11}\) | ~3 sec | Low res / short, limited detail |
+| 30,000 | \(7.4 \times 10^{12}\) | ~12 sec | 480p quality, acceptable for previews |
+| 54,000 | \(2.4 \times 10^{13}\) | ~35 sec | 720p quality, production usable |
+| 100,000 | \(8.2 \times 10^{13}\) | ~90 sec | 1080p quality, high detail |
+| 200,000 | \(3.3 \times 10^{14}\) | ~300 sec | High resolution, max quality |
+| 300,000 | \(7.4 \times 10^{14}\) | ~600 sec | Approaching compute limits |
 
 ### Why Longer Videos Are Exponentially More Expensive
 
@@ -855,7 +855,7 @@ Doubling the duration **quadruples** the compute cost. This is the fundamental r
 | 20 sec | 216,000 | 100x | ~600 sec |
 | 60 sec | 648,000 | 900x | ~5,400 sec |
 
-This is why no current model generates 60-second videos in a single pass. The $N^2$ scaling makes it computationally prohibitive. Instead, longer videos are generated through:
+This is why no current model generates 60-second videos in a single pass. The \(N^2\) scaling makes it computationally prohibitive. Instead, longer videos are generated through:
 - Temporal chunking with autoregressive sliding windows
 - I2V chaining (as described in the Adobe post-production post)
 - Hierarchical generation (generate keyframes, then interpolate)
@@ -868,9 +868,9 @@ The temporal dimension is where video tokenization gets most interesting -- and 
 
 ### Strategy 1: Uniform Temporal Downsampling
 
-The simplest approach: apply a fixed temporal stride in the VAE, reducing every $k$ frames to 1 latent frame.
+The simplest approach: apply a fixed temporal stride in the VAE, reducing every \(k\) frames to 1 latent frame.
 
-**Mechanism**: Strided 3D convolutions with temporal stride $s_t = 2$ applied at multiple layers. Two layers of stride 2 yields $4\times$ total temporal compression.
+**Mechanism**: Strided 3D convolutions with temporal stride \(s_t = 2\) applied at multiple layers. Two layers of stride 2 yields \(4\times\) total temporal compression.
 
 $$
 T' = \frac{T}{s_t^L} = \frac{150}{4} = 37.5 \to 38 \text{ (with padding)}
@@ -887,7 +887,7 @@ $$
 
 **Quality-Compute Tradeoff:**
 
-| Temporal Compression | Latent Frames (5s@30fps) | Tokens (720p, $p=2$) | Temporal Quality |
+| Temporal Compression | Latent Frames (5s@30fps) | Tokens (720p, \(p=2\)) | Temporal Quality |
 |---------------------|------------------------|---------------------|-----------------|
 | 1x (no compression) | 150 | 270,000 | Perfect |
 | 2x | 75 | 135,000 | Very good |
@@ -994,7 +994,7 @@ $$
 \mathbf{z}'_i = \text{Attention}\left(\mathbf{Q}_i, \left\{\mathbf{K}_j, \mathbf{V}_j\right\}_{j \in \mathcal{W}(i)}\right)
 $$
 
-where $\mathcal{W}(i)$ is a local temporal window around position $i$. The stride of the output positions determines the compression ratio.
+where \(\mathcal{W}(i)\) is a local temporal window around position \(i\). The stride of the output positions determines the compression ratio.
 
 **Advantages:**
 - Learns content-adaptive compression
@@ -1028,7 +1028,7 @@ $$
 N_{\text{hierarchical}} = \sum_{l=0}^{L} \frac{T'}{2^l} \times n_h \times n_w
 $$
 
-For $T' = 38$, 4 levels, with $n_h \times n_w = 5{,}400$:
+For \(T' = 38\), 4 levels, with \(n_h \times n_w = 5{,}400\):
 
 $$
 N = (38 + 19 + 10 + 5) \times 5{,}400 = 72 \times 5{,}400 = 388{,}800
@@ -1042,7 +1042,7 @@ This is higher than single-level tokenization, but the lower levels contain far 
 
 ### How Tokenization Determines Speed
 
-The generation speed of a video diffusion model is dominated by the denoising loop, which runs the DiT forward pass $S$ times (one per denoising step):
+The generation speed of a video diffusion model is dominated by the denoising loop, which runs the DiT forward pass \(S\) times (one per denoising step):
 
 $$
 t_{\text{generation}} = S \times t_{\text{forward}}
@@ -1054,16 +1054,16 @@ $$
 t_{\text{forward}} \propto L \times \left(\underbrace{4 N^2 D}_{\text{attention}} + \underbrace{8 N D^2}_{\text{feedforward}}\right)
 $$
 
-For the attention term to dominate (which determines the scaling behavior), we need $4N^2 D > 8ND^2$, i.e., $N > 2D$. With $D = 2048$, this means attention dominates when $N > 4096$ tokens, which is always the case for video.
+For the attention term to dominate (which determines the scaling behavior), we need \(4N^2 D > 8ND^2\), i.e., \(N > 2D\). With \(D = 2048\), this means attention dominates when \(N > 4096\) tokens, which is always the case for video.
 
 **Speed comparison for different tokenization strategies (same content):**
 
 | Strategy | N (tokens) | Relative Speed | Estimated Time (H100, 50 steps) |
 |----------|-----------|----------------|--------------------------------|
-| No temporal compression, $p=1$ | 486,000 | 0.01x | ~2,500 sec |
-| 4x temporal, spatial $p=2$ | 54,000 | 1x (baseline) | ~35 sec |
-| 4x temporal, spacetime $p=(2,2,2)$ | 27,000 | 4x | ~9 sec |
-| 8x temporal, spacetime $p=(2,2,2)$ | 13,500 | 16x | ~2.2 sec |
+| No temporal compression, \(p=1\) | 486,000 | 0.01x | ~2,500 sec |
+| 4x temporal, spatial \(p=2\) | 54,000 | 1x (baseline) | ~35 sec |
+| 4x temporal, spacetime \(p=(2,2,2)\) | 27,000 | 4x | ~9 sec |
+| 8x temporal, spacetime \(p=(2,2,2)\) | 13,500 | 16x | ~2.2 sec |
 
 ### How Tokenization Determines Quality Ceiling
 
@@ -1108,12 +1108,12 @@ T_{\text{max}} = \frac{N_{\text{budget}} \times p_t \times s_t}{f_{\text{fps}}}
 $$
 
 where:
-- $N_{\text{budget}}$ is the maximum number of tokens the model can handle (set by GPU memory and acceptable generation time)
-- $p_t$ is the temporal patch size
-- $s_t$ is the VAE temporal compression factor
-- $f_{\text{fps}}$ is the frame rate
+- \(N_{\text{budget}}\) is the maximum number of tokens the model can handle (set by GPU memory and acceptable generation time)
+- \(p_t\) is the temporal patch size
+- \(s_t\) is the VAE temporal compression factor
+- \(f_{\text{fps}}\) is the frame rate
 
-**Example**: If the token budget is 100,000, spatial dimensions consume $68 \times 120 = 8{,}160$ tokens per temporal position, patch temporal size is 2, and VAE temporal compression is 4x:
+**Example**: If the token budget is 100,000, spatial dimensions consume \(68 \times 120 = 8{,}160\) tokens per temporal position, patch temporal size is 2, and VAE temporal compression is 4x:
 
 $$
 n_t = \frac{N_{\text{budget}}}{n_h \times n_w} = \frac{100{,}000}{8{,}160} \approx 12 \text{ temporal token positions}
@@ -1137,7 +1137,7 @@ $$
 \text{Tokens needed} = \frac{10 \times 30}{4 \times 2} \times 8{,}160 = 37.5 \times 8{,}160 = 306{,}000 \text{ tokens}
 $$
 
-The attention cost scales as $306{,}000^2 / 100{,}000^2 = 9.36\times$ -- nearly an order of magnitude more expensive.
+The attention cost scales as \(306{,}000^2 / 100{,}000^2 = 9.36\times\) -- nearly an order of magnitude more expensive.
 
 **This is why a model with 4x temporal compression can generate 4x longer videos at the same compute cost** compared to a model with 1x temporal compression. The temporal compression factor directly multiplies the achievable duration within a fixed token budget.
 
@@ -1151,13 +1151,13 @@ The following table compares the tokenization approaches of major video generati
 
 | Model | VAE Type | Spatial Comp. | Temporal Comp. | Patch Size | Latent Channels | Typical Tokens (5s, 720p) |
 |-------|----------|--------------|---------------|------------|----------------|---------------------------|
-| **Sora** (OpenAI) | 3D VAE | 8x | 4x (est.) | Spacetime: $(1,2,2)$ to $(2,2,2)$ | 16 (est.) | ~50,000-100,000 |
-| **Veo 2/3** (Google) | Spatial VAE + temporal transformer | 8x | Learned (est. 4-8x) | $(1,2,2)$ | 8 (est.) | ~40,000-80,000 |
-| **Kling 3.0** (Kuaishou) | 3D causal VAE | 8x | 4x | $(2,2,2)$ | 4 | ~27,000 |
-| **Wan 2.2** (Alibaba) | 3D VAE | 8x | 4x | $(1,2,2)$ | 16 | ~54,000 |
-| **CogVideoX** (Zhipu) | 3D causal VAE | 8x | 4x | $(1,2,2)$ | 16 | ~52,000 |
+| **Sora** (OpenAI) | 3D VAE | 8x | 4x (est.) | Spacetime: \((1,2,2)\) to \((2,2,2)\) | 16 (est.) | ~50,000-100,000 |
+| **Veo 2/3** (Google) | Spatial VAE + temporal transformer | 8x | Learned (est. 4-8x) | \((1,2,2)\) | 8 (est.) | ~40,000-80,000 |
+| **Kling 3.0** (Kuaishou) | 3D causal VAE | 8x | 4x | \((2,2,2)\) | 4 | ~27,000 |
+| **Wan 2.2** (Alibaba) | 3D VAE | 8x | 4x | \((1,2,2)\) | 16 | ~54,000 |
+| **CogVideoX** (Zhipu) | 3D causal VAE | 8x | 4x | \((1,2,2)\) | 16 | ~52,000 |
 | **Runway Gen-3** | Proprietary | Est. 8x | Est. 4x | Proprietary | Proprietary | Est. ~40,000-60,000 |
-| **LTX-2** (Lightricks) | 3D VAE | 32x | 8x | $(1,1,1)$ | 128 | ~21,600 |
+| **LTX-2** (Lightricks) | 3D VAE | 32x | 8x | \((1,1,1)\) | 128 | ~21,600 |
 
 ### Key Architectural Differences
 
@@ -1182,7 +1182,7 @@ Veo compensates for the higher token count with efficient attention mechanisms -
 
 #### Kling 3.0: Aggressive Compression for Speed
 
-Kling 3.0 uses one of the most aggressive compression strategies: 8x spatial, 4x temporal, spacetime patches of $(2,2,2)$, and only 4 latent channels. This produces approximately 27,000 tokens for a 5-second 720p video -- roughly half what Sora or Wan use.
+Kling 3.0 uses one of the most aggressive compression strategies: 8x spatial, 4x temporal, spacetime patches of \((2,2,2)\), and only 4 latent channels. This produces approximately 27,000 tokens for a 5-second 720p video -- roughly half what Sora or Wan use.
 
 The result: Kling generates noticeably faster than competitors. The tradeoff is visible in fine temporal details and high-frequency spatial content, where Kling's output is slightly softer than Veo or Sora.
 
@@ -1194,7 +1194,7 @@ $$
 \text{LTX-2 latent}: \frac{720}{32} \times \frac{1280}{32} \times \frac{120}{8} = 22.5 \times 40 \times 15 = 13{,}500 \text{ spatial-temporal positions}
 $$
 
-With patch size $(1,1,1)$ (no additional patching), each latent position becomes one token with 128-dimensional patch content, projected to the model dimension.
+With patch size \((1,1,1)\) (no additional patching), each latent position becomes one token with 128-dimensional patch content, projected to the model dimension.
 
 The extremely low token count (~13,500) enables near-real-time generation but limits fine spatial detail. LTX-2 compensates with its high channel count, which carries more information per token than models with 4-channel latents.
 
@@ -1274,7 +1274,7 @@ For platform builders, understanding these tradeoffs informs model selection:
 
 - **Preview / draft generation**: Choose models with aggressive tokenization (Kling, LTX-2) for speed
 - **Final render / premium output**: Choose models with conservative tokenization (Veo, Sora) for quality
-- **Long-form content**: Chain multiple short generations rather than fighting the $O(N^2)$ scaling wall
+- **Long-form content**: Chain multiple short generations rather than fighting the \(O(N^2)\) scaling wall
 - **Custom models**: If self-hosting, the VAE temporal compression factor is the single most impactful hyperparameter for balancing generation speed against temporal quality
 
 The mathematics are clear: until attention mechanisms with sub-quadratic scaling (linear attention, state-space models) mature for video, tokenization strategy will remain the primary determinant of what is possible in video generation.

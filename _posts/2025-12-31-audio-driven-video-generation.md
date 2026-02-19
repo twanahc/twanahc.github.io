@@ -147,17 +147,17 @@ Before any audio can condition a video model, it must be transformed from raw wa
 
 The mel spectrogram is the workhorse representation for audio in deep learning. It converts the linear frequency scale of the Short-Time Fourier Transform (STFT) into a perceptually-motivated mel scale.
 
-**Step 1: STFT.** Given a discrete audio signal $x[n]$ sampled at rate $f_s$, the STFT at frame $m$ and frequency bin $k$ is:
+**Step 1: STFT.** Given a discrete audio signal \(x[n]\) sampled at rate \(f_s\), the STFT at frame \(m\) and frequency bin \(k\) is:
 
 $$X[m, k] = \sum_{n=0}^{N-1} x[n + mH] \cdot w[n] \cdot e^{-j2\pi kn/N}$$
 
-where $N$ is the FFT window size (typically 2048), $H$ is the hop size (typically 512), and $w[n]$ is a window function (Hann window).
+where \(N\) is the FFT window size (typically 2048), \(H\) is the hop size (typically 512), and \(w[n]\) is a window function (Hann window).
 
 **Step 2: Power spectrum.**
 
 $$S[m, k] = |X[m, k]|^2$$
 
-**Step 3: Mel filterbank.** A set of $M$ triangular filters $\{h_i[k]\}_{i=1}^{M}$ (typically $M = 128$) spaced according to the mel scale:
+**Step 3: Mel filterbank.** A set of \(M\) triangular filters \(\{h_i[k]\}_{i=1}^{M}\) (typically \(M = 128\)) spaced according to the mel scale:
 
 $$\text{mel}(f) = 2595 \cdot \log_{10}\left(1 + \frac{f}{700}\right)$$
 
@@ -165,7 +165,7 @@ $$\text{mel}(f) = 2595 \cdot \log_{10}\left(1 + \frac{f}{700}\right)$$
 
 $$\text{MelSpec}[m, i] = \log\left(\sum_{k} h_i[k] \cdot S[m, k] + \epsilon\right)$$
 
-The result is a 2D representation of shape $(T, M)$ where $T$ is the number of time frames and $M$ is the number of mel bands. This is the standard input to audio encoders in cross-modal models.
+The result is a 2D representation of shape \((T, M)\) where \(T\) is the number of time frames and \(M\) is the number of mel bands. This is the standard input to audio encoders in cross-modal models.
 
 ### Beat Detection
 
@@ -177,11 +177,11 @@ $$O[m] = \sum_{i=1}^{M} \max\left(0, \text{MelSpec}[m, i] - \text{MelSpec}[m-1, 
 
 This captures sudden increases in spectral energy --- exactly what characterizes a musical beat onset.
 
-**Peak picking.** Beats correspond to peaks in $O[m]$. A peak at frame $m$ is selected if:
+**Peak picking.** Beats correspond to peaks in \(O[m]\). A peak at frame \(m\) is selected if:
 
 $$O[m] > O[m-\delta] \quad \text{and} \quad O[m] > O[m+\delta] \quad \text{and} \quad O[m] > \mu + \lambda\sigma$$
 
-where $\delta$ is a minimum peak distance, $\mu$ and $\sigma$ are the local mean and standard deviation of $O$, and $\lambda$ is a threshold factor. The timestamps of selected peaks form the beat grid.
+where \(\delta\) is a minimum peak distance, \(\mu\) and \(\sigma\) are the local mean and standard deviation of \(O\), and \(\lambda\) is a threshold factor. The timestamps of selected peaks form the beat grid.
 
 ### Energy Envelope (RMS)
 
@@ -193,11 +193,11 @@ This is the simplest audio feature but one of the most useful for video conditio
 
 ### Chromagram
 
-The chromagram maps spectral energy to 12 pitch classes (C, C#, D, ..., B), collapsing all octaves. Each chroma bin $c \in \{0, ..., 11\}$ at time frame $m$:
+The chromagram maps spectral energy to 12 pitch classes (C, C#, D, ..., B), collapsing all octaves. Each chroma bin \(c \in \{0, ..., 11\}\) at time frame \(m\):
 
 $$\text{Chroma}[m, c] = \sum_{k \in \text{bins}(c)} S[m, k]$$
 
-where $\text{bins}(c)$ contains all frequency bins whose fundamental frequency corresponds to pitch class $c$ across all audible octaves.
+where \(\text{bins}(c)\) contains all frequency bins whose fundamental frequency corresponds to pitch class \(c\) across all audible octaves.
 
 The chromagram captures harmonic content --- whether the music is in a major or minor key at any moment, which chord is playing, how the harmonic progression evolves. This maps naturally to color mood: major keys to warm, bright palettes; minor keys to cool, desaturated tones.
 
@@ -263,37 +263,37 @@ Beat detection is the foundation of audio-visual synchronization. Getting it rig
 
 ### Tempo Estimation via Autocorrelation
 
-Given the onset strength envelope $O[m]$, the tempo can be estimated by finding the dominant periodicity through autocorrelation:
+Given the onset strength envelope \(O[m]\), the tempo can be estimated by finding the dominant periodicity through autocorrelation:
 
 $$R[\tau] = \sum_{m} O[m] \cdot O[m + \tau]$$
 
-The autocorrelation $R[\tau]$ peaks at lags $\tau$ corresponding to periodic repetitions in the onset envelope. The dominant period $\tau^*$ is:
+The autocorrelation \(R[\tau]\) peaks at lags \(\tau\) corresponding to periodic repetitions in the onset envelope. The dominant period \(\tau^*\) is:
 
 $$\tau^* = \arg\max_{\tau \in [\tau_\min, \tau_\max]} R[\tau]$$
 
-where $\tau_\min$ and $\tau_\max$ correspond to the plausible BPM range (typically 60--200 BPM). Converting lag to BPM:
+where \(\tau_\min\) and \(\tau_\max\) correspond to the plausible BPM range (typically 60--200 BPM). Converting lag to BPM:
 
 $$\text{BPM} = \frac{60 \cdot f_s}{H \cdot \tau^*}$$
 
-where $f_s$ is the sample rate and $H$ is the hop length.
+where \(f_s\) is the sample rate and \(H\) is the hop length.
 
 An alternative formulation uses the median inter-beat interval:
 
 $$\text{BPM} = \frac{60}{\text{median}(\Delta t_{\text{beats}})}$$
 
-where $\Delta t_{\text{beats}} = \{t_{i+1} - t_i\}$ is the set of inter-beat time differences. This is more robust to occasional missed or extra beats.
+where \(\Delta t_{\text{beats}} = \{t_{i+1} - t_i\}\) is the set of inter-beat time differences. This is more robust to occasional missed or extra beats.
 
 ### Dynamic Programming Beat Tracking
 
-The state-of-the-art approach (Ellis 2007, used in librosa) formulates beat tracking as a dynamic programming problem. Define a cost function over candidate beat sequences $\{b_1, b_2, \ldots, b_K\}$:
+The state-of-the-art approach (Ellis 2007, used in librosa) formulates beat tracking as a dynamic programming problem. Define a cost function over candidate beat sequences \(\{b_1, b_2, \ldots, b_K\}\):
 
 $$C(\{b_k\}) = \sum_{k=1}^{K} O[b_k] + \alpha \sum_{k=2}^{K} F(b_k - b_{k-1}, \tau^*)$$
 
-The first term rewards placing beats at frames with high onset strength. The second term penalizes deviations from the estimated tempo period $\tau^*$ via a penalty function:
+The first term rewards placing beats at frames with high onset strength. The second term penalizes deviations from the estimated tempo period \(\tau^*\) via a penalty function:
 
 $$F(\Delta, \tau^*) = -\left(\log \frac{\Delta}{\tau^*}\right)^2$$
 
-This is a Gaussian log-penalty centered on the expected inter-beat interval. The parameter $\alpha$ controls the tradeoff between rhythmic regularity and onset fidelity. The optimal beat sequence is found by dynamic programming in $O(T \cdot W)$ time, where $W$ is the search window around the expected beat period.
+This is a Gaussian log-penalty centered on the expected inter-beat interval. The parameter \(\alpha\) controls the tradeoff between rhythmic regularity and onset fidelity. The optimal beat sequence is found by dynamic programming in \(O(T \cdot W)\) time, where \(W\) is the search window around the expected beat period.
 
 ### Phase and Downbeat Estimation
 
@@ -322,7 +322,7 @@ The cross-attention mechanism is:
 
 $$\text{Attention}(Q, K, V) = \text{softmax}\left(\frac{QK^T}{\sqrt{d_k}}\right) V$$
 
-where $Q$ comes from the visual (noisy latent) features and $K, V$ come from the audio encoder output. This allows each spatial-temporal position in the video to attend to the most relevant parts of the audio.
+where \(Q\) comes from the visual (noisy latent) features and \(K, V\) come from the audio encoder output. This allows each spatial-temporal position in the video to attend to the most relevant parts of the audio.
 
 **Strengths**: Leverages the well-understood cross-attention mechanism. Compatible with existing diffusion architectures. The audio encoder can be pretrained independently.
 
@@ -419,7 +419,7 @@ This approach modulates the diffusion model's internal activations directly usin
 
 $$\hat{h} = \gamma(a) \cdot \frac{h - \mu_h}{\sigma_h} + \beta(a)$$
 
-where $h$ is an intermediate feature map, $a$ is the audio feature vector at the corresponding timestamp, and $\gamma(a), \beta(a)$ are learned affine transformations of the audio. This is analogous to AdaIN (Adaptive Instance Normalization) or FiLM (Feature-wise Linear Modulation).
+where \(h\) is an intermediate feature map, \(a\) is the audio feature vector at the corresponding timestamp, and \(\gamma(a), \beta(a)\) are learned affine transformations of the audio. This is analogous to AdaIN (Adaptive Instance Normalization) or FiLM (Feature-wise Linear Modulation).
 
 This gives the audio very direct control over the visual features --- not through attention (which is soft and distributed) but through explicit modulation of activations. The audio literally scales and shifts the visual features at each layer.
 
@@ -431,15 +431,15 @@ The core technical challenge of audio-driven video is temporal alignment: ensuri
 
 ### Beat Grid Construction
 
-Given detected beat times $\{b_1, b_2, \ldots, b_K\}$ and a target video frame rate $f_\text{fps}$, construct a beat grid that maps each beat to a video frame:
+Given detected beat times \(\{b_1, b_2, \ldots, b_K\}\) and a target video frame rate \(f_\text{fps}\), construct a beat grid that maps each beat to a video frame:
 
 $$f_k = \text{round}(b_k \cdot f_\text{fps})$$
 
-where $f_k$ is the frame index of the $k$-th beat. The inter-beat interval in frames is:
+where \(f_k\) is the frame index of the \(k\)-th beat. The inter-beat interval in frames is:
 
 $$\Delta f_k = f_{k+1} - f_k$$
 
-For 120 BPM music at 24 fps: $\Delta f = \frac{60}{120} \times 24 = 12$ frames per beat. For 140 BPM: $\Delta f \approx 10.3$ frames --- note the non-integer value, which requires careful handling to avoid drift.
+For 120 BPM music at 24 fps: \(\Delta f = \frac{60}{120} \times 24 = 12\) frames per beat. For 140 BPM: \(\Delta f \approx 10.3\) frames --- note the non-integer value, which requires careful handling to avoid drift.
 
 ### Quantization to Beat Grid
 
@@ -447,11 +447,11 @@ When generating video in segments (e.g., 4-second chunks for current models), se
 
 $$\text{segments} = \{(b_{k_i}, b_{k_{i+1}})\}$$
 
-where $\{k_i\}$ are chosen so that each segment duration is close to the model's optimal generation length while respecting beat boundaries. This is a bin-packing problem:
+where \(\{k_i\}\) are chosen so that each segment duration is close to the model's optimal generation length while respecting beat boundaries. This is a bin-packing problem:
 
 $$\min_{\{k_i\}} \sum_i \left| (b_{k_{i+1}} - b_{k_i}) - T_\text{target} \right|$$
 
-subject to $k_0 = 1$, $k_M = K$, and $b_{k_{i+1}} - b_{k_i} \leq T_\max$.
+subject to \(k_0 = 1\), \(k_M = K\), and \(b_{k_{i+1}} - b_{k_i} \leq T_\max\).
 
 ### Visual Event Assignment
 
@@ -639,7 +639,7 @@ $$\theta[m] = \theta_\text{base} + \theta_\text{scale} \cdot E_\text{mid}[m]$$
 
 $$dx[m] = d_\text{scale} \cdot \text{Chroma}[m, c_\text{dominant}]$$
 
-where $E_\text{bass}[m]$ is the energy in the bass frequency band at frame $m$, $E_\text{mid}[m]$ is mid-band energy, and $c_\text{dominant}$ is the dominant chroma at that moment.
+where \(E_\text{bass}[m]\) is the energy in the bass frequency band at frame \(m\), \(E_\text{mid}[m]\) is mid-band energy, and \(c_\text{dominant}\) is the dominant chroma at that moment.
 
 This approach is frame-by-frame (not temporally coherent in the diffusion model's latent space), which creates a characteristic "flowing" or "morphing" aesthetic. It is an aesthetic choice, not a limitation --- many music video creators prefer this dreamlike quality.
 
@@ -649,17 +649,17 @@ A more controlled approach generates keyframes at musically significant moments 
 
 $$z_t = \text{slerp}(z_A, z_B, \alpha(t))$$
 
-where $z_A$ and $z_B$ are latent codes of consecutive keyframes, and $\alpha(t) \in [0, 1]$ is an interpolation parameter driven by the audio:
+where \(z_A\) and \(z_B\) are latent codes of consecutive keyframes, and \(\alpha(t) \in [0, 1]\) is an interpolation parameter driven by the audio:
 
 $$\alpha(t) = \frac{1}{2}\left(1 - \cos\left(\pi \cdot \frac{t - t_A}{t_B - t_A}\right)\right) + \delta \cdot O[m(t)]$$
 
-The cosine term provides smooth baseline interpolation, and the onset envelope $O$ term adds audio-reactive acceleration --- the interpolation speeds up at beat onsets, creating a visual "pulse" synchronized to the rhythm.
+The cosine term provides smooth baseline interpolation, and the onset envelope \(O\) term adds audio-reactive acceleration --- the interpolation speeds up at beat onsets, creating a visual "pulse" synchronized to the rhythm.
 
 Spherical linear interpolation (slerp) is preferred over linear interpolation for latent codes because it traverses the surface of the hypersphere in latent space, avoiding the low-probability interior:
 
 $$\text{slerp}(z_A, z_B, \alpha) = \frac{\sin((1-\alpha)\Omega)}{\sin \Omega} z_A + \frac{\sin(\alpha\Omega)}{\sin \Omega} z_B$$
 
-where $\Omega = \arccos\left(\frac{z_A \cdot z_B}{\|z_A\| \|z_B\|}\right)$.
+where \(\Omega = \arccos\left(\frac{z_A \cdot z_B}{\|z_A\| \|z_B\|}\right)\).
 
 ---
 
@@ -669,9 +669,9 @@ The most powerful audio-driven video systems combine multiple conditioning signa
 
 ### The Attention Budget Problem
 
-In a cross-attention-based diffusion model, every conditioning signal competes for the same attention mechanism. With a text embedding sequence of length $L_\text{text}$ and an audio embedding sequence of length $L_\text{audio}$, the combined key/value sequence has length $L_\text{text} + L_\text{audio}$.
+In a cross-attention-based diffusion model, every conditioning signal competes for the same attention mechanism. With a text embedding sequence of length \(L_\text{text}\) and an audio embedding sequence of length \(L_\text{audio}\), the combined key/value sequence has length \(L_\text{text} + L_\text{audio}\).
 
-The attention weights for a visual query $q$ at position $(x, y, t)$ are:
+The attention weights for a visual query \(q\) at position \((x, y, t)\) are:
 
 $$\alpha_i = \frac{\exp(q \cdot k_i / \sqrt{d})}{\sum_{j=1}^{L_\text{text} + L_\text{audio}} \exp(q \cdot k_j / \sqrt{d})}$$
 
@@ -689,7 +689,7 @@ This gives each modality its own attention mechanism, preventing competition. Th
 
 $$h' = h + g_\text{text} \cdot \text{CrossAttn}_\text{text}(h, c_\text{text}) + g_\text{audio} \cdot \text{CrossAttn}_\text{audio}(h, c_\text{audio})$$
 
-where $g_\text{text}, g_\text{audio}$ are scalar gates (or per-channel gates) that the model learns during training. This allows the model to dynamically weight modalities depending on the content.
+where \(g_\text{text}, g_\text{audio}\) are scalar gates (or per-channel gates) that the model learns during training. This allows the model to dynamically weight modalities depending on the content.
 
 **Hierarchical conditioning.** Use text for global conditioning (via cross-attention at every layer) and audio for temporal modulation (via FiLM conditioning at temporal attention layers only). This respects the natural division: text provides "what to show" while audio provides "when and how to move."
 
@@ -762,7 +762,7 @@ where $g_\text{text}, g_\text{audio}$ are scalar gates (or per-channel gates) th
 
 When applying classifier-free guidance with multiple conditions, you need to decide how to drop conditions during training and how to apply guidance at inference.
 
-**Joint dropout**: Drop all conditions simultaneously with probability $p_\text{uncond}$. This learns a single unconditional mode and a single conditional mode. CFG is applied once:
+**Joint dropout**: Drop all conditions simultaneously with probability \(p_\text{uncond}\). This learns a single unconditional mode and a single conditional mode. CFG is applied once:
 
 $$\hat{\epsilon} = \epsilon_\theta(x_t, \emptyset) + s \cdot [\epsilon_\theta(x_t, c_\text{text}, c_\text{audio}) - \epsilon_\theta(x_t, \emptyset)]$$
 
@@ -770,7 +770,7 @@ $$\hat{\epsilon} = \epsilon_\theta(x_t, \emptyset) + s \cdot [\epsilon_\theta(x_
 
 $$\hat{\epsilon} = \epsilon_\theta(x_t, \emptyset) + s_\text{text} \cdot [\epsilon_\theta(x_t, c_\text{text}, \emptyset_\text{audio}) - \epsilon_\theta(x_t, \emptyset)] + s_\text{audio} \cdot [\epsilon_\theta(x_t, \emptyset_\text{text}, c_\text{audio}) - \epsilon_\theta(x_t, \emptyset)]$$
 
-This requires three forward passes instead of two but gives independent control over how strongly each modality influences the output. You can set $s_\text{audio} = 8$ and $s_\text{text} = 3$ to strongly follow the audio rhythm while loosely following the text description, or vice versa.
+This requires three forward passes instead of two but gives independent control over how strongly each modality influences the output. You can set \(s_\text{audio} = 8\) and \(s_\text{text} = 3\) to strongly follow the audio rhythm while loosely following the text description, or vice versa.
 
 ---
 
@@ -851,7 +851,7 @@ The Mean Opinion Score (MOS) is the arithmetic mean across raters and criteria:
 
 $$\text{MOS} = \frac{1}{N \cdot K} \sum_{n=1}^{N} \sum_{k=1}^{K} r_{n,k}$$
 
-where $N$ is the number of raters and $K$ is the number of criteria. For statistical rigor, you need at least 20 raters per video and should report 95% confidence intervals.
+where \(N\) is the number of raters and \(K\) is the number of criteria. For statistical rigor, you need at least 20 raters per video and should report 95% confidence intervals.
 
 ### Audio-Visual Correspondence (AVC) Metric
 
@@ -859,15 +859,15 @@ An automated metric based on learned audio-visual embeddings. Train a classifier
 
 $$\text{AVC} = P(\hat{y} = y \mid (a, v))$$
 
-where $a$ is an audio clip, $v$ is a video clip, $y$ is the true label (matched or mismatched), and $\hat{y}$ is the classifier's prediction. A higher AVC indicates better audio-visual correspondence in the generated content.
+where \(a\) is an audio clip, \(v\) is a video clip, \(y\) is the true label (matched or mismatched), and \(\hat{y}\) is the classifier's prediction. A higher AVC indicates better audio-visual correspondence in the generated content.
 
 ### Beat Alignment Score (BAS)
 
-A simple, interpretable metric. Given detected beats $\{b_k\}$ and detected visual transitions $\{v_j\}$ (via optical flow peaks or scene change detection):
+A simple, interpretable metric. Given detected beats \(\{b_k\}\) and detected visual transitions \(\{v_j\}\) (via optical flow peaks or scene change detection):
 
 $$\text{BAS} = \frac{1}{K} \sum_{k=1}^{K} \max_j \exp\left(-\frac{(b_k - v_j)^2}{2\tau^2}\right)$$
 
-where $\tau$ is a tolerance window (typically 50--100 ms). This measures, for each beat, how close the nearest visual transition is. A BAS of 1.0 means every beat has a visual event within the tolerance window; a BAS of 0.0 means no beats are visually marked.
+where \(\tau\) is a tolerance window (typically 50--100 ms). This measures, for each beat, how close the nearest visual transition is. A BAS of 1.0 means every beat has a visual event within the tolerance window; a BAS of 0.0 means no beats are visually marked.
 
 ### Onset-Motion Correlation
 
@@ -875,14 +875,14 @@ The Pearson correlation between the audio onset envelope and the video motion ma
 
 $$\rho = \frac{\text{Cov}(O, M)}{\sigma_O \cdot \sigma_M}$$
 
-where $O$ is the onset strength envelope (resampled to video frame rate) and $M$ is the mean optical flow magnitude per frame. Higher positive correlation indicates that visual motion tracks audio intensity.
+where \(O\) is the onset strength envelope (resampled to video frame rate) and \(M\) is the mean optical flow magnitude per frame. Higher positive correlation indicates that visual motion tracks audio intensity.
 
 | Metric | What It Measures | Automated? | Target Range |
 |:--|:--|:-:|:--|
 | MOS (sync) | Human-perceived sync quality | No | > 3.5/5.0 |
 | AVC | Learned audio-visual match | Yes | > 0.75 |
 | BAS | Beat-to-visual transition alignment | Yes | > 0.6 |
-| Onset-Motion $\rho$ | Audio energy to video motion correlation | Yes | > 0.4 |
+| Onset-Motion \(\rho\) | Audio energy to video motion correlation | Yes | > 0.4 |
 | FVD | Video quality (no audio) | Yes | < 300 |
 
 ---
@@ -911,7 +911,7 @@ This is production-feasible but not real-time. For music visualization (abstract
 A 3-minute music video requires generating ~30--60 video segments. Sequential generation would take 15--30 minutes. Parallel generation on multiple GPUs can bring this down to 2--5 minutes, but requires:
 
 1. **Segment independence**: Each segment is generated independently, with only the text prompt and style reference connecting them.
-2. **Edge consistency**: The last frame of segment $n$ must match the first frame of segment $n+1$. This can be achieved by using the last frame of segment $n$ as a conditioning image for segment $n+1$ (image-to-video generation), but this creates sequential dependency.
+2. **Edge consistency**: The last frame of segment \(n\) must match the first frame of segment \(n+1\). This can be achieved by using the last frame of segment \(n\) as a conditioning image for segment \(n+1\) (image-to-video generation), but this creates sequential dependency.
 3. **Temporal overlap**: Generate segments with overlapping frames and cross-dissolve in the overlap region.
 
 The tradeoff between parallelism and visual continuity is a core engineering challenge. In practice, a hierarchical approach works well: generate all keyframes in parallel (image generation, fast), then generate video segments sequentially using keyframes as anchors (slower, but each segment only needs the previous keyframe, not the previous segment).

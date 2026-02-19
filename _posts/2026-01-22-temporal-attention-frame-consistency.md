@@ -32,35 +32,35 @@ Every equation is derived from first principles. Every complexity claim is justi
 
 ## Self-Attention: The Foundation
 
-Self-attention is the core operation in transformer architectures. Given an input sequence of $N$ tokens, each represented as a $d$-dimensional vector, self-attention allows every token to aggregate information from every other token.
+Self-attention is the core operation in transformer architectures. Given an input sequence of \(N\) tokens, each represented as a \(d\)-dimensional vector, self-attention allows every token to aggregate information from every other token.
 
 ### The Mechanism
 
-Let the input be a matrix $X \in \mathbb{R}^{N \times d}$, where each row is a token embedding. Self-attention computes:
+Let the input be a matrix \(X \in \mathbb{R}^{N \times d}\), where each row is a token embedding. Self-attention computes:
 
 $$\text{Attention}(Q, K, V) = \text{softmax}\left(\frac{QK^T}{\sqrt{d_k}}\right) V$$
 
 where:
-- $Q = XW^Q \in \mathbb{R}^{N \times d_k}$ are the **queries** ("what am I looking for?")
-- $K = XW^K \in \mathbb{R}^{N \times d_k}$ are the **keys** ("what do I contain?")
-- $V = XW^V \in \mathbb{R}^{N \times d_v}$ are the **values** ("what information do I provide?")
-- $W^Q, W^K \in \mathbb{R}^{d \times d_k}$ and $W^V \in \mathbb{R}^{d \times d_v}$ are learned projection matrices
+- \(Q = XW^Q \in \mathbb{R}^{N \times d_k}\) are the **queries** ("what am I looking for?")
+- \(K = XW^K \in \mathbb{R}^{N \times d_k}\) are the **keys** ("what do I contain?")
+- \(V = XW^V \in \mathbb{R}^{N \times d_v}\) are the **values** ("what information do I provide?")
+- \(W^Q, W^K \in \mathbb{R}^{d \times d_k}\) and \(W^V \in \mathbb{R}^{d \times d_v}\) are learned projection matrices
 
 ### Step-by-Step Computation
 
-**Step 1: Compute attention scores.** The raw attention score between query $i$ and key $j$ is:
+**Step 1: Compute attention scores.** The raw attention score between query \(i\) and key \(j\) is:
 
 $$e_{ij} = \frac{q_i \cdot k_j}{\sqrt{d_k}} = \frac{\sum_{l=1}^{d_k} q_{il} k_{jl}}{\sqrt{d_k}}$$
 
-This is a scaled dot product. The matrix $QK^T$ has dimensions $N \times N$ -- every query attends to every key.
+This is a scaled dot product. The matrix \(QK^T\) has dimensions \(N \times N\) -- every query attends to every key.
 
 **Step 2: Normalize with softmax.** The attention weights are:
 
 $$\alpha_{ij} = \frac{\exp(e_{ij})}{\sum_{m=1}^{N} \exp(e_{im})}$$
 
-Each row of the attention matrix sums to 1. Token $i$ distributes its attention across all tokens, with higher-scoring tokens receiving more weight.
+Each row of the attention matrix sums to 1. Token \(i\) distributes its attention across all tokens, with higher-scoring tokens receiving more weight.
 
-**Step 3: Aggregate values.** The output for token $i$ is:
+**Step 3: Aggregate values.** The output for token \(i\) is:
 
 $$o_i = \sum_{j=1}^{N} \alpha_{ij} v_j$$
 
@@ -70,22 +70,22 @@ A weighted sum of all value vectors, where the weights are the attention probabi
 
 | Operation | Computation | Memory |
 |---|---|---|
-| $QK^T$ | $O(N^2 d_k)$ | $O(N^2)$ for the attention matrix |
-| Softmax | $O(N^2)$ | $O(N^2)$ |
-| Attention $\times$ V | $O(N^2 d_v)$ | $O(N d_v)$ for output |
-| **Total** | **$O(N^2 d_k)$** | **$O(N^2 + N d_v)$** |
+| \(QK^T\) | \(O(N^2 d_k)\) | \(O(N^2)\) for the attention matrix |
+| Softmax | \(O(N^2)\) | \(O(N^2)\) |
+| Attention \(\times\) V | \(O(N^2 d_v)\) | \(O(N d_v)\) for output |
+| **Total** | **\(O(N^2 d_k)\)** | **\(O(N^2 + N d_v)\)** |
 
-The quadratic dependence on $N$ is the fundamental bottleneck for long sequences -- and video has very long sequences.
+The quadratic dependence on \(N\) is the fundamental bottleneck for long sequences -- and video has very long sequences.
 
 ---
 
 ## Why Scale by sqrt(d_k): A Variance Analysis
 
-The scaling factor $\frac{1}{\sqrt{d_k}}$ is not arbitrary. It prevents the softmax from saturating, which would kill gradients. Let us derive why.
+The scaling factor \(\frac{1}{\sqrt{d_k}}\) is not arbitrary. It prevents the softmax from saturating, which would kill gradients. Let us derive why.
 
 ### Setup
 
-Assume the components of $q_i$ and $k_j$ are independent random variables with mean 0 and variance 1 (this is approximately true after standard initialization):
+Assume the components of \(q_i\) and \(k_j\) are independent random variables with mean 0 and variance 1 (this is approximately true after standard initialization):
 
 $$q_{il} \sim \mathcal{N}(0, 1), \quad k_{jl} \sim \mathcal{N}(0, 1), \quad \text{for } l = 1, \ldots, d_k$$
 
@@ -95,23 +95,23 @@ The unnormalized attention score is:
 
 $$s_{ij} = q_i \cdot k_j = \sum_{l=1}^{d_k} q_{il} k_{jl}$$
 
-Each term $q_{il} k_{jl}$ is a product of two independent standard normals:
+Each term \(q_{il} k_{jl}\) is a product of two independent standard normals:
 
 $$\mathbb{E}[q_{il} k_{jl}] = \mathbb{E}[q_{il}] \cdot \mathbb{E}[k_{jl}] = 0 \cdot 0 = 0$$
 
 $$\text{Var}(q_{il} k_{jl}) = \mathbb{E}[(q_{il} k_{jl})^2] - (\mathbb{E}[q_{il} k_{jl}])^2 = \mathbb{E}[q_{il}^2] \cdot \mathbb{E}[k_{jl}^2] - 0 = 1 \cdot 1 = 1$$
 
-Since the $d_k$ terms are independent:
+Since the \(d_k\) terms are independent:
 
 $$\mathbb{E}[s_{ij}] = 0$$
 
 $$\text{Var}(s_{ij}) = d_k$$
 
-So $s_{ij} \sim \mathcal{N}(0, d_k)$ approximately (by CLT for large $d_k$).
+So \(s_{ij} \sim \mathcal{N}(0, d_k)\) approximately (by CLT for large \(d_k\)).
 
 ### The Problem Without Scaling
 
-If $d_k = 512$, then $s_{ij}$ has standard deviation $\sqrt{512} \approx 22.6$. The softmax of values with magnitude ~22 is extremely peaked:
+If \(d_k = 512\), then \(s_{ij}\) has standard deviation \(\sqrt{512} \approx 22.6\). The softmax of values with magnitude ~22 is extremely peaked:
 
 $$\text{softmax}(22) = \frac{e^{22}}{e^{22} + e^{-22} + \cdots} \approx 1.0$$
 
@@ -121,17 +121,17 @@ $$\frac{\partial \alpha_i}{\partial e_j} = \alpha_i (\delta_{ij} - \alpha_j) \ap
 
 ### The Fix: Scaling
 
-Dividing by $\sqrt{d_k}$:
+Dividing by \(\sqrt{d_k}\):
 
 $$e_{ij} = \frac{s_{ij}}{\sqrt{d_k}}$$
 
 $$\text{Var}(e_{ij}) = \frac{\text{Var}(s_{ij})}{d_k} = \frac{d_k}{d_k} = 1$$
 
-Now $e_{ij} \sim \mathcal{N}(0, 1)$, regardless of $d_k$. The softmax receives inputs with unit variance, producing well-distributed attention weights and healthy gradients.
+Now \(e_{ij} \sim \mathcal{N}(0, 1)\), regardless of \(d_k\). The softmax receives inputs with unit variance, producing well-distributed attention weights and healthy gradients.
 
 ### Numerical Verification
 
-| $d_k$ | $\text{Std}(s_{ij})$ unscaled | $\text{Std}(e_{ij})$ scaled | Softmax behavior |
+| \(d_k\) | \(\text{Std}(s_{ij})\) unscaled | \(\text{Std}(e_{ij})\) scaled | Softmax behavior |
 |---|---|---|---|
 | 16 | 4.0 | 1.0 | Healthy |
 | 64 | 8.0 | 1.0 | Healthy |
@@ -139,7 +139,7 @@ Now $e_{ij} \sim \mathcal{N}(0, 1)$, regardless of $d_k$. The softmax receives i
 | 512 | 22.6 | 1.0 | Healthy |
 | 1024 | 32.0 | 1.0 | Healthy |
 
-Without scaling, the softmax saturates as $d_k$ grows. With scaling, the distribution of attention logits is stable regardless of $d_k$.
+Without scaling, the softmax saturates as \(d_k\) grows. With scaling, the distribution of attention logits is stable regardless of \(d_k\).
 
 ---
 
@@ -149,7 +149,7 @@ In video models, spatial attention operates **within a single frame**. Each fram
 
 ### Tokenization
 
-A frame of resolution $H \times W$ with patch size $p$ produces:
+A frame of resolution \(H \times W\) with patch size \(p\) produces:
 
 $$N_s = \frac{H}{p} \times \frac{W}{p}$$
 
@@ -169,15 +169,15 @@ For a single frame, spatial self-attention is:
 
 $$\text{SpatialAttn}(X_f) = \text{softmax}\left(\frac{Q_f K_f^T}{\sqrt{d_k}}\right) V_f$$
 
-where $X_f \in \mathbb{R}^{N_s \times d}$ contains the tokens from frame $f$.
+where \(X_f \in \mathbb{R}^{N_s \times d}\) contains the tokens from frame \(f\).
 
-**Complexity per frame**: $O(N_s^2 \cdot d_k)$
+**Complexity per frame**: \(O(N_s^2 \cdot d_k)\)
 
-**Memory per frame**: $O(N_s^2)$ for the attention matrix
+**Memory per frame**: \(O(N_s^2)\) for the attention matrix
 
-For $N_s = 4{,}096$ and $d_k = 64$:
-- Attention matrix size: $4{,}096^2 = 16{,}777{,}216$ entries = 64 MB (float32)
-- FLOPs for $QK^T$: $2 \times 4{,}096^2 \times 64 \approx 2.1 \times 10^9$
+For \(N_s = 4{,}096\) and \(d_k = 64\):
+- Attention matrix size: \(4{,}096^2 = 16{,}777{,}216\) entries = 64 MB (float32)
+- FLOPs for \(QK^T\): \(2 \times 4{,}096^2 \times 64 \approx 2.1 \times 10^9\)
 
 ### What Spatial Attention Captures
 
@@ -303,11 +303,11 @@ Each patch can attend to every other patch in the same frame. This enables:
 
 ## Temporal Attention: Across Frames
 
-Temporal attention connects the same spatial position across different frames. This is the mechanism responsible for temporal consistency -- ensuring that an object at position $(x, y)$ looks the same from frame to frame.
+Temporal attention connects the same spatial position across different frames. This is the mechanism responsible for temporal consistency -- ensuring that an object at position \((x, y)\) looks the same from frame to frame.
 
 ### The Mechanism
 
-Consider a video with $T$ frames, each containing $N_s$ spatial tokens. For temporal attention, we take all tokens at a specific spatial position $(h, w)$ across all frames and form a temporal sequence:
+Consider a video with \(T\) frames, each containing \(N_s\) spatial tokens. For temporal attention, we take all tokens at a specific spatial position \((h, w)\) across all frames and form a temporal sequence:
 
 $$X^{(h,w)} = [x_1^{(h,w)}, x_2^{(h,w)}, \ldots, x_T^{(h,w)}] \in \mathbb{R}^{T \times d}$$
 
@@ -315,11 +315,11 @@ Temporal self-attention is then:
 
 $$\text{TemporalAttn}(X^{(h,w)}) = \text{softmax}\left(\frac{Q^{(h,w)} {K^{(h,w)}}^T}{\sqrt{d_k}}\right) V^{(h,w)}$$
 
-where $Q^{(h,w)}, K^{(h,w)}, V^{(h,w)}$ are computed from $X^{(h,w)}$.
+where \(Q^{(h,w)}, K^{(h,w)}, V^{(h,w)}\) are computed from \(X^{(h,w)}\).
 
 ### What Temporal Attention Captures
 
-When frame $t$ attends to frame $t-5$, it "asks": What was happening at this spatial position 5 frames ago? The attention weights encode temporal dependencies:
+When frame \(t\) attends to frame \(t-5\), it "asks": What was happening at this spatial position 5 frames ago? The attention weights encode temporal dependencies:
 
 - **Color consistency**: A blue car stays blue across frames
 - **Motion continuity**: An object moving right continues moving right
@@ -328,15 +328,15 @@ When frame $t$ attends to frame $t-5$, it "asks": What was happening at this spa
 
 ### Complexity
 
-For each spatial position, temporal attention has complexity $O(T^2)$. Since there are $N_s$ spatial positions:
+For each spatial position, temporal attention has complexity \(O(T^2)\). Since there are \(N_s\) spatial positions:
 
-**Total temporal attention complexity**: $O(N_s \cdot T^2 \cdot d_k)$
+**Total temporal attention complexity**: \(O(N_s \cdot T^2 \cdot d_k)\)
 
-**Memory**: $O(N_s \cdot T^2)$ for all the temporal attention matrices
+**Memory**: \(O(N_s \cdot T^2)\) for all the temporal attention matrices
 
-For a 5-second, 30fps video in latent space ($N_s = 4{,}096$, $T = 150$):
-- $N_s \cdot T^2 = 4{,}096 \times 22{,}500 = 92{,}160{,}000$ attention entries per layer
-- Memory: $\sim$352 MB per layer (float32)
+For a 5-second, 30fps video in latent space (\(N_s = 4{,}096\), \(T = 150\)):
+- \(N_s \cdot T^2 = 4{,}096 \times 22{,}500 = 92{,}160{,}000\) attention entries per layer
+- Memory: \(\sim\)352 MB per layer (float32)
 
 ---
 
@@ -348,13 +348,13 @@ The ideal approach would be full 3D attention, where every spatiotemporal token 
 
 $$\text{Full3DAttn}(X) = \text{softmax}\left(\frac{QK^T}{\sqrt{d_k}}\right) V$$
 
-where $X \in \mathbb{R}^{(N_s \cdot T) \times d}$ contains all tokens from all frames.
+where \(X \in \mathbb{R}^{(N_s \cdot T) \times d}\) contains all tokens from all frames.
 
-**Complexity**: $O((N_s \cdot T)^2 \cdot d_k)$
+**Complexity**: \(O((N_s \cdot T)^2 \cdot d_k)\)
 
 For our 5-second, 30fps example:
-- $N_s \cdot T = 4{,}096 \times 150 = 614{,}400$ tokens
-- Attention matrix: $614{,}400^2 \approx 3.77 \times 10^{11}$ entries
+- \(N_s \cdot T = 4{,}096 \times 150 = 614{,}400\) tokens
+- Attention matrix: \(614{,}400^2 \approx 3.77 \times 10^{11}\) entries
 - Memory: ~1.4 TB (float32) for the attention matrix alone
 
 This is completely infeasible. No GPU can hold a 1.4 TB attention matrix. Even with float16, it is 700 GB.
@@ -369,25 +369,25 @@ For each transformer block:
     2. Temporal attention: Each position attends across frames  O(N_s * T^2)
 ```
 
-**Total complexity per block**: $O(N_s^2 \cdot T + N_s \cdot T^2)$
+**Total complexity per block**: \(O(N_s^2 \cdot T + N_s \cdot T^2)\)
 
 This is dramatically cheaper:
 
-| Approach | Complexity | $N_s=4096, T=150$ | Memory |
+| Approach | Complexity | \(N_s=4096, T=150\) | Memory |
 |---|---|---|---|
-| Full 3D | $O(N_s^2 T^2)$ | $\sim 3.8 \times 10^{11}$ | ~1.4 TB |
-| Factored | $O(N_s^2 T + N_s T^2)$ | $\sim 2.6 \times 10^{9}$ | ~9.9 GB |
+| Full 3D | \(O(N_s^2 T^2)\) | \(\sim 3.8 \times 10^{11}\) | ~1.4 TB |
+| Factored | \(O(N_s^2 T + N_s T^2)\) | \(\sim 2.6 \times 10^{9}\) | ~9.9 GB |
 | **Ratio** | | **~146x cheaper** | **~146x less memory** |
 
-The factored approach loses something: spatial position $(h_1, w_1)$ in frame $t_1$ cannot directly attend to spatial position $(h_2, w_2)$ in frame $t_2$ in a single attention operation. It requires two sequential operations -- first temporal attention aligns the time step, then spatial attention allows cross-position communication (or vice versa). In practice, with multiple layers, information can propagate across both space and time effectively.
+The factored approach loses something: spatial position \((h_1, w_1)\) in frame \(t_1\) cannot directly attend to spatial position \((h_2, w_2)\) in frame \(t_2\) in a single attention operation. It requires two sequential operations -- first temporal attention aligns the time step, then spatial attention allows cross-position communication (or vice versa). In practice, with multiple layers, information can propagate across both space and time effectively.
 
 ### Mathematical Justification
 
-The factored decomposition can be viewed as approximating the full 3D attention matrix $A \in \mathbb{R}^{(N_s T) \times (N_s T)}$ as:
+The factored decomposition can be viewed as approximating the full 3D attention matrix \(A \in \mathbb{R}^{(N_s T) \times (N_s T)}\) as:
 
 $$A \approx A_s \otimes I_T + I_{N_s} \otimes A_t$$
 
-where $A_s$ is the spatial attention matrix, $A_t$ is the temporal attention matrix, and $\otimes$ denotes the Kronecker product. This is a low-rank approximation to the full attention matrix.
+where \(A_s\) is the spatial attention matrix, \(A_t\) is the temporal attention matrix, and \(\otimes\) denotes the Kronecker product. This is a low-rank approximation to the full attention matrix.
 
 A deeper justification comes from the observation that spatial and temporal correlations in video are approximately separable -- the spatial structure within a frame is largely independent of the temporal dynamics, except at object boundaries and during rapid motion. The factored approach captures each independently and lets information flow between them through multiple layers.
 
@@ -413,11 +413,11 @@ In causal attention, each frame can only attend to itself and past frames:
 
 $$\alpha_{t,t'} = \begin{cases} \frac{\exp(e_{t,t'})}{\sum_{s=1}^{t} \exp(e_{t,s})} & \text{if } t' \leq t \\ 0 & \text{if } t' > t \end{cases}$$
 
-This is enforced by an attention mask that sets future positions to $-\infty$ before the softmax:
+This is enforced by an attention mask that sets future positions to \(-\infty\) before the softmax:
 
 $$\text{CausalAttn}(Q, K, V) = \text{softmax}\left(\frac{QK^T}{\sqrt{d_k}} + M\right) V$$
 
-where $M$ is the causal mask:
+where \(M\) is the causal mask:
 
 $$M_{t,t'} = \begin{cases} 0 & \text{if } t' \leq t \\ -\infty & \text{if } t' > t \end{cases}$$
 
@@ -547,29 +547,29 @@ $$M_{t,t'} = \begin{cases} 0 & \text{if } t' \leq t \\ -\infty & \text{if } t' >
 
 ## Attention Window Strategies
 
-Full temporal attention (every frame attends to every other frame) becomes expensive as $T$ grows. Several windowed strategies reduce the cost while preserving most of the quality.
+Full temporal attention (every frame attends to every other frame) becomes expensive as \(T\) grows. Several windowed strategies reduce the cost while preserving most of the quality.
 
 ### Strategy 1: Full Temporal Attention
 
 Every frame attends to every other frame.
 
-**Complexity**: $O(T^2)$ per spatial position
+**Complexity**: \(O(T^2)\) per spatial position
 
-**Effective receptive field**: Global -- frame 1 can directly influence frame $T$
+**Effective receptive field**: Global -- frame 1 can directly influence frame \(T\)
 
-**When to use**: Short videos ($T < 100$), or when global coherence is critical
+**When to use**: Short videos (\(T < 100\)), or when global coherence is critical
 
 ### Strategy 2: Sliding Window Attention
 
-Each frame attends only to the $K$ nearest frames (in both directions):
+Each frame attends only to the \(K\) nearest frames (in both directions):
 
 $$\alpha_{t,t'} = 0 \quad \text{if} \quad |t - t'| > K/2$$
 
-**Complexity**: $O(T \cdot K)$ per spatial position
+**Complexity**: \(O(T \cdot K)\) per spatial position
 
-**Effective receptive field**: Local, $K$ frames. After $L$ layers, the effective receptive field is $L \cdot K$ frames.
+**Effective receptive field**: Local, \(K\) frames. After \(L\) layers, the effective receptive field is \(L \cdot K\) frames.
 
-**When to use**: Long videos where local consistency matters more than global coherence. $K = 16$ or $K = 32$ is typical.
+**When to use**: Long videos where local consistency matters more than global coherence. \(K = 16\) or \(K = 32\) is typical.
 
 ### Strategy 3: Dilated Attention
 
@@ -577,7 +577,7 @@ Attend to frames at exponentially increasing intervals:
 
 $$\text{Attended frames for frame } t: \{t-1, t-2, t-4, t-8, t-16, \ldots\}$$
 
-**Complexity**: $O(T \cdot \log T)$ per spatial position
+**Complexity**: \(O(T \cdot \log T)\) per spatial position
 
 **Effective receptive field**: Global (logarithmic span), but sparse. Recent frames have dense coverage; distant frames have sparse coverage.
 
@@ -585,22 +585,22 @@ $$\text{Attended frames for frame } t: \{t-1, t-2, t-4, t-8, t-16, \ldots\}$$
 
 ### Strategy 4: Chunk-Based Attention
 
-Divide the video into chunks of $C$ frames. Full attention within each chunk; a global attention layer connects chunk representatives:
+Divide the video into chunks of \(C\) frames. Full attention within each chunk; a global attention layer connects chunk representatives:
 
 $$\text{Within chunk: } O(C^2), \quad \text{Across chunks: } O((T/C)^2)$$
 
-**Complexity**: $O(T \cdot C + T^2/C)$, minimized when $C = \sqrt{T}$, giving $O(T^{3/2})$
+**Complexity**: \(O(T \cdot C + T^2/C)\), minimized when \(C = \sqrt{T}\), giving \(O(T^{3/2})\)
 
 **When to use**: Very long videos (minutes). This is the approach behind hierarchical generation.
 
 ### Complexity Comparison
 
-| Strategy | Complexity (per pos.) | Memory (per pos.) | $T=150$ | $T=600$ | $T=2400$ |
+| Strategy | Complexity (per pos.) | Memory (per pos.) | \(T=150\) | \(T=600\) | \(T=2400\) |
 |---|---|---|---|---|---|
-| Full | $O(T^2)$ | $O(T^2)$ | 22.5K | 360K | 5.76M |
-| Sliding ($K=32$) | $O(TK)$ | $O(TK)$ | 4.8K | 19.2K | 76.8K |
-| Dilated | $O(T \log T)$ | $O(T \log T)$ | 1.1K | 5.4K | 27.4K |
-| Chunk ($C=\sqrt{T}$) | $O(T^{3/2})$ | $O(T^{3/2})$ | 1.8K | 14.7K | 117.6K |
+| Full | \(O(T^2)\) | \(O(T^2)\) | 22.5K | 360K | 5.76M |
+| Sliding (\(K=32\)) | \(O(TK)\) | \(O(TK)\) | 4.8K | 19.2K | 76.8K |
+| Dilated | \(O(T \log T)\) | \(O(T \log T)\) | 1.1K | 5.4K | 27.4K |
+| Chunk (\(C=\sqrt{T}\)) | \(O(T^{3/2})\) | \(O(T^{3/2})\) | 1.8K | 14.7K | 117.6K |
 
 <svg viewBox="0 0 700 480" xmlns="http://www.w3.org/2000/svg" style="background: white; max-width: 700px; display: block; margin: 2em auto;">
   <text x="350" y="25" text-anchor="middle" font-family="Arial, sans-serif" font-size="16" font-weight="bold" fill="#333">Attention Window Strategies Comparison</text>
@@ -764,7 +764,7 @@ Let us calculate the exact cost of generating a 5-second, 30fps video at 1080p r
 | VAE temporal compression | 4x | 4 frames per latent frame |
 | Patch size (in latent space) | 2 x 2 | Standard for DiTs |
 | Latent channels | 16 | Common for video VAEs |
-| Attention head dim ($d_k$) | 64 | Standard |
+| Attention head dim (\(d_k\)) | 64 | Standard |
 | Number of heads | 24 | Typical for large models |
 | Number of transformer blocks | 28 | Typical for 14B models |
 
@@ -826,20 +826,20 @@ $$\text{Total generation} \approx 420 \times 50 = 21{,}000 \text{ TFLOPs}$$
 
 Now let us double the duration to 10 seconds (300 frames, 75 latent frames):
 
-| Component | 5 seconds ($T_l=38$) | 10 seconds ($T_l=75$) | Ratio |
+| Component | 5 seconds (\(T_l=38\)) | 10 seconds (\(T_l=75\)) | Ratio |
 |---|---|---|---|
-| Spatial attention | $38 \times 8000^2$ | $75 \times 8000^2$ | 1.97x |
-| Temporal attention | $8000 \times 38^2$ | $8000 \times 75^2$ | 3.89x |
+| Spatial attention | \(38 \times 8000^2\) | \(75 \times 8000^2\) | 1.97x |
+| Temporal attention | \(8000 \times 38^2\) | \(8000 \times 75^2\) | 3.89x |
 | Total (spatial-dominated) | ~7.5 TFLOPs/block | ~14.8 TFLOPs/block | ~1.97x |
-| Memory (temporal attn matrix) | $8000 \times 38^2 = 11.6M$ | $8000 \times 75^2 = 45M$ | 3.89x |
+| Memory (temporal attn matrix) | \(8000 \times 38^2 = 11.6M\) | \(8000 \times 75^2 = 45M\) | 3.89x |
 
-Spatial attention scales linearly with $T$ (it is $O(N_s^2 T)$), but temporal attention scales quadratically ($O(N_s T^2)$). For short videos, spatial attention dominates. But as videos get longer, temporal attention becomes the bottleneck.
+Spatial attention scales linearly with \(T\) (it is \(O(N_s^2 T)\)), but temporal attention scales quadratically (\(O(N_s T^2)\)). For short videos, spatial attention dominates. But as videos get longer, temporal attention becomes the bottleneck.
 
 The **crossover point** where temporal attention exceeds spatial attention:
 
 $$N_s T^2 > N_s^2 T \implies T > N_s$$
 
-For $N_s = 8{,}000$, this occurs at $T = 8{,}000$ latent frames, which corresponds to 32,000 actual frames (about 17 minutes at 30fps). For shorter videos, spatial attention dominates. For very long videos, temporal attention becomes the bottleneck.
+For \(N_s = 8{,}000\), this occurs at \(T = 8{,}000\) latent frames, which corresponds to 32,000 actual frames (about 17 minutes at 30fps). For shorter videos, spatial attention dominates. For very long videos, temporal attention becomes the bottleneck.
 
 <svg viewBox="0 0 700 420" xmlns="http://www.w3.org/2000/svg" style="background: white; max-width: 700px; display: block; margin: 2em auto;">
   <text x="350" y="25" text-anchor="middle" font-family="Arial, sans-serif" font-size="16" font-weight="bold" fill="#333">Attention Cost Scaling: Duration vs Compute</text>
@@ -904,7 +904,7 @@ For $N_s = 8{,}000$, this occurs at $T = 8{,}000$ latent frames, which correspon
 
 ### The Mechanism
 
-Multi-head attention runs $h$ independent attention operations in parallel, each with its own learned projections:
+Multi-head attention runs \(h\) independent attention operations in parallel, each with its own learned projections:
 
 $$\text{MultiHead}(Q, K, V) = \text{Concat}(\text{head}_1, \ldots, \text{head}_h) W^O$$
 
@@ -912,7 +912,7 @@ where:
 
 $$\text{head}_i = \text{Attention}(XW_i^Q, XW_i^K, XW_i^V)$$
 
-Each head has dimensions $d_k = d_v = d_{\text{model}} / h$. With $d_{\text{model}} = 1536$ and $h = 24$ heads, each head operates on $d_k = 64$ dimensions.
+Each head has dimensions \(d_k = d_v = d_{\text{model}} / h\). With \(d_{\text{model}} = 1536\) and \(h = 24\) heads, each head operates on \(d_k = 64\) dimensions.
 
 ### Why Multiple Heads Matter for Video
 
@@ -930,19 +930,19 @@ This specialization is not programmed -- it emerges from training. The multiple 
 
 ### Mathematical Justification for Multi-Head
 
-Why not just use a single head with $d_k = d_{\text{model}}$? The answer is that multi-head attention allows the model to attend to information from different representation subspaces at different positions simultaneously:
+Why not just use a single head with \(d_k = d_{\text{model}}\)? The answer is that multi-head attention allows the model to attend to information from different representation subspaces at different positions simultaneously:
 
 $$\text{SingleHead: } \alpha_{ij} = \text{softmax}\left(\frac{q_i \cdot k_j}{\sqrt{d_{\text{model}}}}\right)$$
 
-With a single head, token $i$ has one attention distribution over all other tokens. It must compromise between attending to the token that provides color information and the token that provides motion information.
+With a single head, token \(i\) has one attention distribution over all other tokens. It must compromise between attending to the token that provides color information and the token that provides motion information.
 
 With multiple heads:
 
 $$\alpha_{ij}^{(1)} \neq \alpha_{ij}^{(2)} \neq \cdots \neq \alpha_{ij}^{(h)}$$
 
-Token $i$ can attend to color information through head 1 and motion information through head 3 simultaneously.
+Token \(i\) can attend to color information through head 1 and motion information through head 3 simultaneously.
 
-The concatenation and output projection $W^O$ then learns to combine these different types of information:
+The concatenation and output projection \(W^O\) then learns to combine these different types of information:
 
 $$o_i = W^O \begin{bmatrix} \text{head}_1(i) \\ \text{head}_2(i) \\ \vdots \\ \text{head}_h(i) \end{bmatrix}$$
 
@@ -952,7 +952,7 @@ For a trained video model, we can analyze what each head has learned by computin
 
 $$\bar{d}_{\text{head}_i} = \frac{1}{NT} \sum_{t=1}^{T} \sum_{n=1}^{N} \sum_{m=1}^{N} \alpha_{nm}^{(i)} |n - m|$$
 
-Heads with small $\bar{d}$ are local (attending to nearby tokens), while heads with large $\bar{d}$ are global. In video models, a bimodal distribution emerges: some heads are very local (texture/edge consistency), others are very global (scene layout).
+Heads with small \(\bar{d}\) are local (attending to nearby tokens), while heads with large \(\bar{d}\) are global. In video models, a bimodal distribution emerges: some heads are very local (texture/edge consistency), others are very global (scene layout).
 
 Similarly, the average temporal attention distance:
 
@@ -966,11 +966,11 @@ Heads with small temporal distance focus on frame-to-frame consistency (short-ra
 
 ### The Memory Problem
 
-Standard attention requires materializing the full $N \times N$ attention matrix in GPU memory (HBM). For video with $N = N_s \cdot T_l = 8{,}000 \times 38 = 304{,}000$ total tokens:
+Standard attention requires materializing the full \(N \times N\) attention matrix in GPU memory (HBM). For video with \(N = N_s \cdot T_l = 8{,}000 \times 38 = 304{,}000\) total tokens:
 
 $$\text{Attention matrix size} = 304{,}000^2 \times 2 \text{ bytes (float16)} \approx 172 \text{ GB}$$
 
-This exceeds the memory of any single GPU (A100: 80 GB, H100: 80 GB). Even the factored approach requires $N_s^2 = 64{,}000{,}000$ entries per frame, or about 128 MB per frame per head per layer.
+This exceeds the memory of any single GPU (A100: 80 GB, H100: 80 GB). Even the factored approach requires \(N_s^2 = 64{,}000{,}000\) entries per frame, or about 128 MB per frame per head per layer.
 
 ### Flash Attention: The Key Insight
 
@@ -980,7 +980,7 @@ The key insight: **we do not need to materialize the full attention matrix.** We
 
 ### Algorithm
 
-Flash Attention divides the $Q$, $K$, $V$ matrices into blocks of size $B_r$ (rows) and $B_c$ (columns):
+Flash Attention divides the \(Q\), \(K\), \(V\) matrices into blocks of size \(B_r\) (rows) and \(B_c\) (columns):
 
 ```
 For each block of queries Q_i (rows i*B_r to (i+1)*B_r):
@@ -1003,12 +1003,12 @@ For each block of queries Q_i (rows i*B_r to (i+1)*B_r):
 
 | Component | Standard Attention | Flash Attention |
 |---|---|---|
-| Attention matrix | $O(N^2)$ in HBM | $O(B_r \times B_c)$ in SRAM |
-| Q, K, V | $O(Nd)$ in HBM | $O(Nd)$ in HBM (same) |
-| Output | $O(Nd)$ in HBM | $O(Nd)$ in HBM (same) |
-| **Total HBM** | **$O(N^2 + Nd)$** | **$O(Nd)$** |
+| Attention matrix | \(O(N^2)\) in HBM | \(O(B_r \times B_c)\) in SRAM |
+| Q, K, V | \(O(Nd)\) in HBM | \(O(Nd)\) in HBM (same) |
+| Output | \(O(Nd)\) in HBM | \(O(Nd)\) in HBM (same) |
+| **Total HBM** | **\(O(N^2 + Nd)\)** | **\(O(Nd)\)** |
 
-The quadratic $O(N^2)$ HBM usage is eliminated. For our video example:
+The quadratic \(O(N^2)\) HBM usage is eliminated. For our video example:
 
 | Metric | Standard | Flash Attention | Savings |
 |---|---|---|---|
@@ -1020,9 +1020,9 @@ The quadratic $O(N^2)$ HBM usage is eliminated. For our video example:
 
 Flash Attention is particularly impactful for temporal attention in video models because:
 
-1. **Temporal sequences are getting longer.** As video models generate longer outputs (5s to 30s to minutes), $T$ grows, and the temporal attention matrix grows as $T^2$.
+1. **Temporal sequences are getting longer.** As video models generate longer outputs (5s to 30s to minutes), \(T\) grows, and the temporal attention matrix grows as \(T^2\).
 
-2. **Many parallel temporal sequences.** There are $N_s$ independent temporal attention computations (one per spatial position). Flash Attention's block structure allows efficient batching.
+2. **Many parallel temporal sequences.** There are \(N_s\) independent temporal attention computations (one per spatial position). Flash Attention's block structure allows efficient batching.
 
 3. **Causal masking is free.** Flash Attention can implement causal masking by simply skipping blocks where all entries would be masked. This provides a further 2x speedup for causal temporal attention.
 
@@ -1107,7 +1107,7 @@ Every video generation system faces a fundamental tradeoff between quality, cost
 
 $$\text{Quality} \propto \frac{\text{Compute per frame}}{\text{Number of frames}^{\alpha}}$$
 
-where $\alpha > 0$ reflects the increasing difficulty of maintaining consistency over longer sequences.
+where \(\alpha > 0\) reflects the increasing difficulty of maintaining consistency over longer sequences.
 
 In practice, model providers manage this tradeoff by:
 1. Setting maximum duration limits (5s, 9s, 10s)
@@ -1129,7 +1129,7 @@ If you are building or fine-tuning a video model:
 |---|---|---|
 | < 5 seconds (< 40 latent frames) | Full temporal attention | Small enough to be affordable, best quality |
 | 5-15 seconds (40-120 latent frames) | Full + Flash Attention | Still manageable with memory optimization |
-| 15-60 seconds (120-480 latent frames) | Sliding window ($K=32$) + dilated | Balance local consistency with global coherence |
+| 15-60 seconds (120-480 latent frames) | Sliding window (\(K=32\)) + dilated | Balance local consistency with global coherence |
 | > 60 seconds | Chunk-based hierarchical | Generate in chunks, connect with overlap |
 
 ### API Implications
@@ -1142,7 +1142,7 @@ When building on top of video generation APIs:
 
 3. **Different providers may use different attention strategies**, which affects quality characteristics. A model using sliding window attention may have better frame-to-frame consistency but worse long-range coherence than a model using dilated attention.
 
-4. **Resolution matters as much as duration** for cost. Doubling resolution quadruples $N_s$, which quadruples spatial attention cost. Going from 720p to 1080p is a 2.25x increase in spatial attention cost.
+4. **Resolution matters as much as duration** for cost. Doubling resolution quadruples \(N_s\), which quadruples spatial attention cost. Going from 720p to 1080p is a 2.25x increase in spatial attention cost.
 
 ---
 
@@ -1150,17 +1150,17 @@ When building on top of video generation APIs:
 
 Temporal attention is the mathematical machinery that transforms independent frame generation into coherent video generation. The key takeaways:
 
-1. **Self-attention scales quadratically** with sequence length: $O(N^2)$. The $\sqrt{d_k}$ scaling prevents softmax saturation via a variance normalization argument.
+1. **Self-attention scales quadratically** with sequence length: \(O(N^2)\). The \(\sqrt{d_k}\) scaling prevents softmax saturation via a variance normalization argument.
 
-2. **Factored spatiotemporal attention** decomposes the prohibitive $O(N_s^2 T^2)$ full 3D attention into manageable $O(N_s^2 T + N_s T^2)$ alternating spatial and temporal layers, achieving a ~100x cost reduction with minimal quality loss.
+2. **Factored spatiotemporal attention** decomposes the prohibitive \(O(N_s^2 T^2)\) full 3D attention into manageable \(O(N_s^2 T + N_s T^2)\) alternating spatial and temporal layers, achieving a ~100x cost reduction with minimal quality loss.
 
 3. **Causal attention** enables autoregressive generation (frame-by-frame), while **bidirectional attention** enables higher quality parallel generation (all frames at once). Most current models use bidirectional attention within a diffusion framework.
 
-4. **Windowed attention strategies** (sliding window, dilated, chunk-based) reduce temporal attention from $O(T^2)$ to $O(TK)$, $O(T \log T)$, or $O(T^{3/2})$, enabling longer video generation.
+4. **Windowed attention strategies** (sliding window, dilated, chunk-based) reduce temporal attention from \(O(T^2)\) to \(O(TK)\), \(O(T \log T)\), or \(O(T^{3/2})\), enabling longer video generation.
 
 5. **Multi-head attention** allows specialization: different heads learn to track color, motion, structure, and global context independently.
 
-6. **Flash Attention** eliminates the $O(N^2)$ memory bottleneck by computing attention in blocks within fast SRAM, reducing HBM usage to $O(N)$. This is essential for practical video generation.
+6. **Flash Attention** eliminates the \(O(N^2)\) memory bottleneck by computing attention in blocks within fast SRAM, reducing HBM usage to \(O(N)\). This is essential for practical video generation.
 
 7. **The quadratic scaling** means 10 seconds costs ~4x more than 5 seconds, not 2x. This is why commercial models cap duration and why pricing scales super-linearly with length.
 

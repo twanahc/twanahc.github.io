@@ -39,7 +39,7 @@ Consider a typical multi-shot project: a 30-second product video composed of fiv
 - **Different black and white points** (some lifted blacks, some crushed)
 - **Different color casts** (slight green tint in one, magenta in another)
 
-The root cause is that diffusion models learn to generate plausible images, not consistent images. The training objective $L = \mathbb{E}\left[\|\epsilon - \epsilon_\theta(x_t, t, c)\|^2\right]$ optimizes for individual sample quality. There is no cross-sample consistency term.
+The root cause is that diffusion models learn to generate plausible images, not consistent images. The training objective \(L = \mathbb{E}\left[\|\epsilon - \epsilon_\theta(x_t, t, c)\|^2\right]\) optimizes for individual sample quality. There is no cross-sample consistency term.
 
 <svg viewBox="0 0 800 300" xmlns="http://www.w3.org/2000/svg" style="max-width:800px; margin: 2em auto; display: block;">
   <rect width="800" height="300" fill="white"/>
@@ -105,7 +105,7 @@ Before we can match colors across clips, we need to understand color spaces. The
 
 ### RGB: The Native Space
 
-Every digital image starts in RGB. Each pixel is a triplet $(R, G, B)$ where each channel is typically an 8-bit unsigned integer in $[0, 255]$ or a normalized float in $[0, 1]$. RGB is an additive color model --- red, green, and blue light combine to produce the full spectrum.
+Every digital image starts in RGB. Each pixel is a triplet \((R, G, B)\) where each channel is typically an 8-bit unsigned integer in \([0, 255]\) or a normalized float in \([0, 1]\). RGB is an additive color model --- red, green, and blue light combine to produce the full spectrum.
 
 The problem with RGB for color matching: the channels are not perceptually independent. Changing the red channel affects perceived brightness, hue, and saturation simultaneously. A Euclidean distance in RGB space does not correspond to perceived color difference. Two colors that are far apart in RGB space might look nearly identical to humans, while two colors that are close in RGB space might look obviously different.
 
@@ -113,13 +113,13 @@ The problem with RGB for color matching: the channels are not perceptually indep
 
 HSV separates color into three intuitively meaningful components:
 
-- **Hue** ($H$): The "color" itself --- red, orange, yellow, green, etc. Expressed as an angle in $[0, 360)$ degrees.
-- **Saturation** ($S$): The "purity" of the color --- how vivid it is. In $[0, 1]$.
-- **Value** ($V$): The "brightness" of the color. In $[0, 1]$.
+- **Hue** (\(H\)): The "color" itself --- red, orange, yellow, green, etc. Expressed as an angle in \([0, 360)\) degrees.
+- **Saturation** (\(S\)): The "purity" of the color --- how vivid it is. In \([0, 1]\).
+- **Value** (\(V\)): The "brightness" of the color. In \([0, 1]\).
 
-The conversion from RGB (normalized to $[0,1]$) to HSV:
+The conversion from RGB (normalized to \([0,1]\)) to HSV:
 
-Let $C_{\max} = \max(R, G, B)$, $C_{\min} = \min(R, G, B)$, $\Delta = C_{\max} - C_{\min}$.
+Let \(C_{\max} = \max(R, G, B)\), \(C_{\min} = \min(R, G, B)\), \(\Delta = C_{\max} - C_{\min}\).
 
 $$V = C_{\max}$$
 
@@ -127,7 +127,7 @@ $$S = \begin{cases} 0 & \text{if } C_{\max} = 0 \\ \frac{\Delta}{C_{\max}} & \te
 
 $$H = \begin{cases} 0° & \text{if } \Delta = 0 \\ 60° \times \frac{G - B}{\Delta} \mod 6 & \text{if } C_{\max} = R \\ 60° \times \left(\frac{B - R}{\Delta} + 2\right) & \text{if } C_{\max} = G \\ 60° \times \left(\frac{R - G}{\Delta} + 4\right) & \text{if } C_{\max} = B \end{cases}$$
 
-HSV is better than RGB for color grading because you can independently adjust hue, saturation, and brightness. But it still has a critical flaw: it is not perceptually uniform. Equal numerical changes in $H$, $S$, or $V$ do not correspond to equal perceived changes.
+HSV is better than RGB for color grading because you can independently adjust hue, saturation, and brightness. But it still has a critical flaw: it is not perceptually uniform. Equal numerical changes in \(H\), \(S\), or \(V\) do not correspond to equal perceived changes.
 
 ### CIELAB (LAB): The Perceptually Uniform Space
 
@@ -136,8 +136,8 @@ CIELAB (commonly written LAB) was designed by the International Commission on Il
 The three channels:
 
 - **L\***: Lightness, from 0 (black) to 100 (white)
-- **a\***: Green-red axis, typically $[-128, 127]$
-- **b\***: Blue-yellow axis, typically $[-128, 127]$
+- **a\***: Green-red axis, typically \([-128, 127]\)
+- **b\***: Blue-yellow axis, typically \([-128, 127]\)
 
 The conversion from RGB to LAB requires an intermediate step through CIE XYZ:
 
@@ -147,7 +147,7 @@ For sRGB:
 
 $$C_{\text{linear}} = \begin{cases} \frac{C_{\text{sRGB}}}{12.92} & \text{if } C_{\text{sRGB}} \leq 0.04045 \\ \left(\frac{C_{\text{sRGB}} + 0.055}{1.055}\right)^{2.4} & \text{otherwise} \end{cases}$$
 
-where $C \in \{R, G, B\}$ and $C_{\text{sRGB}} \in [0, 1]$.
+where \(C \in \{R, G, B\}\) and \(C_{\text{sRGB}} \in [0, 1]\).
 
 **Step 2: Linear RGB to XYZ**
 
@@ -161,7 +161,7 @@ Define the helper function:
 
 $$f(t) = \begin{cases} t^{1/3} & \text{if } t > \delta^3 \\ \frac{t}{3\delta^2} + \frac{4}{29} & \text{otherwise} \end{cases}$$
 
-where $\delta = \frac{6}{29}$. Then, using the D65 reference white point $(X_n, Y_n, Z_n) = (0.9505, 1.0, 1.0890)$:
+where \(\delta = \frac{6}{29}\). Then, using the D65 reference white point \((X_n, Y_n, Z_n) = (0.9505, 1.0, 1.0890)\):
 
 $$L^* = 116 \cdot f\!\left(\frac{Y}{Y_n}\right) - 16$$
 
@@ -286,7 +286,7 @@ Histogram matching (also called histogram specification) is the foundational alg
 
 ### The Mathematics of Histogram Matching
 
-Let $p_s(v)$ be the probability density function (histogram) of pixel values in the source image for a particular channel, and $p_r(v)$ be the histogram of the reference image, where $v \in [0, V_{\max}]$.
+Let \(p_s(v)\) be the probability density function (histogram) of pixel values in the source image for a particular channel, and \(p_r(v)\) be the histogram of the reference image, where \(v \in [0, V_{\max}]\).
 
 The cumulative distribution function (CDF) for the source and reference are:
 
@@ -294,33 +294,33 @@ $$F_s(v) = \int_0^v p_s(u) \, du$$
 
 $$F_r(v) = \int_0^v p_r(u) \, du$$
 
-In discrete form (for 8-bit images with $L = 256$ levels):
+In discrete form (for 8-bit images with \(L = 256\) levels):
 
 $$F_s(k) = \sum_{j=0}^{k} p_s(j) = \sum_{j=0}^{k} \frac{n_s(j)}{N_s}$$
 
-where $n_s(j)$ is the number of pixels with value $j$ in the source, and $N_s$ is the total number of pixels.
+where \(n_s(j)\) is the number of pixels with value \(j\) in the source, and \(N_s\) is the total number of pixels.
 
-The histogram matching transformation $T$ maps each source value to a reference value:
+The histogram matching transformation \(T\) maps each source value to a reference value:
 
 $$T(v) = F_r^{-1}\!\left(F_s(v)\right)$$
 
-This is the **inverse CDF mapping**. The intuition: $F_s(v)$ maps a pixel value to a cumulative probability (percentile). $F_r^{-1}$ maps that percentile back to a pixel value, but in the reference distribution. The result: a pixel at the 30th percentile in the source gets mapped to whatever value corresponds to the 30th percentile in the reference.
+This is the **inverse CDF mapping**. The intuition: \(F_s(v)\) maps a pixel value to a cumulative probability (percentile). \(F_r^{-1}\) maps that percentile back to a pixel value, but in the reference distribution. The result: a pixel at the 30th percentile in the source gets mapped to whatever value corresponds to the 30th percentile in the reference.
 
 ### Derivation
 
-Why does this work? We want a monotonic mapping $T$ such that the transformed source has the same CDF as the reference:
+Why does this work? We want a monotonic mapping \(T\) such that the transformed source has the same CDF as the reference:
 
 $$F_r(T(v)) = F_s(v)$$
 
-Applying $F_r^{-1}$ to both sides:
+Applying \(F_r^{-1}\) to both sides:
 
 $$T(v) = F_r^{-1}(F_s(v))$$
 
-The inverse CDF $F_r^{-1}(p)$ is defined as:
+The inverse CDF \(F_r^{-1}(p)\) is defined as:
 
 $$F_r^{-1}(p) = \inf\{v : F_r(v) \geq p\}$$
 
-In discrete implementation, since $F_r$ is a step function, the inverse is computed by searching for the smallest value $k$ such that $F_r(k) \geq F_s(v)$.
+In discrete implementation, since \(F_r\) is a step function, the inverse is computed by searching for the smallest value \(k\) such that \(F_r(k) \geq F_s(v)\).
 
 <svg viewBox="0 0 800 450" xmlns="http://www.w3.org/2000/svg" style="max-width:800px; margin: 2em auto; display: block;">
   <rect width="800" height="450" fill="white"/>
@@ -486,11 +486,11 @@ def histogram_match_lab(source_rgb: np.ndarray, reference_rgb: np.ndarray) -> np
 
 For many use cases, full histogram matching is overkill. Erik Reinhard's method (2001) is simpler and often sufficient: match the mean and standard deviation of each LAB channel.
 
-The transformation for each channel $c \in \{L, a, b\}$:
+The transformation for each channel \(c \in \{L, a, b\}\):
 
 $$\hat{x}_c = \frac{\sigma_r^c}{\sigma_s^c} \cdot (x_c - \mu_s^c) + \mu_r^c$$
 
-where $\mu_s^c, \sigma_s^c$ are the mean and standard deviation of the source, and $\mu_r^c, \sigma_r^c$ are those of the reference.
+where \(\mu_s^c, \sigma_s^c\) are the mean and standard deviation of the source, and \(\mu_r^c, \sigma_r^c\) are those of the reference.
 
 The intuition: shift the source distribution to have the same mean as the reference, then scale it to have the same spread. This is a linear transformation that preserves the shape of the distribution while matching its first two moments.
 
@@ -560,27 +560,27 @@ Histogram matching handles global color statistics. But professional color gradi
 
 ### The Gram Matrix
 
-The key mathematical object in neural style transfer is the Gram matrix. Given the feature maps of layer $l$ in a convolutional network, where $F_{ik}^l$ is the activation of filter $i$ at spatial position $k$, the Gram matrix is:
+The key mathematical object in neural style transfer is the Gram matrix. Given the feature maps of layer \(l\) in a convolutional network, where \(F_{ik}^l\) is the activation of filter \(i\) at spatial position \(k\), the Gram matrix is:
 
 $$G_{ij}^l = \sum_k F_{ik}^l F_{jk}^l$$
 
-The Gram matrix captures the correlations between feature channels. If features $i$ and $j$ tend to activate together, $G_{ij}^l$ is large. This encodes the "style" of an image --- the textures, patterns, and color relationships --- without encoding the spatial layout.
+The Gram matrix captures the correlations between feature channels. If features \(i\) and \(j\) tend to activate together, \(G_{ij}^l\) is large. This encodes the "style" of an image --- the textures, patterns, and color relationships --- without encoding the spatial layout.
 
 For color grading specifically, we care about the Gram matrices of early layers in a pretrained VGG network. Early layers capture low-level features: edges, colors, and simple textures. The Gram matrices of these layers encode color co-occurrence patterns --- which colors appear together and how they relate.
 
 ### Style Loss for Color Transfer
 
-The style loss between a generated image $\hat{x}$ and a reference style image $x_s$ at layer $l$ is:
+The style loss between a generated image \(\hat{x}\) and a reference style image \(x_s\) at layer \(l\) is:
 
 $$\mathcal{L}_{\text{style}}^l = \frac{1}{4 N_l^2 M_l^2} \sum_{i,j} \left(G_{ij}^l(\hat{x}) - G_{ij}^l(x_s)\right)^2$$
 
-where $N_l$ is the number of feature maps in layer $l$ and $M_l$ is the number of spatial positions (height $\times$ width).
+where \(N_l\) is the number of feature maps in layer \(l\) and \(M_l\) is the number of spatial positions (height \(\times\) width).
 
 The total style loss across layers:
 
 $$\mathcal{L}_{\text{style}} = \sum_l w_l \cdot \mathcal{L}_{\text{style}}^l$$
 
-where $w_l$ are per-layer weights.
+where \(w_l\) are per-layer weights.
 
 ### Color-Only Style Transfer
 
@@ -595,13 +595,13 @@ The combined loss:
 
 $$\mathcal{L} = \alpha \cdot \mathcal{L}_{\text{content}} + \beta \cdot \mathcal{L}_{\text{style}} + \gamma \cdot \mathcal{L}_{\text{TV}}$$
 
-where $\mathcal{L}_{\text{TV}}$ is total variation regularization for smoothness, and typically $\alpha \gg \beta$ to preserve content while allowing color changes.
+where \(\mathcal{L}_{\text{TV}}\) is total variation regularization for smoothness, and typically \(\alpha \gg \beta\) to preserve content while allowing color changes.
 
 For color-only transfer, we modify the content loss to operate only on the luminance channel:
 
 $$\mathcal{L}_{\text{content}} = \frac{1}{2} \sum_{i,j} \left(L^*(\hat{x})_{ij} - L^*(x_c)_{ij}\right)^2$$
 
-where $L^*$ is the lightness channel of the LAB representation and $x_c$ is the content image.
+where \(L^*\) is the lightness channel of the LAB representation and \(x_c\) is the content image.
 
 ```python
 import torch
@@ -743,29 +743,29 @@ Option 2 is what we will build in the next section.
 
 ## 3D LUT Generation {#3d-lut-generation}
 
-A 3D Look-Up Table (LUT) is the professional standard for color grading. It is a discrete approximation of a color transformation function $f: \text{RGB} \rightarrow \text{RGB}$.
+A 3D Look-Up Table (LUT) is the professional standard for color grading. It is a discrete approximation of a color transformation function \(f: \text{RGB} \rightarrow \text{RGB}\).
 
 ### What a 3D LUT Is Mathematically
 
-A 3D LUT divides the RGB color cube into a regular grid of $N \times N \times N$ points. For each grid point $(R_i, G_j, B_k)$, the LUT stores the transformed color value $(R'_i, G'_j, B'_k)$.
+A 3D LUT divides the RGB color cube into a regular grid of \(N \times N \times N\) points. For each grid point \((R_i, G_j, B_k)\), the LUT stores the transformed color value \((R'_i, G'_j, B'_k)\).
 
-The grid points are equally spaced. For a LUT of size $N$:
+The grid points are equally spaced. For a LUT of size \(N\):
 
 $$R_i = \frac{i}{N-1}, \quad G_j = \frac{j}{N-1}, \quad B_k = \frac{k}{N-1}$$
 
-for $i, j, k \in \{0, 1, \ldots, N-1\}$.
+for \(i, j, k \in \{0, 1, \ldots, N-1\}\).
 
 Common sizes:
 
 | LUT Size | Grid Points | Total Entries | File Size (.cube) | Precision |
 |---|---|---|---|---|
-| $17^3$ | 4,913 | 14,739 RGB values | ~200 KB | Adequate for most grading |
-| $33^3$ | 35,937 | 107,811 RGB values | ~1.4 MB | Professional standard |
-| $65^3$ | 274,625 | 823,875 RGB values | ~11 MB | Maximum precision |
+| \(17^3\) | 4,913 | 14,739 RGB values | ~200 KB | Adequate for most grading |
+| \(33^3\) | 35,937 | 107,811 RGB values | ~1.4 MB | Professional standard |
+| \(65^3\) | 274,625 | 823,875 RGB values | ~11 MB | Maximum precision |
 
 ### Trilinear Interpolation
 
-For an input color $(R, G, B)$ that falls between grid points, we use trilinear interpolation. Let the input be at fractional grid coordinates:
+For an input color \((R, G, B)\) that falls between grid points, we use trilinear interpolation. Let the input be at fractional grid coordinates:
 
 $$r = R \cdot (N - 1), \quad g = G \cdot (N - 1), \quad b = B \cdot (N - 1)$$
 
@@ -789,7 +789,7 @@ Wait --- that gives the complement weights. More precisely:
 
 $$w_{ijk} = (1 - |\delta_r - i|) \cdot (1 - |\delta_g - j|) \cdot (1 - |\delta_b - k|)$$
 
-So $w_{000} = (1 - \delta_r)(1 - \delta_g)(1 - \delta_b)$ is the weight for the lower-left-front corner, and $w_{111} = \delta_r \cdot \delta_g \cdot \delta_b$ is the weight for the upper-right-back corner.
+So \(w_{000} = (1 - \delta_r)(1 - \delta_g)(1 - \delta_b)\) is the weight for the lower-left-front corner, and \(w_{111} = \delta_r \cdot \delta_g \cdot \delta_b\) is the weight for the upper-right-back corner.
 
 <svg viewBox="0 0 800 400" xmlns="http://www.w3.org/2000/svg" style="max-width:800px; margin: 2em auto; display: block;">
   <rect width="800" height="400" fill="white"/>
@@ -1516,7 +1516,7 @@ The simplified Euclidean distance in LAB space is a reasonable first approximati
 
 ### The CIEDE2000 Formula
 
-Given two colors in LAB space: $(L_1^*, a_1^*, b_1^*)$ and $(L_2^*, a_2^*, b_2^*)$.
+Given two colors in LAB space: \((L_1^*, a_1^*, b_1^*)\) and \((L_2^*, a_2^*, b_2^*)\).
 
 **Step 1: Compute chroma and hue in CIELAB.**
 
@@ -1582,11 +1582,11 @@ $$R_C = 2\sqrt{\frac{\bar{C}'^7}{\bar{C}'^7 + 25^7}}$$
 
 $$\Delta E_{00} = \sqrt{\left(\frac{\Delta L'}{k_L S_L}\right)^2 + \left(\frac{\Delta C'}{k_C S_C}\right)^2 + \left(\frac{\Delta H'}{k_H S_H}\right)^2 + R_T \frac{\Delta C'}{k_C S_C} \frac{\Delta H'}{k_H S_H}}$$
 
-The parametric factors $k_L, k_C, k_H$ are typically all set to 1 for standard conditions.
+The parametric factors \(k_L, k_C, k_H\) are typically all set to 1 for standard conditions.
 
 ### Interpreting CIEDE2000 Values
 
-| $\Delta E_{00}$ | Perceptual Meaning |
+| \(\Delta E_{00}\) | Perceptual Meaning |
 |---|---|
 | 0 -- 1 | Not perceptible to the human eye |
 | 1 -- 2 | Perceptible through close observation |
@@ -1594,7 +1594,7 @@ The parametric factors $k_L, k_C, k_H$ are typically all set to 1 for standard c
 | 3.5 -- 5 | Clear difference, still acceptable for some use cases |
 | > 5 | Obvious difference, unacceptable for matched content |
 
-For AI video consistency, we target $\Delta E_{00} < 3$ between the mean colors of consecutive clips.
+For AI video consistency, we target \(\Delta E_{00} < 3\) between the mean colors of consecutive clips.
 
 ### Implementation
 

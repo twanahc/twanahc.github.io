@@ -1835,9 +1835,9 @@ We benchmarked the WebSocket + Redis Pub/Sub architecture using:
 | Scale | WebSocket + Redis (monthly) | Firebase Realtime DB (monthly) |
 |-------|-----------------------------|-------------------------------|
 | 1K concurrent users | ~$30 (1x t3.medium + ElastiCache) | $0 (free tier) |
-| 10K concurrent users | ~$120 (2x t3.large + ElastiCache) | ~$25 |
-| 50K concurrent users | ~$400 (4x c6i.large + ElastiCache) | ~$150 |
-| 100K concurrent users | ~$800 (8x c6i.large + ElastiCache cluster) | ~$400 |
+| 10K concurrent users | ~\(120 (2x t3.large + ElastiCache) | ~\)25 |
+| 50K concurrent users | ~\(400 (4x c6i.large + ElastiCache) | ~\)150 |
+| 100K concurrent users | ~\(800 (8x c6i.large + ElastiCache cluster) | ~\)400 |
 
 Firebase is cheaper at every scale for this specific use case. The reason to choose the WebSocket approach is control: custom business logic in the transport layer, no vendor dependency, and the ability to use the same WebSocket for other features (chat, collaboration, etc.).
 

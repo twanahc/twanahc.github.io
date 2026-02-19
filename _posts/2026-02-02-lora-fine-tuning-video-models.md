@@ -3,6 +3,7 @@ layout: post
 title: "Train Your Own Video Style in Hours: LoRA Fine-Tuning for Video Models on a Single GPU"
 date: 2026-02-02
 category: architecture
+mathjax: false
 ---
 
 What if your users could upload 10-30 video clips and get a model that generates in their specific visual style? Not a vague style reference — a model trained on their brand's cinematography, their product's aesthetic, their creative direction.

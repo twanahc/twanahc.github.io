@@ -77,8 +77,8 @@ The components:
 
 Starting MRR: $100,000 from 2,000 customers. During the month:
 - 160 customers churned (8% logo churn), losing $4,800 MRR (mostly $20/mo and $30/mo plans)
-- 40 customers downgraded from Pro ($50/mo) to Basic ($20/mo), losing $1,200 MRR
-- 100 customers upgraded from Basic ($20/mo) to Pro ($50/mo), gaining $3,000 MRR
+- 40 customers downgraded from Pro (\(50/mo) to Basic (\)20/mo), losing $1,200 MRR
+- 100 customers upgraded from Basic (\(20/mo) to Pro (\)50/mo), gaining $3,000 MRR
 - 200 customers purchased additional credit packs ($15 average), adding $3,000 one-time MRR
 
 $$
@@ -103,7 +103,7 @@ $$
 \text{Annual Churn} = 1 - (1 - 0.05)^{12} = 1 - 0.95^{12} = 1 - 0.5404 = 45.96\%
 $$
 
-Not $5\% \times 12 = 60\%$. The compounding matters.
+Not \(5\% \times 12 = 60\%\). The compounding matters.
 
 | Monthly Churn | Naive Annual (x12) | Actual Annual | Average Customer Lifetime |
 |---|---|---|---|
@@ -121,7 +121,7 @@ $$
 \bar{L} = \frac{1}{\text{Monthly Churn Rate}}
 $$
 
-At 8% monthly churn, the average customer stays $1/0.08 = 12.5$ months. This is a crucial input to LTV calculations.
+At 8% monthly churn, the average customer stays \(1/0.08 = 12.5\) months. This is a crucial input to LTV calculations.
 
 ### 1.4 Retention Curve
 
@@ -235,12 +235,12 @@ $$
 
 where:
 
-- $\text{ARPU}_t$ is the average revenue per user in month $t$ (can change due to upgrades, credits, price changes)
-- $S(t)$ is the survival probability at month $t$ --- the probability that a customer acquired at time 0 is still active at time $t$
-- $d$ is the monthly discount rate (annual discount rate / 12, approximately)
-- $T$ is the time horizon (typically 36-60 months)
+- \(\text{ARPU}_t\) is the average revenue per user in month \(t\) (can change due to upgrades, credits, price changes)
+- \(S(t)\) is the survival probability at month \(t\) --- the probability that a customer acquired at time 0 is still active at time \(t\)
+- \(d\) is the monthly discount rate (annual discount rate / 12, approximately)
+- \(T\) is the time horizon (typically 36-60 months)
 
-For constant churn rate $c$, the survival function simplifies to:
+For constant churn rate \(c\), the survival function simplifies to:
 
 $$
 S(t) = (1 - c)^t
@@ -254,7 +254,7 @@ $$
 
 This is the formula you should actually use. It's still clean but accounts for the time value of money.
 
-**Worked example:** ARPU = $25/month, monthly churn = 8%, annual discount rate = 10% (monthly $d \approx 0.00833$):
+**Worked example:** ARPU = $25/month, monthly churn = 8%, annual discount rate = 10% (monthly \(d \approx 0.00833\)):
 
 $$
 \text{LTV}_{\text{DCF}} = \frac{25 \times 0.92}{0.08 + 0.00833} = \frac{23.0}{0.08833} = \$260.36
@@ -266,15 +266,15 @@ Compare to the simple formula's $312.50. The discount rate knocks 17% off the LT
 
 AI video platforms have a natural expansion mechanism: credit packs. Users who hit their tier limits buy additional credits. Users who love the product upgrade to higher tiers. This means ARPU grows over time for surviving customers.
 
-If ARPU grows at rate $g$ per month for surviving users:
+If ARPU grows at rate \(g\) per month for surviving users:
 
 $$
 \text{LTV}_{\text{expansion}} = \sum_{t=1}^{\infty} \frac{\text{ARPU}_0 \times (1+g)^t \times (1-c)^t}{(1+d)^t} = \frac{\text{ARPU}_0 \times (1+g)(1-c)}{c + d - g + cg}
 $$
 
-For the case where $g < c + d$ (expansion rate less than churn + discount, which it should be for convergence):
+For the case where \(g < c + d\) (expansion rate less than churn + discount, which it should be for convergence):
 
-**Worked example:** Same as above, but with 2% monthly ARPU expansion ($g = 0.02$):
+**Worked example:** Same as above, but with 2% monthly ARPU expansion (\(g = 0.02\)):
 
 $$
 \text{LTV}_{\text{expansion}} = \frac{25 \times 1.02 \times 0.92}{0.08 + 0.00833 - 0.02 + 0.0016} = \frac{23.46}{0.06993} = \$335.47
@@ -444,7 +444,7 @@ $$
 \text{Credit}_{c} = \frac{1}{n}
 $$
 
-where $n$ is the total number of touchpoints. Each interaction gets equal credit ($1/3$ each). Fair but probably wrong --- the last click matters more than the first impression.
+where \(n\) is the total number of touchpoints. Each interaction gets equal credit ($1/3$ each). Fair but probably wrong --- the last click matters more than the first impression.
 
 **Time-decay attribution:**
 
@@ -452,15 +452,15 @@ $$
 \text{Credit}_{c_i} = \frac{e^{-\lambda(T - t_i)}}{\sum_{j=1}^{n} e^{-\lambda(T - t_j)}}
 $$
 
-where $T$ is the conversion time, $t_i$ is the time of touchpoint $i$, and $\lambda$ is the decay rate. More recent touchpoints get more credit. This is the most mathematically defensible model for most SaaS businesses.
+where \(T\) is the conversion time, \(t_i\) is the time of touchpoint \(i\), and \(\lambda\) is the decay rate. More recent touchpoints get more credit. This is the most mathematically defensible model for most SaaS businesses.
 
-**Worked example (time-decay):** Three touchpoints: TikTok ad (day 1), blog post (day 10), Google ad (day 14), conversion (day 14). With $\lambda = 0.1$:
+**Worked example (time-decay):** Three touchpoints: TikTok ad (day 1), blog post (day 10), Google ad (day 14), conversion (day 14). With \(\lambda = 0.1\):
 
-- TikTok: $e^{-0.1 \times 13} = e^{-1.3} = 0.2725$
-- Blog: $e^{-0.1 \times 4} = e^{-0.4} = 0.6703$
-- Google: $e^{-0.1 \times 0} = e^{0} = 1.0$
+- TikTok: \(e^{-0.1 \times 13} = e^{-1.3} = 0.2725\)
+- Blog: \(e^{-0.1 \times 4} = e^{-0.4} = 0.6703\)
+- Google: \(e^{-0.1 \times 0} = e^{0} = 1.0\)
 
-Total: $0.2725 + 0.6703 + 1.0 = 1.9428$
+Total: \(0.2725 + 0.6703 + 1.0 = 1.9428\)
 
 Credits: TikTok = 14%, Blog = 34.5%, Google = 51.5%
 
@@ -545,7 +545,7 @@ $$
 | 12-18 months | Concerning --- need strong retention to work |
 | > 18 months | Dangerous --- high capital requirements |
 
-A 5.33-month payback with 8% monthly churn means $S(5.33) = 0.92^{5.33} = 0.643$ --- 64.3% of customers are still around to "pay back" their acquisition cost. This is fine. But at 15% monthly churn, $S(5.33) = 0.85^{5.33} = 0.421$ --- only 42% make it to payback. That's unsustainable.
+A 5.33-month payback with 8% monthly churn means \(S(5.33) = 0.92^{5.33} = 0.643\) --- 64.3% of customers are still around to "pay back" their acquisition cost. This is fine. But at 15% monthly churn, \(S(5.33) = 0.85^{5.33} = 0.421\) --- only 42% make it to payback. That's unsustainable.
 
 ### 4.3 Payback-Adjusted LTV:CAC
 
@@ -555,7 +555,7 @@ $$
 \text{Expected Payback} = \text{CAC} \times S\left(\frac{\text{CAC}}{\text{ARPU} \times \text{GM}}\right)
 $$
 
-If $S(t_{\text{payback}}) > 0.5$, more than half your customers reach payback, which is typically the minimum viable threshold.
+If \(S(t_{\text{payback}}) > 0.5\), more than half your customers reach payback, which is typically the minimum viable threshold.
 
 ---
 
@@ -597,7 +597,7 @@ $$
 \text{QR} = \underbrace{\frac{\text{New MRR}}{\text{Lost MRR}}}_{\text{Acquisition Efficiency}} + \underbrace{\frac{\text{Expansion MRR}}{\text{Lost MRR}}}_{\text{Expansion Efficiency}}
 $$
 
-In our example: $12{,}000/7{,}500 + 4{,}000/7{,}500 = 1.60 + 0.53$
+In our example: \(12{,}000/7{,}500 + 4{,}000/7{,}500 = 1.60 + 0.53\)
 
 Acquisition accounts for 75% of growth, expansion for 25%. A mature SaaS business would want expansion contributing 40%+ of growth. This platform is still too dependent on new customer acquisition.
 
@@ -893,9 +893,9 @@ For more sophisticated lifetime predictions, we can borrow from biostatistics: s
 
 The Kaplan-Meier (KM) estimator constructs a survival function from observed data, handling the fact that some users are still active (censored --- we don't know when they'll churn).
 
-Given ordered event times $t_1 < t_2 < \cdots < t_k$ where at each $t_i$:
-- $d_i$ = number of churns at time $t_i$
-- $n_i$ = number of users at risk just before time $t_i$ (still active and not censored)
+Given ordered event times \(t_1 < t_2 < \cdots < t_k\) where at each \(t_i\):
+- \(d_i\) = number of churns at time \(t_i\)
+- \(n_i\) = number of users at risk just before time \(t_i\) (still active and not censored)
 
 $$
 \hat{S}(t) = \prod_{t_i \leq t} \left(1 - \frac{d_i}{n_i}\right)
@@ -903,7 +903,7 @@ $$
 
 **Worked example:**
 
-| Month $t_i$ | At Risk $n_i$ | Churned $d_i$ | Censored | $\frac{d_i}{n_i}$ | $1 - \frac{d_i}{n_i}$ | $\hat{S}(t_i)$ |
+| Month \(t_i\) | At Risk \(n_i\) | Churned \(d_i\) | Censored | \(\frac{d_i}{n_i}\) | \(1 - \frac{d_i}{n_i}\) | \(\hat{S}(t_i)\) |
 |---|---|---|---|---|---|---|
 | 1 | 500 | 130 | 5 | 0.260 | 0.740 | 0.740 |
 | 2 | 365 | 62 | 3 | 0.170 | 0.830 | 0.614 |
@@ -916,9 +916,9 @@ The censored users are those who signed up recently and haven't had the opportun
 
 **Interpreting the KM curve:**
 
-- $\hat{S}(3) = 0.547$: After 3 months, 54.7% of users are still active
-- $\hat{S}(6) = 0.421$: After 6 months, 42.1% are still active
-- The median survival time is the value of $t$ where $\hat{S}(t) = 0.5$, approximately 4 months in this example
+- \(\hat{S}(3) = 0.547\): After 3 months, 54.7% of users are still active
+- \(\hat{S}(6) = 0.421\): After 6 months, 42.1% are still active
+- The median survival time is the value of \(t\) where \(\hat{S}(t) = 0.5\), approximately 4 months in this example
 
 ### 8.2 Confidence Intervals (Greenwood's Formula)
 
@@ -938,7 +938,7 @@ This gives you error bars on your retention predictions. With small cohorts, the
 
 ### 8.3 Using Survival Analysis for LTV Prediction
 
-Once you have $\hat{S}(t)$ from the KM estimator, plug it directly into the LTV formula:
+Once you have \(\hat{S}(t)\) from the KM estimator, plug it directly into the LTV formula:
 
 $$
 \text{LTV} = \sum_{t=1}^{T} \frac{\text{ARPU}_t \times \hat{S}(t)}{(1+d)^t}
@@ -1012,7 +1012,7 @@ results = logrank_test(
 print(f"p-value: {results.p_value:.4f}")
 ```
 
-If the log-rank test shows $p < 0.05$, the survival curves are statistically significantly different. This justifies different LTV assumptions for different channels.
+If the log-rank test shows \(p < 0.05\), the survival curves are statistically significantly different. This justifies different LTV assumptions for different channels.
 
 ---
 

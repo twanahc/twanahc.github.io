@@ -37,7 +37,7 @@ Every significant funding round in AI video generation through early 2026:
 | Company | Round | Date | Amount | Valuation | Lead Investor(s) | Key Co-Investors | Focus |
 |---|---|---|---|---|---|---|---|
 | **Luma AI** | Series (undisclosed) | Nov 2025 | $900M | Not disclosed | Thrive Capital | Andreessen Horowitz, Google Ventures | Consumer + API video gen |
-| **Runway** | Series D | Nov 2024 | $308M total | ~$4.0B | General Atlantic | Nvidia, Salesforce, Google | Professional creative tools |
+| **Runway** | Series D | Nov 2024 | \(308M total | ~\)4.0B | General Atlantic | Nvidia, Salesforce, Google | Professional creative tools |
 | **Synthesia** | Series D | Jun 2025 | $180M | $2.1B | NEA | Accel, GV, Nvidia | Enterprise talking-head video |
 | **Pika** | Series B | Nov 2024 | $80M | $470M | Spark Capital | Lightspeed, New Enterprise Associates | Consumer video gen |
 | **PixVerse** | Multiple rounds | 2024-2025 | $60M+ | Not disclosed | Alibaba | Undisclosed | Consumer video gen + real-time |
@@ -326,16 +326,16 @@ A more realistic LTV model uses cohort-based survival analysis:
 $$\text{LTV} = \sum_{t=1}^{T} \text{ARPU}(t) \times \text{GM}(t) \times S(t) \times \frac{1}{(1+r)^{t/12}}$$
 
 where:
-- $\text{ARPU}(t)$ is the average revenue per user in month $t$ (increases due to upgrades)
-- $\text{GM}(t)$ is the gross margin in month $t$ (improves as compute costs fall)
-- $S(t)$ is the survival rate (probability a user is still active in month $t$)
-- $r$ is the annual discount rate (10-15% for venture-backed companies)
+- \(\text{ARPU}(t)\) is the average revenue per user in month \(t\) (increases due to upgrades)
+- \(\text{GM}(t)\) is the gross margin in month \(t\) (improves as compute costs fall)
+- \(S(t)\) is the survival rate (probability a user is still active in month \(t\))
+- \(r\) is the annual discount rate (10-15% for venture-backed companies)
 
 **Worked example with realistic assumptions**:
 
 - Initial ARPU: $34.18, growing 2% per month (upgrades + overage)
 - Initial gross margin: 70%, improving 0.3% per month (falling compute costs)
-- Survival function: $S(t) = 0.7 \times e^{-0.05t} + 0.3 \times e^{-0.01t}$ (bimodal: 70% of users churn fast, 30% are long-term)
+- Survival function: \(S(t) = 0.7 \times e^{-0.05t} + 0.3 \times e^{-0.01t}\) (bimodal: 70% of users churn fast, 30% are long-term)
 - Discount rate: 12% annual
 
 Computing the first 24 months:
@@ -364,7 +364,7 @@ This is more conservative than the simple LTV formula ($479 at 5% churn) because
 | Subscription revenue | $1,536K | $18,432K | 90% |
 | Overage/usage revenue | $125K | $1,500K | 7% |
 | Enterprise contracts | $50K | $600K | 3% |
-| **Total Revenue** | **$1,711K** | **$20,532K** | **100%** |
+| **Total Revenue** | **\(1,711K** | **\)20,532K** | **100%** |
 | | | | |
 | **COGS** | | | |
 | Video generation APIs | $340K | $4,080K | 19.9% |
@@ -373,9 +373,9 @@ This is more conservative than the simple LTV formula ($479 at 5% churn) because
 | Cloud storage | $15K | $180K | 0.9% |
 | CDN and bandwidth | $12K | $144K | 0.7% |
 | Encoding/transcoding | $8K | $96K | 0.5% |
-| **Total COGS** | **$417K** | **$5,004K** | **24.4%** |
+| **Total COGS** | **\(417K** | **\)5,004K** | **24.4%** |
 | | | | |
-| **Gross Profit** | **$1,294K** | **$15,528K** | **75.6%** |
+| **Gross Profit** | **\(1,294K** | **\)15,528K** | **75.6%** |
 | | | | |
 | **Operating Expenses** | | | |
 | Engineering (20 people) | $350K | $4,200K | 20.5% |
@@ -384,9 +384,9 @@ This is more conservative than the simple LTV formula ($479 at 5% churn) because
 | Customer support (5 people) | $50K | $600K | 2.9% |
 | G&A (legal, finance, ops) | $80K | $960K | 4.7% |
 | Infrastructure (non-COGS) | $40K | $480K | 2.3% |
-| **Total OpEx** | **$760K** | **$9,120K** | **44.4%** |
+| **Total OpEx** | **\(760K** | **\)9,120K** | **44.4%** |
 | | | | |
-| **Operating Income** | **$534K** | **$6,408K** | **31.2%** |
+| **Operating Income** | **\(534K** | **\)6,408K** | **31.2%** |
 
 At 50K paying users, this hypothetical platform achieves a 31% operating margin and a 76% gross margin. This is a healthy business. The challenge is getting to 50K paying users --- which requires either significant marketing spend (pushing operating margin negative during growth) or viral organic growth.
 
@@ -400,11 +400,11 @@ At 50K paying users, this hypothetical platform achieves a 31% operating margin 
 
 **Revenue predictability**:
 
-Let $P_{\text{purchase}}$ be the probability a user purchases credits in a given month, and $V_{\text{avg}}$ be the average purchase value:
+Let \(P_{\text{purchase}}\) be the probability a user purchases credits in a given month, and \(V_{\text{avg}}\) be the average purchase value:
 
 $$\text{Monthly Revenue} = \text{MAU} \times P_{\text{purchase}} \times V_{\text{avg}}$$
 
-The problem: $P_{\text{purchase}}$ is highly variable. Users buy credits when they need them, not on a regular schedule. This creates lumpy, unpredictable revenue.
+The problem: \(P_{\text{purchase}}\) is highly variable. Users buy credits when they need them, not on a regular schedule. This creates lumpy, unpredictable revenue.
 
 **Cash flow pattern**:
 
@@ -448,13 +448,13 @@ No baseline revenue floor.
 
 $$\text{Monthly Revenue} = N_{\text{subscribers}} \times \text{Avg Plan Price} + \text{Overage Revenue}$$
 
-where $N_{\text{subscribers}}$ is highly predictable (changes slowly via acquisition and churn) and overage revenue provides upside.
+where \(N_{\text{subscribers}}\) is highly predictable (changes slowly via acquisition and churn) and overage revenue provides upside.
 
 **The subscription economics formula**:
 
 $$\text{MRR}_{t+1} = \text{MRR}_t \times (1 - c) + \text{New MRR} + \text{Expansion MRR}$$
 
-where $c$ is the monthly churn rate.
+where \(c\) is the monthly churn rate.
 
 For a platform at $500K MRR with 5% monthly churn, $80K new MRR, and $20K expansion MRR:
 
@@ -513,9 +513,9 @@ For API customers, revenue per customer follows a distribution that's typically 
 
 $$\text{Revenue}_i \sim \text{LogNormal}(\mu, \sigma)$$
 
-The mean revenue is $e^{\mu + \sigma^2/2}$ and the median is $e^{\mu}$. The gap between mean and median means a small number of large customers drive most of the revenue.
+The mean revenue is \(e^{\mu + \sigma^2/2}\) and the median is \(e^{\mu}\). The gap between mean and median means a small number of large customers drive most of the revenue.
 
-**Example**: If $\mu = 5.5$ and $\sigma = 1.2$ (calibrated to a platform where median monthly spend is ~$245 and mean is ~$560):
+**Example**: If \(\mu = 5.5\) and \(\sigma = 1.2\) (calibrated to a platform where median monthly spend is ~\(245 and mean is ~\)560):
 
 | Percentile | Monthly Spend | Customer Type |
 |---|---|---|
@@ -703,10 +703,10 @@ The cloud computing stack evolved over 15 years and provides a useful analogy:
 | Layer | Cloud Example | Market Cap/Valuation | Revenue Multiple | When Value Peaked |
 |---|---|---|---|---|
 | Infrastructure | AWS, GCP, Azure | $500B+ (AWS alone) | 8-12x | 2010-2018 |
-| Platform | Stripe ($95B), Twilio ($10B) | $10-100B | 15-30x | 2015-2022 |
-| Application | Shopify ($100B), Salesforce ($250B) | $10-250B | 10-25x | 2018-present |
+| Platform | Stripe (\(95B), Twilio (\)10B) | $10-100B | 15-30x | 2015-2022 |
+| Application | Shopify (\(100B), Salesforce (\)250B) | $10-250B | 10-25x | 2018-present |
 
-The key insight: **the infrastructure layer captured the most absolute value** (AWS is enormous), but the **platform and application layers captured higher multiples and better margins**. Stripe at $95B with ~$20B revenue (5x multiple) generates higher margins and more defensible revenue than AWS.
+The key insight: **the infrastructure layer captured the most absolute value** (AWS is enormous), but the **platform and application layers captured higher multiples and better margins**. Stripe at \(95B with ~\)20B revenue (5x multiple) generates higher margins and more defensible revenue than AWS.
 
 In AI video:
 - **Model layer = infrastructure**: Necessary but commoditizing. Kling, Veo, Sora, and Runway Gen-4 are converging in quality. Six months from now, the quality gap between them will be negligible for most use cases.
@@ -831,13 +831,13 @@ This aligns with our bottom-up estimate of $550-710M.
 $$P(t) = \frac{K}{1 + e^{-r(t - t_0)}}$$
 
 where:
-- $K$ = maximum penetration rate (estimated at 30-40% --- AI won't replace all video creation but will be involved in a large fraction)
-- $r$ = growth rate constant
-- $t_0$ = midpoint of the S-curve (when penetration reaches $K/2$)
+- \(K\) = maximum penetration rate (estimated at 30-40% --- AI won't replace all video creation but will be involved in a large fraction)
+- \(r\) = growth rate constant
+- \(t_0\) = midpoint of the S-curve (when penetration reaches \(K/2\))
 
-Calibrating to current data ($P(2025) = 1.5\%$, $P(2026) \approx 3\%$):
+Calibrating to current data (\(P(2025) = 1.5\%\), \(P(2026) \approx 3\%\)):
 
-With $K = 0.35$, $r = 0.55$, $t_0 = 2032$:
+With \(K = 0.35\), \(r = 0.55\), \(t_0 = 2032\):
 
 | Year | AI Penetration | Total Video Market | AI Video Revenue |
 |---|---|---|---|
@@ -973,7 +973,7 @@ For a platform processing 1M generations/month:
 | Content moderation (enhanced) | $15,000 | $180,000 | Additional AI + human review |
 | Legal/compliance team | $25,000 | $300,000 | 2-3 FTEs |
 | Audit and certification | $5,000 | $60,000 | Third-party audits |
-| **Total** | **$50,000** | **$600,000** | |
+| **Total** | **\(50,000** | **\)600,000** | |
 
 At $600K/year for a platform generating $20M ARR, compliance costs represent 3% of revenue. Annoying but not existential.
 
@@ -1031,7 +1031,7 @@ Even in the bear case, the market reaches $4B by 2030. The $2.5B projection by 2
 
 ## Summary: Where We Stand
 
-The AI video market is in a peculiar position: heavily funded ($2B+ in VC), generating real but modest revenue ($550-710M), growing rapidly (80-150% annually), with unclear competitive dynamics and an uncertain regulatory environment.
+The AI video market is in a peculiar position: heavily funded (\(2B+ in VC), generating real but modest revenue (\)550-710M), growing rapidly (80-150% annually), with unclear competitive dynamics and an uncertain regulatory environment.
 
 The key numbers:
 

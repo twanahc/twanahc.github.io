@@ -3,6 +3,7 @@ layout: post
 title: "From 720p to 4K in Seconds: NVIDIA RTX Video and LTX-2 Change the Upscaling Game"
 date: 2026-01-30
 category: models
+mathjax: false
 ---
 
 Most AI video models generate at 720p. The good ones hit 1080p. Almost none do native 4K. But users want 4K — and the gap between "what the model generates" and "what the user expects" has been filled by post-processing upscaling that's slow, expensive, and mediocre.

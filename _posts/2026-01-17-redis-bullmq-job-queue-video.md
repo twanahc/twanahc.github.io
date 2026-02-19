@@ -1290,9 +1290,9 @@ For a system with a single queue, we can model expected wait time using **queuin
 
 For an M/M/1 queue:
 
-- $\lambda$ = arrival rate (jobs per second)
-- $\mu$ = service rate (jobs per second per worker)
-- $\rho = \lambda / \mu$ = utilization (must be < 1 for stability)
+- \(\lambda\) = arrival rate (jobs per second)
+- \(\mu\) = service rate (jobs per second per worker)
+- \(\rho = \lambda / \mu\) = utilization (must be < 1 for stability)
 
 The expected wait time in the queue is:
 
@@ -1304,24 +1304,24 @@ For an M/M/c queue (c workers), the formula becomes more complex but the insight
 
 | Metric | Value |
 |--------|-------|
-| Average arrival rate ($\lambda$) | 2 jobs/minute |
+| Average arrival rate (\(\lambda\)) | 2 jobs/minute |
 | Average processing time | 2 minutes |
-| Service rate per worker ($\mu$) | 0.5 jobs/minute |
-| Number of workers ($c$) | 5 |
-| Total service rate ($c\mu$) | 2.5 jobs/minute |
-| Utilization ($\rho = \lambda / c\mu$) | 0.8 |
+| Service rate per worker (\(\mu\)) | 0.5 jobs/minute |
+| Number of workers (\(c\)) | 5 |
+| Total service rate (\(c\mu\)) | 2.5 jobs/minute |
+| Utilization (\(\rho = \lambda / c\mu\)) | 0.8 |
 
 At 80% utilization, the expected wait time in an M/M/c queue with c=5 workers is:
 
 $$W_q = \frac{C(c, \rho)}{c\mu(1-\rho)}$$
 
-where $C(c, \rho)$ is the Erlang C formula. For our numbers, this works out to approximately **3.1 minutes** average wait. At 90% utilization, it jumps to **7.5 minutes**. At 95%, it is **16 minutes**. This is why monitoring utilization and scaling workers is critical.
+where \(C(c, \rho)\) is the Erlang C formula. For our numbers, this works out to approximately **3.1 minutes** average wait. At 90% utilization, it jumps to **7.5 minutes**. At 95%, it is **16 minutes**. This is why monitoring utilization and scaling workers is critical.
 
-For a **priority queue**, the expected wait time for priority class $k$ (out of $K$ classes) can be modeled with the priority M/G/1 formula:
+For a **priority queue**, the expected wait time for priority class \(k\) (out of \(K\) classes) can be modeled with the priority M/G/1 formula:
 
 $$W_{q,k} = \frac{W_0}{(1 - \sigma_{k-1})(1 - \sigma_k)}$$
 
-where $\sigma_k = \sum_{i=1}^{k} \rho_i$ is the cumulative utilization of all higher-priority classes, and $W_0$ is the mean residual service time for a random job.
+where \(\sigma_k = \sum_{i=1}^{k} \rho_i\) is the cumulative utilization of all higher-priority classes, and \(W_0\) is the mean residual service time for a random job.
 
 The practical implication: if enterprise users (priority 2) consume 20% of capacity, and the system is at 80% total utilization, free users (priority 10) can expect wait times 3-5x longer than if there were no priority classes. This is the desired behavior — you are selling faster processing to paying customers.
 
@@ -1744,7 +1744,7 @@ The fundamental throughput equation for a job queue is:
 
 $$\text{throughput} = \text{workers} \times \frac{1}{\text{avg\_processing\_time}}$$
 
-If your average video generation takes 120 seconds, each worker produces $1/120 = 0.0083$ jobs per second. Five workers give you $5 \times 0.0083 = 0.0417$ jobs per second, or about **2.5 jobs per minute**.
+If your average video generation takes 120 seconds, each worker produces \(1/120 = 0.0083\) jobs per second. Five workers give you \(5 \times 0.0083 = 0.0417\) jobs per second, or about **2.5 jobs per minute**.
 
 ### When to Scale
 

@@ -30,15 +30,15 @@ This post is the complete mathematical treatment. We start from Bayes' theorem, 
 
 ## The Problem: Conditional Generation is Hard
 
-The goal of conditional generation is to sample from the distribution $p(x \mid c)$, where $x$ is the data (an image or video) and $c$ is the conditioning signal (a text prompt, reference image, class label, etc.).
+The goal of conditional generation is to sample from the distribution \(p(x \mid c)\), where \(x\) is the data (an image or video) and \(c\) is the conditioning signal (a text prompt, reference image, class label, etc.).
 
-Diffusion models learn to reverse a noise process. During training, a model $\epsilon_\theta$ learns to predict the noise $\epsilon$ that was added to a clean sample $x_0$ at some timestep $t$:
+Diffusion models learn to reverse a noise process. During training, a model \(\epsilon_\theta\) learns to predict the noise \(\epsilon\) that was added to a clean sample \(x_0\) at some timestep \(t\):
 
 $$L = \mathbb{E}_{t, x_0, \epsilon}\left[\|\epsilon - \epsilon_\theta(x_t, t, c)\|^2\right]$$
 
-This works. You get a model that can generate images or video conditioned on $c$. But the generations tend to be conservative. The model hedges its bets --- producing outputs that are vaguely related to the prompt but lack the sharp, specific adherence that users expect.
+This works. You get a model that can generate images or video conditioned on \(c\). But the generations tend to be conservative. The model hedges its bets --- producing outputs that are vaguely related to the prompt but lack the sharp, specific adherence that users expect.
 
-Why? Because the model is trained to minimize mean squared error across the entire distribution. It learns the average behavior conditional on $c$, not the sharpest, most distinctive conditional behavior. The probability mass spreads across many plausible outputs rather than concentrating on the outputs that most strongly match the condition.
+Why? Because the model is trained to minimize mean squared error across the entire distribution. It learns the average behavior conditional on \(c\), not the sharpest, most distinctive conditional behavior. The probability mass spreads across many plausible outputs rather than concentrating on the outputs that most strongly match the condition.
 
 We need a way to amplify the influence of the conditioning signal at inference time. This is where guidance comes in.
 
@@ -46,21 +46,21 @@ We need a way to amplify the influence of the conditioning signal at inference t
 
 ## Classifier-Based Guidance: The First Attempt
 
-The first solution, proposed by Dhariwal and Nichol (2021), was classifier guidance. The idea: train a separate classifier $p_\phi(c \mid x_t)$ that can classify noisy images at every timestep $t$. Then use the gradient of the classifier's log-probability to steer the diffusion process toward outputs that the classifier confidently assigns to class $c$.
+The first solution, proposed by Dhariwal and Nichol (2021), was classifier guidance. The idea: train a separate classifier \(p_\phi(c \mid x_t)\) that can classify noisy images at every timestep \(t\). Then use the gradient of the classifier's log-probability to steer the diffusion process toward outputs that the classifier confidently assigns to class \(c\).
 
 The modified score function becomes:
 
 $$\nabla_{x_t} \log p(x_t \mid c) = \nabla_{x_t} \log p(x_t) + \gamma \nabla_{x_t} \log p_\phi(c \mid x_t)$$
 
-where $\gamma$ controls the guidance strength. The first term is the unconditional score (the direction the diffusion model would naturally go), and the second term pushes toward regions that the classifier identifies as belonging to class $c$.
+where \(\gamma\) controls the guidance strength. The first term is the unconditional score (the direction the diffusion model would naturally go), and the second term pushes toward regions that the classifier identifies as belonging to class \(c\).
 
 This works surprisingly well. But it has serious practical problems:
 
 **Problem 1: You need a separate classifier.** Not just any classifier --- one trained on noisy data at every noise level. This is a separate model you have to train, maintain, and run at inference time. For text-conditioned generation, you'd need a classifier that maps noisy images to text descriptions, which is itself a hard problem.
 
-**Problem 2: Noisy gradients.** The classifier operates on noisy inputs $x_t$, especially at high noise levels early in the denoising process. Its gradients can be unreliable, leading to artifacts and instability.
+**Problem 2: Noisy gradients.** The classifier operates on noisy inputs \(x_t\), especially at high noise levels early in the denoising process. Its gradients can be unreliable, leading to artifacts and instability.
 
-**Problem 3: Adversarial behavior.** Gradient-based steering can find adversarial inputs --- images that the classifier confidently labels as class $c$ but that don't actually look like class $c$ to humans. You are optimizing the classifier's confidence, not actual semantic content.
+**Problem 3: Adversarial behavior.** Gradient-based steering can find adversarial inputs --- images that the classifier confidently labels as class \(c\) but that don't actually look like class \(c\) to humans. You are optimizing the classifier's confidence, not actual semantic content.
 
 **Problem 4: Scalability.** For text-to-image or text-to-video generation with open-ended text prompts, you cannot train a classifier over an unbounded label space.
 
@@ -74,11 +74,11 @@ The derivation of CFG starts from first principles. Let us walk through it step 
 
 ### Step 1: Bayes' Theorem
 
-We want to sample from $p(x \mid c)$. By Bayes' theorem:
+We want to sample from \(p(x \mid c)\). By Bayes' theorem:
 
 $$p(x \mid c) = \frac{p(c \mid x) \cdot p(x)}{p(c)}$$
 
-Since $p(c)$ does not depend on $x$, we can write:
+Since \(p(c)\) does not depend on \(x\), we can write:
 
 $$p(x \mid c) \propto p(c \mid x) \cdot p(x)$$
 
@@ -88,25 +88,25 @@ Taking the log of both sides:
 
 $$\log p(x \mid c) = \log p(c \mid x) + \log p(x) + \text{const}$$
 
-The constant term $-\log p(c)$ is independent of $x$ and will vanish when we take gradients.
+The constant term \(-\log p(c)\) is independent of \(x\) and will vanish when we take gradients.
 
 ### Step 3: Score Functions
 
-The score function of a distribution $p(x)$ is defined as the gradient of its log-density with respect to $x$:
+The score function of a distribution \(p(x)\) is defined as the gradient of its log-density with respect to \(x\):
 
 $$s(x) = \nabla_x \log p(x)$$
 
-In diffusion models, the score function at timestep $t$ is:
+In diffusion models, the score function at timestep \(t\) is:
 
 $$s(x_t, t) = \nabla_{x_t} \log p_t(x_t)$$
 
-This is the direction in which to move $x_t$ to increase its log-probability under the data distribution at noise level $t$. The denoising process follows these score functions iteratively.
+This is the direction in which to move \(x_t\) to increase its log-probability under the data distribution at noise level \(t\). The denoising process follows these score functions iteratively.
 
-Taking the gradient of our Bayes' equation with respect to $x_t$:
+Taking the gradient of our Bayes' equation with respect to \(x_t\):
 
 $$\nabla_{x_t} \log p_t(x_t \mid c) = \nabla_{x_t} \log p_t(x_t) + \nabla_{x_t} \log p_t(c \mid x_t)$$
 
-This is the fundamental identity. The conditional score is the unconditional score plus the gradient of the implicit classifier $\log p_t(c \mid x_t)$.
+This is the fundamental identity. The conditional score is the unconditional score plus the gradient of the implicit classifier \(\log p_t(c \mid x_t)\).
 
 ### Step 4: The Connection to Noise Prediction
 
@@ -114,13 +114,13 @@ In score-based diffusion models, there is a direct relationship between the scor
 
 $$\nabla_{x_t} \log p_t(x_t) = -\frac{\epsilon_\theta(x_t, t)}{\sqrt{1 - \bar{\alpha}_t}}$$
 
-where $\bar{\alpha}_t$ is the cumulative noise schedule parameter. The noise prediction $\epsilon_\theta$ and the score function point in opposite directions (the score points toward data, the noise prediction points toward noise), scaled by $\frac{1}{\sqrt{1 - \bar{\alpha}_t}}$.
+where \(\bar{\alpha}_t\) is the cumulative noise schedule parameter. The noise prediction \(\epsilon_\theta\) and the score function point in opposite directions (the score points toward data, the noise prediction points toward noise), scaled by \(\frac{1}{\sqrt{1 - \bar{\alpha}_t}}\).
 
 This means we can rewrite the conditional score as:
 
 $$-\frac{\epsilon_\theta(x_t, t, c)}{\sqrt{1 - \bar{\alpha}_t}} = -\frac{\epsilon_\theta(x_t, t, \emptyset)}{\sqrt{1 - \bar{\alpha}_t}} + \nabla_{x_t} \log p_t(c \mid x_t)$$
 
-where $\epsilon_\theta(x_t, t, \emptyset)$ is the unconditional noise prediction (no conditioning) and $\epsilon_\theta(x_t, t, c)$ is the conditional noise prediction.
+where \(\epsilon_\theta(x_t, t, \emptyset)\) is the unconditional noise prediction (no conditioning) and \(\epsilon_\theta(x_t, t, c)\) is the conditional noise prediction.
 
 Rearranging:
 
@@ -136,13 +136,13 @@ Now we have all the pieces. The classifier guidance equation was:
 
 $$\nabla_{x_t} \log p_t(x_t \mid c) = \nabla_{x_t} \log p_t(x_t) + \gamma \nabla_{x_t} \log p_t(c \mid x_t)$$
 
-The parameter $\gamma$ controls guidance strength. When $\gamma = 1$, this is just standard Bayes' theorem. When $\gamma > 1$, we amplify the classifier signal.
+The parameter \(\gamma\) controls guidance strength. When \(\gamma = 1\), this is just standard Bayes' theorem. When \(\gamma > 1\), we amplify the classifier signal.
 
-Substituting the noise-prediction equivalences and using guidance scale $s$ (where $s = \gamma$):
+Substituting the noise-prediction equivalences and using guidance scale \(s\) (where \(s = \gamma\)):
 
 $$-\frac{\hat{\epsilon}(x_t, t, c)}{\sqrt{1 - \bar{\alpha}_t}} = -\frac{\epsilon_\theta(x_t, t, \emptyset)}{\sqrt{1 - \bar{\alpha}_t}} + s \cdot \left(-\frac{1}{\sqrt{1 - \bar{\alpha}_t}}\right)\left[\epsilon_\theta(x_t, t, c) - \epsilon_\theta(x_t, t, \emptyset)\right]$$
 
-The $-\frac{1}{\sqrt{1 - \bar{\alpha}_t}}$ factor cancels on all terms:
+The \(-\frac{1}{\sqrt{1 - \bar{\alpha}_t}}\) factor cancels on all terms:
 
 $$\hat{\epsilon}(x_t, t, c) = \epsilon_\theta(x_t, t, \emptyset) + s \cdot \left[\epsilon_\theta(x_t, t, c) - \epsilon_\theta(x_t, t, \emptyset)\right]$$
 
@@ -154,25 +154,25 @@ An equivalent rearrangement that is sometimes more intuitive:
 
 $$\hat{\epsilon}_\theta(x_t, c) = (1 - s) \cdot \epsilon_\theta(x_t, \emptyset) + s \cdot \epsilon_\theta(x_t, c)$$
 
-When $s = 1$: $\hat{\epsilon} = \epsilon_\theta(x_t, c)$. Standard conditional generation, no guidance.
+When \(s = 1\): \(\hat{\epsilon} = \epsilon_\theta(x_t, c)\). Standard conditional generation, no guidance.
 
-When $s = 0$: $\hat{\epsilon} = \epsilon_\theta(x_t, \emptyset)$. Unconditional generation, condition is ignored.
+When \(s = 0\): \(\hat{\epsilon} = \epsilon_\theta(x_t, \emptyset)\). Unconditional generation, condition is ignored.
 
-When $s > 1$: The conditional prediction is amplified beyond the trained distribution. The model moves further in the direction of the conditioning signal than the standard conditional model would.
+When \(s > 1\): The conditional prediction is amplified beyond the trained distribution. The model moves further in the direction of the conditioning signal than the standard conditional model would.
 
-When $0 < s < 1$: The conditioning signal is dampened. Generations are more diverse but less prompt-adherent.
+When \(0 < s < 1\): The conditioning signal is dampened. Generations are more diverse but less prompt-adherent.
 
-When $s < 0$: Negative guidance --- the model actively avoids the condition. This is mathematically valid but rarely useful in practice.
+When \(s < 0\): Negative guidance --- the model actively avoids the condition. This is mathematically valid but rarely useful in practice.
 
 ### Training for CFG
 
-For classifier-free guidance to work, the model must be able to produce both conditional and unconditional predictions. During training, the conditioning signal $c$ is randomly dropped (replaced with a null token $\emptyset$) with some probability $p_\text{uncond}$, typically $10\text{--}20\%$:
+For classifier-free guidance to work, the model must be able to produce both conditional and unconditional predictions. During training, the conditioning signal \(c\) is randomly dropped (replaced with a null token \(\emptyset\)) with some probability \(p_\text{uncond}\), typically \(10\text{--}20\%\):
 
 $$c_\text{train} = \begin{cases} c & \text{with probability } 1 - p_\text{uncond} \\ \emptyset & \text{with probability } p_\text{uncond} \end{cases}$$
 
-This means a single model learns both $\epsilon_\theta(x_t, t, c)$ and $\epsilon_\theta(x_t, t, \emptyset)$. No separate unconditional model is needed.
+This means a single model learns both \(\epsilon_\theta(x_t, t, c)\) and \(\epsilon_\theta(x_t, t, \emptyset)\). No separate unconditional model is needed.
 
-The unconditional dropout rate $p_\text{uncond}$ is a hyperparameter. Too low and the unconditional predictions are poor (not enough training signal). Too high and the conditional predictions suffer (too much data wasted on unconditional training). The sweet spot is usually $p_\text{uncond} = 0.1$ to $0.2$.
+The unconditional dropout rate \(p_\text{uncond}\) is a hyperparameter. Too low and the unconditional predictions are poor (not enough training signal). Too high and the conditional predictions suffer (too much data wasted on unconditional training). The sweet spot is usually \(p_\text{uncond} = 0.1\) to $0.2$.
 
 ---
 
@@ -180,9 +180,9 @@ The unconditional dropout rate $p_\text{uncond}$ is a hyperparameter. Too low an
 
 Let us build geometric intuition for what the guidance scale does.
 
-Consider the noise prediction as a vector in a high-dimensional space. The unconditional prediction $\epsilon_\theta(x_t, \emptyset)$ points in a direction determined by the general data distribution. The conditional prediction $\epsilon_\theta(x_t, c)$ points in a slightly different direction, biased by the conditioning.
+Consider the noise prediction as a vector in a high-dimensional space. The unconditional prediction \(\epsilon_\theta(x_t, \emptyset)\) points in a direction determined by the general data distribution. The conditional prediction \(\epsilon_\theta(x_t, c)\) points in a slightly different direction, biased by the conditioning.
 
-The difference vector $\Delta = \epsilon_\theta(x_t, c) - \epsilon_\theta(x_t, \emptyset)$ represents the "pure conditioning signal" --- the direction in which the conditioning pushes the prediction away from the unconditional baseline.
+The difference vector \(\Delta = \epsilon_\theta(x_t, c) - \epsilon_\theta(x_t, \emptyset)\) represents the "pure conditioning signal" --- the direction in which the conditioning pushes the prediction away from the unconditional baseline.
 
 CFG takes this difference vector and scales it:
 
@@ -264,13 +264,13 @@ $$\hat{\epsilon} = \epsilon_\theta(x_t, \emptyset) + s \cdot \Delta$$
   <text x="72" y="139" font-family="Georgia, serif" font-size="12" fill="#999">Higher s = more amplification</text>
 </svg>
 
-At $s = 1$, you get the standard conditional prediction. As $s$ increases, you extrapolate further along the conditioning direction. The model generates outputs that are "more conditional than conditional" --- sharper, more specific, more saturated.
+At \(s = 1\), you get the standard conditional prediction. As \(s\) increases, you extrapolate further along the conditioning direction. The model generates outputs that are "more conditional than conditional" --- sharper, more specific, more saturated.
 
-But there is a limit. Push $s$ too high and you move into regions of the noise-prediction space where the model was never trained. The outputs become oversaturated, distorted, or exhibit repetitive artifacts. This is the fundamental tension of CFG.
+But there is a limit. Push \(s\) too high and you move into regions of the noise-prediction space where the model was never trained. The outputs become oversaturated, distorted, or exhibit repetitive artifacts. This is the fundamental tension of CFG.
 
 ### The Implicit Distribution
 
-What distribution are we actually sampling from when we use CFG with scale $s$? We can work this out from the modified score:
+What distribution are we actually sampling from when we use CFG with scale \(s\)? We can work this out from the modified score:
 
 $$\nabla_{x_t} \log \tilde{p}(x_t \mid c) = \nabla_{x_t} \log p(x_t) + s \cdot \nabla_{x_t} \log p(c \mid x_t)$$
 
@@ -278,9 +278,9 @@ This corresponds to sampling from:
 
 $$\tilde{p}(x \mid c) \propto p(x) \cdot p(c \mid x)^s$$
 
-When $s = 1$, this is just $p(x \mid c)$ by Bayes' theorem. When $s > 1$, we are sampling from a distribution where the likelihood term $p(c \mid x)$ is raised to a power greater than 1. This sharpens the distribution around the modes where $p(c \mid x)$ is highest --- the samples most strongly associated with condition $c$.
+When \(s = 1\), this is just \(p(x \mid c)\) by Bayes' theorem. When \(s > 1\), we are sampling from a distribution where the likelihood term \(p(c \mid x)\) is raised to a power greater than 1. This sharpens the distribution around the modes where \(p(c \mid x)\) is highest --- the samples most strongly associated with condition \(c\).
 
-This is analogous to temperature scaling in language models. Lower temperature (higher $s$ in CFG) concentrates sampling around the most likely outputs. The analogy is not exact --- CFG operates on score functions in continuous space rather than logit distributions over a discrete vocabulary --- but the intuition transfers.
+This is analogous to temperature scaling in language models. Lower temperature (higher \(s\) in CFG) concentrates sampling around the most likely outputs. The analogy is not exact --- CFG operates on score functions in continuous space rather than logit distributions over a discrete vocabulary --- but the intuition transfers.
 
 ---
 
@@ -290,15 +290,15 @@ CFG creates a fundamental tradeoff between sample quality (measured by FID or hu
 
 ### Mathematical Analysis
 
-As guidance scale $s$ increases:
+As guidance scale \(s\) increases:
 
-1. **FID improves** (decreases) up to a point, then degrades. The optimal $s$ for FID is typically in the range $[1.5, 8]$ depending on the model and task.
+1. **FID improves** (decreases) up to a point, then degrades. The optimal \(s\) for FID is typically in the range \([1.5, 8]\) depending on the model and task.
 
-2. **Precision increases monotonically** with $s$ (up to a saturation point). Each sample is more likely to be a high-quality member of the conditional distribution.
+2. **Precision increases monotonically** with \(s\) (up to a saturation point). Each sample is more likely to be a high-quality member of the conditional distribution.
 
-3. **Recall decreases monotonically** with $s$. The model covers less of the true conditional distribution, concentrating on the modes.
+3. **Recall decreases monotonically** with \(s\). The model covers less of the true conditional distribution, concentrating on the modes.
 
-4. **CLIP score increases** with $s$, reflecting better prompt adherence, until artifacts cause CLIP to degrade.
+4. **CLIP score increases** with \(s\), reflecting better prompt adherence, until artifacts cause CLIP to degrade.
 
 <svg viewBox="0 0 700 420" xmlns="http://www.w3.org/2000/svg" style="max-width:700px; margin: 2em auto; display: block;">
 
@@ -444,7 +444,7 @@ The precision-recall framework (Kynkaanniemi et al., 2019) gives us a clean way 
 
 *Representative values for a class-conditional ImageNet model. Exact numbers vary by architecture.*
 
-Notice the FID sweet spot around $s = 5$. Below that, lack of conditioning hurts quality. Above that, over-conditioning introduces artifacts that FID penalizes. Meanwhile, recall drops monotonically --- every increase in guidance sacrifices some diversity.
+Notice the FID sweet spot around \(s = 5\). Below that, lack of conditioning hurts quality. Above that, over-conditioning introduces artifacts that FID penalizes. Meanwhile, recall drops monotonically --- every increase in guidance sacrifices some diversity.
 
 ---
 
@@ -452,11 +452,11 @@ Notice the FID sweet spot around $s = 5$. Below that, lack of conditioning hurts
 
 Different models use different default guidance scales. This is not arbitrary --- it reflects the model architecture, training procedure, conditioning mechanism, and target use case.
 
-| Model | Type | Default $s$ | Recommended Range | Notes |
+| Model | Type | Default \(s\) | Recommended Range | Notes |
 |:--|:--|:-:|:--|:--|
 | Stable Diffusion 1.5 | Image | 7.5 | 5 -- 12 | Classic default, well-studied |
 | Stable Diffusion XL | Image | 7.0 | 5 -- 10 | Slightly lower than SD 1.5 |
-| Flux.1 (Black Forest Labs) | Image | 3.5 | 2.5 -- 5.0 | Guidance-distilled, needs lower $s$ |
+| Flux.1 (Black Forest Labs) | Image | 3.5 | 2.5 -- 5.0 | Guidance-distilled, needs lower \(s\) |
 | DALL-E 3 (via API) | Image | N/A | Fixed internally | Not user-configurable |
 | Wan 2.2 T2V | Video | 5.0 | 3.5 -- 7.0 | MoE architecture, moderate guidance |
 | Kling 3.0 | Video | ~4.5 | N/A (API) | Estimated from outputs |
@@ -467,7 +467,7 @@ Different models use different default guidance scales. This is not arbitrary --
 
 ### Why Video Models Use Lower Guidance
 
-Video models typically use lower guidance scales than image models ($s = 4\text{--}6$ vs $s = 7\text{--}8$). There are several reasons:
+Video models typically use lower guidance scales than image models (\(s = 4\text{--}6\) vs \(s = 7\text{--}8\)). There are several reasons:
 
 **1. Temporal coherence penalty.** Higher guidance amplifies frame-level prompt adherence but can create inconsistencies between frames. Each frame is pushed harder toward the text condition independently, potentially at the expense of smooth temporal transitions.
 
@@ -485,15 +485,15 @@ The interaction between CFG and temporal consistency deserves deeper analysis, a
 
 ### The Temporal Coherence Problem
 
-Consider a video diffusion model denoising a sequence of $F$ frames jointly. At each denoising step, the model predicts noise for all frames simultaneously:
+Consider a video diffusion model denoising a sequence of \(F\) frames jointly. At each denoising step, the model predicts noise for all frames simultaneously:
 
 $$\hat{\epsilon}_\theta(x_t^{1:F}, c) = \epsilon_\theta(x_t^{1:F}, \emptyset) + s \cdot \left[\epsilon_\theta(x_t^{1:F}, c) - \epsilon_\theta(x_t^{1:F}, \emptyset)\right]$$
 
-The model has learned temporal correlations through temporal attention layers. The unconditional prediction $\epsilon_\theta(x_t^{1:F}, \emptyset)$ respects these correlations --- it produces temporally smooth noise predictions even without conditioning.
+The model has learned temporal correlations through temporal attention layers. The unconditional prediction \(\epsilon_\theta(x_t^{1:F}, \emptyset)\) respects these correlations --- it produces temporally smooth noise predictions even without conditioning.
 
-The conditioning difference $\Delta = \epsilon_\theta(x_t^{1:F}, c) - \epsilon_\theta(x_t^{1:F}, \emptyset)$ also generally respects temporal coherence, but less perfectly. The text condition can push different frames in slightly different directions depending on which frame "matches" the prompt best at a given denoising step.
+The conditioning difference \(\Delta = \epsilon_\theta(x_t^{1:F}, c) - \epsilon_\theta(x_t^{1:F}, \emptyset)\) also generally respects temporal coherence, but less perfectly. The text condition can push different frames in slightly different directions depending on which frame "matches" the prompt best at a given denoising step.
 
-When $s > 1$, this per-frame variation in $\Delta$ is amplified. The result: each frame is pushed harder toward prompt adherence, but the temporal smoothness is degraded. Visually, this manifests as:
+When \(s > 1\), this per-frame variation in \(\Delta\) is amplified. The result: each frame is pushed harder toward prompt adherence, but the temporal smoothness is degraded. Visually, this manifests as:
 
 - **Flickering**: Rapid brightness or color changes between adjacent frames
 - **Jitter**: Small spatial displacements of objects frame-to-frame
@@ -504,7 +504,7 @@ When $s > 1$, this per-frame variation in $\Delta$ is amplified. The result: eac
 
 The optimal guidance scale for video is lower than for images, and the penalty for going too high is steeper:
 
-| Quality Metric | Image (optimal $s$) | Video (optimal $s$) |
+| Quality Metric | Image (optimal \(s\)) | Video (optimal \(s\)) |
 |:--|:-:|:-:|
 | FID / FVD | 5 -- 8 | 3.5 -- 6 |
 | CLIP Score | 6 -- 10 | 4 -- 7 |
@@ -517,11 +517,11 @@ For video, you often want to prioritize temporal consistency over prompt adheren
 
 Some implementations apply CFG differently along temporal and spatial dimensions:
 
-**Uniform guidance**: Same $s$ for all frames. Simple but treats the first and last frames identically.
+**Uniform guidance**: Same \(s\) for all frames. Simple but treats the first and last frames identically.
 
-**Keyframe-weighted guidance**: Higher $s$ on keyframes (first, middle, last), lower $s$ on intermediate frames. The keyframes anchor the semantic content while intermediate frames prioritize smooth interpolation.
+**Keyframe-weighted guidance**: Higher \(s\) on keyframes (first, middle, last), lower \(s\) on intermediate frames. The keyframes anchor the semantic content while intermediate frames prioritize smooth interpolation.
 
-**Temporal-decay guidance**: Higher $s$ on the first frame, decreasing toward the end. Ensures the opening frame strongly matches the prompt while allowing the sequence to evolve naturally.
+**Temporal-decay guidance**: Higher \(s\) on the first frame, decreasing toward the end. Ensures the opening frame strongly matches the prompt while allowing the sequence to evolve naturally.
 
 This is an active area of research. Most production models still use uniform guidance, but the next generation of video models will likely incorporate temporal-aware guidance schedules.
 
@@ -529,21 +529,21 @@ This is an active area of research. Most production models still use uniform gui
 
 ## Dynamic Guidance Schedules
 
-Rather than using a fixed guidance scale $s$ throughout the entire denoising process, dynamic schedules vary $s$ as a function of the timestep $t$.
+Rather than using a fixed guidance scale \(s\) throughout the entire denoising process, dynamic schedules vary \(s\) as a function of the timestep \(t\).
 
 ### The Intuition
 
-Early denoising steps (high $t$, high noise) determine the global structure --- composition, layout, major semantic elements. Late denoising steps (low $t$, low noise) refine fine details --- textures, edges, small features.
+Early denoising steps (high \(t\), high noise) determine the global structure --- composition, layout, major semantic elements. Late denoising steps (low \(t\), low noise) refine fine details --- textures, edges, small features.
 
 High guidance is most valuable during early steps, where it steers the global structure toward the prompt. During late steps, the structure is already established, and high guidance mainly causes over-saturation and artifacts on fine details.
 
 ### The Linear Schedule
 
-The simplest dynamic schedule linearly decreases guidance from a maximum $s_\text{max}$ to a minimum $s_\text{min}$ over the denoising steps:
+The simplest dynamic schedule linearly decreases guidance from a maximum \(s_\text{max}\) to a minimum \(s_\text{min}\) over the denoising steps:
 
 $$s(t) = s_\text{min} + (s_\text{max} - s_\text{min}) \cdot \frac{t}{T}$$
 
-where $T$ is the total number of denoising steps, and $t$ counts down from $T$ (high noise) to $0$ (clean output).
+where \(T\) is the total number of denoising steps, and \(t\) counts down from \(T\) (high noise) to $0$ (clean output).
 
 ### The Cosine Schedule
 
@@ -559,7 +559,7 @@ Some practitioners use a simple two-phase approach:
 
 $$s(t) = \begin{cases} s_\text{high} & \text{if } t > t_\text{switch} \\ s_\text{low} & \text{if } t \leq t_\text{switch} \end{cases}$$
 
-where $t_\text{switch}$ is typically around $0.5T$ to $0.7T$.
+where \(t_\text{switch}\) is typically around $0.5T$ to $0.7T$.
 
 <svg viewBox="0 0 700 420" xmlns="http://www.w3.org/2000/svg" style="max-width:700px; margin: 2em auto; display: block;">
 
@@ -625,9 +625,9 @@ where $t_\text{switch}$ is typically around $0.5T$ to $0.7T$.
 
 The mathematical justification comes from analyzing the signal-to-noise ratio at each timestep.
 
-At high noise levels (early steps), the signal-to-noise ratio is low. The model's conditional and unconditional predictions are both heavily influenced by the noise, and the conditioning difference $\Delta$ is small relative to the overall prediction magnitude. High guidance is needed to make the conditioning signal "audible" above the noise.
+At high noise levels (early steps), the signal-to-noise ratio is low. The model's conditional and unconditional predictions are both heavily influenced by the noise, and the conditioning difference \(\Delta\) is small relative to the overall prediction magnitude. High guidance is needed to make the conditioning signal "audible" above the noise.
 
-At low noise levels (late steps), the signal-to-noise ratio is high. The conditioning is already strongly expressed in the partially-denoised sample. The difference $\Delta$ is now operating on fine details, and amplifying it causes:
+At low noise levels (late steps), the signal-to-noise ratio is high. The conditioning is already strongly expressed in the partially-denoised sample. The difference \(\Delta\) is now operating on fine details, and amplifying it causes:
 
 - **Color over-saturation**: Push toward extreme RGB values
 - **Edge ringing**: Gibbs-like artifacts along sharp boundaries
@@ -637,7 +637,7 @@ Reducing guidance in late steps avoids these artifacts while retaining the struc
 
 ### Practical Impact
 
-In experiments across multiple image models, dynamic guidance schedules (particularly cosine decay from $s_\text{max} = 10$ to $s_\text{min} = 2$) improve FID by 5-15% relative to the optimal constant guidance scale. The improvement is even more pronounced for video, where late-step over-guidance causes visible temporal artifacts.
+In experiments across multiple image models, dynamic guidance schedules (particularly cosine decay from \(s_\text{max} = 10\) to \(s_\text{min} = 2\)) improve FID by 5-15% relative to the optimal constant guidance scale. The improvement is even more pronounced for video, where late-step over-guidance causes visible temporal artifacts.
 
 ```python
 # Example: implementing dynamic cosine guidance
@@ -666,11 +666,11 @@ One of the most popular user-facing features of modern image and video generator
 
 ### Standard CFG Recap
 
-In standard CFG, the unconditional prediction $\epsilon_\theta(x_t, \emptyset)$ is obtained by feeding a null conditioning token. The guided prediction extrapolates away from this unconditional baseline toward the positive prompt.
+In standard CFG, the unconditional prediction \(\epsilon_\theta(x_t, \emptyset)\) is obtained by feeding a null conditioning token. The guided prediction extrapolates away from this unconditional baseline toward the positive prompt.
 
 ### Negative Prompt Modification
 
-With a negative prompt $c_\text{neg}$, we replace the null unconditional prediction with the negative-conditioned prediction:
+With a negative prompt \(c_\text{neg}\), we replace the null unconditional prediction with the negative-conditioned prediction:
 
 $$\hat{\epsilon}_\theta(x_t, c_\text{pos}, c_\text{neg}) = \epsilon_\theta(x_t, c_\text{neg}) + s \cdot \left[\epsilon_\theta(x_t, c_\text{pos}) - \epsilon_\theta(x_t, c_\text{neg})\right]$$
 
@@ -686,19 +686,19 @@ The negative-prompt direction is:
 
 $$\Delta_\text{negative} = \epsilon_\theta(x_t, c_\text{pos}) - \epsilon_\theta(x_t, c_\text{neg})$$
 
-These are different vectors. $\Delta_\text{standard}$ points from "generic" toward "matching the prompt." $\Delta_\text{negative}$ points from "matching the negative prompt" toward "matching the positive prompt."
+These are different vectors. \(\Delta_\text{standard}\) points from "generic" toward "matching the prompt." \(\Delta_\text{negative}\) points from "matching the negative prompt" toward "matching the positive prompt."
 
-If your negative prompt describes blurriness, the direction $\Delta_\text{negative}$ not only moves toward your positive prompt but also actively moves away from blur. This is why negative prompts like "blurry, low quality, distorted" are so effective --- they add an additional repulsive force that complements the attractive force of the positive prompt.
+If your negative prompt describes blurriness, the direction \(\Delta_\text{negative}\) not only moves toward your positive prompt but also actively moves away from blur. This is why negative prompts like "blurry, low quality, distorted" are so effective --- they add an additional repulsive force that complements the attractive force of the positive prompt.
 
 ### The Math of Why Negative Prompts Work
 
-We can decompose $\Delta_\text{negative}$ as:
+We can decompose \(\Delta_\text{negative}\) as:
 
 $$\Delta_\text{negative} = \underbrace{[\epsilon_\theta(x_t, c_\text{pos}) - \epsilon_\theta(x_t, \emptyset)]}_{\text{positive guidance}} + \underbrace{[\epsilon_\theta(x_t, \emptyset) - \epsilon_\theta(x_t, c_\text{neg})]}_{\text{negative avoidance}}$$
 
 $$= \Delta_\text{standard} + \Delta_\text{avoidance}$$
 
-The negative prompt adds a new component $\Delta_\text{avoidance}$ that pushes away from the negative condition. This component is independent of (or at least different from) the positive guidance direction, which means negative prompts can address failure modes that positive prompts cannot.
+The negative prompt adds a new component \(\Delta_\text{avoidance}\) that pushes away from the negative condition. This component is independent of (or at least different from) the positive guidance direction, which means negative prompts can address failure modes that positive prompts cannot.
 
 For example, the positive prompt "a sharp, detailed photograph of a cat" and the negative prompt "blurry, out of focus" do not produce identical results even though they seem to describe the same intent. The positive prompt activates features in the model associated with "sharp" and "detailed." The negative prompt deactivates features associated with "blurry" and "out of focus." These are overlapping but distinct sets of features in the model's representation space.
 
@@ -708,21 +708,21 @@ Some implementations allow separate guidance scales for positive and negative pr
 
 $$\hat{\epsilon} = \epsilon_\theta(x_t, \emptyset) + s_\text{pos} \cdot [\epsilon_\theta(x_t, c_\text{pos}) - \epsilon_\theta(x_t, \emptyset)] - s_\text{neg} \cdot [\epsilon_\theta(x_t, c_\text{neg}) - \epsilon_\theta(x_t, \emptyset)]$$
 
-This requires three forward passes (unconditional, positive, negative) instead of two, but gives finer control. You can strongly avoid the negative prompt ($s_\text{neg}$ high) while moderately following the positive prompt ($s_\text{pos}$ moderate), or vice versa.
+This requires three forward passes (unconditional, positive, negative) instead of two, but gives finer control. You can strongly avoid the negative prompt (\(s_\text{neg}\) high) while moderately following the positive prompt (\(s_\text{pos}\) moderate), or vice versa.
 
 ---
 
 ## CFG Rescale and Advanced Variants
 
-Standard CFG has a known failure mode: at high guidance scales, the guided noise prediction $\hat{\epsilon}$ can have a much larger magnitude than the trained range. This causes oversaturation and loss of contrast.
+Standard CFG has a known failure mode: at high guidance scales, the guided noise prediction \(\hat{\epsilon}\) can have a much larger magnitude than the trained range. This causes oversaturation and loss of contrast.
 
 ### The Magnitude Problem
 
-The trained noise predictions $\epsilon_\theta(x_t, c)$ and $\epsilon_\theta(x_t, \emptyset)$ have magnitudes that the denoising sampler expects. When $s > 1$, the guided prediction:
+The trained noise predictions \(\epsilon_\theta(x_t, c)\) and \(\epsilon_\theta(x_t, \emptyset)\) have magnitudes that the denoising sampler expects. When \(s > 1\), the guided prediction:
 
 $$\hat{\epsilon} = \epsilon_\theta(x_t, \emptyset) + s \cdot \Delta$$
 
-can have $\|\hat{\epsilon}\| \gg \|\epsilon_\theta(x_t, c)\|$. The sampler was designed for predictions of a certain magnitude, and oversized predictions cause:
+can have \(\|\hat{\epsilon}\| \gg \|\epsilon_\theta(x_t, c)\|\). The sampler was designed for predictions of a certain magnitude, and oversized predictions cause:
 
 - Pixel values clipping to [0, 1] extremes
 - Loss of mid-tone detail
@@ -735,7 +735,7 @@ The CFG rescale technique normalizes the guided prediction to match the expected
 
 $$\hat{\epsilon}_\text{rescaled} = \hat{\epsilon} \cdot \frac{\|\epsilon_\theta(x_t, c)\|}{\|\hat{\epsilon}\|} \cdot \phi + \hat{\epsilon} \cdot (1 - \phi)$$
 
-where $\phi \in [0, 1]$ controls how much rescaling to apply. At $\phi = 1$, the magnitude is fully normalized. At $\phi = 0$, no rescaling is applied. Typical values: $\phi = 0.7$.
+where \(\phi \in [0, 1]\) controls how much rescaling to apply. At \(\phi = 1\), the magnitude is fully normalized. At \(\phi = 0\), no rescaling is applied. Typical values: \(\phi = 0.7\).
 
 This preserves the direction of the guided prediction (which encodes the CFG effect) while controlling its magnitude (which causes artifacts). The result: you can use higher guidance scales without oversaturation.
 
@@ -761,12 +761,12 @@ An even more recent variant replaces the classifier-free approach with self-atte
 
 CFG doubles the computational cost of inference. Each denoising step requires two forward passes through the model:
 
-1. $\epsilon_\theta(x_t, \emptyset)$ --- unconditional pass
-2. $\epsilon_\theta(x_t, c)$ --- conditional pass
+1. \(\epsilon_\theta(x_t, \emptyset)\) --- unconditional pass
+2. \(\epsilon_\theta(x_t, c)\) --- conditional pass
 
-For a model with $N$ parameters and $T$ denoising steps, the total FLOPs are approximately $2 \times T \times \text{FLOPs}(N)$ instead of $T \times \text{FLOPs}(N)$.
+For a model with \(N\) parameters and \(T\) denoising steps, the total FLOPs are approximately \(2 \times T \times \text{FLOPs}(N)\) instead of \(T \times \text{FLOPs}(N)\).
 
-This is why guidance distillation is valuable. Models like Flux and LCM (Latent Consistency Models) train with guidance baked into the weights, requiring only a single forward pass at inference time. The distilled model approximates $\hat{\epsilon}_\theta(x_t, c, s)$ directly, without needing two separate passes.
+This is why guidance distillation is valuable. Models like Flux and LCM (Latent Consistency Models) train with guidance baked into the weights, requiring only a single forward pass at inference time. The distilled model approximates \(\hat{\epsilon}_\theta(x_t, c, s)\) directly, without needing two separate passes.
 
 ### Batched CFG
 
@@ -799,14 +799,14 @@ When multiple conditioning signals are present (e.g., text prompt + reference im
 
 $$\hat{\epsilon} = \epsilon_\theta(x_t, \emptyset) + \sum_i s_i \cdot [\epsilon_\theta(x_t, c_i) - \epsilon_\theta(x_t, \emptyset)]$$
 
-This requires $N+1$ forward passes for $N$ conditions, which quickly becomes expensive. In practice, multi-condition models usually encode all conditions jointly and apply a single CFG scale to the combined conditioning.
+This requires \(N+1\) forward passes for \(N\) conditions, which quickly becomes expensive. In practice, multi-condition models usually encode all conditions jointly and apply a single CFG scale to the combined conditioning.
 
 ### Numerical Stability
 
-At extreme guidance scales ($s > 20$), numerical overflow can occur in float16 inference. The guided prediction magnitude can exceed the representable range. Mitigations:
+At extreme guidance scales (\(s > 20\)), numerical overflow can occur in float16 inference. The guided prediction magnitude can exceed the representable range. Mitigations:
 
 - Use float32 for the CFG calculation even if the model runs in float16
-- Apply CFG rescale with $\phi \geq 0.5$ at high scales
+- Apply CFG rescale with \(\phi \geq 0.5\) at high scales
 - Clamp the guided prediction magnitude to a reasonable range (e.g., 4 standard deviations)
 
 ---
@@ -830,8 +830,8 @@ $$\tilde{p}(x \mid c) \propto p(x) \cdot p(c \mid x)^s$$
 $$\hat{\epsilon}_\theta = \epsilon_\theta(x_t, c_\text{neg}) + s \cdot [\epsilon_\theta(x_t, c_\text{pos}) - \epsilon_\theta(x_t, c_\text{neg})]$$
 
 For video generation specifically:
-- Use lower guidance scales ($s = 4\text{--}6$) than image models ($s = 7\text{--}8$) to preserve temporal coherence
-- Consider dynamic guidance schedules that decrease $s$ in later denoising steps
+- Use lower guidance scales (\(s = 4\text{--}6\)) than image models (\(s = 7\text{--}8\)) to preserve temporal coherence
+- Consider dynamic guidance schedules that decrease \(s\) in later denoising steps
 - Guidance distillation (single-pass models) halves inference cost and is where the field is heading
 
 Understanding CFG at this level is not just academic. When you tune generation quality for a production video pipeline, you are adjusting these parameters. When you debug why a video flickers or looks oversaturated, you are diagnosing CFG artifacts. When you evaluate whether to use an open-source model with configurable CFG vs. an API model with fixed internal guidance, you are making an informed architectural decision.

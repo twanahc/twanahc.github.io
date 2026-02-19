@@ -32,29 +32,29 @@ Before we can understand tensors, we need to be precise about what we already kn
 
 A **scalar** is a single number. It has no direction, no components. Temperature at a point, mass of a particle, energy of a system. Scalars are **rank-0 tensors** --- they have zero indices and are unchanged by any coordinate transformation.
 
-A **vector** is an ordered list of numbers *that transforms in a specific way under change of basis*. This is critical. Not every ordered list of numbers is a vector. A vector $v$ lives in a vector space $V$ and can be expressed in terms of a basis $\{e_1, e_2, \ldots, e_n\}$ as:
+A **vector** is an ordered list of numbers *that transforms in a specific way under change of basis*. This is critical. Not every ordered list of numbers is a vector. A vector \(v\) lives in a vector space \(V\) and can be expressed in terms of a basis \(\{e_1, e_2, \ldots, e_n\}\) as:
 
 $$v = v^1 e_1 + v^2 e_2 + \cdots + v^n e_n = \sum_{i=1}^{n} v^i e_i$$
 
-The numbers $v^i$ are the **components** of the vector in this basis. Change the basis, and the components change --- but the vector itself is the same geometric object. A vector is a **rank-1 tensor**: one index, one direction.
+The numbers \(v^i\) are the **components** of the vector in this basis. Change the basis, and the components change --- but the vector itself is the same geometric object. A vector is a **rank-1 tensor**: one index, one direction.
 
-A **matrix** is a rank-2 tensor: it has two indices and represents a **linear map** between vector spaces. A matrix $A$ with components $A^i{}_j$ takes a vector $v^j$ and produces a new vector $w^i = A^i{}_j v^j$. The matrix is the coordinate representation of this linear map. Different bases give different matrices for the same underlying map.
+A **matrix** is a rank-2 tensor: it has two indices and represents a **linear map** between vector spaces. A matrix \(A\) with components \(A^i{}_j\) takes a vector \(v^j\) and produces a new vector \(w^i = A^i{}_j v^j\). The matrix is the coordinate representation of this linear map. Different bases give different matrices for the same underlying map.
 
-The pattern is clear: a rank-$k$ tensor has $k$ indices. But the crucial insight is that tensors are not *defined* by their components. They are defined by their **transformation behavior** and their **multilinear** nature. The components are just one way to represent the tensor after choosing a basis.
+The pattern is clear: a rank-\(k\) tensor has \(k\) indices. But the crucial insight is that tensors are not *defined* by their components. They are defined by their **transformation behavior** and their **multilinear** nature. The components are just one way to represent the tensor after choosing a basis.
 
 ---
 
 ## What a Tensor Actually Is
 
-Here is the formal definition. A **tensor of type $(p, q)$** is a **multilinear map**:
+Here is the formal definition. A **tensor of type \((p, q)\)** is a **multilinear map**:
 
 $$T: \underbrace{V^* \times \cdots \times V^*}_{p \text{ copies}} \times \underbrace{V \times \cdots \times V}_{q \text{ copies}} \longrightarrow \mathbb{R}$$
 
-where $V$ is a vector space and $V^*$ is its **dual space** (the space of all linear maps from $V$ to $\mathbb{R}$, also called linear functionals or covectors).
+where \(V\) is a vector space and \(V^*\) is its **dual space** (the space of all linear maps from \(V\) to \(\mathbb{R}\), also called linear functionals or covectors).
 
 Let us unpack this piece by piece.
 
-**Multilinear** means linear in each argument separately. If $T$ is a $(1,1)$ tensor, then for vectors $u, v \in V$, covectors $\alpha, \beta \in V^*$, and scalars $a, b \in \mathbb{R}$:
+**Multilinear** means linear in each argument separately. If \(T\) is a \((1,1)\) tensor, then for vectors \(u, v \in V\), covectors \(\alpha, \beta \in V^*\), and scalars \(a, b \in \mathbb{R}\):
 
 $$T(a\alpha + b\beta, \, v) = a \, T(\alpha, v) + b \, T(\beta, v)$$
 
@@ -62,43 +62,43 @@ $$T(\alpha, \, au + bv) = a \, T(\alpha, u) + b \, T(\alpha, v)$$
 
 Linearity in each slot independently. This is weaker than full linearity (a bilinear map is not the same as a linear map on the product space).
 
-**The dual space $V^*$** consists of all linear functions $\varphi: V \rightarrow \mathbb{R}$. If $V$ has basis $\{e_1, \ldots, e_n\}$, then $V^*$ has a dual basis $\{e^1, \ldots, e^n\}$ defined by:
+**The dual space \(V^*\)** consists of all linear functions \(\varphi: V \rightarrow \mathbb{R}\). If \(V\) has basis \(\{e_1, \ldots, e_n\}\), then \(V^*\) has a dual basis \(\{e^1, \ldots, e^n\}\) defined by:
 
 $$e^i(e_j) = \delta^i_j = \begin{cases} 1 & \text{if } i = j \\ 0 & \text{if } i \neq j \end{cases}$$
 
-This $\delta^i_j$ is the **Kronecker delta** --- it picks out matching indices. The dual basis element $e^i$ "extracts" the $i$-th component of any vector: $e^i(v) = v^i$.
+This \(\delta^i_j\) is the **Kronecker delta** --- it picks out matching indices. The dual basis element \(e^i\) "extracts" the \(i\)-th component of any vector: \(e^i(v) = v^i\).
 
-Now, why do we need both $V$ and $V^*$? Because vectors and covectors transform *differently* under change of basis. This distinction is invisible when you work in an orthonormal basis (where $V$ and $V^*$ can be identified), which is why most programmers never encounter it. But it is fundamental to the mathematics.
+Now, why do we need both \(V\) and \(V^*\)? Because vectors and covectors transform *differently* under change of basis. This distinction is invisible when you work in an orthonormal basis (where \(V\) and \(V^*\) can be identified), which is why most programmers never encounter it. But it is fundamental to the mathematics.
 
 Let us see some examples:
 
-- A **scalar** is a $(0,0)$ tensor: it takes no inputs and returns a real number.
-- A **vector** is a $(1,0)$ tensor: it takes one covector and returns a real number. (Technically, vectors are elements of $V$, and we identify them with $(1,0)$ tensors via the natural isomorphism.)
-- A **covector** (or one-form) is a $(0,1)$ tensor: it takes one vector and returns a real number.
-- A **linear map** $A: V \rightarrow V$ is a $(1,1)$ tensor: it takes one covector and one vector and returns a real number. In components: $A(\alpha, v) = \alpha_i A^i{}_j v^j$.
-- A **bilinear form** (like the dot product) is a $(0,2)$ tensor: it takes two vectors and returns a real number.
+- A **scalar** is a \((0,0)\) tensor: it takes no inputs and returns a real number.
+- A **vector** is a \((1,0)\) tensor: it takes one covector and returns a real number. (Technically, vectors are elements of \(V\), and we identify them with \((1,0)\) tensors via the natural isomorphism.)
+- A **covector** (or one-form) is a \((0,1)\) tensor: it takes one vector and returns a real number.
+- A **linear map** \(A: V \rightarrow V\) is a \((1,1)\) tensor: it takes one covector and one vector and returns a real number. In components: \(A(\alpha, v) = \alpha_i A^i{}_j v^j\).
+- A **bilinear form** (like the dot product) is a \((0,2)\) tensor: it takes two vectors and returns a real number.
 
-The **rank** of a tensor is $p + q$, the total number of indices. A matrix is rank 2. A three-dimensional array of numbers *might* be a rank-3 tensor, but only if it transforms correctly.
+The **rank** of a tensor is \(p + q\), the total number of indices. A matrix is rank 2. A three-dimensional array of numbers *might* be a rank-3 tensor, but only if it transforms correctly.
 
 ---
 
 ## The Tensor Product
 
-The **tensor product** is the fundamental operation that builds higher-rank tensors from lower-rank ones. If $u \in V$ and $w \in V$ are vectors, their tensor product $u \otimes w$ is a rank-2 tensor defined by its action on a pair of covectors:
+The **tensor product** is the fundamental operation that builds higher-rank tensors from lower-rank ones. If \(u \in V\) and \(w \in V\) are vectors, their tensor product \(u \otimes w\) is a rank-2 tensor defined by its action on a pair of covectors:
 
 $$(u \otimes w)(\alpha, \beta) = \alpha(u) \cdot \beta(w)$$
 
-for all $\alpha, \beta \in V^*$. In components, if $u$ has components $u^i$ and $w$ has components $w^j$, then:
+for all \(\alpha, \beta \in V^*\). In components, if \(u\) has components \(u^i\) and \(w\) has components \(w^j\), then:
 
 $$(u \otimes w)^{ij} = u^i w^j$$
 
-This is exactly the **outer product**. The tensor product of two vectors with $n$ components each gives an $n \times n$ matrix. But --- and this is important --- not every $n \times n$ matrix can be written as an outer product of two vectors. A matrix $M^{ij}$ that equals $u^i w^j$ for some $u, w$ is called a **rank-1 matrix** (rank in the linear algebra sense, not the tensor sense). A general rank-2 tensor (matrix) is a *sum* of such outer products:
+This is exactly the **outer product**. The tensor product of two vectors with \(n\) components each gives an \(n \times n\) matrix. But --- and this is important --- not every \(n \times n\) matrix can be written as an outer product of two vectors. A matrix \(M^{ij}\) that equals \(u^i w^j\) for some \(u, w\) is called a **rank-1 matrix** (rank in the linear algebra sense, not the tensor sense). A general rank-2 tensor (matrix) is a *sum* of such outer products:
 
 $$M^{ij} = \sum_{r=1}^{R} u_r^i w_r^j$$
 
-The minimum number of terms $R$ needed in this sum is the **matrix rank**. This idea generalizes to higher-order tensors and is the foundation of tensor decomposition.
+The minimum number of terms \(R\) needed in this sum is the **matrix rank**. This idea generalizes to higher-order tensors and is the foundation of tensor decomposition.
 
-More generally, if $S$ is a tensor of type $(p_1, q_1)$ and $T$ is a tensor of type $(p_2, q_2)$, then $S \otimes T$ is a tensor of type $(p_1 + p_2, q_1 + q_2)$. The tensor product of vector spaces $V \otimes W$ is a new vector space whose dimension is $\dim(V) \times \dim(W)$.
+More generally, if \(S\) is a tensor of type \((p_1, q_1)\) and \(T\) is a tensor of type \((p_2, q_2)\), then \(S \otimes T\) is a tensor of type \((p_1 + p_2, q_1 + q_2)\). The tensor product of vector spaces \(V \otimes W\) is a new vector space whose dimension is \(\dim(V) \times \dim(W)\).
 
 <svg viewBox="0 0 700 300" xmlns="http://www.w3.org/2000/svg" style="max-width: 700px; display: block; margin: 2em auto;">
   <text x="350" y="25" text-anchor="middle" font-size="14" font-weight="bold" fill="#d4d4d4">Tensor Product: From Vectors to Matrices (Outer Product)</text>
@@ -142,28 +142,28 @@ More generally, if $S$ is a tensor of type $(p_1, q_1)$ and $T$ is a tensor of t
 
 When working with tensors beyond rank 2, writing explicit summation signs becomes unbearable. Einstein summation convention is a notational shortcut: **whenever an index appears once as a superscript and once as a subscript in the same term, it is implicitly summed over**.
 
-For example, the matrix-vector product $w = Av$ in index notation:
+For example, the matrix-vector product \(w = Av\) in index notation:
 
 $$w^i = A^i{}_j v^j$$
 
-The index $j$ appears once up (on $v^j$) and once down (on $A^i{}_j$), so it is summed over: $w^i = \sum_{j=1}^{n} A^i{}_j v^j$. The index $i$ appears only once (as a superscript on $w$ and on $A$), so it is a **free index** --- it labels which component of the result we are computing.
+The index \(j\) appears once up (on \(v^j\)) and once down (on \(A^i{}_j\)), so it is summed over: \(w^i = \sum_{j=1}^{n} A^i{}_j v^j\). The index \(i\) appears only once (as a superscript on \(w\) and on \(A\)), so it is a **free index** --- it labels which component of the result we are computing.
 
 Rules:
 - **Free indices** appear on both sides of the equation, once per term. They label the components.
-- **Contracted (dummy) indices** appear exactly twice in a single term --- once up, once down --- and are summed over. Their letter is arbitrary: $A^i{}_j v^j = A^i{}_k v^k$.
+- **Contracted (dummy) indices** appear exactly twice in a single term --- once up, once down --- and are summed over. Their letter is arbitrary: \(A^i{}_j v^j = A^i{}_k v^k\).
 - An index appearing twice in the same position (both up or both down) typically indicates a mistake.
 
 Some key examples:
 
-**Dot product:** $u \cdot v = u_i v^i$ (contract the one index --- result is a scalar, no free indices).
+**Dot product:** \(u \cdot v = u_i v^i\) (contract the one index --- result is a scalar, no free indices).
 
-**Matrix multiplication:** $(AB)^i{}_k = A^i{}_j B^j{}_k$ (contract over $j$).
+**Matrix multiplication:** \((AB)^i{}_k = A^i{}_j B^j{}_k\) (contract over \(j\)).
 
-**Trace:** $\text{tr}(A) = A^i{}_i$ (contract the two indices of a single matrix --- result is a scalar).
+**Trace:** \(\text{tr}(A) = A^i{}_i\) (contract the two indices of a single matrix --- result is a scalar).
 
-**Rank-3 contraction:** $T^i{}_{jk} v^k = S^i{}_j$ (contract over $k$ --- a rank-3 tensor acting on a vector gives a rank-2 tensor).
+**Rank-3 contraction:** \(T^i{}_{jk} v^k = S^i{}_j\) (contract over \(k\) --- a rank-3 tensor acting on a vector gives a rank-2 tensor).
 
-This notation scales beautifully. An expression like $T^{abc}{}_{de} S^{d}{}_{fg} v^{e} w^{g}$ has contracted indices $d$, $e$, $g$ (each appears once up and once down) and free indices $a, b, c, f$. The result is a rank-4 tensor with components labeled by $a, b, c, f$.
+This notation scales beautifully. An expression like \(T^{abc}{}_{de} S^{d}{}_{fg} v^{e} w^{g}\) has contracted indices \(d\), \(e\), \(g\) (each appears once up and once down) and free indices \(a, b, c, f\). The result is a rank-4 tensor with components labeled by \(a, b, c, f\).
 
 NumPy's `einsum` function is a direct implementation of this notation, and we will use it extensively in the Python section.
 
@@ -173,35 +173,35 @@ NumPy's `einsum` function is a direct implementation of this notation, and we wi
 
 Why do we distinguish between upper and lower indices? This is where the transformation law comes in.
 
-Consider a vector space $V$ with basis $\{e_1, \ldots, e_n\}$. Now change to a new basis $\{e'_1, \ldots, e'_n\}$ related by:
+Consider a vector space \(V\) with basis \(\{e_1, \ldots, e_n\}\). Now change to a new basis \(\{e'_1, \ldots, e'_n\}\) related by:
 
 $$e'_i = M^j{}_i \, e_j$$
 
-where $M$ is an invertible matrix. How do the components of a vector $v$ change?
+where \(M\) is an invertible matrix. How do the components of a vector \(v\) change?
 
-The vector itself is unchanged: $v = v^i e_i = v'^i e'_i$. Substituting the basis change:
+The vector itself is unchanged: \(v = v^i e_i = v'^i e'_i\). Substituting the basis change:
 
 $$v'^i e'_i = v'^i M^j{}_i e_j$$
 
-Comparing with $v = v^j e_j$, we get $v^j = M^j{}_i v'^i$, which means:
+Comparing with \(v = v^j e_j\), we get \(v^j = M^j{}_i v'^i\), which means:
 
 $$v'^i = (M^{-1})^i{}_j \, v^j$$
 
-The components transform with the **inverse** of the basis change matrix. Components that transform this way are called **contravariant** and are written with **upper indices**: $v^i$.
+The components transform with the **inverse** of the basis change matrix. Components that transform this way are called **contravariant** and are written with **upper indices**: \(v^i\).
 
-Now consider a covector $\varphi \in V^*$. Its components $\varphi_i$ in the dual basis transform as:
+Now consider a covector \(\varphi \in V^*\). Its components \(\varphi_i\) in the dual basis transform as:
 
 $$\varphi'_i = M^j{}_i \, \varphi_j$$
 
-The components transform with the **same** matrix as the basis (not the inverse). Components that transform this way are called **covariant** and are written with **lower indices**: $\varphi_i$.
+The components transform with the **same** matrix as the basis (not the inverse). Components that transform this way are called **covariant** and are written with **lower indices**: \(\varphi_i\).
 
 The naming is counterintuitive --- "contravariant" means varying *contrary* to the basis, and "covariant" means varying *with* the basis. But the key point is operational: **an index repeated once up and once down contracts correctly under any change of basis**, producing a basis-independent scalar. This is why Einstein summation only contracts between an upper and lower index.
 
-For a general tensor of type $(p,q)$, the transformation law is:
+For a general tensor of type \((p,q)\), the transformation law is:
 
 $$T'^{i_1 \cdots i_p}{}_{j_1 \cdots j_q} = (M^{-1})^{i_1}{}_{a_1} \cdots (M^{-1})^{i_p}{}_{a_p} \, M^{b_1}{}_{j_1} \cdots M^{b_q}{}_{j_q} \, T^{a_1 \cdots a_p}{}_{b_1 \cdots b_q}$$
 
-Each upper index gets a factor of $M^{-1}$, each lower index gets a factor of $M$. This is **the** defining property of a tensor.
+Each upper index gets a factor of \(M^{-1}\), each lower index gets a factor of \(M\). This is **the** defining property of a tensor.
 
 ---
 
@@ -209,13 +209,13 @@ Each upper index gets a factor of $M^{-1}$, each lower index gets a factor of $M
 
 A **contraction** is the operation of summing over one upper and one lower index of a tensor, reducing its rank by 2. This is the generalization of several familiar operations:
 
-**Matrix trace** is a contraction. The matrix $A^i{}_j$ contracted over $i$ and $j$:
+**Matrix trace** is a contraction. The matrix \(A^i{}_j\) contracted over \(i\) and \(j\):
 
 $$\text{tr}(A) = A^i{}_i = \sum_{i} A^i{}_i$$
 
 This takes a rank-2 tensor to a rank-0 tensor (scalar).
 
-**Matrix-vector multiplication** is a contraction of the tensor product. First form $A^i{}_j \otimes v^k$, which is a rank-3 object with components $A^i{}_j v^k$. Then contract $j$ with $k$ (identifying them, which requires $j$ to be a lower index and $k$ to be an upper index on the vector):
+**Matrix-vector multiplication** is a contraction of the tensor product. First form \(A^i{}_j \otimes v^k\), which is a rank-3 object with components \(A^i{}_j v^k\). Then contract \(j\) with \(k\) (identifying them, which requires \(j\) to be a lower index and \(k\) to be an upper index on the vector):
 
 $$A^i{}_j v^j = w^i$$
 
@@ -233,21 +233,21 @@ The general pattern: every contraction removes one upper and one lower index, re
 
 ## The Metric Tensor
 
-The **metric tensor** $g$ is a rank-$(0,2)$ tensor that defines an inner product on a vector space. In components:
+The **metric tensor** \(g\) is a rank-\((0,2)\) tensor that defines an inner product on a vector space. In components:
 
 $$g_{ij} = g(e_i, e_j)$$
 
-It must be symmetric ($g_{ij} = g_{ji}$) and non-degenerate ($\det(g_{ij}) \neq 0$). The metric allows you to:
+It must be symmetric (\(g_{ij} = g_{ji}\)) and non-degenerate (\(\det(g_{ij}) \neq 0\)). The metric allows you to:
 
-1. **Measure distances.** The squared length of a vector $v$ is $\|v\|^2 = g_{ij} v^i v^j$.
+1. **Measure distances.** The squared length of a vector \(v\) is \(\|v\|^2 = g_{ij} v^i v^j\).
 
-2. **Measure angles.** The inner product of $u$ and $v$ is $\langle u, v \rangle = g_{ij} u^i v^j$.
+2. **Measure angles.** The inner product of \(u\) and \(v\) is \(\langle u, v \rangle = g_{ij} u^i v^j\).
 
-3. **Lower indices.** Given a contravariant vector $v^i$, define the covariant version $v_i = g_{ij} v^j$. This converts a vector into a covector.
+3. **Lower indices.** Given a contravariant vector \(v^i\), define the covariant version \(v_i = g_{ij} v^j\). This converts a vector into a covector.
 
-4. **Raise indices.** The inverse metric $g^{ij}$ (defined by $g^{ik} g_{kj} = \delta^i_j$) raises indices: $v^i = g^{ij} v_j$.
+4. **Raise indices.** The inverse metric \(g^{ij}\) (defined by \(g^{ik} g_{kj} = \delta^i_j\)) raises indices: \(v^i = g^{ij} v_j\).
 
-In flat Euclidean space with an orthonormal basis, the metric is just the identity matrix: $g_{ij} = \delta_{ij}$. In this case, raising and lowering indices does nothing, which is why the distinction between upper and lower indices is invisible in most machine learning code. The components $v^i$ and $v_i$ are numerically identical.
+In flat Euclidean space with an orthonormal basis, the metric is just the identity matrix: \(g_{ij} = \delta_{ij}\). In this case, raising and lowering indices does nothing, which is why the distinction between upper and lower indices is invisible in most machine learning code. The components \(v^i\) and \(v_i\) are numerically identical.
 
 But in curved spaces (general relativity), in non-orthogonal coordinate systems, or when working with non-Euclidean metrics (as in information geometry, which underlies natural gradient methods), the metric is non-trivial and the distinction matters.
 
@@ -261,7 +261,7 @@ Just as matrices can be decomposed (SVD, eigendecomposition, LU, QR), higher-ord
 
 ### CP Decomposition (CANDECOMP/PARAFAC)
 
-The **CP decomposition** expresses a tensor as a sum of rank-1 tensors. A rank-1 tensor of order $N$ is an outer product of $N$ vectors. For a third-order tensor $\mathcal{T} \in \mathbb{R}^{I \times J \times K}$:
+The **CP decomposition** expresses a tensor as a sum of rank-1 tensors. A rank-1 tensor of order \(N\) is an outer product of \(N\) vectors. For a third-order tensor \(\mathcal{T} \in \mathbb{R}^{I \times J \times K}\):
 
 $$\mathcal{T} \approx \sum_{r=1}^{R} \lambda_r \, a_r \otimes b_r \otimes c_r$$
 
@@ -269,11 +269,11 @@ In component form:
 
 $$T_{ijk} \approx \sum_{r=1}^{R} \lambda_r \, a_{r,i} \, b_{r,j} \, c_{r,k}$$
 
-where $\lambda_r$ are scalar weights and $a_r, b_r, c_r$ are vectors. The minimum $R$ for which this decomposition is exact is the **tensor rank** (or CP rank).
+where \(\lambda_r\) are scalar weights and \(a_r, b_r, c_r\) are vectors. The minimum \(R\) for which this decomposition is exact is the **tensor rank** (or CP rank).
 
-This directly generalizes the matrix SVD. A matrix $M = U \Sigma V^T$ can be written as $M_{ij} = \sum_r \sigma_r u_{r,i} v_{r,j}$, which is exactly a CP decomposition of a rank-2 tensor.
+This directly generalizes the matrix SVD. A matrix \(M = U \Sigma V^T\) can be written as \(M_{ij} = \sum_r \sigma_r u_{r,i} v_{r,j}\), which is exactly a CP decomposition of a rank-2 tensor.
 
-**Why it matters:** A tensor $\mathcal{T} \in \mathbb{R}^{n \times n \times n}$ has $n^3$ components. A CP decomposition with rank $R$ requires only $R(3n + 1)$ parameters. If $R \ll n^2/3$, this is a massive compression. In practice, many real-world tensors have low CP rank, making this decomposition useful for data compression and analysis.
+**Why it matters:** A tensor \(\mathcal{T} \in \mathbb{R}^{n \times n \times n}\) has \(n^3\) components. A CP decomposition with rank \(R\) requires only \(R(3n + 1)\) parameters. If \(R \ll n^2/3\), this is a massive compression. In practice, many real-world tensors have low CP rank, making this decomposition useful for data compression and analysis.
 
 ### Tucker Decomposition
 
@@ -285,11 +285,11 @@ In components:
 
 $$T_{ijk} \approx \sum_{p=1}^{P} \sum_{q=1}^{Q} \sum_{r=1}^{R} G_{pqr} \, A_{ip} \, B_{jq} \, C_{kr}$$
 
-Here $\mathcal{G} \in \mathbb{R}^{P \times Q \times R}$ is a smaller **core tensor**, and $A \in \mathbb{R}^{I \times P}$, $B \in \mathbb{R}^{J \times Q}$, $C \in \mathbb{R}^{K \times R}$ are factor matrices. The $\times_n$ denotes the **mode-$n$ product** --- contracting the core tensor with a matrix along the $n$-th mode.
+Here \(\mathcal{G} \in \mathbb{R}^{P \times Q \times R}\) is a smaller **core tensor**, and \(A \in \mathbb{R}^{I \times P}\), \(B \in \mathbb{R}^{J \times Q}\), \(C \in \mathbb{R}^{K \times R}\) are factor matrices. The \(\times_n\) denotes the **mode-\(n\) product** --- contracting the core tensor with a matrix along the \(n\)-th mode.
 
 Tucker decomposition is a generalization of CP decomposition (if the core is superdiagonal, you get CP). It is also a generalization of PCA to higher dimensions --- the factor matrices play the role of principal directions, and the core tensor captures the interactions.
 
-**Storage comparison.** Original tensor: $I \times J \times K$ numbers. Tucker: $PQR + IP + JQ + KR$ numbers. With $P, Q, R \ll I, J, K$, the compression is enormous.
+**Storage comparison.** Original tensor: \(I \times J \times K\) numbers. Tucker: \(PQR + IP + JQ + KR\) numbers. With \(P, Q, R \ll I, J, K\), the compression is enormous.
 
 ---
 
@@ -301,21 +301,21 @@ This simplification is mostly fine for implementation. But understanding the mat
 
 ### Attention as a Tensor Contraction
 
-The attention mechanism in transformers is fundamentally a tensor contraction. Given queries $Q \in \mathbb{R}^{n \times d_k}$, keys $K \in \mathbb{R}^{n \times d_k}$, and values $V \in \mathbb{R}^{n \times d_v}$:
+The attention mechanism in transformers is fundamentally a tensor contraction. Given queries \(Q \in \mathbb{R}^{n \times d_k}\), keys \(K \in \mathbb{R}^{n \times d_k}\), and values \(V \in \mathbb{R}^{n \times d_v}\):
 
 $$\text{Attention}(Q, K, V) = \text{softmax}\left(\frac{QK^T}{\sqrt{d_k}}\right) V$$
 
-The product $QK^T$ is a tensor contraction: $S_{ij} = \sum_k Q_{ik} K_{jk}$. In Einstein notation: $S_{ij} = Q_{ik} K_{jk}$, contracting over the shared dimension $k$. The subsequent multiplication with $V$ is another contraction: $O_{id} = A_{ij} V_{jd}$, contracting over sequence positions $j$.
+The product \(QK^T\) is a tensor contraction: \(S_{ij} = \sum_k Q_{ik} K_{jk}\). In Einstein notation: \(S_{ij} = Q_{ik} K_{jk}\), contracting over the shared dimension \(k\). The subsequent multiplication with \(V\) is another contraction: \(O_{id} = A_{ij} V_{jd}\), contracting over sequence positions \(j\).
 
-Multi-head attention adds another index: the head dimension. With $h$ heads, we have $Q^{(h)}$, $K^{(h)}$, $V^{(h)}$ for each head, making the full attention a rank-4 tensor operation.
+Multi-head attention adds another index: the head dimension. With \(h\) heads, we have \(Q^{(h)}\), \(K^{(h)}\), \(V^{(h)}\) for each head, making the full attention a rank-4 tensor operation.
 
 ### Convolutions as Tensor Operations
 
-A 2D convolution with input $X \in \mathbb{R}^{C_{in} \times H \times W}$ and kernel $W \in \mathbb{R}^{C_{out} \times C_{in} \times k \times k}$ produces output:
+A 2D convolution with input \(X \in \mathbb{R}^{C_{in} \times H \times W}\) and kernel \(W \in \mathbb{R}^{C_{out} \times C_{in} \times k \times k}\) produces output:
 
 $$Y_{o,i,j} = \sum_{c=1}^{C_{in}} \sum_{p=0}^{k-1} \sum_{q=0}^{k-1} W_{o,c,p,q} \, X_{c, \, i+p, \, j+q}$$
 
-This is a tensor contraction with a twist --- the shifting indices $i+p, j+q$ make it a contraction with translation (technically, a cross-correlation). The kernel $W$ is a rank-4 tensor, and the convolution contracts it with the input along the channel, height-offset, and width-offset dimensions.
+This is a tensor contraction with a twist --- the shifting indices \(i+p, j+q\) make it a contraction with translation (technically, a cross-correlation). The kernel \(W\) is a rank-4 tensor, and the convolution contracts it with the input along the channel, height-offset, and width-offset dimensions.
 
 ### What Deep Learning Loses
 

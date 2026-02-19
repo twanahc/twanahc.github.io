@@ -34,7 +34,7 @@ Let us start with the concrete specifications and compare them against the prior
 | **Native Resolution** | 720p | 720p / 1080p (upscaled) | Native 1080p |
 | **Max Duration** | 5s | 9s | 9s |
 | **Generation Speed (5s clip)** | ~120s | ~60s | ~15s |
-| **Cost per 5s clip** | ~$0.50 | ~$0.30 | ~$0.10 |
+| **Cost per 5s clip** | ~\(0.50 | ~\)0.30 | ~$0.10 |
 | **Start Frame** | Yes | Yes | Yes |
 | **End Frame** | No | Yes (Dec 2025) | Yes (improved) |
 | **Start + End Frame** | No | Yes (Dec 2025) | Yes (improved) |
@@ -98,7 +98,7 @@ The 4x speed improvement likely comes from a combination of:
 
 2. **Model distillation**: The Ray3.14 model may be a distilled version of a larger teacher model, retaining quality while reducing compute per forward pass. Distillation typically reduces parameter count by 30-50% while preserving 95%+ of quality on benchmarks.
 
-3. **Flash Attention and kernel optimization**: NVIDIA's FlashAttention-3 on Hopper GPUs reduces memory bandwidth bottlenecks in attention computation. For video models with joint spatial-temporal attention, this is a massive speedup because the attention matrix scales as $O(T \cdot H \cdot W)$ where $T$ is the number of frames and $H \times W$ is the spatial resolution.
+3. **Flash Attention and kernel optimization**: NVIDIA's FlashAttention-3 on Hopper GPUs reduces memory bandwidth bottlenecks in attention computation. For video models with joint spatial-temporal attention, this is a massive speedup because the attention matrix scales as \(O(T \cdot H \cdot W)\) where \(T\) is the number of frames and \(H \times W\) is the spatial resolution.
 
 4. **Speculative decoding for diffusion**: An emerging technique where a smaller model predicts the denoising trajectory, and the larger model validates and corrects. This can reduce the effective number of full-model forward passes by 30-50%.
 
@@ -106,15 +106,15 @@ Let us quantify the combined effect. Suppose Ray3's inference pipeline looked li
 
 $$\text{Ray3 time} = N_{\text{steps}} \times t_{\text{forward}} + t_{\text{decode}}$$
 
-Where $N_{\text{steps}} = 50$, $t_{\text{forward}} = 1.1\text{s}$, and $t_{\text{decode}} = 5\text{s}$.
+Where \(N_{\text{steps}} = 50\), \(t_{\text{forward}} = 1.1\text{s}\), and \(t_{\text{decode}} = 5\text{s}\).
 
 $$\text{Ray3 time} = 50 \times 1.1 + 5 = 60\text{s}$$
 
-For Ray3.14 with 20 steps, distilled forward pass of $0.4\text{s}$, and optimized decode of $3\text{s}$:
+For Ray3.14 with 20 steps, distilled forward pass of \(0.4\text{s}\), and optimized decode of \(3\text{s}\):
 
 $$\text{Ray3.14 time} = 20 \times 0.4 + 3 = 11\text{s}$$
 
-That gives a speedup factor of $60 / 11 \approx 5.5\times$, which is in the right ballpark of the claimed "4x faster" (Luma may be conservative, or may be comparing median rather than best-case).
+That gives a speedup factor of \(60 / 11 \approx 5.5\times\), which is in the right ballpark of the claimed "4x faster" (Luma may be conservative, or may be comparing median rather than best-case).
 
 ---
 
@@ -131,16 +131,16 @@ Let us model this. The cost of a single generation is:
 $$C_{\text{gen}} = \frac{N_{\text{steps}} \times F_{\text{forward}} \times t_{\text{GPU}}}{T_{\text{throughput}}}$$
 
 Where:
-- $N_{\text{steps}}$ = number of diffusion steps
-- $F_{\text{forward}}$ = FLOPs per forward pass
-- $t_{\text{GPU}}$ = cost per GPU-second (e.g., $0.0011/s for an H100 at $4/hr)
-- $T_{\text{throughput}}$ = GPU FLOP/s throughput
+- \(N_{\text{steps}}\) = number of diffusion steps
+- \(F_{\text{forward}}\) = FLOPs per forward pass
+- \(t_{\text{GPU}}\) = cost per GPU-second (e.g., $0.0011/s for an H100 at $4/hr)
+- \(T_{\text{throughput}}\) = GPU FLOP/s throughput
 
 If we reduce steps from 50 to 20 (2.5x reduction) and reduce the model size by 20% through distillation (1.25x reduction in FLOPs per forward pass), the combined effect is:
 
 $$\text{Cost ratio} = \frac{20 \times 0.8 \cdot F}{50 \times F} = \frac{16}{50} = 0.32$$
 
-That is a $3.125\times$ cost reduction from compute efficiency alone. This alone could explain the entire 3x improvement.
+That is a \(3.125\times\) cost reduction from compute efficiency alone. This alone could explain the entire 3x improvement.
 
 ### 2. Hardware Efficiency Gains
 
@@ -152,7 +152,7 @@ Moving from H100 to H200 GPUs (which Luma likely did between Ray3 and Ray3.14, g
 
 ### 3. Batching and Utilization
 
-Luma's infrastructure can batch multiple generation requests together. A 4x increase in generation speed means GPUs turn over faster, which improves utilization. If a GPU was previously 60% utilized (waiting for new requests) and is now 80% utilized (faster turnover means less idle time), that is a $0.80/0.60 = 1.33\times$ effective cost reduction.
+Luma's infrastructure can batch multiple generation requests together. A 4x increase in generation speed means GPUs turn over faster, which improves utilization. If a GPU was previously 60% utilized (waiting for new requests) and is now 80% utilized (faster turnover means less idle time), that is a \(0.80/0.60 = 1.33\times\) effective cost reduction.
 
 ### 4. Competitive Pricing Pressure
 
@@ -178,17 +178,17 @@ Start/end frame conditioning is Ray3.14's most important feature from a pipeline
 
 ### The Boundary Value Problem Formulation
 
-Traditional text-to-video generation is an **initial value problem** (IVP): given a text description $c$ and optional noise seed $z_0$, generate a sequence of frames $\{x_1, x_2, \ldots, x_T\}$ that satisfies the text description. Formally:
+Traditional text-to-video generation is an **initial value problem** (IVP): given a text description \(c\) and optional noise seed \(z_0\), generate a sequence of frames \(\{x_1, x_2, \ldots, x_T\}\) that satisfies the text description. Formally:
 
 $$\{x_1, \ldots, x_T\} = \text{Denoise}(z_T, c) \quad \text{where } z_T \sim \mathcal{N}(0, I)$$
 
 The model has full freedom over all frames. This is maximally flexible but minimally controllable.
 
-Start frame conditioning converts this to a **constrained initial value problem**: given text $c$ and a start frame $x_1^*$, generate $\{x_1^*, x_2, \ldots, x_T\}$ such that the first frame matches $x_1^*$ exactly and subsequent frames are coherent.
+Start frame conditioning converts this to a **constrained initial value problem**: given text \(c\) and a start frame \(x_1^*\), generate \(\{x_1^*, x_2, \ldots, x_T\}\) such that the first frame matches \(x_1^*\) exactly and subsequent frames are coherent.
 
 $$\{x_2, \ldots, x_T\} = \text{Denoise}(z_T, c, x_1^*) \quad \text{s.t. } x_1 = x_1^*$$
 
-Start+end frame conditioning converts this to a **boundary value problem** (BVP): given text $c$, start frame $x_1^*$, and end frame $x_T^*$, generate $\{x_1^*, x_2, \ldots, x_{T-1}, x_T^*\}$ such that both boundary frames are matched and the intermediate frames are coherent.
+Start+end frame conditioning converts this to a **boundary value problem** (BVP): given text \(c\), start frame \(x_1^*\), and end frame \(x_T^*\), generate \(\{x_1^*, x_2, \ldots, x_{T-1}, x_T^*\}\) such that both boundary frames are matched and the intermediate frames are coherent.
 
 $$\{x_2, \ldots, x_{T-1}\} = \text{Denoise}(z_T, c, x_1^*, x_T^*) \quad \text{s.t. } x_1 = x_1^* \text{ and } x_T = x_T^*$$
 
@@ -196,19 +196,19 @@ This is exactly analogous to a boundary value problem in differential equations.
 
 ### Why Boundary Conditions Reduce Error
 
-Consider the error accumulation in an IVP. At each time step, the model introduces some prediction error $\epsilon_t$. Over $T$ steps, these errors compound:
+Consider the error accumulation in an IVP. At each time step, the model introduces some prediction error \(\epsilon_t\). Over \(T\) steps, these errors compound:
 
 $$\text{Error}(x_T) = \sum_{t=1}^{T} \epsilon_t + \text{compounding terms}$$
 
 In the worst case, errors can drift the final frame arbitrarily far from the intended target. This is why long T2V generations often "drift" -- characters change appearance, camera angles shift unexpectedly, objects morph.
 
-With a BVP, the end frame is fixed. The model must find a trajectory that arrives at $x_T^*$ exactly. The error at any intermediate frame $x_t$ is bounded by:
+With a BVP, the end frame is fixed. The model must find a trajectory that arrives at \(x_T^*\) exactly. The error at any intermediate frame \(x_t\) is bounded by:
 
 $$\text{Error}(x_t) \leq \min\left(\text{Error}_{\text{forward}}(x_1^* \to x_t), \text{Error}_{\text{backward}}(x_T^* \to x_t)\right)$$
 
-The maximum error occurs at the midpoint, $t = T/2$, and is roughly proportional to $T/2$ rather than $T$. For frames near either boundary, the error is even smaller.
+The maximum error occurs at the midpoint, \(t = T/2\), and is roughly proportional to \(T/2\) rather than \(T\). For frames near either boundary, the error is even smaller.
 
-Let us visualize this with a numerical example. Suppose each frame has an independent error of $\epsilon = 0.02$ (2% deviation from ideal):
+Let us visualize this with a numerical example. Suppose each frame has an independent error of \(\epsilon = 0.02\) (2% deviation from ideal):
 
 **IVP (start frame only), T=30 frames:**
 
@@ -236,11 +236,11 @@ At the model architecture level, start/end frame conditioning works through seve
 
 **1. Latent Space Initialization**
 
-Instead of starting from pure noise $z_T \sim \mathcal{N}(0, I)$, the denoising process is initialized with a partially noised version of the boundary frames. For the start frame:
+Instead of starting from pure noise \(z_T \sim \mathcal{N}(0, I)\), the denoising process is initialized with a partially noised version of the boundary frames. For the start frame:
 
 $$z_T^{\text{start}} = \sqrt{\bar{\alpha}_T} \cdot \text{Encode}(x_1^*) + \sqrt{1 - \bar{\alpha}_T} \cdot \epsilon \quad \text{where } \epsilon \sim \mathcal{N}(0, I)$$
 
-Where $\bar{\alpha}_T$ is the cumulative noise schedule. The end frame receives similar treatment. Intermediate frames start from pure noise. This gives the denoising process a "hint" of where it needs to arrive.
+Where \(\bar{\alpha}_T\) is the cumulative noise schedule. The end frame receives similar treatment. Intermediate frames start from pure noise. This gives the denoising process a "hint" of where it needs to arrive.
 
 **2. Cross-Attention Conditioning**
 
@@ -248,11 +248,11 @@ The encoded start and end frames are injected into the DiT backbone via cross-at
 
 $$\text{Attn}(Q, K_{\text{text}}, V_{\text{text}}) + \lambda_s \cdot \text{Attn}(Q, K_{\text{start}}, V_{\text{start}}) + \lambda_e \cdot \text{Attn}(Q, K_{\text{end}}, V_{\text{end}})$$
 
-The weighting coefficients $\lambda_s$ and $\lambda_e$ vary based on temporal position: $\lambda_s$ is high for frames near the start and decays toward the end; $\lambda_e$ is the reverse. A simple linear schedule:
+The weighting coefficients \(\lambda_s\) and \(\lambda_e\) vary based on temporal position: \(\lambda_s\) is high for frames near the start and decays toward the end; \(\lambda_e\) is the reverse. A simple linear schedule:
 
 $$\lambda_s(t) = 1 - \frac{t}{T}, \quad \lambda_e(t) = \frac{t}{T}$$
 
-Where $t$ is the frame index and $T$ is total frames. This ensures each frame is most influenced by its nearest boundary frame.
+Where \(t\) is the frame index and \(T\) is total frames. This ensures each frame is most influenced by its nearest boundary frame.
 
 **3. Temporal Attention Masking**
 
@@ -868,7 +868,7 @@ This price trajectory follows an exponential decay with a half-life of approxima
 
 $$P(t) = P_0 \cdot e^{-\lambda t}$$
 
-Where $P_0 = \$0.50$ (Feb 2024 baseline) and $\lambda = \ln(2) / 6 \approx 0.1155$ per month.
+Where \(P_0 = \\)0.50$ (Feb 2024 baseline) and \(\lambda = \ln(2) / 6 \approx 0.1155\) per month.
 
 Checking against the data:
 
@@ -904,7 +904,7 @@ This is exactly the pattern we saw when Kling undercut the market in late 2024, 
 
 ## Luma's $900M Strategy and Developer-First Positioning
 
-In November 2025, Luma AI closed a $900M funding round at a $5.8B valuation. This is among the largest raises in the AI video space, putting Luma alongside Runway (~$4B valuation) and above Pika (~$2B).
+In November 2025, Luma AI closed a $900M funding round at a \(5.8B valuation. This is among the largest raises in the AI video space, putting Luma alongside Runway (~\)4B valuation) and above Pika (~$2B).
 
 ### How $900M Gets Spent in AI Video
 
@@ -979,7 +979,7 @@ To achieve a 60% margin (healthy for a SaaS business):
 
 $$0.60 = 1 - \frac{0.060}{x} \implies x = \frac{0.060}{0.40} = \$0.15 \text{ per credit}$$
 
-So you would charge users approximately $0.15 per credit-equivalent, or $15 per 100 credits, if your underlying cost is $0.06/credit. At the Enterprise tier ($0.035/credit), the same 60% margin requires charging only $0.0875/credit, giving you more pricing flexibility.
+So you would charge users approximately $0.15 per credit-equivalent, or $15 per 100 credits, if your underlying cost is \(0.06/credit. At the Enterprise tier (\)0.035/credit), the same 60% margin requires charging only $0.0875/credit, giving you more pricing flexibility.
 
 ---
 
@@ -1017,14 +1017,14 @@ Target margin: 55%
 
 Revenue per credit:
 
-For Luma: $\frac{0.12 + 0.02}{1 - 0.55} = \frac{0.14}{0.45} = \$0.311$
+For Luma: \(\frac{0.12 + 0.02}{1 - 0.55} = \frac{0.14}{0.45} = \\)0.311$
 
-For Veo: $\frac{1.50 + 0.02}{1 - 0.55} = \frac{1.52}{0.45} = \$3.378$
+For Veo: \(\frac{1.50 + 0.02}{1 - 0.55} = \frac{1.52}{0.45} = \\)3.378$
 
 If your credits are priced at $0.10 each:
 
-- Luma Ray3.14 5s clip = $\lceil 0.311 / 0.10 \rceil = 4$ credits
-- Veo 3 5s clip = $\lceil 3.378 / 0.10 \rceil = 34$ credits
+- Luma Ray3.14 5s clip = \(\lceil 0.311 / 0.10 \rceil = 4\) credits
+- Veo 3 5s clip = \(\lceil 3.378 / 0.10 \rceil = 34\) credits
 
 This makes intuitive sense: Veo 3 costs roughly 10x more than Luma, and takes roughly 8.5x more credits (34 vs 4). The rounding and fixed infrastructure costs slightly compress the ratio.
 

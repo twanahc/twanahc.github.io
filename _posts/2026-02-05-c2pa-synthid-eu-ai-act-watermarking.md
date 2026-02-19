@@ -3,6 +3,7 @@ layout: post
 title: "The August 2026 Deadline: Why Every AI Video Platform Needs Content Provenance Now"
 date: 2026-02-05
 category: infrastructure
+mathjax: false
 ---
 
 The EU AI Act Article 50 transparency obligations take effect on August 2, 2026. If your platform generates AI video and serves European users — or your users' audiences include Europeans — you need machine-readable labeling on every output.

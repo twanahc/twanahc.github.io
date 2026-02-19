@@ -86,13 +86,13 @@ Storyboard JSON --> [Structure Encoder] --------------+          v
                                                     [Audio Tokens] -> [Vocoder]
 ```
 
-**Text Encoder**: A multilingual transformer (likely based on mT5 or similar) that handles the 5 supported languages. Text embeddings are projected into the conditioning space with dimension $d_{cond}$.
+**Text Encoder**: A multilingual transformer (likely based on mT5 or similar) that handles the 5 supported languages. Text embeddings are projected into the conditioning space with dimension \(d_{cond}\).
 
 **Vision Encoder**: A SigLIP-family model that encodes reference images into visual tokens. Multiple reference images are encoded independently and then concatenated, giving the model multiple "views" of each character:
 
 $$E_{visual} = \text{Concat}[\text{SigLIP}(img_1), \text{SigLIP}(img_2), \ldots, \text{SigLIP}(img_n)]$$
 
-For $n$ reference images, each producing $k$ tokens, the visual conditioning has $n \times k$ tokens. Typical values: $k = 256$ tokens per image, $n = 1\text{-}5$ images, giving $256\text{-}1280$ visual conditioning tokens.
+For \(n\) reference images, each producing \(k\) tokens, the visual conditioning has \(n \times k\) tokens. Typical values: \(k = 256\) tokens per image, \(n = 1\text{-}5\) images, giving \(256\text{-}1280\) visual conditioning tokens.
 
 **Structure Encoder**: This is the novel component. The storyboard JSON is parsed into a structured representation that includes:
 
@@ -104,7 +104,7 @@ The structure encoder processes the storyboard into a hierarchical token sequenc
 
 $$E_{struct} = [\text{Global}] \oplus [\text{Scene}_1] \oplus [\text{Boundary}_{1\to2}] \oplus [\text{Scene}_2] \oplus \ldots$$
 
-where $\oplus$ denotes concatenation and each $[\text{Scene}_i]$ contains the encoded shot parameters.
+where \(\oplus\) denotes concatenation and each \([\text{Scene}_i]\) contains the encoded shot parameters.
 
 ### Cross-Attention with Hierarchical Conditioning
 
@@ -114,15 +114,15 @@ The DiT backbone uses cross-attention to condition on the fused input tokens. Th
 
 2. **Local cross-attention**: Video tokens within each scene attend to that scene's specific conditioning (shot description, camera, framing). Tokens near scene boundaries attend to both adjacent scenes' conditioning.
 
-Mathematically, for a video token $q_i$ in scene $s$:
+Mathematically, for a video token \(q_i\) in scene \(s\):
 
 $$\text{Attn}(q_i) = \text{softmax}\left(\frac{q_i \cdot K_{global}^T}{\sqrt{d}} \right) V_{global} + \text{softmax}\left(\frac{q_i \cdot K_{scene_s}^T}{\sqrt{d}} \right) V_{scene_s}$$
 
-For tokens near scene boundaries (within $w$ frames of the boundary), an additional cross-scene attention term is added:
+For tokens near scene boundaries (within \(w\) frames of the boundary), an additional cross-scene attention term is added:
 
 $$\text{Attn}_{boundary}(q_i) = \text{Attn}(q_i) + \alpha \cdot \text{softmax}\left(\frac{q_i \cdot K_{scene_{s\pm1}}^T}{\sqrt{d}} \right) V_{scene_{s\pm1}}$$
 
-where $\alpha$ decays with distance from the boundary. This enables smooth transitions between scenes.
+where \(\alpha\) decays with distance from the boundary. This enables smooth transitions between scenes.
 
 ### Temporal Attention Across Scene Boundaries
 
@@ -138,7 +138,7 @@ Scene 2 frames:  [T1+1, T1+2, ..., T1+T2]
 Scene 3 frames:  [T1+T2+1, ...]
 ```
 
-Within each scene, frames have full bidirectional temporal attention. Across scene boundaries, attention is restricted to the boundary region (last $w$ frames of scene $s$, first $w$ frames of scene $s+1$). This prevents distant scenes from interfering with each other while maintaining coherence at transitions.
+Within each scene, frames have full bidirectional temporal attention. Across scene boundaries, attention is restricted to the boundary region (last \(w\) frames of scene \(s\), first \(w\) frames of scene \(s+1\)). This prevents distant scenes from interfering with each other while maintaining coherence at transitions.
 
 The attention mask can be expressed as:
 
@@ -148,7 +148,7 @@ $$M_{ij} = \begin{cases}
 0 & \text{otherwise}
 \end{cases}$$
 
-where $boundary$ is the frame index of the scene transition. Typical $w = 8\text{-}16$ frames (0.33-0.67 seconds at 24fps).
+where \(boundary\) is the frame index of the scene transition. Typical \(w = 8\text{-}16\) frames (0.33-0.67 seconds at 24fps).
 
 ### Character Consistency Mechanism
 
@@ -164,7 +164,7 @@ The effectiveness of this approach can be quantified by measuring character iden
 
 $$\text{ID Consistency} = \frac{1}{N_{pairs}} \sum_{(i,j)} \cos(\text{ArcFace}(face_i), \text{ArcFace}(face_j))$$
 
-where $(i, j)$ are face crops from different scenes of the same character.
+where \((i, j)\) are face crops from different scenes of the same character.
 
 Reported/estimated identity consistency scores:
 
@@ -288,7 +288,7 @@ The generation process for a storyboard request proceeds in stages:
 - Encode all text descriptions through the multilingual text encoder
 - Download and encode reference images through SigLIP
 - Construct the hierarchical conditioning token sequence
-- Calculate total frame count: $\sum_i \text{duration}_i \times \text{fps} = (8+5+6+10) \times 24 = 696$ frames
+- Calculate total frame count: \(\sum_i \text{duration}_i \times \text{fps} = (8+5+6+10) \times 24 = 696\) frames
 
 **Stage 2: Latent Planning** (~5-10 seconds)
 - Generate a low-resolution "plan" of the entire video at 1/4 resolution
@@ -348,7 +348,7 @@ The transition type is determined by a classifier that operates on the boundary 
 
 $$\text{transition\_type} = \text{argmax}(\text{MLP}(z_{boundary}))$$
 
-where $z_{boundary}$ is the concatenation of the last latent frame of shot $s$ and the first latent frame of shot $s+1$.
+where \(z_{boundary}\) is the concatenation of the last latent frame of shot \(s\) and the first latent frame of shot \(s+1\).
 
 ---
 
@@ -614,7 +614,7 @@ The most common operational issues:
 
 At the Pro tier (15 req/min), maximum throughput is 15 generations per minute. If each generation is a 5-second clip, that is 75 seconds of video per minute, or 4,500 seconds per hour, or 108,000 seconds per day.
 
-At $0.12/sec average cost, that is $12,960/day or ~$389K/month at maximum throughput.
+At $0.12/sec average cost, that is \(12,960/day or ~\)389K/month at maximum throughput.
 
 ---
 
@@ -660,7 +660,7 @@ Combining credit costs with per-generation credits:
 | 15s, 1080p + audio | 65 | $0.071 | $4.64 | $0.309 |
 | Storyboard ~30s | 120 | $0.071 | $8.57 | $0.286 |
 
-Wait --- these numbers are higher than the commonly cited $0.08-0.15/sec range. That is because the commonly cited numbers use the Enterprise tier pricing ($0.063/credit):
+Wait --- these numbers are higher than the commonly cited \(0.08-0.15/sec range. That is because the commonly cited numbers use the Enterprise tier pricing (\)0.063/credit):
 
 | Configuration | Credits | $/Credit (Enterprise) | Total Cost | $/Second |
 |--------------|---------|---------------------|-----------|----------|
@@ -957,7 +957,7 @@ Using a logistic growth model (S-curve):
 
 $$R(t) = \frac{R_{max}}{1 + e^{-k(t - t_0)}}$$
 
-Fitting to Kling's data points with $R_{max} = \$800M$ (estimated saturation), $k = 0.3$ (growth rate), and $t_0 = 12$ (inflection point at 12 months):
+Fitting to Kling's data points with \(R_{max} = \\)800M$ (estimated saturation), \(k = 0.3\) (growth rate), and \(t_0 = 12\) (inflection point at 12 months):
 
 | Months from launch | Projected ARR |
 |-------------------|--------------|

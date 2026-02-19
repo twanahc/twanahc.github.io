@@ -3,6 +3,7 @@ layout: post
 title: "The 2026 Video Prompt Playbook: Cinematography Language That Actually Works"
 date: 2026-01-31
 category: architecture
+mathjax: false
 ---
 
 Here's a prompt that produces mediocre video: "A beautiful sunset over the ocean with waves."

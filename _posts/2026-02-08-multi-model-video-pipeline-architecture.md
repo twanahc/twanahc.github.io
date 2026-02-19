@@ -702,28 +702,28 @@ Where:
 
 | Symbol | Meaning | Range |
 |--------|---------|-------|
-| $S_m$ | Final score for model $m$ | 0 to 1 |
-| $Q_m$ | Quality score for this content type | 0 to 1 |
-| $C_m$ | Cost for this request using model $m$ | USD |
-| $C_{\max}$ | Maximum cost across all candidate models | USD |
-| $L_m$ | Latency (P95) for model $m$ | ms |
-| $L_{\max}$ | Maximum latency across all candidate models | ms |
-| $A_m$ | Availability score (trailing success rate) | 0 to 1 |
-| $w_q, w_c, w_s, w_a$ | Weights (must sum to 1) | 0 to 1 |
+| \(S_m\) | Final score for model \(m\) | 0 to 1 |
+| \(Q_m\) | Quality score for this content type | 0 to 1 |
+| \(C_m\) | Cost for this request using model \(m\) | USD |
+| \(C_{\max}\) | Maximum cost across all candidate models | USD |
+| \(L_m\) | Latency (P95) for model \(m\) | ms |
+| \(L_{\max}\) | Maximum latency across all candidate models | ms |
+| \(A_m\) | Availability score (trailing success rate) | 0 to 1 |
+| \(w_q, w_c, w_s, w_a\) | Weights (must sum to 1) | 0 to 1 |
 
 **Worked Example:** A user requests a 5-second dialogue scene at 1080p in standard mode.
 
 Candidate models and their raw values:
 
-| Model | $Q_m$ (dialogue) | $C_m$ (5s @ 1080p) | $L_m$ (p95) | $A_m$ |
+| Model | \(Q_m\) (dialogue) | \(C_m\) (5s @ 1080p) | \(L_m\) (p95) | \(A_m\) |
 |-------|-------------------|---------------------|--------------|-------|
 | veo-31-standard | 0.92 | $1.50 | 90,000ms | 0.96 |
 | sora-2 | 0.80 | $0.60 | 150,000ms | 0.92 |
 | kling-3 | 0.88 | $0.50 | 180,000ms | 0.90 |
 
-Derived values: $C_{\max} = 1.50$, $L_{\max} = 180{,}000$
+Derived values: \(C_{\max} = 1.50\), \(L_{\max} = 180{,}000\)
 
-Weights for standard mode: $w_q = 0.40$, $w_c = 0.30$, $w_s = 0.15$, $w_a = 0.15$
+Weights for standard mode: \(w_q = 0.40\), \(w_c = 0.30\), \(w_s = 0.15\), \(w_a = 0.15\)
 
 **Veo 3.1 Standard:**
 
@@ -745,7 +745,7 @@ $$S_{kling} = 0.352 + 0.200 + 0.000 + 0.135 = 0.687$$
 
 **Result: Kling 3.0 wins** with a score of 0.687. It has good dialogue quality (0.88), the lowest cost ($0.50), and acceptable availability -- even though it's the slowest model and has the lowest availability. The cost savings and quality together outweigh the speed and reliability disadvantage.
 
-Now, if the user switches to **premium mode**, we shift the weights: $w_q = 0.60$, $w_c = 0.10$, $w_s = 0.15$, $w_a = 0.15$:
+Now, if the user switches to **premium mode**, we shift the weights: \(w_q = 0.60\), \(w_c = 0.10\), \(w_s = 0.15\), \(w_a = 0.15\):
 
 $$S_{veo} = 0.60 \times 0.92 + 0.10 \times 0.00 + 0.15 \times 0.50 + 0.15 \times 0.96 = 0.552 + 0.000 + 0.075 + 0.144 = 0.771$$
 
@@ -1600,7 +1600,7 @@ The cost of a false positive (bad video delivered to user) is measured in churn 
 
 $$\text{Total Cost} = C_{fp} \cdot \text{FPR} \cdot N + C_{retry} \cdot \text{FNR} \cdot N$$
 
-Where $C_{fp}$ is the expected cost of delivering a bad video (user churn risk times LTV), $C_{retry}$ is the cost of an unnecessary retry, and $N$ is total generations.
+Where \(C_{fp}\) is the expected cost of delivering a bad video (user churn risk times LTV), \(C_{retry}\) is the cost of an unnecessary retry, and \(N\) is total generations.
 
 In practice, err on the side of higher thresholds. Retrying a generation costs $0.25-$2.00. Losing a user costs $50-$500 in LTV.
 
@@ -1616,13 +1616,13 @@ The probability that all models are simultaneously unavailable:
 
 $$P(\text{all down}) = \prod_{i=1}^{n}(1-A_i)$$
 
-Therefore, the composite availability of a system with $n$ independent fallbacks:
+Therefore, the composite availability of a system with \(n\) independent fallbacks:
 
 $$A_{\text{system}} = 1 - \prod_{i=1}^{n}(1-A_i)$$
 
 **Worked example** with our six models:
 
-| Model | Availability $A_i$ | Downtime probability $(1-A_i)$ |
+| Model | Availability \(A_i\) | Downtime probability \((1-A_i)\) |
 |-------|---------------------|-------------------------------|
 | veo-31-standard | 0.96 | 0.04 |
 | runway-gen45-turbo | 0.98 | 0.02 |
@@ -1651,7 +1651,7 @@ When a model fails, don't retry immediately. Use exponential backoff with jitter
 
 $$t_{\text{wait}} = \min\left(t_{\text{base}} \cdot 2^{n} + \text{random}(0, t_{\text{jitter}}), \; t_{\text{max}}\right)$$
 
-Where $n$ is the retry attempt number, $t_{\text{base}}$ is the initial delay (e.g., 1 second), $t_{\text{jitter}}$ is the maximum random jitter (e.g., 1 second), and $t_{\text{max}}$ is the maximum delay cap (e.g., 30 seconds).
+Where \(n\) is the retry attempt number, \(t_{\text{base}}\) is the initial delay (e.g., 1 second), \(t_{\text{jitter}}\) is the maximum random jitter (e.g., 1 second), and \(t_{\text{max}}\) is the maximum delay cap (e.g., 30 seconds).
 
 | Retry # | Base delay | With jitter (example) |
 |---------|------------|----------------------|
@@ -1947,14 +1947,14 @@ User prompt --> [Generate Preview] --> [Show to User] --> [User Approves?]
 
 Assume 40% of previews get edited/rejected before the user is happy:
 
-- Without preview: 100 requests x $2.00 avg = **$200.00**
-- With preview: 100 previews x $0.25 = $25.00, plus 60 final renders x $2.00 = $120.00 = **$145.00**
+- Without preview: 100 requests x \(2.00 avg = **\)200.00**
+- With preview: 100 previews x $0.25 = $25.00, plus 60 final renders x $2.00 = \(120.00 = **\)145.00**
 - Savings: **27.5%**
 
 If the rejection rate is 60% (common for first-time users):
 
 - Without preview: 100 x $2.00 = $200.00
-- With preview: 100 x $0.25 = $25.00 + 40 x $2.00 = $80.00 = **$105.00**
+- With preview: 100 x $0.25 = $25.00 + 40 x $2.00 = \(80.00 = **\)105.00**
 - Savings: **47.5%**
 
 ### Real-Time Cost Dashboard
@@ -1985,7 +1985,7 @@ The **cost per quality point** metric is the most useful for routing optimizatio
 
 $$\text{CPQ}_m = \frac{\bar{C}_m}{\bar{Q}_m}$$
 
-Lower is better. A model that costs $0.50 and averages 0.80 quality ($0.625/point) is more efficient than one that costs $2.00 and averages 0.95 quality ($2.11/point) -- unless the user specifically requested premium quality.
+Lower is better. A model that costs \(0.50 and averages 0.80 quality (\)0.625/point) is more efficient than one that costs \(2.00 and averages 0.95 quality (\)2.11/point) -- unless the user specifically requested premium quality.
 
 ---
 
@@ -2047,7 +2047,7 @@ interface GenerationLog {
 
 $$P95 = \text{latencies}[\lceil 0.95 \times N \rceil]$$
 
-where latencies are sorted ascending and $N$ is the number of observations.
+where latencies are sorted ascending and \(N\) is the number of observations.
 
 Target: under 120 seconds for standard mode, under 60 seconds for preview.
 
@@ -2209,10 +2209,10 @@ console.log(`Generation time: ${output.generationTimeMs}ms`);
 Building a multi-model video pipeline is the architectural inflection point for any AI video platform. The core components:
 
 1. **Model Registry**: Single source of truth for capabilities, cost, quality, and health.
-2. **Router**: Score-based routing with the formula $S_m = w_q \cdot Q_m + w_c \cdot (1 - C_m/C_{\max}) + w_s \cdot (1 - L_m/L_{\max}) + w_a \cdot A_m$ and mode-specific weight profiles.
+2. **Router**: Score-based routing with the formula \(S_m = w_q \cdot Q_m + w_c \cdot (1 - C_m/C_{\max}) + w_s \cdot (1 - L_m/L_{\max}) + w_a \cdot A_m\) and mode-specific weight profiles.
 3. **Adapter Layer**: Normalize every model's API behind a single interface. New model = new adapter, nothing else changes.
 4. **Quality Gate**: Gemini Flash evaluates every output. Cost: $0.001 per evaluation. Value: prevents bad output from reaching users.
-5. **Fallback Chain**: Circuit breakers + exponential backoff + ordered fallbacks = $A_{\text{system}} = 1 - \prod(1-A_i)$ composite availability.
+5. **Fallback Chain**: Circuit breakers + exponential backoff + ordered fallbacks = \(A_{\text{system}} = 1 - \prod(1-A_i)\) composite availability.
 6. **Cost Management**: Budget enforcement, preview-then-commit, and cost-per-quality-point optimization.
 7. **Observability**: Structured logs, key metrics (P95 latency, QAC, model utilization), and threshold-based alerting.
 

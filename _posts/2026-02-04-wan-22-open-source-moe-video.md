@@ -27,15 +27,15 @@ Alibaba's Wan 2.2 is the first serious deployment of Mixture-of-Experts in video
 
 ### 1.1 The Core MoE Formulation
 
-A Mixture-of-Experts layer replaces a single feedforward network with $N$ parallel expert networks $\{E_1, E_2, \ldots, E_N\}$ and a gating function $G$ that decides which experts to activate for each input.
+A Mixture-of-Experts layer replaces a single feedforward network with \(N\) parallel expert networks \(\{E_1, E_2, \ldots, E_N\}\) and a gating function \(G\) that decides which experts to activate for each input.
 
-Given an input token $x \in \mathbb{R}^d$, the MoE layer output is:
+Given an input token \(x \in \mathbb{R}^d\), the MoE layer output is:
 
 $$
 \text{MoE}(x) = \sum_{i=1}^{N} G(x)_i \cdot E_i(x)
 $$
 
-where $G(x)_i$ is the gating weight for expert $i$ and $E_i(x)$ is the output of expert $i$.
+where \(G(x)_i\) is the gating weight for expert \(i\) and \(E_i(x)\) is the output of expert \(i\).
 
 ### 1.2 The Gating Function
 
@@ -45,17 +45,17 @@ $$
 G(x) = \text{softmax}\bigl(\text{TopK}(W_g \cdot x)\bigr)
 $$
 
-where $W_g \in \mathbb{R}^{N \times d}$ is a learnable weight matrix that projects the input to a score for each expert.
+where \(W_g \in \mathbb{R}^{N \times d}\) is a learnable weight matrix that projects the input to a score for each expert.
 
-The $\text{TopK}$ operation keeps only the top-$K$ scores and zeros out the rest:
+The \(\text{TopK}\) operation keeps only the top-\(K\) scores and zeros out the rest:
 
 $$
 \text{TopK}(v)_i = \begin{cases} v_i & \text{if } v_i \text{ is among the top-}K \text{ values of } v \\ -\infty & \text{otherwise} \end{cases}
 $$
 
-After the softmax, the zeroed-out experts get weight $\approx 0$, so only $K$ experts are actually computed. This is the source of the compute savings: you have $N$ experts worth of parameters but only evaluate $K$ of them.
+After the softmax, the zeroed-out experts get weight \(\approx 0\), so only \(K\) experts are actually computed. This is the source of the compute savings: you have \(N\) experts worth of parameters but only evaluate \(K\) of them.
 
-**Worked example.** Suppose $N = 8$ experts, $K = 2$, and the gating logits are:
+**Worked example.** Suppose \(N = 8\) experts, \(K = 2\), and the gating logits are:
 
 $$
 W_g \cdot x = [1.2, \; 0.3, \; 2.8, \; -0.1, \; 0.7, \; 3.1, \; 0.2, \; -0.5]
@@ -77,7 +77,7 @@ $$
 G(x)_5 = \frac{e^{3.1}}{e^{2.8} + e^{3.1}} = \frac{22.20}{16.44 + 22.20} = 0.575
 $$
 
-The output is $0.425 \cdot E_2(x) + 0.575 \cdot E_5(x)$. Only two expert forward passes are computed.
+The output is \(0.425 \cdot E_2(x) + 0.575 \cdot E_5(x)\). Only two expert forward passes are computed.
 
 ### 1.3 Load Balancing
 
@@ -90,23 +90,23 @@ $$
 $$
 
 where:
-- $f_i$ is the fraction of tokens routed to expert $i$
-- $p_i$ is the average gating probability for expert $i$
-- $\alpha$ is a hyperparameter (typically $0.01$ to $0.1$)
-- The factor $N$ normalizes so that a uniform distribution gives $\mathcal{L}_{\text{balance}} = \alpha$
+- \(f_i\) is the fraction of tokens routed to expert \(i\)
+- \(p_i\) is the average gating probability for expert \(i\)
+- \(\alpha\) is a hyperparameter (typically $0.01$ to $0.1$)
+- The factor \(N\) normalizes so that a uniform distribution gives \(\mathcal{L}_{\text{balance}} = \alpha\)
 
-This loss penalizes configurations where load is unevenly distributed. When all experts receive equal traffic, $f_i = p_i = 1/N$ and the loss is minimized.
+This loss penalizes configurations where load is unevenly distributed. When all experts receive equal traffic, \(f_i = p_i = 1/N\) and the loss is minimized.
 
 ### 1.4 Parameter Efficiency
 
 The key insight of MoE: you can scale model capacity (total parameters) without proportionally scaling compute (active parameters).
 
-For a standard transformer layer with feedforward dimension $d_{ff}$:
+For a standard transformer layer with feedforward dimension \(d_{ff}\):
 
-- **Dense model**: Parameters = $2 \cdot d \cdot d_{ff}$ (two linear layers)
-- **MoE model** with $N$ experts, top-$K$ routing: Total parameters = $N \cdot 2 \cdot d \cdot d_{ff}$, but active parameters per token = $K \cdot 2 \cdot d \cdot d_{ff}$
+- **Dense model**: Parameters = \(2 \cdot d \cdot d_{ff}\) (two linear layers)
+- **MoE model** with \(N\) experts, top-\(K\) routing: Total parameters = \(N \cdot 2 \cdot d \cdot d_{ff}\), but active parameters per token = \(K \cdot 2 \cdot d \cdot d_{ff}\)
 
-The ratio of active to total parameters is $K/N$. For Wan 2.2 with $N=2, K=1$, this ratio is $1/2$, which is why 27B total yields 14B active (approximately --- the non-expert layers like attention are shared).
+The ratio of active to total parameters is \(K/N\). For Wan 2.2 with \(N=2, K=1\), this ratio is $1/2$, which is why 27B total yields 14B active (approximately --- the non-expert layers like attention are shared).
 
 ---
 
@@ -116,7 +116,7 @@ The ratio of active to total parameters is $K/N$. For Wan 2.2 with $N=2, K=1$, t
 
 LLM MoE architectures typically use many experts:
 
-| Model | Total Experts ($N$) | Active Experts ($K$) | $K/N$ |
+| Model | Total Experts (\(N\)) | Active Experts (\(K\)) | \(K/N\) |
 |---|---|---|---|
 | Mixtral 8x7B | 8 | 2 | 0.25 |
 | Switch Transformer | 64-2048 | 1 | 0.0005-0.016 |
@@ -128,9 +128,9 @@ Wan 2.2's two-expert design is radically simpler. Why?
 
 **Hypothesis: The natural decomposition of diffusion.** In a diffusion model, the denoising process has two fundamentally different regimes:
 
-1. **High-noise regime** ($t$ close to $T$): The model works with heavily corrupted inputs. The task is global structure --- overall composition, scene layout, object placement. Fine details are invisible under the noise.
+1. **High-noise regime** (\(t\) close to \(T\)): The model works with heavily corrupted inputs. The task is global structure --- overall composition, scene layout, object placement. Fine details are invisible under the noise.
 
-2. **Low-noise regime** ($t$ close to $0$): The model works with nearly clean inputs. The task is local refinement --- textures, edges, fine details, facial features.
+2. **Low-noise regime** (\(t\) close to $0$): The model works with nearly clean inputs. The task is local refinement --- textures, edges, fine details, facial features.
 
 These two regimes require such different computations that a single network is wasting capacity trying to serve both. Two experts is the minimal decomposition that captures this dichotomy.
 
@@ -138,7 +138,7 @@ These two regimes require such different computations that a single network is w
 
 In LLM MoE, the gating function routes based on the token's content --- a word about math goes to the "math expert," a word about code goes to the "code expert." The routing varies per token within a single forward pass.
 
-In Wan 2.2's video MoE, the routing is primarily conditioned on the **diffusion timestep** $t$. At high noise levels, the gating function routes to the high-noise expert. At low noise levels, it routes to the low-noise expert.
+In Wan 2.2's video MoE, the routing is primarily conditioned on the **diffusion timestep** \(t\). At high noise levels, the gating function routes to the high-noise expert. At low noise levels, it routes to the low-noise expert.
 
 This means that within a single denoising step, *all* spatial-temporal tokens are routed to the *same* expert. The routing is a function of where you are in the denoising trajectory, not what part of the image you're processing.
 
@@ -148,15 +148,15 @@ $$
 G(x, t) \approx \begin{cases} [1, 0] & \text{if } t > t_{\text{switch}} \\ [0, 1] & \text{if } t \leq t_{\text{switch}} \end{cases}
 $$
 
-where $t_{\text{switch}}$ is the learned crossover point. In practice, the gating is soft (not a hard switch), and there is a transition zone where both experts contribute.
+where \(t_{\text{switch}}\) is the learned crossover point. In practice, the gating is soft (not a hard switch), and there is a transition zone where both experts contribute.
 
 ### 2.3 Why This Works: An Information-Theoretic Argument
 
-Consider the mutual information between the input $x_t$ (noisy video at timestep $t$) and the target $\epsilon$ (the noise to predict):
+Consider the mutual information between the input \(x_t\) (noisy video at timestep \(t\)) and the target \(\epsilon\) (the noise to predict):
 
-At high $t$: $I(x_t; \text{spatial details})$ is low because the signal is buried in noise. The model's useful information comes from global statistics --- mean intensity, rough blob positions, text conditioning.
+At high \(t\): \(I(x_t; \text{spatial details})\) is low because the signal is buried in noise. The model's useful information comes from global statistics --- mean intensity, rough blob positions, text conditioning.
 
-At low $t$: $I(x_t; \text{spatial details})$ is high. The model can now see edges, textures, and fine structure. The text conditioning becomes less important relative to the visual signal.
+At low \(t\): \(I(x_t; \text{spatial details})\) is high. The model can now see edges, textures, and fine structure. The text conditioning becomes less important relative to the visual signal.
 
 A single network must allocate its capacity to handle both regimes. An MoE with two experts can specialize: one expert develops features for global structure recovery, the other for fine detail synthesis. Neither wastes parameters on the other's task.
 
@@ -236,11 +236,11 @@ Wan 2.2 has not disclosed exact training costs, but we can estimate based on com
 
 Training video diffusion models requires processing each video frame as a patch sequence. For a 5-second, 24fps clip at 720p:
 - Frames: 120
-- Patches per frame (16x16 patch size at 720p): $\frac{1280}{16} \times \frac{720}{16} = 80 \times 45 = 3{,}600$
-- Total patches per clip: $120 \times 3{,}600 = 432{,}000$
+- Patches per frame (16x16 patch size at 720p): \(\frac{1280}{16} \times \frac{720}{16} = 80 \times 45 = 3{,}600\)
+- Total patches per clip: \(120 \times 3{,}600 = 432{,}000\)
 
 At 91.6M clips, with multiple training epochs (say 3-5 epochs) and 1000 denoising steps sampled per clip:
-- Total forward passes: $91.6\text{M} \times 4 \text{ epochs} \times \sim 1 \text{ sampled step} = 366.4\text{M forward passes}$
+- Total forward passes: \(91.6\text{M} \times 4 \text{ epochs} \times \sim 1 \text{ sampled step} = 366.4\text{M forward passes}\)
 - Each forward pass processes ~432K tokens through a 14B-active-parameter model
 
 At ~312 TFLOPS per H100 (bf16), each forward pass is roughly:
@@ -257,7 +257,7 @@ $$
 \text{H100-seconds} = \frac{4.43 \times 10^{24}}{312 \times 10^{12}} \approx 1.42 \times 10^{10} \text{ seconds} \approx 164{,}000 \text{ H100-days}
 $$
 
-This is clearly an overestimate (models use efficient attention, gradient checkpointing, variable-length sequences, etc.), but suggests the order of magnitude is tens of thousands of GPU-days. At ~$2/H100-hour, training cost is in the **$5M-$20M range** --- significant but within reach for Alibaba's compute budget.
+This is clearly an overestimate (models use efficient attention, gradient checkpointing, variable-length sequences, etc.), but suggests the order of magnitude is tens of thousands of GPU-days. At ~\(2/H100-hour, training cost is in the **\)5M-$20M range** --- significant but within reach for Alibaba's compute budget.
 
 ### 3.4 Training Methodology
 
@@ -313,11 +313,11 @@ Same architecture as T2V-A14B, but with an additional image conditioning pathway
 
 **Image conditioning mechanism**:
 1. Reference image is encoded by the same VAE used for video
-2. Image latent is injected as the first frame of the noise sequence (replacing the noise at $t=0$ position)
+2. Image latent is injected as the first frame of the noise sequence (replacing the noise at \(t=0\) position)
 3. Cross-attention layers attend to both text embeddings and image features
 4. The model learns to "animate" the reference frame while maintaining visual consistency
 
-**Why I2V produces better results**: The reference image provides approximately $\log_2(\text{pixel values}) \times W \times H \times 3 \approx 8 \times 1920 \times 1080 \times 3 \approx 49.8 \text{ Mbits}$ of raw visual information. Even after compression through the VAE (which reduces to ~1/64 of spatial resolution), the reference frame provides orders of magnitude more visual information than a text prompt (typically <1 Kbit of information).
+**Why I2V produces better results**: The reference image provides approximately \(\log_2(\text{pixel values}) \times W \times H \times 3 \approx 8 \times 1920 \times 1080 \times 3 \approx 49.8 \text{ Mbits}\) of raw visual information. Even after compression through the VAE (which reduces to ~1/64 of spatial resolution), the reference frame provides orders of magnitude more visual information than a text prompt (typically <1 Kbit of information).
 
 The model doesn't need to "imagine" the scene's visual identity --- color palette, lighting, character appearance, background details --- from text alone. It just needs to animate what's already there.
 
@@ -367,11 +367,11 @@ Here is a comprehensive breakdown of running Wan 2.2 on various hardware:
 
 | Provider | Hourly Rate | Monthly (on-demand) | Spot/Interruptible |
 |---|---|---|---|
-| RunPod | $1.64/hr | ~$1,181/mo | $0.89/hr |
-| Lambda | $1.99/hr | ~$1,433/mo | N/A |
+| RunPod | \(1.64/hr | ~\)1,181/mo | $0.89/hr |
+| Lambda | \(1.99/hr | ~\)1,433/mo | N/A |
 | Vast.ai | $1.20-1.80/hr | Varies | $0.70-1.10/hr |
-| AWS (p4d.24xlarge / 8xA100) | $32.77/hr ($4.10/GPU) | ~$23,594/mo | ~$12.50/hr |
-| GCP (a2-highgpu-1g) | $3.67/hr | ~$2,642/mo | ~$1.10/hr |
+| AWS (p4d.24xlarge / 8xA100) | \(32.77/hr (\)4.10/GPU) | ~\(23,594/mo | ~\)12.50/hr |
+| GCP (a2-highgpu-1g) | \(3.67/hr | ~\)2,642/mo | ~$1.10/hr |
 
 **Wan 2.2 T2V-A14B on A100 80GB**:
 - VRAM usage (fp16): ~56GB
@@ -384,11 +384,11 @@ Here is a comprehensive breakdown of running Wan 2.2 on various hardware:
 
 | Provider | Hourly Rate | Monthly (on-demand) | Spot/Interruptible |
 |---|---|---|---|
-| RunPod | $3.89/hr | ~$2,801/mo | $2.49/hr |
-| Lambda | $2.49/hr | ~$1,793/mo | N/A |
+| RunPod | \(3.89/hr | ~\)2,801/mo | $2.49/hr |
+| Lambda | \(2.49/hr | ~\)1,793/mo | N/A |
 | Vast.ai | $2.50-4.00/hr | Varies | $1.50-2.50/hr |
-| AWS (p5.48xlarge / 8xH100) | $98.32/hr ($12.29/GPU) | ~$70,790/mo | ~$30/hr |
-| GCP (a3-highgpu-1g) | $3.81/hr | ~$2,743/mo | ~$1.52/hr |
+| AWS (p5.48xlarge / 8xH100) | \(98.32/hr (\)12.29/GPU) | ~\(70,790/mo | ~\)30/hr |
+| GCP (a3-highgpu-1g) | \(3.81/hr | ~\)2,743/mo | ~$1.52/hr |
 
 **Wan 2.2 T2V-A14B on H100 80GB**:
 - VRAM usage: same as A100 (model size doesn't change)
@@ -401,9 +401,9 @@ Here is a comprehensive breakdown of running Wan 2.2 on various hardware:
 
 | Provider | Hourly Rate | Monthly (on-demand) |
 |---|---|---|
-| RunPod | $0.44/hr | ~$317/mo |
+| RunPod | \(0.44/hr | ~\)317/mo |
 | Vast.ai | $0.30-0.50/hr | Varies |
-| Self-owned | ~$0.10/hr amortized | ~$72/mo (electricity + depreciation) |
+| Self-owned | ~\(0.10/hr amortized | ~\)72/mo (electricity + depreciation) |
 
 **Wan 2.2 TI2V-5B on RTX 4090 24GB**:
 - VRAM usage (fp16): ~12GB
@@ -424,20 +424,20 @@ $$
 
 | Hardware | Provider | $/hr | Gen Time | Cost/Gen |
 |---|---|---|---|---|
-| A100 80GB | RunPod (on-demand) | $1.64 | 150s | **$0.068** |
-| A100 80GB | RunPod (spot) | $0.89 | 150s | **$0.037** |
-| A100 80GB | Vast.ai (spot) | $0.70 | 150s | **$0.029** |
-| H100 80GB | Lambda | $2.49 | 75s | **$0.052** |
-| H100 80GB | RunPod (spot) | $2.49 | 75s | **$0.052** |
-| H100 80GB | Vast.ai (spot) | $1.50 | 75s | **$0.031** |
+| A100 80GB | RunPod (on-demand) | \(1.64 | 150s | **\)0.068** |
+| A100 80GB | RunPod (spot) | \(0.89 | 150s | **\)0.037** |
+| A100 80GB | Vast.ai (spot) | \(0.70 | 150s | **\)0.029** |
+| H100 80GB | Lambda | \(2.49 | 75s | **\)0.052** |
+| H100 80GB | RunPod (spot) | \(2.49 | 75s | **\)0.052** |
+| H100 80GB | Vast.ai (spot) | \(1.50 | 75s | **\)0.031** |
 
 #### TI2V-5B at 720p
 
 | Hardware | Provider | $/hr | Gen Time | Cost/Gen |
 |---|---|---|---|---|
-| RTX 4090 | RunPod | $0.44 | 120s | **$0.015** |
-| RTX 4090 | Vast.ai | $0.35 | 120s | **$0.012** |
-| RTX 4090 | Self-owned | $0.10 | 120s | **$0.003** |
+| RTX 4090 | RunPod | \(0.44 | 120s | **\)0.015** |
+| RTX 4090 | Vast.ai | \(0.35 | 120s | **\)0.012** |
+| RTX 4090 | Self-owned | \(0.10 | 120s | **\)0.003** |
 
 ### 5.3 Throughput Analysis
 
@@ -458,11 +458,11 @@ $$
 \text{GPUs needed} = \frac{1000 \text{ gen/day}}{24 \text{ gen/hr} \times 24 \text{ hr}} = 1.74 \approx 2 \text{ A100s}
 $$
 
-Daily cost at RunPod spot rates: $2 \times 0.89 \times 24 = \$42.72/\text{day}$
+Daily cost at RunPod spot rates: \(2 \times 0.89 \times 24 = \\)42.72/\text{day}$
 
 Monthly cost: ~$1,282
 
-At 1,000 generations/day, that's $\$42.72 / 1000 = \$0.043$ per generation.
+At 1,000 generations/day, that's \(\\)42.72 / 1000 = \$0.043$ per generation.
 
 ### 5.4 Break-Even Analysis vs. API Pricing
 
@@ -505,11 +505,11 @@ That is roughly **100 generations per day**. If your platform serves more than t
 
 | Monthly Volume | API Cost (Runway Turbo) | Self-Hosted Cost | Monthly Savings |
 |---|---|---|---|
-| 1,000 gen | $250 | $37 + $650 fixed = $687 | **-$437** (API cheaper) |
-| 5,000 gen | $1,250 | $185 + $650 = $835 | **+$415** |
-| 10,000 gen | $2,500 | $370 + $650 = $1,020 | **+$1,480** |
-| 50,000 gen | $12,500 | $1,850 + $650 = $2,500 | **+$10,000** |
-| 100,000 gen | $25,000 | $3,700 + $650 = $4,350 | **+$20,650** |
+| 1,000 gen | $250 | $37 + $650 fixed = \(687 | **-\)437** (API cheaper) |
+| 5,000 gen | $1,250 | $185 + $650 = \(835 | **+\)415** |
+| 10,000 gen | $2,500 | $370 + $650 = \(1,020 | **+\)1,480** |
+| 50,000 gen | $12,500 | $1,850 + $650 = \(2,500 | **+\)10,000** |
+| 100,000 gen | $25,000 | $3,700 + $650 = \(4,350 | **+\)20,650** |
 
 The break-even point is around 3,000-5,000 generations per month. Above that, self-hosting is dramatically cheaper, with savings growing linearly.
 
@@ -609,11 +609,11 @@ Self-hosting Wan 2.2 unlocks something commercial APIs cannot offer: **model cus
 
 | Parameter | Recommended Range | Notes |
 |---|---|---|
-| LoRA rank ($r$) | 8-32 | Higher rank = more capacity but slower training |
-| LoRA alpha ($\alpha$) | Equal to rank, or 2x rank | Scaling factor: effective weight = $\alpha / r$ |
-| Learning rate | $1 \times 10^{-4}$ to $5 \times 10^{-4}$ | Use cosine schedule with warmup |
+| LoRA rank (\(r\)) | 8-32 | Higher rank = more capacity but slower training |
+| LoRA alpha (\(\alpha\)) | Equal to rank, or 2x rank | Scaling factor: effective weight = \(\alpha / r\) |
+| Learning rate | \(1 \times 10^{-4}\) to \(5 \times 10^{-4}\) | Use cosine schedule with warmup |
 | Batch size | 1-4 | Limited by VRAM |
-| Gradient accumulation | 4-8 steps | Effective batch = batch_size $\times$ grad_accum |
+| Gradient accumulation | 4-8 steps | Effective batch = batch_size \(\times\) grad_accum |
 | Training steps | 1,000-3,000 | More data = more steps |
 | Warmup steps | 100-200 | 5-10% of total steps |
 | Weight decay | 0.01 | Standard AdamW |
@@ -887,15 +887,15 @@ if __name__ == "__main__":
 For rank-16 LoRA on attention Q/K/V/O projections:
 
 Suppose each attention layer has:
-- $d_{\text{model}} = 5120$ (hidden dimension for 14B model)
-- Q, K, V, O projections: each is $5120 \times 5120$
-- LoRA adds $B \in \mathbb{R}^{5120 \times 16}$ and $A \in \mathbb{R}^{16 \times 5120}$
-- Parameters per LoRA pair: $5120 \times 16 + 16 \times 5120 = 163{,}840$
-- Per attention layer (4 projections): $4 \times 163{,}840 = 655{,}360$
+- \(d_{\text{model}} = 5120\) (hidden dimension for 14B model)
+- Q, K, V, O projections: each is \(5120 \times 5120\)
+- LoRA adds \(B \in \mathbb{R}^{5120 \times 16}\) and \(A \in \mathbb{R}^{16 \times 5120}\)
+- Parameters per LoRA pair: \(5120 \times 16 + 16 \times 5120 = 163{,}840\)
+- Per attention layer (4 projections): \(4 \times 163{,}840 = 655{,}360\)
 
 For a 48-layer transformer:
-- Total LoRA parameters: $48 \times 655{,}360 = 31{,}457{,}280 \approx 31.5\text{M}$
-- At fp16 (2 bytes/param): $31.5\text{M} \times 2 = 63\text{MB}$
+- Total LoRA parameters: \(48 \times 655{,}360 = 31{,}457{,}280 \approx 31.5\text{M}\)
+- At fp16 (2 bytes/param): \(31.5\text{M} \times 2 = 63\text{MB}\)
 
 The adapter file is ~63MB --- trivial to store and transfer. You can host thousands of user-specific LoRAs on cheap object storage.
 
@@ -904,7 +904,7 @@ The adapter file is ~63MB --- trivial to store and transfer. You can host thousa
 Loading a LoRA adapter at inference time adds minimal overhead:
 
 - **Adapter loading time**: ~0.5-2 seconds (from local SSD), ~3-5 seconds (from R2/S3)
-- **Per-step compute overhead**: Negligible. The LoRA computation adds $2 \times d \times r$ FLOPs per projection, vs. $d^2$ for the base projection. For $r=16, d=5120$: overhead is $2 \times 5120 \times 16 / 5120^2 = 0.6\%$
+- **Per-step compute overhead**: Negligible. The LoRA computation adds \(2 \times d \times r\) FLOPs per projection, vs. \(d^2\) for the base projection. For \(r=16, d=5120\): overhead is \(2 \times 5120 \times 16 / 5120^2 = 0.6\%\)
 - **VRAM overhead**: ~63MB additional (the adapter weights)
 
 The key optimization is **hot-swapping**: keep the base model in VRAM at all times, and swap LoRA adapters between generations. PEFT (Parameter-Efficient Fine-Tuning) libraries support this natively:

@@ -30,41 +30,41 @@ This post builds the transformer from the ground up. We start with the raw probl
 
 Nearly everything interesting in machine learning involves sequences. A sentence is a sequence of words. An image is a sequence of patches. A video is a sequence of frames, each of which is a sequence of patches. Audio is a sequence of spectral snapshots.
 
-Let us formalize the problem. Suppose we have a sequence of $n$ **tokens**. A token is the atomic unit of our sequence --- a word, a subword piece, an image patch, a video frame tile. Each token is represented as a vector in $\mathbb{R}^d$, meaning each token is described by $d$ numbers. We call $d$ the **embedding dimension** or **model dimension**.
+Let us formalize the problem. Suppose we have a sequence of \(n\) **tokens**. A token is the atomic unit of our sequence --- a word, a subword piece, an image patch, a video frame tile. Each token is represented as a vector in \(\mathbb{R}^d\), meaning each token is described by \(d\) numbers. We call \(d\) the **embedding dimension** or **model dimension**.
 
-Stack all $n$ token vectors as rows of a matrix:
+Stack all \(n\) token vectors as rows of a matrix:
 
 $$
 X \in \mathbb{R}^{n \times d}
 $$
 
-Row $i$ of $X$, written $x_i \in \mathbb{R}^d$, is the representation of the $i$-th token. Initially, these vectors come from an embedding table (for text) or a patchification layer (for images/video). They encode what each token is, but not how it relates to the other tokens in the sequence.
+Row \(i\) of \(X\), written \(x_i \in \mathbb{R}^d\), is the representation of the \(i\)-th token. Initially, these vectors come from an embedding table (for text) or a patchification layer (for images/video). They encode what each token is, but not how it relates to the other tokens in the sequence.
 
-The fundamental problem: **transform $X$ into a new representation $Y \in \mathbb{R}^{n \times d}$ where each token's representation incorporates information from the entire sequence.**
+The fundamental problem: **transform \(X\) into a new representation \(Y \in \mathbb{R}^{n \times d}\) where each token's representation incorporates information from the entire sequence.**
 
 Token 5 in the sentence "The cat sat on the mat" needs to know about token 2 ("cat") and token 3 ("sat") to properly represent "the" (which "the"? the one near the mat, not the one near the cat). Token representations must be **context-dependent**.
 
-The question is: what function $f$ should map $X$ to $Y$?
+The question is: what function \(f\) should map \(X\) to \(Y\)?
 
 ---
 
 ## Why Not RNNs?
 
-The first generation solution was the **recurrent neural network** (RNN). An RNN processes the sequence one token at a time, maintaining a hidden state $h_t$ that accumulates information:
+The first generation solution was the **recurrent neural network** (RNN). An RNN processes the sequence one token at a time, maintaining a hidden state \(h_t\) that accumulates information:
 
 $$
 h_t = \sigma(W_h h_{t-1} + W_x x_t + b)
 $$
 
-Here $\sigma$ is a nonlinear activation function (like tanh), $W_h$ and $W_x$ are weight matrices, and $b$ is a bias vector. The hidden state $h_t$ depends on the previous hidden state $h_{t-1}$ and the current input $x_t$.
+Here \(\sigma\) is a nonlinear activation function (like tanh), \(W_h\) and \(W_x\) are weight matrices, and \(b\) is a bias vector. The hidden state \(h_t\) depends on the previous hidden state \(h_{t-1}\) and the current input \(x_t\).
 
 This has three serious problems.
 
-**Problem 1: Sequential computation.** To compute $h_{100}$, you need $h_{99}$, which needs $h_{98}$, all the way back to $h_1$. You cannot parallelize this. Processing a sequence of length $n$ takes $O(n)$ sequential steps. On modern GPUs with thousands of cores, this is catastrophic --- the hardware sits idle while you wait for each step to finish.
+**Problem 1: Sequential computation.** To compute \(h_{100}\), you need \(h_{99}\), which needs \(h_{98}\), all the way back to \(h_1\). You cannot parallelize this. Processing a sequence of length \(n\) takes \(O(n)\) sequential steps. On modern GPUs with thousands of cores, this is catastrophic --- the hardware sits idle while you wait for each step to finish.
 
-**Problem 2: Vanishing gradients.** During backpropagation, the gradient of the loss with respect to early tokens must flow through every intermediate hidden state. Each step multiplies by $W_h$. If the spectral norm of $W_h$ (its largest singular value) is less than 1, the gradient shrinks exponentially. After 100 steps, the gradient from the loss to token 1 is scaled by roughly $\|W_h\|^{100}$, which is astronomically small. The model cannot learn long-range dependencies. LSTMs and GRUs mitigate this with gating mechanisms, but they do not eliminate it.
+**Problem 2: Vanishing gradients.** During backpropagation, the gradient of the loss with respect to early tokens must flow through every intermediate hidden state. Each step multiplies by \(W_h\). If the spectral norm of \(W_h\) (its largest singular value) is less than 1, the gradient shrinks exponentially. After 100 steps, the gradient from the loss to token 1 is scaled by roughly \(\|W_h\|^{100}\), which is astronomically small. The model cannot learn long-range dependencies. LSTMs and GRUs mitigate this with gating mechanisms, but they do not eliminate it.
 
-**Problem 3: Information bottleneck.** All information about the past must fit into the fixed-size hidden state $h_t \in \mathbb{R}^{d_h}$. The model compresses the entire history of the sequence into a single vector. For long sequences, this is an impossible compression task. Information from early tokens gets overwritten.
+**Problem 3: Information bottleneck.** All information about the past must fit into the fixed-size hidden state \(h_t \in \mathbb{R}^{d_h}\). The model compresses the entire history of the sequence into a single vector. For long sequences, this is an impossible compression task. Information from early tokens gets overwritten.
 
 What we want: a mechanism where every token can directly attend to every other token, in parallel, with no sequential bottleneck. That mechanism is **attention**.
 
@@ -74,23 +74,23 @@ What we want: a mechanism where every token can directly attend to every other t
 
 ### The Core Idea
 
-Start with the simplest version of the problem. We have $n$ tokens, each represented by a vector $x_i \in \mathbb{R}^d$. We want to produce a new representation $y_i$ for token $i$ that incorporates information from all tokens in the sequence. The most natural approach: **compute $y_i$ as a weighted average of all token representations**, where the weights reflect how relevant each token is to token $i$.
+Start with the simplest version of the problem. We have \(n\) tokens, each represented by a vector \(x_i \in \mathbb{R}^d\). We want to produce a new representation \(y_i\) for token \(i\) that incorporates information from all tokens in the sequence. The most natural approach: **compute \(y_i\) as a weighted average of all token representations**, where the weights reflect how relevant each token is to token \(i\).
 
 $$
 y_i = \sum_{j=1}^{n} \alpha_{ij} \, x_j
 $$
 
-Here $\alpha_{ij}$ is the **attention weight** --- how much token $i$ should attend to token $j$. The weights must be non-negative and sum to 1 (so they form a probability distribution): $\alpha_{ij} \geq 0$ and $\sum_j \alpha_{ij} = 1$.
+Here \(\alpha_{ij}\) is the **attention weight** --- how much token \(i\) should attend to token \(j\). The weights must be non-negative and sum to 1 (so they form a probability distribution): \(\alpha_{ij} \geq 0\) and \(\sum_j \alpha_{ij} = 1\).
 
-The question is: how do we compute $\alpha_{ij}$?
+The question is: how do we compute \(\alpha_{ij}\)?
 
 ### Queries, Keys, and Values
 
 The key insight --- and the entire intellectual contribution of the attention mechanism --- is to separate three roles that each token plays:
 
-- **Query ($q_i$):** "What am I looking for?" --- the representation of token $i$ when it is asking for information.
-- **Key ($k_j$):** "What do I contain?" --- the representation of token $j$ when it is advertising its content.
-- **Value ($v_j$):** "What information do I provide?" --- the actual content that token $j$ contributes when attended to.
+- **Query (\(q_i\)):** "What am I looking for?" --- the representation of token \(i\) when it is asking for information.
+- **Key (\(k_j\)):** "What do I contain?" --- the representation of token \(j\) when it is advertising its content.
+- **Value (\(v_j\)):** "What information do I provide?" --- the actual content that token \(j\) contributes when attended to.
 
 These are computed by multiplying the input by three learned weight matrices:
 
@@ -98,19 +98,19 @@ $$
 Q = XW_Q, \quad K = XW_K, \quad V = XW_V
 $$
 
-where $W_Q, W_K \in \mathbb{R}^{d \times d_k}$ and $W_V \in \mathbb{R}^{d \times d_v}$. Here $d_k$ is the dimension of the query/key space, and $d_v$ is the dimension of the value space. Often $d_k = d_v = d$ for single-head attention, but we will see later that multi-head attention uses smaller dimensions.
+where \(W_Q, W_K \in \mathbb{R}^{d \times d_k}\) and \(W_V \in \mathbb{R}^{d \times d_v}\). Here \(d_k\) is the dimension of the query/key space, and \(d_v\) is the dimension of the value space. Often \(d_k = d_v = d\) for single-head attention, but we will see later that multi-head attention uses smaller dimensions.
 
 Why separate Q, K, and V? Because the notion of "relevance" (what should I attend to?) is fundamentally different from "content" (what information should I extract?). The word "bank" in "river bank" and "bank account" has different relevance to the word "water" (high vs. low) but might have similar raw content. By using separate projections, the model can learn to decouple these roles.
 
 ### The Attention Score
 
-The relevance of token $j$ to token $i$ is measured by the **dot product** of the query of $i$ with the key of $j$:
+The relevance of token \(j\) to token \(i\) is measured by the **dot product** of the query of \(i\) with the key of \(j\):
 
 $$
 e_{ij} = q_i \cdot k_j = q_i^T k_j
 $$
 
-Why the dot product? The dot product of two vectors measures their alignment. If $q_i$ and $k_j$ point in similar directions in $\mathbb{R}^{d_k}$, the dot product is large and positive. If they are orthogonal, it is zero. If they point in opposite directions, it is large and negative. So the dot product naturally measures "how well does key $j$ match query $i$?" in the learned subspace.
+Why the dot product? The dot product of two vectors measures their alignment. If \(q_i\) and \(k_j\) point in similar directions in \(\mathbb{R}^{d_k}\), the dot product is large and positive. If they are orthogonal, it is zero. If they point in opposite directions, it is large and negative. So the dot product naturally measures "how well does key \(j\) match query \(i\)?" in the learned subspace.
 
 In matrix form, computing all pairwise dot products at once:
 
@@ -118,11 +118,11 @@ $$
 E = QK^T \in \mathbb{R}^{n \times n}
 $$
 
-Entry $(i, j)$ of this matrix is $q_i^T k_j$ --- the raw attention score from token $i$ to token $j$.
+Entry \((i, j)\) of this matrix is \(q_i^T k_j\) --- the raw attention score from token \(i\) to token \(j\).
 
-### The Scaling Factor: Why $\sqrt{d_k}$?
+### The Scaling Factor: Why \(\sqrt{d_k}\)?
 
-Here is where things get interesting. We do not use $E$ directly. We divide by $\sqrt{d_k}$:
+Here is where things get interesting. We do not use \(E\) directly. We divide by \(\sqrt{d_k}\):
 
 $$
 \text{Attention}(Q, K, V) = \text{softmax}\!\left(\frac{QK^T}{\sqrt{d_k}}\right) V
@@ -130,21 +130,21 @@ $$
 
 Why? This is not a heuristic. It comes from a precise variance calculation.
 
-Assume the entries of $q_i$ and $k_j$ are independent random variables with mean 0 and variance 1 (which is approximately true after standard initialization and layer normalization). The dot product is:
+Assume the entries of \(q_i\) and \(k_j\) are independent random variables with mean 0 and variance 1 (which is approximately true after standard initialization and layer normalization). The dot product is:
 
 $$
 e_{ij} = q_i^T k_j = \sum_{m=1}^{d_k} q_{i,m} \cdot k_{j,m}
 $$
 
-Each term $q_{i,m} \cdot k_{j,m}$ has mean 0 (product of two zero-mean independent variables) and variance 1 (since $\text{Var}(q_{i,m} \cdot k_{j,m}) = \text{Var}(q_{i,m})\text{Var}(k_{j,m}) = 1 \cdot 1 = 1$ for independent zero-mean variables).
+Each term \(q_{i,m} \cdot k_{j,m}\) has mean 0 (product of two zero-mean independent variables) and variance 1 (since \(\text{Var}(q_{i,m} \cdot k_{j,m}) = \text{Var}(q_{i,m})\text{Var}(k_{j,m}) = 1 \cdot 1 = 1\) for independent zero-mean variables).
 
-Since we sum $d_k$ such independent terms:
+Since we sum \(d_k\) such independent terms:
 
 $$
 \text{Var}(e_{ij}) = d_k
 $$
 
-So the standard deviation of $e_{ij}$ is $\sqrt{d_k}$. For $d_k = 64$ (a typical value), the dot products have standard deviation 8. For $d_k = 512$, it is about 22.6.
+So the standard deviation of \(e_{ij}\) is \(\sqrt{d_k}\). For \(d_k = 64\) (a typical value), the dot products have standard deviation 8. For \(d_k = 512\), it is about 22.6.
 
 Now consider what happens when we feed these into the **softmax** function. Softmax is defined as:
 
@@ -152,12 +152,12 @@ $$
 \text{softmax}(z)_i = \frac{e^{z_i}}{\sum_j e^{z_j}}
 $$
 
-When the input values $z_i$ have large magnitude, softmax **saturates**: almost all the probability mass concentrates on the single largest entry, and the output approaches a one-hot vector. This is a problem because:
+When the input values \(z_i\) have large magnitude, softmax **saturates**: almost all the probability mass concentrates on the single largest entry, and the output approaches a one-hot vector. This is a problem because:
 
 1. The gradients of softmax vanish when it saturates (the derivative of a near-constant function is near zero).
 2. The model cannot express "attend moderately to several tokens" --- it is forced into hard, winner-take-all attention.
 
-By dividing by $\sqrt{d_k}$, we normalize the dot products to have unit variance regardless of $d_k$:
+By dividing by \(\sqrt{d_k}\), we normalize the dot products to have unit variance regardless of \(d_k\):
 
 $$
 \text{Var}\!\left(\frac{e_{ij}}{\sqrt{d_k}}\right) = \frac{d_k}{d_k} = 1
@@ -175,13 +175,13 @@ $$
 
 The computation proceeds in three stages:
 
-1. **Compute scores:** $S = QK^T / \sqrt{d_k} \in \mathbb{R}^{n \times n}$
-2. **Normalize:** $A = \text{softmax}(S) \in \mathbb{R}^{n \times n}$ (softmax applied row-wise, so each row sums to 1)
-3. **Aggregate:** $Y = AV \in \mathbb{R}^{n \times d_v}$
+1. **Compute scores:** \(S = QK^T / \sqrt{d_k} \in \mathbb{R}^{n \times n}\)
+2. **Normalize:** \(A = \text{softmax}(S) \in \mathbb{R}^{n \times n}\) (softmax applied row-wise, so each row sums to 1)
+3. **Aggregate:** \(Y = AV \in \mathbb{R}^{n \times d_v}\)
 
-The output $Y$ has the same number of tokens as the input, but each token's representation is now a weighted combination of all value vectors, with weights determined by query-key similarity.
+The output \(Y\) has the same number of tokens as the input, but each token's representation is now a weighted combination of all value vectors, with weights determined by query-key similarity.
 
-**Computational cost:** The dominant term is the matrix multiplication $QK^T$, which requires $O(n^2 d_k)$ operations. This is the quadratic cost of attention that has driven years of research into efficient alternatives. For a sequence of 8192 tokens with $d_k = 64$, this is about $8192^2 \times 64 \approx 4.3 \times 10^9$ multiply-add operations per attention layer.
+**Computational cost:** The dominant term is the matrix multiplication \(QK^T\), which requires \(O(n^2 d_k)\) operations. This is the quadratic cost of attention that has driven years of research into efficient alternatives. For a sequence of 8192 tokens with \(d_k = 64\), this is about \(8192^2 \times 64 \approx 4.3 \times 10^9\) multiply-add operations per attention layer.
 
 ---
 
@@ -273,11 +273,11 @@ The attention mechanism has a beautiful geometric interpretation that makes the 
   <text x="350" y="190" text-anchor="middle" font-size="10" fill="#888">scores</text>
 </svg>
 
-**Think of attention as a soft dictionary lookup.** In a regular dictionary (hash map), you provide a query key and get back exactly one value. In attention, the query $q_i$ is compared against all keys $k_1, \ldots, k_n$. Instead of returning the value of the single best match, attention returns a **weighted combination** of all values, with weights proportional to how well each key matches the query.
+**Think of attention as a soft dictionary lookup.** In a regular dictionary (hash map), you provide a query key and get back exactly one value. In attention, the query \(q_i\) is compared against all keys \(k_1, \ldots, k_n\). Instead of returning the value of the single best match, attention returns a **weighted combination** of all values, with weights proportional to how well each key matches the query.
 
 The Q and K projections define a learned similarity space. Two tokens might be dissimilar in the raw embedding space but highly similar in the query-key subspace, because the model has learned that the relationship between them matters for the task. The V projection defines what content to extract --- the model can learn to extract different information from a token than what it uses to determine relevance.
 
-This factorization into Q, K, V is what gives attention its expressive power. A simple dot product between raw token embeddings $x_i^T x_j$ would conflate relevance with content. The three separate projections let the model independently learn: what to search for, what to advertise, and what to transmit.
+This factorization into Q, K, V is what gives attention its expressive power. A simple dot product between raw token embeddings \(x_i^T x_j\) would conflate relevance with content. The three separate projections let the model independently learn: what to search for, what to advertise, and what to transmit.
 
 ---
 
@@ -285,7 +285,7 @@ This factorization into Q, K, V is what gives attention its expressive power. A 
 
 ### Why One Head Is Not Enough
 
-A single attention head computes one set of attention weights $A \in \mathbb{R}^{n \times n}$. This means each token computes one probability distribution over all other tokens and extracts one weighted combination of values.
+A single attention head computes one set of attention weights \(A \in \mathbb{R}^{n \times n}\). This means each token computes one probability distribution over all other tokens and extracts one weighted combination of values.
 
 But tokens need to attend to multiple things simultaneously. Consider the sentence: "The animal didn't cross the street because it was too wide." The word "it" needs to simultaneously:
 
@@ -297,15 +297,15 @@ A single softmax distribution must concentrate its probability mass. It cannot g
 
 ### The Multi-Head Construction
 
-The solution: run $h$ attention heads in parallel, each with its own Q, K, V projections, each learning to attend to different aspects of the input.
+The solution: run \(h\) attention heads in parallel, each with its own Q, K, V projections, each learning to attend to different aspects of the input.
 
-For head $i \in \{1, \ldots, h\}$:
+For head \(i \in \{1, \ldots, h\}\):
 
 $$
 Q_i = XW_Q^{(i)}, \quad K_i = XW_K^{(i)}, \quad V_i = XW_V^{(i)}
 $$
 
-where $W_Q^{(i)}, W_K^{(i)} \in \mathbb{R}^{d \times d_k}$ and $W_V^{(i)} \in \mathbb{R}^{d \times d_v}$, with $d_k = d_v = d / h$.
+where \(W_Q^{(i)}, W_K^{(i)} \in \mathbb{R}^{d \times d_k}\) and \(W_V^{(i)} \in \mathbb{R}^{d \times d_v}\), with \(d_k = d_v = d / h\).
 
 Each head computes attention independently:
 
@@ -319,29 +319,29 @@ $$
 \text{MultiHead}(X) = \text{Concat}(\text{head}_1, \ldots, \text{head}_h) W_O
 $$
 
-where $W_O \in \mathbb{R}^{d \times d}$ is the output projection matrix. Since each head produces output in $\mathbb{R}^{n \times d_k}$ and $d_k = d/h$, the concatenation gives $\mathbb{R}^{n \times d}$, and after multiplying by $W_O$ we get $\mathbb{R}^{n \times d}$ --- the same shape as the input.
+where \(W_O \in \mathbb{R}^{d \times d}\) is the output projection matrix. Since each head produces output in \(\mathbb{R}^{n \times d_k}\) and \(d_k = d/h\), the concatenation gives \(\mathbb{R}^{n \times d}\), and after multiplying by \(W_O\) we get \(\mathbb{R}^{n \times d}\) --- the same shape as the input.
 
 ### The Computational Cost Trick
 
-Here is the remarkable fact: **multi-head attention costs the same as single-head attention** with the full dimension $d$.
+Here is the remarkable fact: **multi-head attention costs the same as single-head attention** with the full dimension \(d\).
 
-Single-head attention with dimension $d$:
-- $Q, K, V$ computation: $3 \times (n \times d \times d) = 3nd^2$
-- $QK^T$: $n \times n \times d = n^2 d$
-- $AV$: $n \times n \times d = n^2 d$
-- Total: $3nd^2 + 2n^2 d$
+Single-head attention with dimension \(d\):
+- \(Q, K, V\) computation: \(3 \times (n \times d \times d) = 3nd^2\)
+- \(QK^T\): \(n \times n \times d = n^2 d\)
+- \(AV\): \(n \times n \times d = n^2 d\)
+- Total: \(3nd^2 + 2n^2 d\)
 
-Multi-head attention with $h$ heads, each of dimension $d_k = d/h$:
-- Per head: $Q_i, K_i, V_i$ computation: $3 \times (n \times d \times d/h) = 3nd^2/h$
-- Per head: $Q_i K_i^T$: $n^2 \times d/h$
-- Per head: $A_i V_i$: $n^2 \times d/h$
-- Sum over $h$ heads: $h \times (3nd^2/h + 2n^2 d/h) = 3nd^2 + 2n^2 d$
-- Output projection $W_O$: $nd^2$
-- Total: $4nd^2 + 2n^2 d$
+Multi-head attention with \(h\) heads, each of dimension \(d_k = d/h\):
+- Per head: \(Q_i, K_i, V_i\) computation: \(3 \times (n \times d \times d/h) = 3nd^2/h\)
+- Per head: \(Q_i K_i^T\): \(n^2 \times d/h\)
+- Per head: \(A_i V_i\): \(n^2 \times d/h\)
+- Sum over \(h\) heads: \(h \times (3nd^2/h + 2n^2 d/h) = 3nd^2 + 2n^2 d\)
+- Output projection \(W_O\): \(nd^2\)
+- Total: \(4nd^2 + 2n^2 d\)
 
-The difference is only the output projection, which is a minor addition. The $n^2 d$ terms --- the expensive part --- are identical. We get $h$ independent attention patterns for essentially the same computational budget as one. This is why multi-head attention is used universally: it is strictly more expressive at roughly the same cost.
+The difference is only the output projection, which is a minor addition. The \(n^2 d\) terms --- the expensive part --- are identical. We get \(h\) independent attention patterns for essentially the same computational budget as one. This is why multi-head attention is used universally: it is strictly more expressive at roughly the same cost.
 
-In practice, the multi-head computation is implemented as a single large matrix multiplication followed by a reshape, not as $h$ separate operations. You compute $Q = XW_Q$ where $W_Q \in \mathbb{R}^{d \times d}$, then reshape the result from $(n, d)$ to $(n, h, d_k)$ and transpose to $(h, n, d_k)$. This allows batched matrix multiplication across heads, fully utilizing GPU parallelism.
+In practice, the multi-head computation is implemented as a single large matrix multiplication followed by a reshape, not as \(h\) separate operations. You compute \(Q = XW_Q\) where \(W_Q \in \mathbb{R}^{d \times d}\), then reshape the result from \((n, d)\) to \((n, h, d_k)\) and transpose to \((h, n, d_k)\). This allows batched matrix multiplication across heads, fully utilizing GPU parallelism.
 
 ---
 
@@ -349,9 +349,9 @@ In practice, the multi-head computation is implemented as a single large matrix 
 
 ### Attention Is Permutation-Equivariant
 
-There is a critical property of the attention mechanism that we need to address. Consider what happens if we permute the input sequence --- shuffle the tokens in $X$ using some permutation $\pi$.
+There is a critical property of the attention mechanism that we need to address. Consider what happens if we permute the input sequence --- shuffle the tokens in \(X\) using some permutation \(\pi\).
 
-Let $P_\pi$ be the permutation matrix corresponding to $\pi$. The permuted input is $P_\pi X$. Let us trace through the attention computation:
+Let \(P_\pi\) be the permutation matrix corresponding to \(\pi\). The permuted input is \(P_\pi X\). Let us trace through the attention computation:
 
 $$
 Q' = P_\pi X W_Q = P_\pi Q
@@ -383,19 +383,19 @@ $$
 Y' = A' V' = P_\pi A P_\pi^T P_\pi V = P_\pi A V = P_\pi Y
 $$
 
-So if you permute the input by $\pi$, the output is permuted by exactly the same $\pi$. This is **permutation equivariance**: the attention mechanism treats the input as a **set**, not a sequence. It has no notion of order.
+So if you permute the input by \(\pi\), the output is permuted by exactly the same \(\pi\). This is **permutation equivariance**: the attention mechanism treats the input as a **set**, not a sequence. It has no notion of order.
 
 This is a problem. "The cat sat on the mat" and "mat the on sat cat the" contain the same tokens, but the first is English and the second is not. We need to explicitly inject position information.
 
 ### Sinusoidal Positional Encoding
 
-The original transformer paper (Vaswani et al., 2017) proposed adding a **positional encoding** vector $p_{\text{pos}} \in \mathbb{R}^d$ to each token embedding before attention:
+The original transformer paper (Vaswani et al., 2017) proposed adding a **positional encoding** vector \(p_{\text{pos}} \in \mathbb{R}^d\) to each token embedding before attention:
 
 $$
 \tilde{x}_i = x_i + p_i
 $$
 
-The sinusoidal encoding defines each component of the positional vector as follows. For position $\text{pos}$ (which integer position in the sequence, starting from 0) and dimension index $i$ (from 0 to $d-1$):
+The sinusoidal encoding defines each component of the positional vector as follows. For position \(\text{pos}\) (which integer position in the sequence, starting from 0) and dimension index \(i\) (from 0 to \(d-1\)):
 
 $$
 p_{\text{pos}, 2i} = \sin\!\left(\frac{\text{pos}}{10000^{2i/d}}\right)
@@ -405,19 +405,19 @@ $$
 p_{\text{pos}, 2i+1} = \cos\!\left(\frac{\text{pos}}{10000^{2i/d}}\right)
 $$
 
-Each pair of dimensions $(2i, 2i+1)$ is a sinusoid at a different frequency. The frequency decreases exponentially with the dimension index: low-indexed dimensions oscillate rapidly (capturing fine-grained position differences), while high-indexed dimensions oscillate slowly (capturing coarse position).
+Each pair of dimensions \((2i, 2i+1)\) is a sinusoid at a different frequency. The frequency decreases exponentially with the dimension index: low-indexed dimensions oscillate rapidly (capturing fine-grained position differences), while high-indexed dimensions oscillate slowly (capturing coarse position).
 
 ### Why Sinusoids? The Rotation Matrix Argument
 
 This is not an arbitrary choice. Sinusoids have a special property: **the encoding of a relative position offset can be expressed as a linear transformation of the encoding at any absolute position.**
 
-Define the frequency for dimension pair $i$: $\omega_i = 1 / 10000^{2i/d}$. The encoding for position $\text{pos}$ in dimensions $(2i, 2i+1)$ is the 2D vector:
+Define the frequency for dimension pair \(i\): \(\omega_i = 1 / 10000^{2i/d}\). The encoding for position \(\text{pos}\) in dimensions \((2i, 2i+1)\) is the 2D vector:
 
 $$
 \begin{pmatrix} \sin(\omega_i \cdot \text{pos}) \\ \cos(\omega_i \cdot \text{pos}) \end{pmatrix}
 $$
 
-The encoding for position $\text{pos} + k$ (offset by $k$) is:
+The encoding for position \(\text{pos} + k\) (offset by \(k\)) is:
 
 $$
 \begin{pmatrix} \sin(\omega_i (\text{pos} + k)) \\ \cos(\omega_i (\text{pos} + k)) \end{pmatrix}
@@ -439,7 +439,7 @@ $$
 \begin{pmatrix} \sin(\omega_i (\text{pos}+k)) \\ \cos(\omega_i (\text{pos}+k)) \end{pmatrix} = \begin{pmatrix} \cos(\omega_i k) & \sin(\omega_i k) \\ -\sin(\omega_i k) & \cos(\omega_i k) \end{pmatrix} \begin{pmatrix} \sin(\omega_i \text{pos}) \\ \cos(\omega_i \text{pos}) \end{pmatrix}
 $$
 
-The matrix on the right is a **rotation matrix** $R_k$ that depends only on the offset $k$, not on the absolute position $\text{pos}$. This means: to get from the encoding at position $\text{pos}$ to the encoding at position $\text{pos} + k$, you apply a fixed linear transformation. The dot product $p_{\text{pos}}^T p_{\text{pos}+k}$ therefore depends only on $k$, the relative distance, not on the absolute positions. This is exactly what we want --- attention should be able to detect "these two tokens are 3 positions apart" without needing to memorize absolute positions.
+The matrix on the right is a **rotation matrix** \(R_k\) that depends only on the offset \(k\), not on the absolute position \(\text{pos}\). This means: to get from the encoding at position \(\text{pos}\) to the encoding at position \(\text{pos} + k\), you apply a fixed linear transformation. The dot product \(p_{\text{pos}}^T p_{\text{pos}+k}\) therefore depends only on \(k\), the relative distance, not on the absolute positions. This is exactly what we want --- attention should be able to detect "these two tokens are 3 positions apart" without needing to memorize absolute positions.
 
 ### RoPE: The Modern Alternative
 
@@ -449,13 +449,13 @@ $$
 q_i' = R_i q_i, \quad k_j' = R_j k_j
 $$
 
-where $R_i$ is a block-diagonal rotation matrix that rotates pairs of dimensions by angles proportional to position $i$. The attention score becomes:
+where \(R_i\) is a block-diagonal rotation matrix that rotates pairs of dimensions by angles proportional to position \(i\). The attention score becomes:
 
 $$
 q_i'^T k_j' = q_i^T R_i^T R_j k_j = q_i^T R_{j-i} k_j
 $$
 
-This naturally encodes relative position $j - i$ into the attention score. The advantage over additive sinusoidal encoding: position information is injected directly into the similarity computation rather than being mixed into the token representation, which empirically gives better performance on long-context tasks.
+This naturally encodes relative position \(j - i\) into the attention score. The advantage over additive sinusoidal encoding: position information is injected directly into the similarity computation rather than being mixed into the token representation, which empirically gives better performance on long-context tasks.
 
 ---
 
@@ -555,27 +555,27 @@ $$
 \text{output} = x + f(x)
 $$
 
-where $f$ is the sub-layer (attention or FFN). Why is this essential?
+where \(f\) is the sub-layer (attention or FFN). Why is this essential?
 
-Consider the gradient flow during backpropagation. If $y = x + f(x)$, then:
+Consider the gradient flow during backpropagation. If \(y = x + f(x)\), then:
 
 $$
 \frac{\partial y}{\partial x} = I + \frac{\partial f}{\partial x}
 $$
 
-The identity matrix $I$ ensures that gradients can flow directly from later layers to earlier layers without passing through any nonlinearities or weight matrices. Even if $\partial f / \partial x$ is small (vanishing gradient in the sub-layer), the gradient still flows through the identity path. This is the same principle that made ResNets work for deep convolutional networks --- it creates "gradient highways" that allow training networks with hundreds of layers.
+The identity matrix \(I\) ensures that gradients can flow directly from later layers to earlier layers without passing through any nonlinearities or weight matrices. Even if \(\partial f / \partial x\) is small (vanishing gradient in the sub-layer), the gradient still flows through the identity path. This is the same principle that made ResNets work for deep convolutional networks --- it creates "gradient highways" that allow training networks with hundreds of layers.
 
 Without residual connections, a 96-layer transformer would be essentially untrainable. With them, gradients from the loss reach the first layer with magnitude comparable to the last layer.
 
 ### Layer Normalization
 
-**Layer normalization** normalizes the activations across the feature dimension for each token independently. Given a vector $x \in \mathbb{R}^d$:
+**Layer normalization** normalizes the activations across the feature dimension for each token independently. Given a vector \(x \in \mathbb{R}^d\):
 
 $$
 \text{LayerNorm}(x) = \gamma \odot \frac{x - \mu}{\sigma + \epsilon} + \beta
 $$
 
-where $\mu = \frac{1}{d}\sum_{i=1}^d x_i$ is the mean, $\sigma = \sqrt{\frac{1}{d}\sum_{i=1}^d (x_i - \mu)^2}$ is the standard deviation, $\gamma$ and $\beta$ are learned scale and shift parameters (vectors in $\mathbb{R}^d$), $\odot$ is element-wise multiplication, and $\epsilon$ is a small constant for numerical stability (typically $10^{-5}$).
+where \(\mu = \frac{1}{d}\sum_{i=1}^d x_i\) is the mean, \(\sigma = \sqrt{\frac{1}{d}\sum_{i=1}^d (x_i - \mu)^2}\) is the standard deviation, \(\gamma\) and \(\beta\) are learned scale and shift parameters (vectors in \(\mathbb{R}^d\)), \(\odot\) is element-wise multiplication, and \(\epsilon\) is a small constant for numerical stability (typically \(10^{-5}\)).
 
 Why is this needed? Without normalization, the scale of activations can drift as they pass through many layers --- growing exponentially (exploding activations) or shrinking toward zero. Layer norm resets the scale at each sub-layer, keeping activations in a numerically stable range. This is critical because transformers are deep (GPT-3 has 96 layers) and each layer's output feeds into the next.
 
@@ -595,7 +595,7 @@ $$
 \text{FFN}(x) = W_2 \, \sigma(W_1 x + b_1) + b_2
 $$
 
-where $W_1 \in \mathbb{R}^{d \times d_{ff}}$, $W_2 \in \mathbb{R}^{d_{ff} \times d}$, and typically $d_{ff} = 4d$. The activation $\sigma$ is GELU (Gaussian Error Linear Unit) in most modern transformers.
+where \(W_1 \in \mathbb{R}^{d \times d_{ff}}\), \(W_2 \in \mathbb{R}^{d_{ff} \times d}\), and typically \(d_{ff} = 4d\). The activation \(\sigma\) is GELU (Gaussian Error Linear Unit) in most modern transformers.
 
 The FFN is where the transformer stores factual knowledge. Attention moves information between tokens (inter-token communication), but the FFN transforms each token independently (intra-token computation). Research has shown that individual neurons in the FFN activate for specific semantic concepts --- "Paris is the capital of France" is stored in specific weight patterns of the FFN layers.
 
@@ -607,33 +607,33 @@ The expansion to $4d$ and back means the FFN has a wide hidden layer, giving it 
 
 ### The Autoregressive Generation Problem
 
-Large language models generate text one token at a time. To generate token $t+1$, the model runs a forward pass over the entire sequence $[x_1, x_2, \ldots, x_t]$, computes the probability distribution over the vocabulary for position $t+1$, samples a token, appends it, and repeats.
+Large language models generate text one token at a time. To generate token \(t+1\), the model runs a forward pass over the entire sequence \([x_1, x_2, \ldots, x_t]\), computes the probability distribution over the vocabulary for position \(t+1\), samples a token, appends it, and repeats.
 
-Naively, generating the $(t+1)$-th token requires recomputing attention over all $t$ previous tokens. Generating a sequence of length $n$ requires $O(n)$ forward passes, each with $O(n)$ attention, giving $O(n^2)$ total work. But most of this is redundant: when generating token $t+1$, the keys and values for tokens $1$ through $t$ have not changed since the last step.
+Naively, generating the \((t+1)\)-th token requires recomputing attention over all \(t\) previous tokens. Generating a sequence of length \(n\) requires \(O(n)\) forward passes, each with \(O(n)\) attention, giving \(O(n^2)\) total work. But most of this is redundant: when generating token \(t+1\), the keys and values for tokens $1$ through \(t\) have not changed since the last step.
 
 ### The KV Cache
 
-The solution is to **cache the key and value matrices** from all previous tokens. At step $t+1$:
+The solution is to **cache the key and value matrices** from all previous tokens. At step \(t+1\):
 
-1. Compute Q, K, V only for the **new** token $x_{t+1}$: $q_{t+1} = x_{t+1} W_Q$, $k_{t+1} = x_{t+1} W_K$, $v_{t+1} = x_{t+1} W_V$
-2. **Append** $k_{t+1}$ and $v_{t+1}$ to the cached K and V matrices
-3. Compute attention: $q_{t+1}$ attends over all cached keys $[k_1, \ldots, k_{t+1}]$ to produce the output
+1. Compute Q, K, V only for the **new** token \(x_{t+1}\): \(q_{t+1} = x_{t+1} W_Q\), \(k_{t+1} = x_{t+1} W_K\), \(v_{t+1} = x_{t+1} W_V\)
+2. **Append** \(k_{t+1}\) and \(v_{t+1}\) to the cached K and V matrices
+3. Compute attention: \(q_{t+1}\) attends over all cached keys \([k_1, \ldots, k_{t+1}]\) to produce the output
 
-This reduces the per-step computation from $O(t \cdot d)$ for the full Q, K, V computation to $O(d)$ for just the new token (the attention score computation is still $O(t \cdot d_k)$ per head, but this is unavoidable).
+This reduces the per-step computation from \(O(t \cdot d)\) for the full Q, K, V computation to \(O(d)\) for just the new token (the attention score computation is still \(O(t \cdot d_k)\) per head, but this is unavoidable).
 
 ### Memory Cost Derivation
 
 The KV cache stores key and value vectors for every token, every head, and every layer. Let us compute the exact memory footprint.
 
 **Parameters:**
-- $n$ = sequence length (number of cached tokens)
-- $L$ = number of transformer layers
-- $h$ = number of attention heads
-- $d_k = d / h$ = dimension per head
+- \(n\) = sequence length (number of cached tokens)
+- \(L\) = number of transformer layers
+- \(h\) = number of attention heads
+- \(d_k = d / h\) = dimension per head
 
 For each layer, each head stores:
-- One key vector per token: $d_k$ values
-- One value vector per token: $d_k$ values
+- One key vector per token: \(d_k\) values
+- One value vector per token: \(d_k\) values
 
 Total cached values per layer:
 
@@ -641,7 +641,7 @@ $$
 n \times h \times 2 \times d_k = n \times h \times 2 \times \frac{d}{h} = 2nd
 $$
 
-Total across all $L$ layers:
+Total across all \(L\) layers:
 
 $$
 \text{KV cache size} = 2 \times n \times d \times L
@@ -654,10 +654,10 @@ $$
 $$
 
 **Concrete example: LLaMA-2 70B**
-- $d = 8192$, $L = 80$, context length $n = 4096$
-- KV cache: $4 \times 4096 \times 8192 \times 80 = 10.7 \times 10^9$ bytes $\approx 10$ GB
+- \(d = 8192\), \(L = 80\), context length \(n = 4096\)
+- KV cache: \(4 \times 4096 \times 8192 \times 80 = 10.7 \times 10^9\) bytes \(\approx 10\) GB
 
-For a 128K context window (as in newer models): $10 \times (128000 / 4096) \approx 312$ GB just for the KV cache of a single sequence. This is why long-context inference requires multiple GPUs even when the model weights themselves fit on one GPU. The KV cache grows linearly with sequence length, and it is the dominant memory consumer during generation.
+For a 128K context window (as in newer models): \(10 \times (128000 / 4096) \approx 312\) GB just for the KV cache of a single sequence. This is why long-context inference requires multiple GPUs even when the model weights themselves fit on one GPU. The KV cache grows linearly with sequence length, and it is the dominant memory consumer during generation.
 
 This is the fundamental reason why autoregressive generation is **memory-bound rather than compute-bound**. The arithmetic is fast (one token's worth of matrix multiplications), but reading and writing the KV cache from GPU memory is slow. The ratio of compute to memory access --- the **arithmetic intensity** --- is very low during generation, which is why specialized hardware and memory optimization techniques (quantized KV cache, sliding window attention, paged attention) are active areas of research.
 
@@ -673,15 +673,15 @@ Early diffusion models (Stable Diffusion 1.x, DALL-E 2) used U-Net architectures
 
 ### Adaptive Layer Norm (adaLN)
 
-In a standard diffusion model, the denoising network must know what timestep $t$ it is operating at --- the noise level determines what the network should do (at high $t$, denoise aggressively; at low $t$, refine details). In U-Nets, timestep conditioning is typically injected via additive or multiplicative conditioning.
+In a standard diffusion model, the denoising network must know what timestep \(t\) it is operating at --- the noise level determines what the network should do (at high \(t\), denoise aggressively; at low \(t\), refine details). In U-Nets, timestep conditioning is typically injected via additive or multiplicative conditioning.
 
-DiT uses **adaptive layer normalization** (adaLN). Instead of using fixed learned $\gamma$ and $\beta$ in layer norm, these parameters are predicted from the timestep (and optionally the class label or text embedding):
+DiT uses **adaptive layer normalization** (adaLN). Instead of using fixed learned \(\gamma\) and \(\beta\) in layer norm, these parameters are predicted from the timestep (and optionally the class label or text embedding):
 
 $$
 \gamma, \beta = \text{MLP}(t_{\text{emb}})
 $$
 
-where $t_{\text{emb}}$ is an embedding of the diffusion timestep. The layer norm then becomes:
+where \(t_{\text{emb}}\) is an embedding of the diffusion timestep. The layer norm then becomes:
 
 $$
 \text{adaLN}(x, t) = \gamma(t) \odot \frac{x - \mu}{\sigma + \epsilon} + \beta(t)
@@ -693,7 +693,7 @@ This is elegant: every layer norm operation in the transformer becomes condition
 
 For video generation (as in Sora, CogVideoX, and other video models), the DiT processes a 3D grid of tokens: spatial patches across multiple frames. The self-attention operates over all spatiotemporal tokens, allowing the model to capture both spatial coherence within frames and temporal coherence across frames in a single unified mechanism.
 
-The token count for video is large. A 16-frame video at 32x32 latent resolution with 2x2 patches gives $16 \times 16 \times 16 = 4096$ tokens. Modern video models use factored attention (spatial attention within frames, then temporal attention across frames) or windowed attention to manage this cost, but the core architecture remains a transformer with adaLN conditioning.
+The token count for video is large. A 16-frame video at 32x32 latent resolution with 2x2 patches gives \(16 \times 16 \times 16 = 4096\) tokens. Modern video models use factored attention (spatial attention within frames, then temporal attention across frames) or windowed attention to manage this cost, but the core architecture remains a transformer with adaLN conditioning.
 
 ---
 
@@ -813,7 +813,7 @@ print(f"\nAttention weights (each row sums to 1):")
 print(f"Row sums: {weights.sum(axis=1)}")
 ```
 
-The leftmost plot shows the raw scores $QK^T / \sqrt{d_k}$ --- these can be positive or negative, and their magnitude reflects how strongly each query-key pair aligns. The center plot shows these scores after softmax: now each row is a probability distribution summing to 1, and we can read off how much each token attends to each other token. The rightmost plot verifies our variance derivation: without $\sqrt{d_k}$ scaling, the standard deviation of dot products grows as $\sqrt{d_k}$, but after scaling it stays at 1 regardless of dimension.
+The leftmost plot shows the raw scores \(QK^T / \sqrt{d_k}\) --- these can be positive or negative, and their magnitude reflects how strongly each query-key pair aligns. The center plot shows these scores after softmax: now each row is a probability distribution summing to 1, and we can read off how much each token attends to each other token. The rightmost plot verifies our variance derivation: without \(\sqrt{d_k}\) scaling, the standard deviation of dot products grows as \(\sqrt{d_k}\), but after scaling it stays at 1 regardless of dimension.
 
 ### Multi-Head Attention Implementation
 
@@ -907,20 +907,20 @@ This confirms the mathematical proof from the positional encoding section: permu
 
 Let us collect the key ideas:
 
-1. **The problem:** Transform a sequence of token vectors $X \in \mathbb{R}^{n \times d}$ so each token's representation incorporates context from the entire sequence.
+1. **The problem:** Transform a sequence of token vectors \(X \in \mathbb{R}^{n \times d}\) so each token's representation incorporates context from the entire sequence.
 
-2. **Attention** solves this by computing weighted averages: each token's output is a softmax-weighted combination of all value vectors, with weights determined by query-key dot products. The $\sqrt{d_k}$ scaling keeps gradients healthy by maintaining unit variance in the attention scores.
+2. **Attention** solves this by computing weighted averages: each token's output is a softmax-weighted combination of all value vectors, with weights determined by query-key dot products. The \(\sqrt{d_k}\) scaling keeps gradients healthy by maintaining unit variance in the attention scores.
 
-3. **Multi-head attention** runs $h$ parallel attention mechanisms with separate learned projections, allowing the model to capture multiple types of relationships simultaneously, at essentially the same computational cost as single-head attention.
+3. **Multi-head attention** runs \(h\) parallel attention mechanisms with separate learned projections, allowing the model to capture multiple types of relationships simultaneously, at essentially the same computational cost as single-head attention.
 
 4. **Positional encoding** is necessary because attention is permutation-equivariant. Sinusoidal encodings enable the model to detect relative positions via rotation matrices. RoPE injects position directly into the attention score computation.
 
 5. **The transformer block** wraps attention and a feed-forward network with residual connections (gradient highways) and layer normalization (activation stability). Attention handles inter-token communication; the FFN handles per-token nonlinear transformation.
 
-6. **KV caching** exploits the fact that keys and values for previous tokens do not change during autoregressive generation, reducing redundant computation but creating a memory bottleneck that scales as $O(ndL)$.
+6. **KV caching** exploits the fact that keys and values for previous tokens do not change during autoregressive generation, reducing redundant computation but creating a memory bottleneck that scales as \(O(ndL)\).
 
 7. **DiT** adapts the transformer for diffusion models by using adaptive layer normalization for timestep conditioning, enabling transformers to replace U-Nets as the denoising backbone for image and video generation.
 
-Every component exists because removing it causes a specific, demonstrable failure. The $\sqrt{d_k}$ scaling prevents gradient death. Multi-head attention prevents representational bottlenecks. Positional encoding prevents order-blindness. Residual connections prevent training collapse. Layer norm prevents activation drift. The feed-forward network provides per-token processing capacity. The KV cache prevents redundant computation.
+Every component exists because removing it causes a specific, demonstrable failure. The \(\sqrt{d_k}\) scaling prevents gradient death. Multi-head attention prevents representational bottlenecks. Positional encoding prevents order-blindness. Residual connections prevent training collapse. Layer norm prevents activation drift. The feed-forward network provides per-token processing capacity. The KV cache prevents redundant computation.
 
 The transformer is not a single clever idea. It is a carefully engineered stack of solutions to specific problems, each mathematically motivated and empirically validated. Understanding it at this level --- not just the equations, but the failure modes they prevent --- is what separates reading about transformers from actually understanding them.

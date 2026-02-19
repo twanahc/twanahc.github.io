@@ -54,7 +54,7 @@ Both real and generated images are passed through an InceptionV3 network pretrai
 
 Why InceptionV3? It was the best available image classifier when FID was proposed. The pool-2048 features capture high-level semantic information --- object identity, scene composition, texture statistics --- while being invariant to small spatial perturbations.
 
-For a set of $N$ images $\{x_1, x_2, \ldots, x_N\}$, we compute:
+For a set of \(N\) images \(\{x_1, x_2, \ldots, x_N\}\), we compute:
 
 $$f_i = \text{InceptionV3}(x_i) \in \mathbb{R}^{2048}$$
 
@@ -68,7 +68,7 @@ And for generated images:
 
 $$\mu_g = \frac{1}{N_g} \sum_{i=1}^{N_g} f_i^{(g)}, \qquad \Sigma_g = \frac{1}{N_g - 1} \sum_{i=1}^{N_g} (f_i^{(g)} - \mu_g)(f_i^{(g)} - \mu_g)^T$$
 
-where $\mu \in \mathbb{R}^{2048}$ is the mean vector and $\Sigma \in \mathbb{R}^{2048 \times 2048}$ is the covariance matrix.
+where \(\mu \in \mathbb{R}^{2048}\) is the mean vector and \(\Sigma \in \mathbb{R}^{2048 \times 2048}\) is the covariance matrix.
 
 ### Step 3: Compute the Frechet Distance
 
@@ -78,33 +78,33 @@ $$\text{FID} = \|\mu_r - \mu_g\|^2 + \text{Tr}\left(\Sigma_r + \Sigma_g - 2\left
 
 Let us unpack each term:
 
-**Term 1: $\|\mu_r - \mu_g\|^2$**
+**Term 1: \(\|\mu_r - \mu_g\|^2\)**
 
 This is the squared Euclidean distance between the mean feature vectors. It measures whether the "center" of the generated distribution matches the "center" of the real distribution. If your model generates images that are, on average, in the right semantic neighborhood, this term is small.
 
-**Term 2: $\text{Tr}(\Sigma_r + \Sigma_g - 2(\Sigma_r \Sigma_g)^{1/2})$**
+**Term 2: \(\text{Tr}(\Sigma_r + \Sigma_g - 2(\Sigma_r \Sigma_g)^{1/2})\)**
 
 This measures the difference in spread and shape between the two distributions. Even if the means match perfectly, the generated distribution might be too narrow (mode collapse) or too wide (noisy outputs) or rotated in feature space.
 
-The matrix square root $(\Sigma_r \Sigma_g)^{1/2}$ is the unique positive-definite matrix $M$ such that $M^2 = \Sigma_r \Sigma_g$. When $\Sigma_r = \Sigma_g$, we get $(\Sigma_r^2)^{1/2} = \Sigma_r$, and the trace term becomes $\text{Tr}(\Sigma_r + \Sigma_r - 2\Sigma_r) = 0$.
+The matrix square root \((\Sigma_r \Sigma_g)^{1/2}\) is the unique positive-definite matrix \(M\) such that \(M^2 = \Sigma_r \Sigma_g\). When \(\Sigma_r = \Sigma_g\), we get \((\Sigma_r^2)^{1/2} = \Sigma_r\), and the trace term becomes \(\text{Tr}(\Sigma_r + \Sigma_r - 2\Sigma_r) = 0\).
 
 ### The Full Derivation
 
-The Frechet distance between two Gaussians $\mathcal{N}(\mu_1, \Sigma_1)$ and $\mathcal{N}(\mu_2, \Sigma_2)$ is defined as:
+The Frechet distance between two Gaussians \(\mathcal{N}(\mu_1, \Sigma_1)\) and \(\mathcal{N}(\mu_2, \Sigma_2)\) is defined as:
 
 $$d_F^2 = \inf_{\gamma \in \Gamma(\mathcal{N}_1, \mathcal{N}_2)} \mathbb{E}_{(x,y) \sim \gamma}\left[\|x - y\|^2\right]$$
 
-where $\Gamma$ is the set of all joint distributions (couplings) with the given marginals. The optimal coupling for Gaussians is known in closed form. The joint distribution that minimizes the expected squared distance is:
+where \(\Gamma\) is the set of all joint distributions (couplings) with the given marginals. The optimal coupling for Gaussians is known in closed form. The joint distribution that minimizes the expected squared distance is:
 
 $$\gamma^* = \mathcal{N}\left(\begin{pmatrix} \mu_1 \\ \mu_2 \end{pmatrix}, \begin{pmatrix} \Sigma_1 & C \\ C^T & \Sigma_2 \end{pmatrix}\right)$$
 
-where $C = \Sigma_1^{1/2}(\Sigma_1^{1/2} \Sigma_2 \Sigma_1^{1/2})^{1/2} \Sigma_1^{-1/2}$.
+where \(C = \Sigma_1^{1/2}(\Sigma_1^{1/2} \Sigma_2 \Sigma_1^{1/2})^{1/2} \Sigma_1^{-1/2}\).
 
 Evaluating the expected squared distance under this optimal coupling yields:
 
 $$d_F^2 = \|\mu_1 - \mu_2\|^2 + \text{Tr}(\Sigma_1) + \text{Tr}(\Sigma_2) - 2\text{Tr}\left((\Sigma_1^{1/2} \Sigma_2 \Sigma_1^{1/2})^{1/2}\right)$$
 
-Using the cyclic property of the trace and the identity $\text{Tr}(A^{1/2}) = \text{Tr}((A)^{1/2})$ for positive-definite matrices:
+Using the cyclic property of the trace and the identity \(\text{Tr}(A^{1/2}) = \text{Tr}((A)^{1/2})\) for positive-definite matrices:
 
 $$\text{Tr}\left((\Sigma_1^{1/2} \Sigma_2 \Sigma_1^{1/2})^{1/2}\right) = \text{Tr}\left((\Sigma_1 \Sigma_2)^{1/2}\right)$$
 
@@ -190,7 +190,7 @@ $$\text{FID} = \|\mu_r - \mu_g\|^2 + \text{Tr}\left(\Sigma_r + \Sigma_g - 2(\Sig
 
 **FID = 0** means the two distributions are identical. This never happens in practice --- even comparing a dataset to itself with finite samples gives a small positive FID due to estimation noise.
 
-**FID is symmetric**: $\text{FID}(p, q) = \text{FID}(q, p)$, because the Frechet distance is symmetric.
+**FID is symmetric**: \(\text{FID}(p, q) = \text{FID}(q, p)\), because the Frechet distance is symmetric.
 
 **FID satisfies the triangle inequality**: It is a proper metric on the space of Gaussian distributions.
 
@@ -208,23 +208,23 @@ Suppose we extract 2D features (instead of 2048D) from 5 real images and 5 gener
 
 **Real image features:**
 
-| Image | $f_1$ | $f_2$ |
+| Image | \(f_1\) | \(f_2\) |
 |:-:|:-:|:-:|
-| $r_1$ | 2.0 | 3.0 |
-| $r_2$ | 2.5 | 3.5 |
-| $r_3$ | 1.5 | 2.5 |
-| $r_4$ | 2.2 | 3.2 |
-| $r_5$ | 1.8 | 2.8 |
+| \(r_1\) | 2.0 | 3.0 |
+| \(r_2\) | 2.5 | 3.5 |
+| \(r_3\) | 1.5 | 2.5 |
+| \(r_4\) | 2.2 | 3.2 |
+| \(r_5\) | 1.8 | 2.8 |
 
 **Generated image features:**
 
-| Image | $f_1$ | $f_2$ |
+| Image | \(f_1\) | \(f_2\) |
 |:-:|:-:|:-:|
-| $g_1$ | 3.0 | 4.0 |
-| $g_2$ | 3.5 | 4.5 |
-| $g_3$ | 2.5 | 3.5 |
-| $g_4$ | 3.2 | 4.2 |
-| $g_5$ | 2.8 | 3.8 |
+| \(g_1\) | 3.0 | 4.0 |
+| \(g_2\) | 3.5 | 4.5 |
+| \(g_3\) | 2.5 | 3.5 |
+| \(g_4\) | 3.2 | 4.2 |
+| \(g_5\) | 2.8 | 3.8 |
 
 ### Step 1: Compute Means
 
@@ -240,13 +240,13 @@ $$\|\mu_r - \mu_g\|^2 = (2.0 - 3.0)^2 + (3.0 - 4.0)^2 = 1.0 + 1.0 = 2.0$$
 
 For the real features, centering the data:
 
-| | $f_1 - \bar{f}_1$ | $f_2 - \bar{f}_2$ |
+| | \(f_1 - \bar{f}_1\) | \(f_2 - \bar{f}_2\) |
 |:-:|:-:|:-:|
-| $r_1$ | 0.0 | 0.0 |
-| $r_2$ | 0.5 | 0.5 |
-| $r_3$ | -0.5 | -0.5 |
-| $r_4$ | 0.2 | 0.2 |
-| $r_5$ | -0.2 | -0.2 |
+| \(r_1\) | 0.0 | 0.0 |
+| \(r_2\) | 0.5 | 0.5 |
+| \(r_3\) | -0.5 | -0.5 |
+| \(r_4\) | 0.2 | 0.2 |
+| \(r_5\) | -0.2 | -0.2 |
 
 $$\Sigma_r = \frac{1}{4} \begin{pmatrix} 0.0^2 + 0.5^2 + 0.5^2 + 0.2^2 + 0.2^2 & \cdots \\ \cdots & \cdots \end{pmatrix}$$
 
@@ -266,17 +266,17 @@ $$\Sigma_g = \begin{pmatrix} 0.145 & 0.145 \\ 0.145 & 0.145 \end{pmatrix}$$
 
 ### Step 4: Compute the Matrix Square Root
 
-Since $\Sigma_r = \Sigma_g = \Sigma$ in this example:
+Since \(\Sigma_r = \Sigma_g = \Sigma\) in this example:
 
 $$\Sigma_r \Sigma_g = \Sigma^2 = \begin{pmatrix} 0.145 & 0.145 \\ 0.145 & 0.145 \end{pmatrix}^2 = \begin{pmatrix} 0.042 & 0.042 \\ 0.042 & 0.042 \end{pmatrix}$$
 
-The eigenvalues of $\Sigma^2$ are $\lambda_1 = 0.084$ and $\lambda_2 = 0$ (since $\Sigma$ is rank-1).
+The eigenvalues of \(\Sigma^2\) are \(\lambda_1 = 0.084\) and \(\lambda_2 = 0\) (since \(\Sigma\) is rank-1).
 
-The square root $(\Sigma^2)^{1/2}$ has eigenvalues $\sqrt{0.084} = 0.290$ and $0$, with the same eigenvectors. This gives:
+The square root \((\Sigma^2)^{1/2}\) has eigenvalues \(\sqrt{0.084} = 0.290\) and $0$, with the same eigenvectors. This gives:
 
 $$(\Sigma_r \Sigma_g)^{1/2} = \Sigma = \begin{pmatrix} 0.145 & 0.145 \\ 0.145 & 0.145 \end{pmatrix}$$
 
-(This simplification holds because $\Sigma_r = \Sigma_g$ and both are positive semi-definite.)
+(This simplification holds because \(\Sigma_r = \Sigma_g\) and both are positive semi-definite.)
 
 ### Step 5: Compute the Trace Term
 
@@ -310,11 +310,11 @@ FID assumes that Inception features follow a multivariate Gaussian distribution.
 
 ### 2. Sample Size Sensitivity
 
-FID is biased for finite samples. The bias depends on sample size $N$ and feature dimensionality $d$:
+FID is biased for finite samples. The bias depends on sample size \(N\) and feature dimensionality \(d\):
 
 $$\text{Bias} \approx \frac{d}{N}$$
 
-For $d = 2048$ and $N = 10{,}000$, the bias is approximately 0.2 --- small but not negligible when comparing models with similar FID. The standard recommendation is $N \geq 50{,}000$ samples, but many papers use fewer.
+For \(d = 2048\) and \(N = 10{,}000\), the bias is approximately 0.2 --- small but not negligible when comparing models with similar FID. The standard recommendation is \(N \geq 50{,}000\) samples, but many papers use fewer.
 
 | Sample Size | Approximate FID Bias (d=2048) |
 |:-:|:-:|
@@ -353,7 +353,7 @@ FVD (Unterthiner et al., 2019) extends FID to video by replacing the InceptionV3
 
 ### The I3D Architecture
 
-I3D (Carreira & Zisserman, 2017) inflates 2D convolution filters from InceptionV1 into 3D by adding a temporal dimension. A 2D filter of shape $(k, k)$ becomes a 3D filter of shape $(k, k, k)$ that processes spatial and temporal information jointly.
+I3D (Carreira & Zisserman, 2017) inflates 2D convolution filters from InceptionV1 into 3D by adding a temporal dimension. A 2D filter of shape \((k, k)\) becomes a 3D filter of shape \((k, k, k)\) that processes spatial and temporal information jointly.
 
 The network is pretrained on the Kinetics-400 action recognition dataset (400 classes of human actions in video). Features are extracted from the final average pooling layer, producing a 400-dimensional feature vector for each video clip.
 
@@ -365,7 +365,7 @@ FVD uses the same Frechet distance formula as FID, but with video features:
 
 $$\text{FVD} = \|\mu_r - \mu_g\|^2 + \text{Tr}\left(\Sigma_r + \Sigma_g - 2(\Sigma_r \Sigma_g)^{1/2}\right)$$
 
-where $\mu_r, \Sigma_r$ are computed from I3D features of real videos and $\mu_g, \Sigma_g$ from generated videos.
+where \(\mu_r, \Sigma_r\) are computed from I3D features of real videos and \(\mu_g, \Sigma_g\) from generated videos.
 
 ### Input Requirements
 
@@ -486,7 +486,7 @@ How well does FVD predict what humans actually prefer? Studies have found modera
   <text x="535" y="90" font-family="Georgia, serif" font-size="11" fill="#999" text-anchor="middle">Moderate-strong correlation</text>
 </svg>
 
-The Spearman rank correlation between FVD and human preference is typically $\rho \approx -0.7$ to $-0.8$ (negative because lower FVD = better, higher human preference = better). This is decent but far from perfect. The outliers are informative:
+The Spearman rank correlation between FVD and human preference is typically \(\rho \approx -0.7\) to \(-0.8\) (negative because lower FVD = better, higher human preference = better). This is decent but far from perfect. The outliers are informative:
 
 - **Artistic style models** may have high FVD (their outputs don't look like the real-video reference distribution) but high human preference (humans find them appealing)
 - **Mode-collapsed models** may have low FVD (the few things they generate match the reference well) but low human preference (boring, repetitive)
@@ -501,14 +501,14 @@ CLIP Score measures something entirely different from FID/FVD. Instead of compar
 
 CLIP (Radford et al., 2021) consists of two encoders trained jointly with contrastive learning:
 
-- **Image encoder** $\text{CLIP}_\text{image}: \mathbb{R}^{H \times W \times 3} \to \mathbb{R}^{d}$, typically a Vision Transformer (ViT-L/14), producing a $d$-dimensional embedding ($d = 768$ for ViT-L/14)
-- **Text encoder** $\text{CLIP}_\text{text}: \text{tokens} \to \mathbb{R}^{d}$, a Transformer that produces a $d$-dimensional embedding from tokenized text
+- **Image encoder** \(\text{CLIP}_\text{image}: \mathbb{R}^{H \times W \times 3} \to \mathbb{R}^{d}\), typically a Vision Transformer (ViT-L/14), producing a \(d\)-dimensional embedding (\(d = 768\) for ViT-L/14)
+- **Text encoder** \(\text{CLIP}_\text{text}: \text{tokens} \to \mathbb{R}^{d}\), a Transformer that produces a \(d\)-dimensional embedding from tokenized text
 
 Training objective: maximize the cosine similarity between matched image-text pairs and minimize it for unmatched pairs. After training on 400 million image-text pairs from the internet, CLIP learns a shared embedding space where semantically related images and text are close together.
 
 ### CLIP Score Definition
 
-For a generated image $I$ and its text prompt $T$:
+For a generated image \(I\) and its text prompt \(T\):
 
 $$\text{CLIP Score}(I, T) = \cos\left(\text{CLIP}_\text{image}(I), \ \text{CLIP}_\text{text}(T)\right) = \frac{\text{CLIP}_\text{image}(I) \cdot \text{CLIP}_\text{text}(T)}{\|\text{CLIP}_\text{image}(I)\| \cdot \|\text{CLIP}_\text{text}(T)\|}$$
 
@@ -524,7 +524,7 @@ CLIP was trained on images, not video. Applying it to video requires an adaptati
 
 $$\text{CLIP}_\text{video}(V, T) = \cos\left(\frac{1}{F}\sum_{f=1}^{F} \text{CLIP}_\text{image}(V_f), \ \text{CLIP}_\text{text}(T)\right)$$
 
-where $V_f$ is the $f$-th frame and $F$ is the total number of frames.
+where \(V_f\) is the \(f\)-th frame and \(F\) is the total number of frames.
 
 **Per-frame CLIP Score**: Compute CLIP Score for each frame independently and report the mean:
 
@@ -721,7 +721,7 @@ Ultimately, the question is: do humans like the output? Automated metrics are pr
 
 The most reliable human evaluation method: show two videos side by side and ask which is better. This is simpler and more consistent than absolute rating scales.
 
-Given prompt $T$, generate video $A$ from Model 1 and video $B$ from Model 2. Ask human raters: "Which video better matches the prompt and looks more realistic?" Record the winner.
+Given prompt \(T\), generate video \(A\) from Model 1 and video \(B\) from Model 2. Ask human raters: "Which video better matches the prompt and looks more realistic?" Record the winner.
 
 ### ELO Rating System
 
@@ -729,39 +729,39 @@ The ELO rating system, originally designed for chess, provides a principled way 
 
 **The ELO probability model:**
 
-Given two models with ratings $R_A$ and $R_B$, the expected win probability for Model A is:
+Given two models with ratings \(R_A\) and \(R_B\), the expected win probability for Model A is:
 
 $$E_A = \frac{1}{1 + 10^{(R_B - R_A)/400}}$$
 
-This is a logistic function centered at $R_A - R_B = 0$. When the ratings are equal, $E_A = 0.5$ (equal chance of winning). A rating difference of 400 corresponds to a 10:1 expected win ratio.
+This is a logistic function centered at \(R_A - R_B = 0\). When the ratings are equal, \(E_A = 0.5\) (equal chance of winning). A rating difference of 400 corresponds to a 10:1 expected win ratio.
 
 **Rating update after a match:**
 
 $$R_A' = R_A + K \cdot (S_A - E_A)$$
 
 where:
-- $S_A = 1$ if A wins, $S_A = 0$ if A loses, $S_A = 0.5$ for a tie
-- $K$ is the update factor (controls how much each match changes the rating)
-- $E_A$ is the expected score computed above
+- \(S_A = 1\) if A wins, \(S_A = 0\) if A loses, \(S_A = 0.5\) for a tie
+- \(K\) is the update factor (controls how much each match changes the rating)
+- \(E_A\) is the expected score computed above
 
 **Properties:**
-- ELO is a zero-sum system: $R_A' + R_B' = R_A + R_B$ (total rating is conserved)
+- ELO is a zero-sum system: \(R_A' + R_B' = R_A + R_B\) (total rating is conserved)
 - Ratings converge to a stable equilibrium after enough matches
 - Rating differences have a consistent probabilistic interpretation
 
 ### Bradley-Terry Model
 
-The Bradley-Terry model provides a maximum-likelihood alternative to iterative ELO updates. It models the probability of Model $i$ beating Model $j$ as:
+The Bradley-Terry model provides a maximum-likelihood alternative to iterative ELO updates. It models the probability of Model \(i\) beating Model \(j\) as:
 
 $$P(i \text{ beats } j) = \frac{\pi_i}{\pi_i + \pi_j}$$
 
-where $\pi_i > 0$ is the "strength" parameter of Model $i$. Taking $\pi_i = 10^{R_i / 400}$ recovers the ELO model.
+where \(\pi_i > 0\) is the "strength" parameter of Model \(i\). Taking \(\pi_i = 10^{R_i / 400}\) recovers the ELO model.
 
-Given $n$ pairwise comparisons, the maximum-likelihood estimates of $\{\pi_i\}$ are found by solving:
+Given \(n\) pairwise comparisons, the maximum-likelihood estimates of \(\{\pi_i\}\) are found by solving:
 
 $$\sum_{j \neq i} \frac{w_{ij}}{\hat{\pi}_i} = \sum_{j \neq i} \frac{w_{ij} + w_{ji}}{\hat{\pi}_i + \hat{\pi}_j}$$
 
-where $w_{ij}$ is the number of times Model $i$ beat Model $j$. This system of equations can be solved by iterative algorithms (Zermelo's algorithm, MM algorithm, or standard gradient descent).
+where \(w_{ij}\) is the number of times Model \(i\) beat Model \(j\). This system of equations can be solved by iterative algorithms (Zermelo's algorithm, MM algorithm, or standard gradient descent).
 
 ### ELO for Video Models: Practical Considerations
 
@@ -778,7 +778,7 @@ Applying ELO to video model evaluation requires careful design:
 
 **3. Rater calibration.** Different human raters have different standards. Use multiple raters per comparison and aggregate (e.g., majority vote or weighted average based on rater agreement rates).
 
-**4. Confidence intervals.** Report uncertainty in ELO ratings. With $N$ comparisons, the standard error of the rating is approximately:
+**4. Confidence intervals.** Report uncertainty in ELO ratings. With \(N\) comparisons, the standard error of the rating is approximately:
 
 $$\text{SE}(R) \approx \frac{400}{\sqrt{N}} \cdot \frac{1}{\sqrt{\text{avg. information per match}}}$$
 

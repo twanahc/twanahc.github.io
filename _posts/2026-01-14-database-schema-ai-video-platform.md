@@ -632,7 +632,7 @@ Let us calculate the read cost for common UI views under different schema design
 11 reads total
 ```
 
-**Read amplification factor:** $\frac{111}{11} = 10.1\times$
+**Read amplification factor:** \(\frac{111}{11} = 10.1\times\)
 
 At Firestore's pricing of $0.06 per 100,000 reads:
 

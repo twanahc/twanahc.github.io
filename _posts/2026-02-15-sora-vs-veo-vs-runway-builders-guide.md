@@ -39,13 +39,13 @@ Runway Gen-4.5 is built on a Diffusion Transformer (DiT) architecture optimized 
 
 **High denoising step count**: Gen-4.5 Aleph uses an estimated 50-80 denoising steps (inferred from generation time analysis). More steps means the diffusion process can correct finer details at each iteration, producing sharper textures, more accurate lighting, and more physically plausible motion.
 
-To understand why more steps matter, consider the denoising process. At each step $t$, the model predicts the noise $\epsilon_\theta(x_t, t)$ and takes a step toward the clean signal:
+To understand why more steps matter, consider the denoising process. At each step \(t\), the model predicts the noise \(\epsilon_\theta(x_t, t)\) and takes a step toward the clean signal:
 
 $$x_{t-1} = \frac{1}{\sqrt{\alpha_t}} \left( x_t - \frac{\beta_t}{\sqrt{1-\bar{\alpha}_t}} \epsilon_\theta(x_t, t) \right) + \sigma_t z$$
 
-where $\alpha_t, \beta_t$ are the noise schedule parameters, $\bar{\alpha}_t = \prod_{s=1}^{t} \alpha_s$, and $z \sim \mathcal{N}(0, I)$.
+where \(\alpha_t, \beta_t\) are the noise schedule parameters, \(\bar{\alpha}_t = \prod_{s=1}^{t} \alpha_s\), and \(z \sim \mathcal{N}(0, I)\).
 
-With more steps, each step makes a smaller adjustment ($\beta_t$ is smaller), allowing more precise control over the generation. Fewer steps means larger jumps, which can miss fine details. The analogy is gradient descent: more smaller steps converge more precisely than fewer larger steps.
+With more steps, each step makes a smaller adjustment (\(\beta_t\) is smaller), allowing more precise control over the generation. Fewer steps means larger jumps, which can miss fine details. The analogy is gradient descent: more smaller steps converge more precisely than fewer larger steps.
 
 **Gen-4.5 Turbo** uses progressive distillation to compress the denoising process into approximately 8-15 steps. The distillation trains a "student" model to match the output of a 2-step process:
 
@@ -99,14 +99,14 @@ This matches the observed price ratio: $0.15/sec (Fast/720p) vs $0.40/sec (Stand
 
 Sora 2 uses a fundamentally different tokenization strategy: spacetime patches that treat video as a native 3D signal.
 
-**Joint spacetime tokenization**: Rather than factoring spatial and temporal attention, Sora patches the video into 3D chunks (e.g., $2 \times 16 \times 16$ latent pixels). Each token represents a small volume of spacetime. The benefit is that spatial and temporal correlations are captured jointly, which can produce more coherent motion for complex dynamics.
+**Joint spacetime tokenization**: Rather than factoring spatial and temporal attention, Sora patches the video into 3D chunks (e.g., \(2 \times 16 \times 16\) latent pixels). Each token represents a small volume of spacetime. The benefit is that spatial and temporal correlations are captured jointly, which can produce more coherent motion for complex dynamics.
 
 The tradeoff is computational: joint attention over 3D patches is more expensive per token than factored 2D + 1D attention, but the total token count is much smaller (because each token covers a larger volume):
 
 | Architecture | Tokens (5s, 720p) | Attention cost per layer | Total attention cost |
 |-------------|-------------------|------------------------|---------------------|
-| Factored (Gen-4.5) | ~216,000 | $O(N \cdot S) + O(N \cdot T')$ | ~$7.9 \times 10^8$ |
-| Spacetime patches (Sora) | ~3,375 | $O(N^2)$ | ~$1.1 \times 10^7$ |
+| Factored (Gen-4.5) | ~216,000 | \(O(N \cdot S) + O(N \cdot T')\) | ~\(7.9 \times 10^8\) |
+| Spacetime patches (Sora) | ~3,375 | \(O(N^2)\) | ~\(1.1 \times 10^7\) |
 
 Sora's approach is ~72x cheaper in raw attention cost, but the hidden dimension per token is much larger (each token carries more information), and the number of layers and MLP width are correspondingly larger. The total FLOPs end up being comparable, but the computational pattern is different.
 
@@ -210,7 +210,7 @@ Credits consumed per generation:
 | Aleph | 5s | 1080p | 100 | $0.16 |
 | Aleph | 10s | 1080p | 175 | $0.14 |
 
-The credit-based system means the effective $/second depends on your subscription tier. At Pro pricing ($0.008/credit), Turbo costs ~$0.04/sec and Aleph costs ~$0.12-0.16/sec.
+The credit-based system means the effective \(/second depends on your subscription tier. At Pro pricing (\)0.008/credit), Turbo costs ~\(0.04/sec and Aleph costs ~\)0.12-0.16/sec.
 
 ### Unified Price Comparison Table
 
@@ -641,9 +641,9 @@ How does latency scale with requested duration? We would expect roughly linear s
 | 10s | 35s | 220s | N/A (max 8s) |
 | 15s | N/A (max 10s) | 320s | N/A (max 8s) |
 
-The scaling is approximately linear for all three models. Fitting $L = a \cdot D + b$ where $L$ is latency and $D$ is duration:
+The scaling is approximately linear for all three models. Fitting \(L = a \cdot D + b\) where \(L\) is latency and \(D\) is duration:
 
-| Model | Slope (a) [sec latency / sec duration] | Intercept (b) [sec] | $R^2$ |
+| Model | Slope (a) [sec latency / sec duration] | Intercept (b) [sec] | \(R^2\) |
 |-------|----|---|------|
 | Gen-4.5 Turbo | 3.3 | 2.5 | 0.98 |
 | Sora 2 | 20.0 | 20.0 | 0.99 |
@@ -997,7 +997,7 @@ Sora 2's effective cost is about 3% higher than its list price due to partial ch
 
 **Sora 2 is the most restrictive**: only 5 RPM at the paid tier. This is a significant constraint for platforms with concurrent users. At 5 RPM, you can handle approximately 5 simultaneous users making one request per minute.
 
-For a platform with $N$ concurrent users, each generating $R$ requests per minute, you need:
+For a platform with \(N\) concurrent users, each generating \(R\) requests per minute, you need:
 
 $$\text{Required RPM} = N \times R$$
 
@@ -1209,9 +1209,9 @@ Let me model the cost of running a multi-model platform at three scales: 100, 1,
 - Final (with audio): Veo 3.1 Fast at $0.15/sec
 
 **Cost per generation** (5 seconds):
-- Draft: 5 $\times$ $0.04 = $0.20
-- Final (no audio): 5 $\times$ $0.12 = $0.60
-- Final (with audio): 5 $\times$ $0.15 = $0.75
+- Draft: 5 \(\times\) $0.04 = $0.20
+- Final (no audio): 5 \(\times\) $0.12 = $0.60
+- Final (with audio): 5 \(\times\) $0.15 = $0.75
 
 **Blended cost per generation**:
 
@@ -1255,12 +1255,12 @@ What if you used just one model for everything?
 
 The multi-model approach saves 32-91% compared to using a single premium model. At 10,000 generations/month, the savings are:
 
-- vs. all Sora 2: $1,100/month ($13,200/year)
-- vs. all Veo 3.1 Fast: $3,100/month ($37,200/year)
+- vs. all Sora 2: \(1,100/month (\)13,200/year)
+- vs. all Veo 3.1 Fast: \(3,100/month (\)37,200/year)
 
 The engineering cost of maintaining 3 API integrations versus 1 must be weighed against these savings. A rough estimate of the additional engineering cost: 40 hours to build + 5 hours/month to maintain = $15,000 initial + $750/month ongoing (at $150/hr).
 
-**Break-even for multi-model vs. single Veo**: The $3,100/month savings against $750/month maintenance cost means the multi-model approach pays for itself in month 1 at 10,000 generations/month. At 1,000 generations/month, the savings are ~$380/month vs. $750/month maintenance --- single-model is cheaper at small scale.
+**Break-even for multi-model vs. single Veo**: The $3,100/month savings against \(750/month maintenance cost means the multi-model approach pays for itself in month 1 at 10,000 generations/month. At 1,000 generations/month, the savings are ~\)380/month vs. $750/month maintenance --- single-model is cheaper at small scale.
 
 **Rule of thumb**: Multi-model routing becomes cost-justified at approximately 3,000+ generations per month.
 

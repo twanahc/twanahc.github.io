@@ -46,7 +46,7 @@ Suppose you offer an "Unlimited" plan at $49/month. You need to model the expect
 
 $$E[\text{cost}] = \sum_{i} P(\text{action}_i) \times C(\text{action}_i) \times N_{\text{generations}}$$
 
-Where $P(\text{action}_i)$ is the probability of choosing model $i$, $C(\text{action}_i)$ is the cost, and $N_{\text{generations}}$ is monthly generation count.
+Where \(P(\text{action}_i)\) is the probability of choosing model \(i\), \(C(\text{action}_i)\) is the cost, and \(N_{\text{generations}}\) is monthly generation count.
 
 For a typical active user:
 
@@ -185,7 +185,7 @@ For the Pro tier, assuming median users generate 50 videos/month at an average o
 
 $$\text{Included credits} = 50 \times 8 \times 1.5 = 600 \text{ credits}$$
 
-The 1.5x buffer (50% more than expected usage) ensures that most Pro users stay within their included credits, which feels good. The overage pricing at $0.10/credit is higher than the effective included rate ($49.99 / 600 = $0.083/credit), incentivizing users to upgrade to the next tier rather than paying overage.
+The 1.5x buffer (50% more than expected usage) ensures that most Pro users stay within their included credits, which feels good. The overage pricing at \(0.10/credit is higher than the effective included rate (\)49.99 / 600 = $0.083/credit), incentivizing users to upgrade to the next tier rather than paying overage.
 
 **Margin analysis at the Pro tier:**
 
@@ -234,7 +234,7 @@ If power users tend to use premium models more (average cost per credit of $0.09
 
 $$\text{Overage rate} = \frac{0.09}{1 - 0.45} = \$0.164$$
 
-Rounding to $0.15/credit for the Pro tier overage would yield healthier power-user margins. But this is a psychological tension: $0.15/credit overage vs $0.083/credit included feels punitive. The solution is to make the upgrade to Business tier ($149.99/month for 2000 credits = $0.075/credit) more attractive than paying overage.
+Rounding to $0.15/credit for the Pro tier overage would yield healthier power-user margins. But this is a psychological tension: $0.15/credit overage vs \(0.083/credit included feels punitive. The solution is to make the upgrade to Business tier (\)149.99/month for 2000 credits = $0.075/credit) more attractive than paying overage.
 
 **Upgrade decision point for a Pro user:**
 
@@ -354,13 +354,13 @@ This is the production credit table that balances user perception with sustainab
 
 | Model | Usage % | Credits | Revenue | Cost | Contribution |
 |---|---|---|---|---|---|
-| Luma Ray3.14 5s | 35% | 4 | $0.33 | $0.14 | +$0.067 |
-| Luma Ray3.14 start+end | 10% | 5 | $0.42 | $0.20 | +$0.022 |
-| Kling 2.1 Std 5s | 20% | 12 | $1.00 | $0.52 | +$0.096 |
-| Kling 2.1 Pro 5s | 10% | 30 | $2.50 | $1.62 | +$0.088 |
-| Veo 3 5s | 5% | 42 | $3.50 | $2.42 | +$0.054 |
-| Runway Gen-4 5s | 5% | 24 | $2.00 | $1.02 | +$0.049 |
-| Flux images | 15% | 1.5 avg | $0.13 | $0.04 | +$0.014 |
+| Luma Ray3.14 5s | 35% | 4 | $0.33 | \(0.14 | +\)0.067 |
+| Luma Ray3.14 start+end | 10% | 5 | $0.42 | \(0.20 | +\)0.022 |
+| Kling 2.1 Std 5s | 20% | 12 | $1.00 | \(0.52 | +\)0.096 |
+| Kling 2.1 Pro 5s | 10% | 30 | $2.50 | \(1.62 | +\)0.088 |
+| Veo 3 5s | 5% | 42 | $3.50 | \(2.42 | +\)0.054 |
+| Runway Gen-4 5s | 5% | 24 | $2.00 | \(1.02 | +\)0.049 |
+| Flux images | 15% | 1.5 avg | $0.13 | \(0.04 | +\)0.014 |
 
 $$\text{Weighted revenue per generation} = \$0.82$$
 
@@ -379,10 +379,10 @@ The general pricing formula for any AI video operation:
 $$P_{\text{user}} = \frac{C_{\text{provider}} + C_{\text{infra}} + C_{\text{support}}}{1 - M_{\text{target}}}$$
 
 Where:
-- $C_{\text{provider}}$ = API cost from the model provider
-- $C_{\text{infra}}$ = your infrastructure cost (API gateway, queue, storage, CDN, monitoring)
-- $C_{\text{support}}$ = allocated customer support cost per generation
-- $M_{\text{target}}$ = target gross margin (0.50 to 0.65 for SaaS)
+- \(C_{\text{provider}}\) = API cost from the model provider
+- \(C_{\text{infra}}\) = your infrastructure cost (API gateway, queue, storage, CDN, monitoring)
+- \(C_{\text{support}}\) = allocated customer support cost per generation
+- \(M_{\text{target}}\) = target gross margin (0.50 to 0.65 for SaaS)
 
 ### Infrastructure Cost Breakdown
 
@@ -399,9 +399,9 @@ For a typical AI video SaaS processing 50,000 generations per month:
 | **Auth** (Firebase Auth / Clerk) | $50 | $0.001 |
 | **Background Jobs** (Cloud Run / Lambda) | $150 | $0.003 |
 | **Webhook Processing** | $30 | $0.001 |
-| **Total Infrastructure** | **$842** | **$0.017** |
+| **Total Infrastructure** | **\(842** | **\)0.017** |
 
-So $C_{\text{infra}} \approx \$0.02$ per generation is a reasonable estimate at moderate scale. At higher scale (500K+ generations/month), this drops to ~$0.005-0.01 due to better amortization.
+So \(C_{\text{infra}} \approx \\)0.02$ per generation is a reasonable estimate at moderate scale. At higher scale (500K+ generations/month), this drops to ~$0.005-0.01 due to better amortization.
 
 ### The Support Cost Factor
 
@@ -411,7 +411,7 @@ Customer support is easy to overlook. For an AI video platform:
 - **Billing questions**: At a 2% monthly contact rate per user and $3/ticket, roughly $0.005 per generation.
 - **Feature questions**: Minimal, ~$0.002 per generation.
 
-Total: $C_{\text{support}} \approx \$0.02$ per generation.
+Total: \(C_{\text{support}} \approx \\)0.02$ per generation.
 
 ### Complete Pricing Model
 
@@ -421,11 +421,11 @@ $$P_{\text{user}} = \frac{C_{\text{provider}} + 0.02 + 0.02}{1 - 0.55}$$
 
 | Model | Provider Cost | + Infra | + Support | Total Cost | / (1-0.55) | User Price |
 |---|---|---|---|---|---|---|
-| Luma Ray3.14 5s | $0.10 | $0.12 | $0.14 | $0.14 | $0.31 | **$0.35** |
-| Kling 2.1 Std 5s | $0.50 | $0.52 | $0.54 | $0.54 | $1.20 | **$1.25** |
-| Kling 2.1 Pro 5s | $1.60 | $1.62 | $1.64 | $1.64 | $3.64 | **$3.75** |
-| Veo 3 5s | $2.40 | $2.42 | $2.44 | $2.44 | $5.42 | **$5.50** |
-| Runway Gen-4 5s | $1.00 | $1.02 | $1.04 | $1.04 | $2.31 | **$2.50** |
+| Luma Ray3.14 5s | $0.10 | $0.12 | $0.14 | $0.14 | \(0.31 | **\)0.35** |
+| Kling 2.1 Std 5s | $0.50 | $0.52 | $0.54 | $0.54 | \(1.20 | **\)1.25** |
+| Kling 2.1 Pro 5s | $1.60 | $1.62 | $1.64 | $1.64 | \(3.64 | **\)3.75** |
+| Veo 3 5s | $2.40 | $2.42 | $2.44 | $2.44 | \(5.42 | **\)5.50** |
+| Runway Gen-4 5s | $1.00 | $1.02 | $1.04 | $1.04 | \(2.31 | **\)2.50** |
 
 These are the per-generation prices at 55% gross margin. In a credit system, you convert these to credit amounts by dividing by your price-per-credit.
 
@@ -1463,7 +1463,7 @@ They are mathematically identical. But Option B converts better. Why?
 
 2. **Decoupling**: When spending dollars, each generation triggers a "is this worth $0.10?" evaluation. With credits, the payment happened at purchase time. Each generation feels "free" because the credits are already bought.
 
-3. **Anchoring**: "$10 for 100 credits" anchors to the round number (100) rather than the unit price ($0.10). 100 feels like a lot. $0.10 per generation also feels cheap, but the 100 anchor is more memorable.
+3. **Anchoring**: "\(10 for 100 credits" anchors to the round number (100) rather than the unit price (\)0.10). 100 feels like a lot. $0.10 per generation also feels cheap, but the 100 anchor is more memorable.
 
 4. **Loss aversion reversal**: With per-generation pricing, each generation is a loss ($0.10 gone). With credits, NOT using them is the loss ("I paid for 100 credits, I should use them"). This drives engagement.
 

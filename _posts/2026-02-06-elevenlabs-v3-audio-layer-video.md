@@ -1418,10 +1418,10 @@ For detecting a 5% improvement in video completion rate (baseline 60%, target 65
 $$n = \frac{(Z_{\alpha/2} + Z_\beta)^2 \cdot (p_1(1-p_1) + p_2(1-p_2))}{(p_2 - p_1)^2}$$
 
 Where:
-- $Z_{\alpha/2} = 1.96$ (95% confidence)
-- $Z_\beta = 0.84$ (80% power)
-- $p_1 = 0.60$ (baseline completion rate)
-- $p_2 = 0.65$ (target completion rate)
+- \(Z_{\alpha/2} = 1.96\) (95% confidence)
+- \(Z_\beta = 0.84\) (80% power)
+- \(p_1 = 0.60\) (baseline completion rate)
+- \(p_2 = 0.65\) (target completion rate)
 
 $$n = \frac{(1.96 + 0.84)^2 \cdot (0.60 \times 0.40 + 0.65 \times 0.35)}{(0.65 - 0.60)^2}$$
 
@@ -1437,7 +1437,7 @@ Once the test completes, compute the lift for each treatment relative to control
 
 $$\text{Lift} = \frac{\text{Treatment Rate} - \text{Control Rate}}{\text{Control Rate}} \times 100\%$$
 
-And the statistical significance using a chi-squared test or z-test for proportions. Only ship a treatment if $p < 0.05$.
+And the statistical significance using a chi-squared test or z-test for proportions. Only ship a treatment if \(p < 0.05\).
 
 From industry benchmarks and our internal testing, expected results:
 

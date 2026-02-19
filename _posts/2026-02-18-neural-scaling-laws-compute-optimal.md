@@ -35,19 +35,19 @@ A **power law** is a functional relationship of the form:
 
 $$f(x) = a \cdot x^{-\alpha}$$
 
-where $a > 0$ is a constant (the scale factor) and $\alpha > 0$ is the **exponent** (sometimes called the scaling exponent). The defining characteristic: on a log-log plot, a power law appears as a straight line. Take the logarithm of both sides:
+where \(a > 0\) is a constant (the scale factor) and \(\alpha > 0\) is the **exponent** (sometimes called the scaling exponent). The defining characteristic: on a log-log plot, a power law appears as a straight line. Take the logarithm of both sides:
 
 $$\log f(x) = \log a - \alpha \log x$$
 
-This is just $y = b + mx$ with slope $-\alpha$. So if you plot your data on log-log axes and see a straight line, you have a power law.
+This is just \(y = b + mx\) with slope \(-\alpha\). So if you plot your data on log-log axes and see a straight line, you have a power law.
 
 Power laws show up everywhere in nature: earthquake magnitudes (Gutenberg-Richter law), city populations (Zipf's law), income distributions (Pareto), species extinction rates, citations of academic papers, and --- as it turns out --- the loss of neural networks as a function of their size.
 
-For neural scaling laws, there is an important refinement. The loss does not go to zero as the model grows infinitely large. There is a floor --- the **irreducible loss** $L_\infty$ --- representing the entropy of the data itself. No model, no matter how large, can predict truly random content. So the scaling law takes the form:
+For neural scaling laws, there is an important refinement. The loss does not go to zero as the model grows infinitely large. There is a floor --- the **irreducible loss** \(L_\infty\) --- representing the entropy of the data itself. No model, no matter how large, can predict truly random content. So the scaling law takes the form:
 
 $$L(x) = a \cdot x^{-\alpha} + L_\infty$$
 
-The quantity $L(x) - L_\infty$ is the **reducible loss**: the part that better modeling can actually shrink. It is this reducible component that follows the power law.
+The quantity \(L(x) - L_\infty\) is the **reducible loss**: the part that better modeling can actually shrink. It is this reducible component that follows the power law.
 
 <svg viewBox="0 0 700 380" xmlns="http://www.w3.org/2000/svg" style="max-width: 700px; display: block; margin: 2em auto;">
   <defs>
@@ -87,11 +87,11 @@ The quantity $L(x) - L_\infty$ is the **reducible loss**: the part that better m
 
 Here is what researchers at OpenAI, DeepMind, and other labs found when they trained language models of many different sizes on many different amounts of data, and plotted the resulting cross-entropy loss.
 
-**Cross-entropy loss** measures how well a model predicts the next token in a sequence. If the model assigns probability $p_i$ to the correct next token, the loss for that token is $-\log p_i$. Averaged over many tokens, this gives the model's loss $L$. Lower is better. A loss of 0 would mean perfect prediction; the entropy of natural language sets a floor around $L_\infty \approx 1.6$ nats for English text (roughly corresponding to a perplexity of 5).
+**Cross-entropy loss** measures how well a model predicts the next token in a sequence. If the model assigns probability \(p_i\) to the correct next token, the loss for that token is \(-\log p_i\). Averaged over many tokens, this gives the model's loss \(L\). Lower is better. A loss of 0 would mean perfect prediction; the entropy of natural language sets a floor around \(L_\infty \approx 1.6\) nats for English text (roughly corresponding to a perplexity of 5).
 
 The observation, reported first systematically by Hestness et al. (2017) and then in much greater detail by Kaplan et al. (2020), is this:
 
-> When you plot loss against model size $N$ (number of parameters), dataset size $D$ (number of tokens), or total compute $C$ (floating point operations), **the data falls on a straight line in log-log space**. This holds over at least 6-7 orders of magnitude.
+> When you plot loss against model size \(N\) (number of parameters), dataset size \(D\) (number of tokens), or total compute \(C\) (floating point operations), **the data falls on a straight line in log-log space**. This holds over at least 6-7 orders of magnitude.
 
 This is surprising for several reasons:
 
@@ -121,33 +121,33 @@ $$L(D) = \left(\frac{D_c}{D}\right)^{\alpha_D}, \quad \alpha_D \approx 0.095, \q
 
 $$L(C) = \left(\frac{C_c}{C}\right)^{\alpha_C}, \quad \alpha_C \approx 0.050, \quad C_c \approx 3.1 \times 10^8$$
 
-Here $N$ is the number of non-embedding parameters, $D$ is the number of training tokens, and $C$ is the total number of floating-point operations (FLOPs) used during training.
+Here \(N\) is the number of non-embedding parameters, \(D\) is the number of training tokens, and \(C\) is the total number of floating-point operations (FLOPs) used during training.
 
-The notation $N_c$, $D_c$, $C_c$ are characteristic scales --- fitting constants that set where the power law "starts." The important quantities are the exponents $\alpha_N$, $\alpha_D$, $\alpha_C$.
+The notation \(N_c\), \(D_c\), \(C_c\) are characteristic scales --- fitting constants that set where the power law "starts." The important quantities are the exponents \(\alpha_N\), \(\alpha_D\), \(\alpha_C\).
 
 ### The Compute Approximation
 
-For a decoder-only transformer with $N$ parameters trained on $D$ tokens, the total compute is approximately:
+For a decoder-only transformer with \(N\) parameters trained on \(D\) tokens, the total compute is approximately:
 
 $$C \approx 6ND$$
 
-Where does the 6 come from? Each token requires a forward pass and a backward pass. The forward pass through a dense layer with $N$ parameters takes approximately $2N$ FLOPs (one multiply and one add per parameter). The backward pass takes approximately $4N$ FLOPs (computing gradients with respect to both weights and activations). So the total per token is $\approx 6N$ FLOPs, and over $D$ tokens we get $C \approx 6ND$.
+Where does the 6 come from? Each token requires a forward pass and a backward pass. The forward pass through a dense layer with \(N\) parameters takes approximately $2N$ FLOPs (one multiply and one add per parameter). The backward pass takes approximately $4N$ FLOPs (computing gradients with respect to both weights and activations). So the total per token is \(\approx 6N\) FLOPs, and over \(D\) tokens we get \(C \approx 6ND\).
 
 This is an approximation. It ignores attention computation (which scales quadratically with sequence length but is usually a small fraction of total compute for large models), embedding layers, and layer norms. But it is accurate to within a factor of 2 for most practical transformer architectures, and it is extremely useful for reasoning about the tradeoff between model size and data.
 
 ### Kaplan's Compute-Optimal Allocation
 
-Given a fixed compute budget $C$, how should you split it between model size $N$ and dataset size $D$? This is a constrained optimization problem.
+Given a fixed compute budget \(C\), how should you split it between model size \(N\) and dataset size \(D\)? This is a constrained optimization problem.
 
 Kaplan et al. proposed a combined loss function:
 
 $$L(N, D) = \left[\left(\frac{N_c}{N}\right)^{\alpha_N / \alpha_D} + \frac{D_c}{D}\right]^{\alpha_D}$$
 
-They found that minimizing this subject to $C = 6ND$ yields:
+They found that minimizing this subject to \(C = 6ND\) yields:
 
 $$N^* \propto C^{0.73}, \quad D^* \propto C^{0.27}$$
 
-The exponents sum to 1 (since $C \propto ND$, $0.73 + 0.27 = 1.00$). But the asymmetry is dramatic: **parameters should scale much faster than data**. If your compute budget increases by $10\times$, you should make the model $\approx 5.4\times$ bigger but only use $\approx 1.9\times$ more data.
+The exponents sum to 1 (since \(C \propto ND\), \(0.73 + 0.27 = 1.00\)). But the asymmetry is dramatic: **parameters should scale much faster than data**. If your compute budget increases by \(10\times\), you should make the model \(\approx 5.4\times\) bigger but only use \(\approx 1.9\times\) more data.
 
 This finding directly influenced the design of GPT-3 (2020): 175 billion parameters trained on only 300 billion tokens. By the Chinchilla analysis we will derive below, this was significantly undertrained --- the model was far too large for the amount of data it saw.
 
@@ -171,11 +171,11 @@ $$A \approx 406.4, \quad B \approx 410.7, \quad \alpha \approx 0.34, \quad \beta
 
 This has a clean interpretation. The loss decomposes into three additive terms:
 
-1. **$A / N^{\alpha}$** --- the approximation loss. The model is too small to represent the true data distribution. More parameters reduce this.
+1. **\(A / N^{\alpha}\)** --- the approximation loss. The model is too small to represent the true data distribution. More parameters reduce this.
 
-2. **$B / D^{\beta}$** --- the estimation loss. The model has not seen enough data to learn the parameters it has. More data reduces this.
+2. **\(B / D^{\beta}\)** --- the estimation loss. The model has not seen enough data to learn the parameters it has. More data reduces this.
 
-3. **$L_\infty$** --- the irreducible loss. The inherent entropy of the data. No amount of modeling can reduce this. For natural language, this reflects genuine unpredictability --- the next word in a sentence is often not deterministic.
+3. **\(L_\infty\)** --- the irreducible loss. The inherent entropy of the data. No amount of modeling can reduce this. For natural language, this reflects genuine unpredictability --- the next word in a sentence is often not deterministic.
 
 The key structural insight: these three sources of loss are **additive and independent**. Making the model bigger only helps the first term. Adding more data only helps the second term. Neither helps the third.
 
@@ -223,7 +223,7 @@ The critical difference between Kaplan and Chinchilla lies in how the training r
 
 Kaplan trained all models for a fixed "token budget" (or close to it), then observed how loss varied with model size. But a small model converges quickly on a given dataset, while a large model needs more data to converge. By using the same dataset size for all model sizes, the large models were undertrained --- they had not seen enough data to realize the benefit of their extra parameters. This made model size look disproportionately effective compared to data.
 
-Chinchilla corrected for this by training each model size on varying amounts of data and observing the loss surface $L(N, D)$ directly. They found that the marginal return from data was much higher than Kaplan had estimated --- meaning data was more valuable than previously thought.
+Chinchilla corrected for this by training each model size on varying amounts of data and observing the loss surface \(L(N, D)\) directly. They found that the marginal return from data was much higher than Kaplan had estimated --- meaning data was more valuable than previously thought.
 
 The practical consequence was stark: the 70-billion parameter Chinchilla model, trained on 1.4 trillion tokens, matched or outperformed the 280-billion parameter Gopher model trained on 300 billion tokens. Four times fewer parameters, nearly five times more data, same compute budget, better results.
 
@@ -231,7 +231,7 @@ The practical consequence was stark: the 70-billion parameter Chinchilla model, 
 
 ## Deriving the Chinchilla Optimal Allocation
 
-Now for the main derivation. We want to find the compute-optimal model size $N^*$ and dataset size $D^*$ that minimize the loss for a given compute budget. This is a classic constrained optimization problem, and we solve it with **Lagrange multipliers**.
+Now for the main derivation. We want to find the compute-optimal model size \(N^*\) and dataset size \(D^*\) that minimize the loss for a given compute budget. This is a classic constrained optimization problem, and we solve it with **Lagrange multipliers**.
 
 ### The Setup
 
@@ -243,13 +243,13 @@ subject to the compute constraint:
 
 $$g(N, D) = 6ND - C = 0$$
 
-where $C$ is the fixed compute budget.
+where \(C\) is the fixed compute budget.
 
-**Lagrange multipliers** is a technique for finding the extrema of a function subject to constraints. The idea: at an optimum of $L$ subject to $g = 0$, the gradient of $L$ must be proportional to the gradient of $g$ --- otherwise you could move along the constraint surface and improve $L$. Formally, we require:
+**Lagrange multipliers** is a technique for finding the extrema of a function subject to constraints. The idea: at an optimum of \(L\) subject to \(g = 0\), the gradient of \(L\) must be proportional to the gradient of \(g\) --- otherwise you could move along the constraint surface and improve \(L\). Formally, we require:
 
 $$\nabla L = \lambda \nabla g$$
 
-for some scalar $\lambda$ (the Lagrange multiplier).
+for some scalar \(\lambda\) (the Lagrange multiplier).
 
 ### The Lagrangian
 
@@ -259,7 +259,7 @@ $$\mathcal{L}(N, D, \lambda) = \frac{A}{N^{\alpha}} + \frac{B}{D^{\beta}} + L_\i
 
 ### Taking Partial Derivatives
 
-**With respect to $N$:**
+**With respect to \(N\):**
 
 $$\frac{\partial \mathcal{L}}{\partial N} = -\frac{\alpha A}{N^{\alpha + 1}} + 6\lambda D = 0$$
 
@@ -267,7 +267,7 @@ This gives us:
 
 $$6\lambda D = \frac{\alpha A}{N^{\alpha + 1}} \quad \Rightarrow \quad \lambda = \frac{\alpha A}{6 D N^{\alpha + 1}} \tag{1}$$
 
-**With respect to $D$:**
+**With respect to \(D\):**
 
 $$\frac{\partial \mathcal{L}}{\partial D} = -\frac{\beta B}{D^{\beta + 1}} + 6\lambda N = 0$$
 
@@ -277,7 +277,7 @@ $$6\lambda N = \frac{\beta B}{D^{\beta + 1}} \quad \Rightarrow \quad \lambda = \
 
 ### Equating
 
-Setting equations (1) and (2) equal (both equal $\lambda$):
+Setting equations (1) and (2) equal (both equal \(\lambda\)):
 
 $$\frac{\alpha A}{6 D N^{\alpha + 1}} = \frac{\beta B}{6 N D^{\beta + 1}}$$
 
@@ -291,17 +291,17 @@ $$\alpha A \cdot N \cdot D^{\beta + 1} = \beta B \cdot D \cdot N^{\alpha + 1}$$
 
 $$\alpha A \cdot D^{\beta} = \beta B \cdot N^{\alpha}$$
 
-This is the **optimality condition**: at the compute-optimal point, the marginal reduction in loss from increasing $N$ (weighted by the compute cost) equals the marginal reduction from increasing $D$.
+This is the **optimality condition**: at the compute-optimal point, the marginal reduction in loss from increasing \(N\) (weighted by the compute cost) equals the marginal reduction from increasing \(D\).
 
 Solving for the ratio:
 
 $$\frac{N^{\alpha}}{D^{\beta}} = \frac{\alpha A}{\beta B} \tag{3}$$
 
-This tells us the relationship between the optimal $N$ and $D$. Now we use the constraint $C = 6ND$ to express everything in terms of $C$.
+This tells us the relationship between the optimal \(N\) and \(D\). Now we use the constraint \(C = 6ND\) to express everything in terms of \(C\).
 
-### Expressing $N^*$ and $D^*$ in Terms of $C$
+### Expressing \(N^*\) and \(D^*\) in Terms of \(C\)
 
-From the constraint: $D = C / (6N)$. Substitute into equation (3):
+From the constraint: \(D = C / (6N)\). Substitute into equation (3):
 
 $$N^{\alpha} = \frac{\alpha A}{\beta B} \cdot D^{\beta} = \frac{\alpha A}{\beta B} \cdot \left(\frac{C}{6N}\right)^{\beta}$$
 
@@ -311,29 +311,29 @@ $$N^{\alpha + \beta} = \frac{\alpha A}{\beta B \cdot 6^{\beta}} \cdot C^{\beta}$
 
 $$N = \left(\frac{\alpha A}{\beta B \cdot 6^{\beta}}\right)^{\frac{1}{\alpha + \beta}} \cdot C^{\frac{\beta}{\alpha + \beta}}$$
 
-Similarly, from $N = C / (6D)$:
+Similarly, from \(N = C / (6D)\):
 
 $$D = \left(\frac{\beta B \cdot 6^{\alpha}}{\alpha A}\right)^{\frac{1}{\alpha + \beta}} \cdot C^{\frac{\alpha}{\alpha + \beta}}$$
 
 ### The Scaling Exponents
 
-The compute-scaling exponents for $N$ and $D$ are:
+The compute-scaling exponents for \(N\) and \(D\) are:
 
 $$N^* \propto C^{\frac{\beta}{\alpha + \beta}}, \quad D^* \propto C^{\frac{\alpha}{\alpha + \beta}}$$
 
-With Chinchilla's values $\alpha \approx 0.34$ and $\beta \approx 0.28$:
+With Chinchilla's values \(\alpha \approx 0.34\) and \(\beta \approx 0.28\):
 
 $$\frac{\beta}{\alpha + \beta} = \frac{0.28}{0.62} \approx 0.45, \quad \frac{\alpha}{\alpha + \beta} = \frac{0.34}{0.62} \approx 0.55$$
 
-So $N^* \propto C^{0.45}$ and $D^* \propto C^{0.55}$.
+So \(N^* \propto C^{0.45}\) and \(D^* \propto C^{0.55}\).
 
 These exponents are close to $0.5$ --- meaning **parameters and data should scale roughly equally with compute**. This is the Chinchilla result. For every doubling of parameters, you need approximately a doubling of data.
 
-Compare with Kaplan: $N^* \propto C^{0.73}$, $D^* \propto C^{0.27}$. Kaplan said scale parameters $2.7\times$ faster than data. Chinchilla says scale them approximately equally.
+Compare with Kaplan: \(N^* \propto C^{0.73}\), \(D^* \propto C^{0.27}\). Kaplan said scale parameters \(2.7\times\) faster than data. Chinchilla says scale them approximately equally.
 
 ### The Optimal Token-to-Parameter Ratio
 
-We can derive the optimal ratio $D^*/N^*$. Since $C = 6N^*D^*$ and both scale as $\sim C^{0.5}$, the ratio $D^*/N^*$ is approximately constant --- it does not change with scale.
+We can derive the optimal ratio \(D^*/N^*\). Since \(C = 6N^*D^*\) and both scale as \(\sim C^{0.5}\), the ratio \(D^*/N^*\) is approximately constant --- it does not change with scale.
 
 Using the Chinchilla fits:
 
@@ -351,9 +351,9 @@ We have established the empirical fact: loss follows power laws. But why? This i
 
 Natural data --- language, images, video --- has structure at many scales simultaneously. In language: character-level patterns (spelling), word-level patterns (grammar), sentence-level patterns (syntax), paragraph-level patterns (rhetoric), document-level patterns (narrative). Each scale has its own statistical regularities.
 
-A model with $N$ parameters has a certain capacity to resolve statistical regularities. As you add parameters, the model can resolve progressively finer-grained features. But the number of features at each scale follows its own distribution, and the contribution of each scale to the total loss is roughly power-law distributed.
+A model with \(N\) parameters has a certain capacity to resolve statistical regularities. As you add parameters, the model can resolve progressively finer-grained features. But the number of features at each scale follows its own distribution, and the contribution of each scale to the total loss is roughly power-law distributed.
 
-Think of it like a fractal. A fractal has detail at every scale of magnification, and the amount of detail at scale $\epsilon$ is proportional to $\epsilon^{-d_f}$ where $d_f$ is the fractal dimension. If the data manifold is fractal-like --- having structure at every scale --- then a model that "resolves" down to scale $\epsilon$ (requiring $N \sim \epsilon^{-d_f}$ parameters) will capture a fraction of variance that also follows a power law.
+Think of it like a fractal. A fractal has detail at every scale of magnification, and the amount of detail at scale \(\epsilon\) is proportional to \(\epsilon^{-d_f}\) where \(d_f\) is the fractal dimension. If the data manifold is fractal-like --- having structure at every scale --- then a model that "resolves" down to scale \(\epsilon\) (requiring \(N \sim \epsilon^{-d_f}\) parameters) will capture a fraction of variance that also follows a power law.
 
 ### Hypothesis 2: Connection to Statistical Physics
 
@@ -361,7 +361,7 @@ There is a deep connection to statistical mechanics, specifically to the theory 
 
 In statistical physics, a system at a **critical point** (like water at exactly the boiling temperature and pressure) exhibits power-law correlations. The correlation length diverges, fluctuations happen at all scales, and the system is described by **universal** exponents that depend only on the symmetry class and dimensionality of the system --- not on microscopic details.
 
-The analogy to neural scaling: the loss exponents ($\alpha_N \approx 0.076$, etc.) are remarkably insensitive to architectural details. They are the same for GPT-style models, for different layer counts, for different attention head configurations. This universality is reminiscent of critical exponents in physics.
+The analogy to neural scaling: the loss exponents (\(\alpha_N \approx 0.076\), etc.) are remarkably insensitive to architectural details. They are the same for GPT-style models, for different layer counts, for different attention head configurations. This universality is reminiscent of critical exponents in physics.
 
 The hypothesis is that the learning process itself is a kind of critical phenomenon. The neural network, as it grows, is performing a form of coarse-graining (in the renormalization group sense) of the data distribution. Each layer of the network resolves one more level of the hierarchy. The power-law exponent reflects the fractal dimension of the data distribution in some appropriate sense.
 
@@ -369,15 +369,15 @@ This is not just an analogy. Roberts et al. (2022) and Bahri et al. (2024) have 
 
 ### Hypothesis 3: The Power Law of Learning Curves
 
-There is a classical result in learning theory. For a model class with $N$ effective parameters learning from $D$ data points, the generalization error (how much worse the model does on test data vs. training data) scales as:
+There is a classical result in learning theory. For a model class with \(N\) effective parameters learning from \(D\) data points, the generalization error (how much worse the model does on test data vs. training data) scales as:
 
 $$\epsilon_{gen} \sim \frac{N}{D}$$
 
-This is the bias-variance tradeoff. Too few parameters (high bias): the model cannot fit the data. Too few data points (high variance): the model overfits. But if we layer in the approximation error --- which depends on the complexity of the true function relative to the model class --- we get a richer picture. If the true function has a certain smoothness (belonging to a Sobolev space of order $s$ in dimension $d$), the optimal approximation rate is:
+This is the bias-variance tradeoff. Too few parameters (high bias): the model cannot fit the data. Too few data points (high variance): the model overfits. But if we layer in the approximation error --- which depends on the complexity of the true function relative to the model class --- we get a richer picture. If the true function has a certain smoothness (belonging to a Sobolev space of order \(s\) in dimension \(d\)), the optimal approximation rate is:
 
 $$L \sim N^{-2s/d}$$
 
-This is a power law, and the exponent depends on the intrinsic complexity ($s$, $d$) of the function being learned. The neural scaling exponents, from this viewpoint, encode information about the intrinsic complexity of natural language.
+This is a power law, and the exponent depends on the intrinsic complexity (\(s\), \(d\)) of the function being learned. The neural scaling exponents, from this viewpoint, encode information about the intrinsic complexity of natural language.
 
 ### The "Broken Power Law" Phenomenon
 
@@ -399,7 +399,7 @@ The evidence is that yes, power laws hold here too, but the exponents are differ
 
 $$\text{FID}(C) \propto C^{-\alpha_{FID}}$$
 
-with $\alpha_{FID}$ values in the range 0.05--0.15 depending on the architecture and dataset.
+with \(\alpha_{FID}\) values in the range 0.05--0.15 depending on the architecture and dataset.
 
 The core principle transfers: scaling compute (through larger models or more training) reliably improves image quality, and the improvement follows a power law.
 
@@ -411,7 +411,7 @@ The scaling behavior for video models has some distinctive features:
 
 1. **Spatial quality scales similarly to images.** Per-frame visual quality follows the same kind of power law as image models.
 
-2. **Temporal consistency is harder to scale.** Maintaining coherence across frames requires the model to learn long-range dependencies in time. This appears to require disproportionately more data than simply scaling the model. Preliminary evidence suggests that the $\beta$ exponent (data scaling) is relatively larger for video than for language or images --- meaning video models are more data-hungry.
+2. **Temporal consistency is harder to scale.** Maintaining coherence across frames requires the model to learn long-range dependencies in time. This appears to require disproportionately more data than simply scaling the model. Preliminary evidence suggests that the \(\beta\) exponent (data scaling) is relatively larger for video than for language or images --- meaning video models are more data-hungry.
 
 3. **Video data is harder to curate.** This is perhaps the most important practical constraint. The internet contains trillions of tokens of text, but high-quality video data at scale is much harder to source. Text can be scraped, filtered, and deduplicated relatively easily. Video requires downloading, decoding, filtering for quality and content, handling copyright issues, and dealing with enormous storage and bandwidth requirements. A single hour of 1080p video at 30fps contains about 108,000 frames --- the data cost per "meaningful unit" is far higher than text.
 
@@ -425,11 +425,11 @@ Now we turn to the question that keeps CFOs awake at night: given that scaling w
 
 ### The Cost-to-Improve Formula
 
-Suppose the current state of the art achieves loss $L_1$ using compute $C_1$, and we want to reach a new loss $L_2 < L_1$. From the scaling law:
+Suppose the current state of the art achieves loss \(L_1\) using compute \(C_1\), and we want to reach a new loss \(L_2 < L_1\). From the scaling law:
 
 $$L = \left(\frac{C_c}{C}\right)^{\alpha_C} + L_\infty$$
 
-The reducible component is $L - L_\infty = (C_c/C)^{\alpha_C}$, so:
+The reducible component is \(L - L_\infty = (C_c/C)^{\alpha_C}\), so:
 
 $$C = C_c \cdot (L - L_\infty)^{-1/\alpha_C}$$
 
@@ -439,11 +439,11 @@ $$\frac{C_2}{C_1} = \left(\frac{L_1 - L_\infty}{L_2 - L_\infty}\right)^{1/\alpha
 
 ### What Does Halving the Reducible Loss Cost?
 
-If we want to halve the reducible loss ($L_2 - L_\infty = \frac{1}{2}(L_1 - L_\infty)$):
+If we want to halve the reducible loss (\(L_2 - L_\infty = \frac{1}{2}(L_1 - L_\infty)\)):
 
 $$\frac{C_2}{C_1} = 2^{1/\alpha_C}$$
 
-With $\alpha_C \approx 0.05$:
+With \(\alpha_C \approx 0.05\):
 
 $$\frac{C_2}{C_1} = 2^{20} = 1,048,576$$
 
@@ -453,15 +453,15 @@ That is: **halving the reducible loss requires approximately one million times m
 
 Halving the loss is an extreme target. What about more modest improvements?
 
-A 10% reduction in reducible loss ($L_2 - L_\infty = 0.9 (L_1 - L_\infty)$):
+A 10% reduction in reducible loss (\(L_2 - L_\infty = 0.9 (L_1 - L_\infty)\)):
 
 $$\frac{C_2}{C_1} = \left(\frac{1}{0.9}\right)^{1/0.05} = \left(\frac{10}{9}\right)^{20} \approx 6.7$$
 
-So a 10% loss improvement requires about $7\times$ more compute. A 20% improvement:
+So a 10% loss improvement requires about \(7\times\) more compute. A 20% improvement:
 
 $$\frac{C_2}{C_1} = \left(\frac{1}{0.8}\right)^{20} = 1.25^{20} \approx 86.7$$
 
-About $87\times$ more compute for a 20% gain. And a 50% improvement:
+About \(87\times\) more compute for a 20% gain. And a 50% improvement:
 
 $$\frac{C_2}{C_1} = 2^{20} \approx 10^6$$
 
@@ -472,10 +472,10 @@ These numbers make clear why the scaling game has limits. At current GPU prices 
 This cost wall has motivated a different strategy: instead of spending all compute at training time, spend some at **inference time**. Techniques include:
 
 - **Chain-of-thought prompting**: Have the model reason step by step, using more tokens (and hence more FLOPs) per query
-- **Best-of-N sampling**: Generate $N$ candidate answers and select the best one (using a verifier or reward model)
+- **Best-of-N sampling**: Generate \(N\) candidate answers and select the best one (using a verifier or reward model)
 - **Tree search**: Explore multiple reasoning paths and select the most promising
 
-The key insight is that inference compute scales differently. If you generate $N$ samples and pick the best, the effective quality improvement follows:
+The key insight is that inference compute scales differently. If you generate \(N\) samples and pick the best, the effective quality improvement follows:
 
 $$L_{eff}(N_{samples}) \sim L_{base} - c \cdot \log(N_{samples})$$
 
@@ -489,19 +489,19 @@ The Chinchilla result tells you how to train the best model for a given compute 
 
 ### The Total Cost Model
 
-Let $C_{train}$ be the training compute and $c_{inf}$ be the inference compute per token. If the model will serve $T$ total tokens over its lifetime, the total compute is:
+Let \(C_{train}\) be the training compute and \(c_{inf}\) be the inference compute per token. If the model will serve \(T\) total tokens over its lifetime, the total compute is:
 
 $$C_{total} = C_{train} + c_{inf} \cdot T$$
 
-For a transformer with $N$ parameters, the inference compute per token is approximately $2N$ FLOPs (one forward pass). So:
+For a transformer with \(N\) parameters, the inference compute per token is approximately $2N$ FLOPs (one forward pass). So:
 
 $$C_{total} = 6ND + 2N \cdot T$$
 
-where $D$ is the number of training tokens.
+where \(D\) is the number of training tokens.
 
 ### The Chinchilla-Optimal Case
 
-At the Chinchilla-optimal point, $D^* \approx 20N$, so:
+At the Chinchilla-optimal point, \(D^* \approx 20N\), so:
 
 $$C_{train} = 6N \cdot 20N = 120N^2$$
 
@@ -509,29 +509,29 @@ $$C_{total} = 120N^2 + 2NT$$
 
 ### The Overtrained (Inference-Optimal) Case
 
-Now suppose we train a smaller model $N' < N^*$ but on much more data $D' \gg 20N'$, keeping the training budget the same: $6N'D' = 6N^*D^*$. The model is "overtrained" --- past the Chinchilla-optimal point. Its loss will be slightly worse than the Chinchilla-optimal model (since we are not at the minimum of the loss surface for this compute budget). But inference is cheaper because the model is smaller.
+Now suppose we train a smaller model \(N' < N^*\) but on much more data \(D' \gg 20N'\), keeping the training budget the same: \(6N'D' = 6N^*D^*\). The model is "overtrained" --- past the Chinchilla-optimal point. Its loss will be slightly worse than the Chinchilla-optimal model (since we are not at the minimum of the loss surface for this compute budget). But inference is cheaper because the model is smaller.
 
 The total cost becomes:
 
 $$C_{total}' = 6N'D' + 2N' \cdot T = C_{train} + 2N' \cdot T$$
 
-Since $N' < N^*$, the inference term $2N'T$ is smaller. If $T$ is large enough, the savings in inference outweigh the slight increase in loss.
+Since \(N' < N^*\), the inference term $2N'T$ is smaller. If \(T\) is large enough, the savings in inference outweigh the slight increase in loss.
 
 ### The Llama Philosophy
 
-This is precisely the philosophy behind Meta's Llama models. Llama 1 (2023) trained a 7B parameter model on 1 trillion tokens --- about 140 tokens per parameter, which is $7\times$ the Chinchilla-optimal ratio of 20 tokens per parameter. The model was heavily overtrained. Its loss was not the best achievable for that training compute, but its small size made it extremely cheap to deploy.
+This is precisely the philosophy behind Meta's Llama models. Llama 1 (2023) trained a 7B parameter model on 1 trillion tokens --- about 140 tokens per parameter, which is \(7\times\) the Chinchilla-optimal ratio of 20 tokens per parameter. The model was heavily overtrained. Its loss was not the best achievable for that training compute, but its small size made it extremely cheap to deploy.
 
 Llama 2 pushed further: 2 trillion tokens for the 7B model (nearly 300 tokens per parameter). Llama 3 used 15 trillion tokens for the 8B model --- almost 2000 tokens per parameter, far beyond Chinchilla-optimal.
 
-The tradeoff calculation: for a model that will be served to millions of users, each generating thousands of tokens per session, the total inference compute $T$ easily reaches $10^{18}$ or more. At that scale, cutting the model size by $4\times$ (and inference cost by $4\times$) is worth a modest loss increase, because the inference savings dominate.
+The tradeoff calculation: for a model that will be served to millions of users, each generating thousands of tokens per session, the total inference compute \(T\) easily reaches \(10^{18}\) or more. At that scale, cutting the model size by \(4\times\) (and inference cost by \(4\times\)) is worth a modest loss increase, because the inference savings dominate.
 
 ### The Breakeven Point
 
-We can compute the breakeven number of inference tokens $T^*$ where overtaining becomes worth it. Suppose the overtrained model has loss $L' = L^* + \Delta L$ (slightly worse) but uses a model of size $N' = N^*/k$ for some factor $k > 1$. The training cost is the same ($C_{train}$ fixed), but inference savings are:
+We can compute the breakeven number of inference tokens \(T^*\) where overtaining becomes worth it. Suppose the overtrained model has loss \(L' = L^* + \Delta L\) (slightly worse) but uses a model of size \(N' = N^*/k\) for some factor \(k > 1\). The training cost is the same (\(C_{train}\) fixed), but inference savings are:
 
 $$\Delta C_{inf} = 2(N^* - N'/k) \cdot T = 2N^*(1 - 1/k) \cdot T$$
 
-This is positive for all $T > 0$ --- meaning overtraining is always better for inference cost, and the only question is whether the loss penalty $\Delta L$ is acceptable for your application. In practice, the loss penalty from moderate overtraining (say $2\times$ to $5\times$ the Chinchilla-optimal data) is small, on the order of a few percent.
+This is positive for all \(T > 0\) --- meaning overtraining is always better for inference cost, and the only question is whether the loss penalty \(\Delta L\) is acceptable for your application. In practice, the loss penalty from moderate overtraining (say \(2\times\) to \(5\times\) the Chinchilla-optimal data) is small, on the order of a few percent.
 
 ---
 
@@ -593,7 +593,7 @@ plt.show()
 
 ### Simulation 2: Chinchilla Optimal Frontier
 
-This is the key visualization. We plot iso-loss contours in $(N, D)$ space, overlaid with compute-constraint lines $C = 6ND$. The Chinchilla-optimal point for each compute budget is where the compute line is tangent to an iso-loss contour.
+This is the key visualization. We plot iso-loss contours in \((N, D)\) space, overlaid with compute-constraint lines \(C = 6ND\). The Chinchilla-optimal point for each compute budget is where the compute line is tangent to an iso-loss contour.
 
 ```python
 import numpy as np
@@ -802,7 +802,7 @@ The scaling laws tell a story that is simultaneously empowering and sobering.
 
 **Empowering:** we have a predictive theory. Before training a model that costs $100 million, you can train a small version for $1,000 and extrapolate. The power law lets you predict the loss of a 100B-parameter model from the losses of 1M, 10M, and 100M-parameter models. This is extraordinary --- it turns an empirical science into something closer to engineering.
 
-**Sobering:** the exponents are small. $\alpha_C \approx 0.05$ means that the game of "just make it bigger" hits diminishing returns brutally fast. A $10\times$ increase in compute buys you only a $\sim 12\%$ reduction in reducible loss. The era of easy gains from scaling is approaching its limits, at least along the pure training-compute axis.
+**Sobering:** the exponents are small. \(\alpha_C \approx 0.05\) means that the game of "just make it bigger" hits diminishing returns brutally fast. A \(10\times\) increase in compute buys you only a \(\sim 12\%\) reduction in reducible loss. The era of easy gains from scaling is approaching its limits, at least along the pure training-compute axis.
 
 The field is responding in several ways:
 

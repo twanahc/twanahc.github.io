@@ -32,11 +32,11 @@ This post is a deep mathematical dive into latent spaces: what they are, why the
 
 A latent space is a learned compressed representation of data. The word "latent" means hidden -- these are variables that we never observe directly, but that the model learns to use internally.
 
-Consider a 512x512 RGB video frame. In pixel space, this is a vector in $\mathbb{R}^{786432}$ (512 x 512 x 3 = 786,432 dimensions). Most of this space is empty. Random vectors in $\mathbb{R}^{786432}$ do not look like natural images -- they look like static noise. The set of natural images occupies an infinitesimally thin subregion of pixel space.
+Consider a 512x512 RGB video frame. In pixel space, this is a vector in \(\mathbb{R}^{786432}\) (512 x 512 x 3 = 786,432 dimensions). Most of this space is empty. Random vectors in \(\mathbb{R}^{786432}\) do not look like natural images -- they look like static noise. The set of natural images occupies an infinitesimally thin subregion of pixel space.
 
-A latent space compresses this. A typical video model encoder maps each frame to a vector $z \in \mathbb{R}^{d}$ where $d$ might be 4, 8, 16, or at most a few hundred dimensions. The critical property is that this compression is not random -- it is **learned** to preserve semantic structure.
+A latent space compresses this. A typical video model encoder maps each frame to a vector \(z \in \mathbb{R}^{d}\) where \(d\) might be 4, 8, 16, or at most a few hundred dimensions. The critical property is that this compression is not random -- it is **learned** to preserve semantic structure.
 
-Formally, an encoder $E: \mathcal{X} \rightarrow \mathcal{Z}$ maps from input space $\mathcal{X}$ (images, video frames) to latent space $\mathcal{Z}$, and a decoder $D: \mathcal{Z} \rightarrow \mathcal{X}$ maps back. The pair is trained so that $D(E(x)) \approx x$ -- reconstruction fidelity -- while the latent space $\mathcal{Z}$ is simultaneously constrained to have useful geometric properties.
+Formally, an encoder \(E: \mathcal{X} \rightarrow \mathcal{Z}\) maps from input space \(\mathcal{X}\) (images, video frames) to latent space \(\mathcal{Z}\), and a decoder \(D: \mathcal{Z} \rightarrow \mathcal{X}\) maps back. The pair is trained so that \(D(E(x)) \approx x\) -- reconstruction fidelity -- while the latent space \(\mathcal{Z}\) is simultaneously constrained to have useful geometric properties.
 
 ```
 Input Space (High-D)          Latent Space (Low-D)         Output Space (High-D)
@@ -57,11 +57,11 @@ The key insight: **semantically similar inputs map to nearby points in latent sp
 
 The manifold hypothesis states that high-dimensional real-world data (images, video, audio, text) lies on or near a low-dimensional manifold embedded in the high-dimensional ambient space.
 
-Formally: if $\mathcal{X} \subset \mathbb{R}^{D}$ is the space of all possible pixel configurations and $\mathcal{M} \subset \mathcal{X}$ is the set of natural images, then $\mathcal{M}$ is approximately a smooth manifold of dimension $d \ll D$.
+Formally: if \(\mathcal{X} \subset \mathbb{R}^{D}\) is the space of all possible pixel configurations and \(\mathcal{M} \subset \mathcal{X}\) is the set of natural images, then \(\mathcal{M}\) is approximately a smooth manifold of dimension \(d \ll D\).
 
 Why should this be true? Consider what determines a face image: the identity of the person (a handful of parameters), their expression (a few more), the lighting direction (3 parameters), the camera angle (3 parameters), the background (a few parameters). Even a generous count gives perhaps 50 to 100 meaningful degrees of freedom. Yet the image lives in a space of 786,432 dimensions. The ratio of intrinsic to ambient dimensionality is roughly 100 : 786,432 or about 0.013%.
 
-This means the data manifold is incredibly thin compared to the ambient space. A latent space model attempts to learn a coordinate system for this manifold -- a set of $d$ coordinates that parameterize the manifold smoothly.
+This means the data manifold is incredibly thin compared to the ambient space. A latent space model attempts to learn a coordinate system for this manifold -- a set of \(d\) coordinates that parameterize the manifold smoothly.
 
 The implications are profound:
 
@@ -132,32 +132,32 @@ The Variational Autoencoder (VAE) is the most principled framework for building 
 
 ### The Generative Model
 
-We posit a generative model for data $x$:
+We posit a generative model for data \(x\):
 
-1. Sample a latent variable: $z \sim p(z) = \mathcal{N}(0, I)$
-2. Generate data from the latent: $x \sim p_\theta(x|z)$
+1. Sample a latent variable: \(z \sim p(z) = \mathcal{N}(0, I)\)
+2. Generate data from the latent: \(x \sim p_\theta(x|z)\)
 
 The marginal likelihood of the data is:
 
 $$p_\theta(x) = \int p_\theta(x|z) \, p(z) \, dz$$
 
-This integral is intractable -- we cannot compute it exactly because it requires integrating over all possible latent codes $z$.
+This integral is intractable -- we cannot compute it exactly because it requires integrating over all possible latent codes \(z\).
 
 ### The Variational Lower Bound
 
-Since we cannot compute $p_\theta(x)$ directly, we introduce an approximate posterior $q_\phi(z|x)$ and derive a lower bound on $\log p_\theta(x)$.
+Since we cannot compute \(p_\theta(x)\) directly, we introduce an approximate posterior \(q_\phi(z|x)\) and derive a lower bound on \(\log p_\theta(x)\).
 
 Start with the log-marginal-likelihood:
 
 $$\log p_\theta(x) = \log \int p_\theta(x|z) \, p(z) \, dz$$
 
-Multiply and divide by $q_\phi(z|x)$:
+Multiply and divide by \(q_\phi(z|x)\):
 
 $$\log p_\theta(x) = \log \int \frac{p_\theta(x|z) \, p(z)}{q_\phi(z|x)} \, q_\phi(z|x) \, dz$$
 
 $$= \log \mathbb{E}_{q_\phi(z|x)} \left[ \frac{p_\theta(x|z) \, p(z)}{q_\phi(z|x)} \right]$$
 
-By Jensen's inequality ($\log \mathbb{E}[X] \geq \mathbb{E}[\log X]$ for concave $\log$):
+By Jensen's inequality (\(\log \mathbb{E}[X] \geq \mathbb{E}[\log X]\) for concave \(\log\)):
 
 $$\log p_\theta(x) \geq \mathbb{E}_{q_\phi(z|x)} \left[ \log \frac{p_\theta(x|z) \, p(z)}{q_\phi(z|x)} \right]$$
 
@@ -169,19 +169,19 @@ This is the **Evidence Lower Bound (ELBO)**:
 
 $$\text{ELBO} = \underbrace{\mathbb{E}_{q_\phi(z|x)} [\log p_\theta(x|z)]}_{\text{Reconstruction term}} - \underbrace{D_{KL}(q_\phi(z|x) \| p(z))}_{\text{Regularization term}}$$
 
-The first term encourages the decoder to reconstruct $x$ from $z$. The second term encourages the encoder's posterior to stay close to the prior $p(z) = \mathcal{N}(0, I)$.
+The first term encourages the decoder to reconstruct \(x\) from \(z\). The second term encourages the encoder's posterior to stay close to the prior \(p(z) = \mathcal{N}(0, I)\).
 
 ### The Encoder Parameterization
 
-The encoder $q_\phi(z|x)$ is parameterized as a diagonal Gaussian:
+The encoder \(q_\phi(z|x)\) is parameterized as a diagonal Gaussian:
 
 $$q_\phi(z|x) = \mathcal{N}(z; \mu_\phi(x), \text{diag}(\sigma_\phi^2(x)))$$
 
-The neural network takes input $x$ and outputs two vectors: $\mu_\phi(x) \in \mathbb{R}^d$ and $\log \sigma_\phi^2(x) \in \mathbb{R}^d$.
+The neural network takes input \(x\) and outputs two vectors: \(\mu_\phi(x) \in \mathbb{R}^d\) and \(\log \sigma_\phi^2(x) \in \mathbb{R}^d\).
 
 ### Deriving the KL Divergence Term
 
-For the specific case where $q_\phi(z|x) = \mathcal{N}(\mu, \text{diag}(\sigma^2))$ and $p(z) = \mathcal{N}(0, I)$, the KL divergence has a closed-form solution. Let us derive it.
+For the specific case where \(q_\phi(z|x) = \mathcal{N}(\mu, \text{diag}(\sigma^2))\) and \(p(z) = \mathcal{N}(0, I)\), the KL divergence has a closed-form solution. Let us derive it.
 
 The KL divergence between two distributions is:
 
@@ -191,11 +191,11 @@ For multivariate Gaussians, the general formula is:
 
 $$D_{KL}(\mathcal{N}(\mu_1, \Sigma_1) \| \mathcal{N}(\mu_2, \Sigma_2)) = \frac{1}{2} \left[ \log \frac{|\Sigma_2|}{|\Sigma_1|} - d + \text{tr}(\Sigma_2^{-1} \Sigma_1) + (\mu_2 - \mu_1)^T \Sigma_2^{-1} (\mu_2 - \mu_1) \right]$$
 
-Substituting $\mu_1 = \mu$, $\Sigma_1 = \text{diag}(\sigma^2)$, $\mu_2 = 0$, $\Sigma_2 = I$:
+Substituting \(\mu_1 = \mu\), \(\Sigma_1 = \text{diag}(\sigma^2)\), \(\mu_2 = 0\), \(\Sigma_2 = I\):
 
 $$D_{KL} = \frac{1}{2} \left[ \log \frac{|I|}{|\text{diag}(\sigma^2)|} - d + \text{tr}(I^{-1} \cdot \text{diag}(\sigma^2)) + \mu^T I^{-1} \mu \right]$$
 
-Since $|I| = 1$, $|\text{diag}(\sigma^2)| = \prod_j \sigma_j^2$, and $\text{tr}(\text{diag}(\sigma^2)) = \sum_j \sigma_j^2$:
+Since \(|I| = 1\), \(|\text{diag}(\sigma^2)| = \prod_j \sigma_j^2\), and \(\text{tr}(\text{diag}(\sigma^2)) = \sum_j \sigma_j^2\):
 
 $$D_{KL} = \frac{1}{2} \left[ -\sum_{j=1}^{d} \log \sigma_j^2 - d + \sum_{j=1}^{d} \sigma_j^2 + \sum_{j=1}^{d} \mu_j^2 \right]$$
 
@@ -205,12 +205,12 @@ This is the KL loss term used in every VAE implementation. Let us verify the int
 
 | Component | When is it small? | Meaning |
 |---|---|---|
-| $\mu_j^2$ | When $\mu_j \approx 0$ | Posterior mean is near the prior mean |
-| $\sigma_j^2$ | When $\sigma_j \approx 1$ | Posterior variance matches the prior |
-| $\log \sigma_j^2$ | When $\sigma_j \approx 1$ | Balances the $\sigma_j^2$ term |
-| $1$ | Always | Constant offset making KL = 0 when $\mu=0, \sigma=1$ |
+| \(\mu_j^2\) | When \(\mu_j \approx 0\) | Posterior mean is near the prior mean |
+| \(\sigma_j^2\) | When \(\sigma_j \approx 1\) | Posterior variance matches the prior |
+| \(\log \sigma_j^2\) | When \(\sigma_j \approx 1\) | Balances the \(\sigma_j^2\) term |
+| $1$ | Always | Constant offset making KL = 0 when \(\mu=0, \sigma=1\) |
 
-When $\mu_j = 0$ and $\sigma_j = 1$ for all $j$, the KL divergence is exactly zero -- the posterior matches the prior perfectly.
+When \(\mu_j = 0\) and \(\sigma_j = 1\) for all \(j\), the KL divergence is exactly zero -- the posterior matches the prior perfectly.
 
 ### The Reparameterization Trick
 
@@ -218,7 +218,7 @@ To backpropagate through the stochastic sampling step, we use the reparameteriza
 
 $$z = \mu_\phi(x) + \sigma_\phi(x) \odot \epsilon, \quad \epsilon \sim \mathcal{N}(0, I)$$
 
-This moves the stochasticity into $\epsilon$, which is independent of the parameters $\phi$. The gradient with respect to $\phi$ can now flow through $\mu_\phi$ and $\sigma_\phi$:
+This moves the stochasticity into \(\epsilon\), which is independent of the parameters \(\phi\). The gradient with respect to \(\phi\) can now flow through \(\mu_\phi\) and \(\sigma_\phi\):
 
 $$\frac{\partial z}{\partial \phi} = \frac{\partial \mu_\phi}{\partial \phi} + \frac{\partial \sigma_\phi}{\partial \phi} \odot \epsilon$$
 
@@ -232,17 +232,17 @@ The KL divergence term is not just a regularizer -- it is the reason latent spac
 
 ### Continuity
 
-The KL term penalizes the encoder for placing the posterior $q_\phi(z|x)$ too far from $\mathcal{N}(0, I)$. This means different inputs cannot be mapped to arbitrarily separated regions of latent space. The posteriors overlap, creating a **continuous** space where intermediate points are also valid.
+The KL term penalizes the encoder for placing the posterior \(q_\phi(z|x)\) too far from \(\mathcal{N}(0, I)\). This means different inputs cannot be mapped to arbitrarily separated regions of latent space. The posteriors overlap, creating a **continuous** space where intermediate points are also valid.
 
 Without KL regularization (a plain autoencoder), the encoder can map different inputs to isolated islands in latent space. Points between the islands decode to garbage. With KL regularization, the posteriors are forced to overlap with each other and with the prior, filling in the gaps.
 
 ### Completeness
 
-Any point sampled from the prior $z \sim \mathcal{N}(0, I)$ should decode to a plausible output. The KL term ensures this by keeping the aggregate posterior $q(z) = \mathbb{E}_{p(x)}[q_\phi(z|x)]$ close to $p(z)$. If the aggregate posterior matches the prior, then sampling from the prior samples from the same distribution the decoder was trained on.
+Any point sampled from the prior \(z \sim \mathcal{N}(0, I)\) should decode to a plausible output. The KL term ensures this by keeping the aggregate posterior \(q(z) = \mathbb{E}_{p(x)}[q_\phi(z|x)]\) close to \(p(z)\). If the aggregate posterior matches the prior, then sampling from the prior samples from the same distribution the decoder was trained on.
 
 ### Smoothness
 
-Small changes in $z$ produce small changes in $D(z)$. This follows from the continuity of neural networks and the fact that nearby latent codes often came from similar inputs (due to the overlap enforced by KL).
+Small changes in \(z\) produce small changes in \(D(z)\). This follows from the continuity of neural networks and the fact that nearby latent codes often came from similar inputs (due to the overlap enforced by KL).
 
 These three properties -- continuity, completeness, smoothness -- are what make interpolation and arithmetic meaningful in latent space.
 
@@ -269,23 +269,23 @@ The simplest way to move between two latent codes is linear interpolation (LERP)
 
 $$z_{\text{interp}}(t) = (1-t) \cdot z_1 + t \cdot z_2, \quad t \in [0, 1]$$
 
-At $t = 0$, we get $z_1$. At $t = 1$, we get $z_2$. At $t = 0.5$, we get the midpoint.
+At \(t = 0\), we get \(z_1\). At \(t = 1\), we get \(z_2\). At \(t = 0.5\), we get the midpoint.
 
-LERP traces a **straight line** through latent space. When decoded, this line produces a sequence of outputs that smoothly transition from the input corresponding to $z_1$ to the input corresponding to $z_2$.
+LERP traces a **straight line** through latent space. When decoded, this line produces a sequence of outputs that smoothly transition from the input corresponding to \(z_1\) to the input corresponding to \(z_2\).
 
 ### Properties of LERP
 
-**Constant velocity.** The derivative is constant: $\frac{dz}{dt} = z_2 - z_1$. The interpolated point moves at uniform speed along the line.
+**Constant velocity.** The derivative is constant: \(\frac{dz}{dt} = z_2 - z_1\). The interpolated point moves at uniform speed along the line.
 
 **Norm variation.** The norm of the interpolated point varies non-monotonically:
 
 $$\|z_{\text{interp}}(t)\|^2 = (1-t)^2 \|z_1\|^2 + 2t(1-t)(z_1 \cdot z_2) + t^2 \|z_2\|^2$$
 
-If $z_1$ and $z_2$ are nearly orthogonal (as they tend to be in high dimensions), then at $t = 0.5$:
+If \(z_1\) and \(z_2\) are nearly orthogonal (as they tend to be in high dimensions), then at \(t = 0.5\):
 
 $$\|z_{\text{interp}}(0.5)\|^2 \approx \frac{\|z_1\|^2 + \|z_2\|^2}{4} \approx \frac{\|z_1\|^2}{2}$$
 
-The midpoint has roughly $\frac{1}{\sqrt{2}} \approx 0.707$ times the norm of the endpoints. **The interpolated path dips toward the origin.** In high-dimensional spaces, this dip passes through a region that the model never saw during training, potentially producing low-quality or blurry outputs.
+The midpoint has roughly \(\frac{1}{\sqrt{2}} \approx 0.707\) times the norm of the endpoints. **The interpolated path dips toward the origin.** In high-dimensional spaces, this dip passes through a region that the model never saw during training, potentially producing low-quality or blurry outputs.
 
 ### When LERP Works
 
@@ -307,7 +307,7 @@ Spherical Linear Interpolation (SLERP) moves along the **great circle** connecti
 
 $$z_{\text{interp}}(t) = \frac{\sin((1-t)\Omega)}{\sin \Omega} z_1 + \frac{\sin(t\Omega)}{\sin \Omega} z_2$$
 
-where $\Omega$ is the angle between $z_1$ and $z_2$:
+where \(\Omega\) is the angle between \(z_1\) and \(z_2\):
 
 $$\Omega = \arccos \left( \frac{z_1 \cdot z_2}{\|z_1\| \|z_2\|} \right)$$
 
@@ -317,31 +317,31 @@ SLERP can be derived from the requirement that the interpolation:
 1. Stays on the surface of the sphere
 2. Moves at constant angular velocity
 
-Consider two unit vectors $\hat{z}_1$ and $\hat{z}_2$ on the unit sphere $S^{d-1}$. We want a curve $\gamma(t)$ on the sphere such that $\gamma(0) = \hat{z}_1$, $\gamma(1) = \hat{z}_2$, and $\|\gamma(t)\| = 1$ for all $t$.
+Consider two unit vectors \(\hat{z}_1\) and \(\hat{z}_2\) on the unit sphere \(S^{d-1}\). We want a curve \(\gamma(t)\) on the sphere such that \(\gamma(0) = \hat{z}_1\), \(\gamma(1) = \hat{z}_2\), and \(\|\gamma(t)\| = 1\) for all \(t\).
 
-We can decompose $\hat{z}_2$ into components parallel and perpendicular to $\hat{z}_1$:
+We can decompose \(\hat{z}_2\) into components parallel and perpendicular to \(\hat{z}_1\):
 
 $$\hat{z}_2 = (\hat{z}_1 \cdot \hat{z}_2) \hat{z}_1 + \hat{z}_\perp$$
 
-where $\hat{z}_\perp$ is the unit vector perpendicular to $\hat{z}_1$ in the plane spanned by $\hat{z}_1$ and $\hat{z}_2$.
+where \(\hat{z}_\perp\) is the unit vector perpendicular to \(\hat{z}_1\) in the plane spanned by \(\hat{z}_1\) and \(\hat{z}_2\).
 
 The great circle in this plane is parameterized by:
 
 $$\gamma(t) = \cos(t\Omega) \hat{z}_1 + \sin(t\Omega) \hat{e}_\perp$$
 
-where $\hat{e}_\perp = \frac{\hat{z}_2 - (\hat{z}_1 \cdot \hat{z}_2)\hat{z}_1}{\|\hat{z}_2 - (\hat{z}_1 \cdot \hat{z}_2)\hat{z}_1\|}$ and $\Omega = \arccos(\hat{z}_1 \cdot \hat{z}_2)$.
+where \(\hat{e}_\perp = \frac{\hat{z}_2 - (\hat{z}_1 \cdot \hat{z}_2)\hat{z}_1}{\|\hat{z}_2 - (\hat{z}_1 \cdot \hat{z}_2)\hat{z}_1\|}\) and \(\Omega = \arccos(\hat{z}_1 \cdot \hat{z}_2)\).
 
-Substituting and simplifying (using $\sin \Omega = \|\hat{z}_2 - \cos\Omega \cdot \hat{z}_1\|$), we obtain:
+Substituting and simplifying (using \(\sin \Omega = \|\hat{z}_2 - \cos\Omega \cdot \hat{z}_1\|\)), we obtain:
 
 $$\gamma(t) = \frac{\sin((1-t)\Omega)}{\sin \Omega} \hat{z}_1 + \frac{\sin(t\Omega)}{\sin \Omega} \hat{z}_2$$
 
-For non-unit vectors, we can either normalize first and then scale, or apply SLERP directly with an interpolated radius: $r(t) = (1-t)\|z_1\| + t\|z_2\|$.
+For non-unit vectors, we can either normalize first and then scale, or apply SLERP directly with an interpolated radius: \(r(t) = (1-t)\|z_1\| + t\|z_2\|\).
 
 ### Properties of SLERP
 
-**Constant norm (on unit sphere).** If $\|z_1\| = \|z_2\| = 1$, then $\|\gamma(t)\| = 1$ for all $t$. The interpolation stays on the sphere.
+**Constant norm (on unit sphere).** If \(\|z_1\| = \|z_2\| = 1\), then \(\|\gamma(t)\| = 1\) for all \(t\). The interpolation stays on the sphere.
 
-**Constant angular velocity.** The angle from $\hat{z}_1$ to $\gamma(t)$ is exactly $t\Omega$. The point moves at uniform angular speed.
+**Constant angular velocity.** The angle from \(\hat{z}_1\) to \(\gamma(t)\) is exactly \(t\Omega\). The point moves at uniform angular speed.
 
 **No norm collapse.** Unlike LERP, the midpoint has the same norm as the endpoints. This avoids the "dip toward the origin" problem.
 
@@ -407,29 +407,29 @@ In high-dimensional spaces, the geometry of Gaussian distributions is deeply cou
 
 ### Gaussian Shell Concentration
 
-For $z \sim \mathcal{N}(0, I_d)$ in $d$ dimensions, the squared norm $\|z\|^2$ follows a chi-squared distribution with $d$ degrees of freedom:
+For \(z \sim \mathcal{N}(0, I_d)\) in \(d\) dimensions, the squared norm \(\|z\|^2\) follows a chi-squared distribution with \(d\) degrees of freedom:
 
 $$\|z\|^2 \sim \chi^2_d$$
 
-The mean is $\mathbb{E}[\|z\|^2] = d$ and the variance is $\text{Var}(\|z\|^2) = 2d$.
+The mean is \(\mathbb{E}[\|z\|^2] = d\) and the variance is \(\text{Var}(\|z\|^2) = 2d\).
 
-Therefore, the norm $\|z\|$ concentrates around $\sqrt{d}$:
+Therefore, the norm \(\|z\|\) concentrates around \(\sqrt{d}\):
 
 $$\mathbb{E}[\|z\|] \approx \sqrt{d} - \frac{1}{2\sqrt{d}}, \quad \text{Var}(\|z\|) \approx \frac{1}{2}$$
 
-The standard deviation of $\|z\|$ is approximately $\frac{1}{\sqrt{2}}$, **independent of $d$**. As $d$ grows, the ratio of standard deviation to mean shrinks as $O(1/\sqrt{d})$. In $d = 512$ dimensions:
+The standard deviation of \(\|z\|\) is approximately \(\frac{1}{\sqrt{2}}\), **independent of \(d\)**. As \(d\) grows, the ratio of standard deviation to mean shrinks as \(O(1/\sqrt{d})\). In \(d = 512\) dimensions:
 
 $$\|z\| \approx 22.6 \pm 0.71$$
 
-Virtually all the probability mass is concentrated in a thin **spherical shell** of radius $\approx \sqrt{d}$ and thickness $\approx O(1)$.
+Virtually all the probability mass is concentrated in a thin **spherical shell** of radius \(\approx \sqrt{d}\) and thickness \(\approx O(1)\).
 
 ### Why This Breaks LERP
 
-If two points $z_1$ and $z_2$ are sampled from $\mathcal{N}(0, I_{512})$, they both have norm $\approx 22.6$. But their LERP midpoint has norm:
+If two points \(z_1\) and \(z_2\) are sampled from \(\mathcal{N}(0, I_{512})\), they both have norm \(\approx 22.6\). But their LERP midpoint has norm:
 
 $$\|z_{\text{mid}}\| = \left\|\frac{z_1 + z_2}{2}\right\|$$
 
-In high dimensions, random vectors are nearly orthogonal ($z_1 \cdot z_2 \approx 0$), so:
+In high dimensions, random vectors are nearly orthogonal (\(z_1 \cdot z_2 \approx 0\)), so:
 
 $$\|z_{\text{mid}}\|^2 \approx \frac{\|z_1\|^2 + \|z_2\|^2}{4} \approx \frac{d}{2}$$
 
@@ -437,19 +437,19 @@ $$\|z_{\text{mid}}\| \approx \sqrt{d/2} \approx \frac{\sqrt{d}}{\sqrt{2}} \appro
 
 The midpoint has norm $16.0$ instead of $22.6$. This is **deep inside the sphere**, in a region that has essentially zero probability under the prior. The decoder has never been trained on points with this norm. The output is often blurry, washed out, or semantically incoherent.
 
-SLERP avoids this entirely by staying on the spherical shell of radius $\sqrt{d}$.
+SLERP avoids this entirely by staying on the spherical shell of radius \(\sqrt{d}\).
 
 ### Numerical Example
 
-| Dimension $d$ | Shell radius $\sqrt{d}$ | LERP midpoint norm | Ratio | Probability of norm < midpoint |
+| Dimension \(d\) | Shell radius \(\sqrt{d}\) | LERP midpoint norm | Ratio | Probability of norm < midpoint |
 |---|---|---|---|---|
 | 2 | 1.41 | 1.00 | 0.707 | ~39% |
 | 10 | 3.16 | 2.24 | 0.707 | ~6.8% |
-| 100 | 10.0 | 7.07 | 0.707 | ~$10^{-7}$ |
-| 512 | 22.6 | 16.0 | 0.707 | ~$10^{-35}$ |
-| 4096 | 64.0 | 45.3 | 0.707 | ~$10^{-280}$ |
+| 100 | 10.0 | 7.07 | 0.707 | ~\(10^{-7}\) |
+| 512 | 22.6 | 16.0 | 0.707 | ~\(10^{-35}\) |
+| 4096 | 64.0 | 45.3 | 0.707 | ~\(10^{-280}\) |
 
-In 512 dimensions, the probability of a random sample having a norm as small as the LERP midpoint is approximately $10^{-35}$. The midpoint is in a region of essentially zero probability. This is not a theoretical curiosity -- it directly causes visible artifacts in generated outputs.
+In 512 dimensions, the probability of a random sample having a norm as small as the LERP midpoint is approximately \(10^{-35}\). The midpoint is in a region of essentially zero probability. This is not a theoretical curiosity -- it directly causes visible artifacts in generated outputs.
 
 ---
 
@@ -459,13 +459,13 @@ A representation is **disentangled** when individual dimensions (or small groups
 
 ### Formal Definition
 
-Let $z = (z_1, z_2, \ldots, z_d)$ be a latent representation, and let $v = (v_1, v_2, \ldots, v_K)$ be the true generative factors (pose, lighting, identity, expression, etc.). A representation is disentangled if:
+Let \(z = (z_1, z_2, \ldots, z_d)\) be a latent representation, and let \(v = (v_1, v_2, \ldots, v_K)\) be the true generative factors (pose, lighting, identity, expression, etc.). A representation is disentangled if:
 
-1. **Each $z_j$ depends on at most one $v_k$**: Changes to $z_j$ only affect one factor.
-2. **Each $v_k$ is captured by at most a few $z_j$'s**: Each factor has a localized representation.
-3. **The factors are independent**: $p(z) = \prod_j p(z_j)$.
+1. **Each \(z_j\) depends on at most one \(v_k\)**: Changes to \(z_j\) only affect one factor.
+2. **Each \(v_k\) is captured by at most a few \(z_j\)'s**: Each factor has a localized representation.
+3. **The factors are independent**: \(p(z) = \prod_j p(z_j)\).
 
-In a perfectly disentangled space, moving along dimension $z_3$ might change only the lighting, while moving along $z_7$ might change only the facial expression.
+In a perfectly disentangled space, moving along dimension \(z_3\) might change only the lighting, while moving along \(z_7\) might change only the facial expression.
 
 ### beta-VAE: Pressuring Disentanglement
 
@@ -473,15 +473,15 @@ The beta-VAE modifies the standard VAE objective by weighting the KL term:
 
 $$\mathcal{L}_{\beta\text{-VAE}} = \mathbb{E}_{q_\phi(z|x)} [\log p_\theta(x|z)] - \beta \cdot D_{KL}(q_\phi(z|x) \| p(z))$$
 
-When $\beta > 1$, the model faces stronger pressure to match the prior $\mathcal{N}(0, I)$. Since the prior factorizes as $p(z) = \prod_j p(z_j) = \prod_j \mathcal{N}(0, 1)$, this encourages the aggregate posterior to also factorize, which implies statistical independence between dimensions, which promotes disentanglement.
+When \(\beta > 1\), the model faces stronger pressure to match the prior \(\mathcal{N}(0, I)\). Since the prior factorizes as \(p(z) = \prod_j p(z_j) = \prod_j \mathcal{N}(0, 1)\), this encourages the aggregate posterior to also factorize, which implies statistical independence between dimensions, which promotes disentanglement.
 
-The tradeoff: higher $\beta$ means better disentanglement but worse reconstruction. The model cannot use correlated dimensions to encode complex features, so it must sacrifice detail.
+The tradeoff: higher \(\beta\) means better disentanglement but worse reconstruction. The model cannot use correlated dimensions to encode complex features, so it must sacrifice detail.
 
 The information bottleneck interpretation:
 
 $$I(x; z) \leq \frac{1}{\beta} \left[ \mathbb{E}_{q_\phi(z|x)} [\log p_\theta(x|z)] + \text{const} \right]$$
 
-Higher $\beta$ tightens the bottleneck, forcing the model to encode only the most important, independent factors.
+Higher \(\beta\) tightens the bottleneck, forcing the model to encode only the most important, independent factors.
 
 ### Metrics for Disentanglement
 
@@ -489,12 +489,12 @@ Several metrics have been proposed:
 
 | Metric | What it measures | Approach |
 |---|---|---|
-| **DCI** (Disentanglement, Completeness, Informativeness) | Whether each code dimension captures one factor | Train regressors from $z$ to $v$ |
-| **MIG** (Mutual Information Gap) | Gap in mutual information between top-2 codes per factor | $\frac{1}{K} \sum_k \frac{1}{H(v_k)} (I_{top1} - I_{top2})$ |
+| **DCI** (Disentanglement, Completeness, Informativeness) | Whether each code dimension captures one factor | Train regressors from \(z\) to \(v\) |
+| **MIG** (Mutual Information Gap) | Gap in mutual information between top-2 codes per factor | \(\frac{1}{K} \sum_k \frac{1}{H(v_k)} (I_{top1} - I_{top2})\) |
 | **SAP** (Separated Attribute Predictability) | Whether factors can be predicted from individual codes | Classification accuracy gap |
 | **Factor VAE metric** | Whether individual dimensions encode individual factors | Majority vote classifier |
 
-In practice, disentanglement in video models is partial. Modern latent video diffusion models (like those used in Sora, Veo, Kling) use high-dimensional latent spaces (typically $d = 4$ to $16$ per spatial position, but with spatial dimensions preserved, so the total latent dimensionality is very high). Full disentanglement is neither achieved nor necessary -- partial disentanglement is sufficient for the arithmetic operations we care about.
+In practice, disentanglement in video models is partial. Modern latent video diffusion models (like those used in Sora, Veo, Kling) use high-dimensional latent spaces (typically \(d = 4\) to $16$ per spatial position, but with spatial dimensions preserved, so the total latent dimensionality is very high). Full disentanglement is neither achieved nor necessary -- partial disentanglement is sufficient for the arithmetic operations we care about.
 
 ---
 
@@ -508,11 +508,11 @@ In word2vec, word embeddings exhibit linear structure:
 
 $$\vec{\text{king}} - \vec{\text{man}} + \vec{\text{woman}} \approx \vec{\text{queen}}$$
 
-This works because the embedding space encodes a "royalty" direction and a "gender" direction as approximately orthogonal linear subspaces. The vector $\vec{\text{king}} - \vec{\text{man}}$ isolates the "royalty" component, and adding it to $\vec{\text{woman}}$ produces the royal female.
+This works because the embedding space encodes a "royalty" direction and a "gender" direction as approximately orthogonal linear subspaces. The vector \(\vec{\text{king}} - \vec{\text{man}}\) isolates the "royalty" component, and adding it to \(\vec{\text{woman}}\) produces the royal female.
 
 ### Why Arithmetic Works
 
-Consider a simplified model where the latent space has been trained to encode two independent factors: content $c$ and style $s$. If the encoding is approximately linear:
+Consider a simplified model where the latent space has been trained to encode two independent factors: content \(c\) and style \(s\). If the encoding is approximately linear:
 
 $$z = W_c \cdot c + W_s \cdot s + b$$
 
@@ -520,7 +520,7 @@ Then:
 
 $$z_{\text{content}} - z_{\text{neutral}} + z_{\text{style target}} = W_c \cdot c_{\text{content}} + W_s \cdot s_{\text{neutral}} - W_c \cdot c_{\text{neutral}} - W_s \cdot s_{\text{neutral}} + W_c \cdot c_{\text{style target}} + W_s \cdot s_{\text{style target}}$$
 
-If we choose $c_{\text{neutral}} = c_{\text{style target}}$ (same content), this simplifies to:
+If we choose \(c_{\text{neutral}} = c_{\text{style target}}\) (same content), this simplifies to:
 
 $$= W_c \cdot c_{\text{content}} + W_s \cdot s_{\text{style target}}$$
 
@@ -533,11 +533,11 @@ The general formula for style transfer in latent space:
 $$z_{\text{output}} = z_{\text{content}} + (z_{\text{style reference}} - z_{\text{neutral}})$$
 
 where:
-- $z_{\text{content}}$ is the encoding of the content you want to keep
-- $z_{\text{style reference}}$ is the encoding of something in the target style
-- $z_{\text{neutral}}$ is the encoding of something in a neutral / default style with similar content to the style reference
+- \(z_{\text{content}}\) is the encoding of the content you want to keep
+- \(z_{\text{style reference}}\) is the encoding of something in the target style
+- \(z_{\text{neutral}}\) is the encoding of something in a neutral / default style with similar content to the style reference
 
-The difference $(z_{\text{style reference}} - z_{\text{neutral}})$ isolates the **style direction** -- the vector that points from "neutral" to "stylized" while keeping content fixed.
+The difference \((z_{\text{style reference}} - z_{\text{neutral}})\) isolates the **style direction** -- the vector that points from "neutral" to "stylized" while keeping content fixed.
 
 ### Attribute Vectors
 
@@ -545,11 +545,11 @@ More generally, we can extract **attribute vectors** by averaging:
 
 $$v_{\text{attribute}} = \frac{1}{|S_+|} \sum_{x \in S_+} E(x) - \frac{1}{|S_-|} \sum_{x \in S_-} E(x)$$
 
-where $S_+$ is a set of inputs that have the attribute and $S_-$ is a set that lacks it. The resulting vector $v_{\text{attribute}}$ points in the direction of "having the attribute."
+where \(S_+\) is a set of inputs that have the attribute and \(S_-\) is a set that lacks it. The resulting vector \(v_{\text{attribute}}\) points in the direction of "having the attribute."
 
 Examples for video:
 
-| Attribute | $S_+$ (has attribute) | $S_-$ (lacks attribute) | Application |
+| Attribute | \(S_+\) (has attribute) | \(S_-\) (lacks attribute) | Application |
 |---|---|---|---|
 | "cinematic" | Professional movie clips | Amateur footage | Make any video look cinematic |
 | "slow motion" | Slow-mo clips | Normal speed clips | Add slow-mo feel |
@@ -617,13 +617,13 @@ Attribute vectors can be composed by addition:
 
 $$z_{\text{output}} = z_{\text{base}} + \alpha_1 v_{\text{cinematic}} + \alpha_2 v_{\text{warm}} + \alpha_3 v_{\text{slow motion}}$$
 
-where $\alpha_i$ controls the strength of each attribute. This works because:
+where \(\alpha_i\) controls the strength of each attribute. This works because:
 
 1. The attribute vectors are approximately orthogonal (different factors of variation)
 2. The latent space is approximately linear in the relevant directions
 3. The decoder smoothly maps nearby latent codes to nearby outputs
 
-The coefficients $\alpha_i$ are typically in the range $[-2, 2]$. Values beyond this range push the latent code outside the training distribution and can produce artifacts.
+The coefficients \(\alpha_i\) are typically in the range \([-2, 2]\). Values beyond this range push the latent code outside the training distribution and can produce artifacts.
 
 ### When Arithmetic Fails
 
@@ -633,7 +633,7 @@ Latent arithmetic is an approximation. It fails when:
 
 2. **The attributes are not independent.** If "cinematic" and "warm lighting" are highly correlated in the training data, their attribute vectors will not be orthogonal, and composing them may double-count shared features.
 
-3. **The operation pushes too far off-manifold.** Large $\alpha$ values or many composed attributes can push the latent code into regions the decoder has not learned, producing artifacts.
+3. **The operation pushes too far off-manifold.** Large \(\alpha\) values or many composed attributes can push the latent code into regions the decoder has not learned, producing artifacts.
 
 4. **The space has holes.** Real latent spaces are not perfectly smooth. There can be discontinuities or regions where the decoder behaves erratically.
 
@@ -744,7 +744,7 @@ This is the basis of **temporal super-resolution** -- generating intermediate fr
 
 ### Multi-Reference Blending
 
-Given $N$ reference latent codes $\{z_1, \ldots, z_N\}$ with weights $\{w_1, \ldots, w_N\}$ where $\sum_i w_i = 1$, we can blend:
+Given \(N\) reference latent codes \(\{z_1, \ldots, z_N\}\) with weights \(\{w_1, \ldots, w_N\}\) where \(\sum_i w_i = 1\), we can blend:
 
 $$z_{\text{blend}} = \sum_{i=1}^{N} w_i z_i$$
 
@@ -776,20 +776,20 @@ This enables blending references from multiple source videos with precise contro
 
 To extract a style direction from a trained model:
 
-1. Collect 50-100 images/frames in the target style ($S_+$)
-2. Collect 50-100 images/frames in neutral style ($S_-$)
-3. Encode all images: $\{E(x) : x \in S_+\}$ and $\{E(x) : x \in S_-\}$
-4. Compute the mean difference: $v_{\text{style}} = \frac{1}{|S_+|}\sum_{S_+} E(x) - \frac{1}{|S_-|}\sum_{S_-} E(x)$
-5. Optionally normalize: $\hat{v}_{\text{style}} = v_{\text{style}} / \|v_{\text{style}}\|$
+1. Collect 50-100 images/frames in the target style (\(S_+\))
+2. Collect 50-100 images/frames in neutral style (\(S_-\))
+3. Encode all images: \(\{E(x) : x \in S_+\}\) and \(\{E(x) : x \in S_-\}\)
+4. Compute the mean difference: \(v_{\text{style}} = \frac{1}{|S_+|}\sum_{S_+} E(x) - \frac{1}{|S_-|}\sum_{S_-} E(x)\)
+5. Optionally normalize: \(\hat{v}_{\text{style}} = v_{\text{style}} / \|v_{\text{style}}\|\)
 
-The resulting direction can be applied with a scalar multiplier: $z_{\text{output}} = z_{\text{input}} + \alpha \hat{v}_{\text{style}}$.
+The resulting direction can be applied with a scalar multiplier: \(z_{\text{output}} = z_{\text{input}} + \alpha \hat{v}_{\text{style}}\).
 
 ### Recipe 2: Smooth Video Transitions
 
 For seamlessly transitioning between two generated videos:
 
-1. Generate video A with latent sequence $\{z^A_1, \ldots, z^A_T\}$
-2. Generate video B with latent sequence $\{z^B_1, \ldots, z^B_T\}$
+1. Generate video A with latent sequence \(\{z^A_1, \ldots, z^A_T\}\)
+2. Generate video B with latent sequence \(\{z^B_1, \ldots, z^B_T\}\)
 3. Create transition by SLERP-ing the final frames of A with the first frames of B:
 
 ```python
@@ -805,7 +805,7 @@ def create_transition(z_A_end, z_B_start, num_transition_frames=15):
     return frames
 ```
 
-The cosine easing function $t_{\text{eased}} = \frac{1}{2}(1 - \cos(\pi t))$ produces a perceptually smoother transition by moving slowly at the start and end (where changes are most noticeable) and faster in the middle.
+The cosine easing function \(t_{\text{eased}} = \frac{1}{2}(1 - \cos(\pi t))\) produces a perceptually smoother transition by moving slowly at the start and end (where changes are most noticeable) and faster in the middle.
 
 ### Recipe 3: Attribute Strength Tuning
 
@@ -830,7 +830,7 @@ Rather than using classifier-free guidance in pixel/noise space, you can guide g
 
 $$z_{t-1} = z_{t-1}^{\text{uncond}} + s \cdot (z_{t-1}^{\text{cond}} - z_{t-1}^{\text{uncond}})$$
 
-where $s$ is the guidance scale. This is mathematically equivalent to classifier-free guidance when the denoising happens in latent space (as in Latent Diffusion Models), and it is the standard approach in modern video generation models.
+where \(s\) is the guidance scale. This is mathematically equivalent to classifier-free guidance when the denoising happens in latent space (as in Latent Diffusion Models), and it is the standard approach in modern video generation models.
 
 ---
 
@@ -844,13 +844,13 @@ In a well-trained video model, the latent codes for consecutive frames lie on a 
 
 $$v_t = z_{t+1} - z_t$$
 
-If $v_t$ is constant, the motion is uniform. If $v_t$ changes smoothly, the motion accelerates or decelerates naturally. Abrupt changes in $v_t$ produce jerky motion.
+If \(v_t\) is constant, the motion is uniform. If \(v_t\) changes smoothly, the motion accelerates or decelerates naturally. Abrupt changes in \(v_t\) produce jerky motion.
 
 This means the **second derivative** of the latent trajectory matters for video quality:
 
 $$a_t = v_{t+1} - v_t = z_{t+2} - 2z_{t+1} + z_t$$
 
-Small $\|a_t\|$ implies smooth motion. Video generation models are implicitly trained to produce trajectories with small second derivatives.
+Small \(\|a_t\|\) implies smooth motion. Video generation models are implicitly trained to produce trajectories with small second derivatives.
 
 ### Resolution-Dependent Latent Dimensions
 
@@ -858,8 +858,8 @@ Modern video VAEs (like the 3D VAEs used in Wan, CogVideo, and similar architect
 
 | Compression | Input | Latent | Ratio |
 |---|---|---|---|
-| Spatial only | $512 \times 512 \times 3$ | $64 \times 64 \times 4$ | 48x |
-| Spatiotemporal | $16 \times 512 \times 512 \times 3$ | $4 \times 64 \times 64 \times 4$ | 192x |
+| Spatial only | \(512 \times 512 \times 3\) | \(64 \times 64 \times 4\) | 48x |
+| Spatiotemporal | \(16 \times 512 \times 512 \times 3\) | \(4 \times 64 \times 64 \times 4\) | 192x |
 
 The temporal compression (typically 4x to 8x) means each latent "frame" actually represents multiple output frames. Interpolation in this space produces temporally smooth results because the decoder is trained to generate smooth frame sequences from each latent code.
 
@@ -941,19 +941,19 @@ The temporal compression (typically 4x to 8x) means each latent "frame" actually
 
 ## Mathematical Comparison: LERP vs SLERP Quality
 
-To quantify the difference, consider the reconstruction quality along an interpolation path. Let $Q(z)$ be the quality of the decoded output (measured, for instance, by FID against the training distribution). In a well-structured latent space:
+To quantify the difference, consider the reconstruction quality along an interpolation path. Let \(Q(z)\) be the quality of the decoded output (measured, for instance, by FID against the training distribution). In a well-structured latent space:
 
 $$Q(z) \propto p(z)$$
 
 The quality is proportional to the density of the learned distribution at that point. Points in high-density regions decode well; points in low-density regions decode poorly.
 
-For a standard Gaussian prior in $d$ dimensions, the log-density is:
+For a standard Gaussian prior in \(d\) dimensions, the log-density is:
 
 $$\log p(z) = -\frac{d}{2}\log(2\pi) - \frac{1}{2}\|z\|^2$$
 
-The density depends only on the norm. The maximum of $p(z) \cdot r^{d-1}$ (the radial density) occurs at $\|z\| = \sqrt{d-1} \approx \sqrt{d}$.
+The density depends only on the norm. The maximum of \(p(z) \cdot r^{d-1}\) (the radial density) occurs at \(\|z\| = \sqrt{d-1} \approx \sqrt{d}\).
 
-For a LERP midpoint with $\|z_{\text{mid}}\| \approx \sqrt{d/2}$, the log-density penalty relative to the shell is:
+For a LERP midpoint with \(\|z_{\text{mid}}\| \approx \sqrt{d/2}\), the log-density penalty relative to the shell is:
 
 $$\Delta \log p = -\frac{1}{2}\left(\frac{d}{2}\right) + \frac{1}{2}(d) + (d-1)\log\frac{\sqrt{d/2}}{\sqrt{d}}$$
 
@@ -961,13 +961,13 @@ $$= \frac{d}{4} + (d-1)\log\frac{1}{\sqrt{2}}$$
 
 $$= \frac{d}{4} - \frac{d-1}{2}\log 2$$
 
-For $d = 512$:
+For \(d = 512\):
 
 $$\Delta \log p \approx 128 - 177 = -49$$
 
-The density at the LERP midpoint is $e^{-49} \approx 10^{-21}$ times lower than at the shell. The quality degradation is severe.
+The density at the LERP midpoint is \(e^{-49} \approx 10^{-21}\) times lower than at the shell. The quality degradation is severe.
 
-SLERP, by staying on the shell, maintains $\|z\| = \sqrt{d}$ throughout, so $\Delta \log p = 0$. The quality is uniformly high along the entire interpolation path.
+SLERP, by staying on the shell, maintains \(\|z\| = \sqrt{d}\) throughout, so \(\Delta \log p = 0\). The quality is uniformly high along the entire interpolation path.
 
 ---
 
@@ -975,17 +975,17 @@ SLERP, by staying on the shell, maintains $\|z\| = \sqrt{d}$ throughout, so $\De
 
 Modern video generation models like Stable Video Diffusion, Wan 2.x, and the architectures behind Sora and Veo use a two-level latent space:
 
-1. **VAE latent space**: The 3D VAE compresses video from pixel space to a spatial-temporal latent space (e.g., from $T \times H \times W \times 3$ to $T/4 \times H/8 \times W/8 \times 4$).
+1. **VAE latent space**: The 3D VAE compresses video from pixel space to a spatial-temporal latent space (e.g., from \(T \times H \times W \times 3\) to \(T/4 \times H/8 \times W/8 \times 4\)).
 
 2. **Diffusion latent space**: The diffusion process operates within the VAE latent space, starting from pure noise and iteratively denoising to a clean latent code.
 
 Arithmetic in the VAE latent space affects the overall content. Arithmetic during the diffusion process (at intermediate noise levels) affects different aspects depending on the noise level:
 
-| Noise level $t$ | What arithmetic affects | Analogy |
+| Noise level \(t\) | What arithmetic affects | Analogy |
 |---|---|---|
-| $t \approx T$ (high noise) | Global structure, composition, layout | Rough sketch |
-| $t \approx T/2$ (medium noise) | Style, color palette, medium-scale features | Color blocking |
-| $t \approx 0$ (low noise) | Fine details, textures, edges | Finishing touches |
+| \(t \approx T\) (high noise) | Global structure, composition, layout | Rough sketch |
+| \(t \approx T/2\) (medium noise) | Style, color palette, medium-scale features | Color blocking |
+| \(t \approx 0\) (low noise) | Fine details, textures, edges | Finishing touches |
 
 This gives a powerful tool: by performing arithmetic at different noise levels, you can control which aspects of the output are modified.
 
@@ -1028,7 +1028,7 @@ Latent space arithmetic is not a trick -- it is a mathematical consequence of ho
 
 4. **Disentanglement** means individual directions correspond to semantic attributes, enabling targeted style transfer, mood adjustment, and attribute composition.
 
-5. **Vector arithmetic** ($z_{\text{output}} = z_{\text{content}} + (z_{\text{style}} - z_{\text{neutral}})$) is the foundation of style transfer, mood gradients, and multi-reference blending in video generation.
+5. **Vector arithmetic** (\(z_{\text{output}} = z_{\text{content}} + (z_{\text{style}} - z_{\text{neutral}})\)) is the foundation of style transfer, mood gradients, and multi-reference blending in video generation.
 
 6. **Arithmetic at different noise levels** in diffusion models provides fine-grained control over which aspects of the output are modified.
 

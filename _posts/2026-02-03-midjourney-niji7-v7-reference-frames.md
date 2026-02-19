@@ -72,11 +72,11 @@ This ratio quantifies why I2V produces more predictable, higher-quality results.
 
 ### 1.2 Conditional Entropy Reduction
 
-Formally, let $V$ be the target video, $T$ be the text prompt, and $I$ be the reference image. The model must minimize the conditional entropy:
+Formally, let \(V\) be the target video, \(T\) be the text prompt, and \(I\) be the reference image. The model must minimize the conditional entropy:
 
-**T2V**: Model must handle $H(V | T)$ --- all visual uncertainty given only text.
+**T2V**: Model must handle \(H(V | T)\) --- all visual uncertainty given only text.
 
-**I2V**: Model must handle $H(V | I, T)$ --- residual uncertainty given image and text.
+**I2V**: Model must handle \(H(V | I, T)\) --- residual uncertainty given image and text.
 
 By the chain rule of entropy:
 
@@ -84,9 +84,9 @@ $$
 H(V | T) = H(V | I, T) + I(V; I | T)
 $$
 
-where $I(V; I | T)$ is the mutual information between the video and the reference image, given the text. This term is large: the reference image resolves the scene's visual identity (colors, lighting, layout, character appearance, background detail).
+where \(I(V; I | T)\) is the mutual information between the video and the reference image, given the text. This term is large: the reference image resolves the scene's visual identity (colors, lighting, layout, character appearance, background detail).
 
-The model's task in I2V is easier by exactly $I(V; I | T)$ bits --- the amount of visual information the reference frame provides that the text does not.
+The model's task in I2V is easier by exactly \(I(V; I | T)\) bits --- the amount of visual information the reference frame provides that the text does not.
 
 ### 1.3 Empirical Evidence
 
@@ -179,7 +179,7 @@ $$
 \text{LN}(x) = \gamma \cdot \frac{x - \mu}{\sigma} + \beta
 $$
 
-AdaLN-Zero replaces the learnable $\gamma, \beta$ with values regressed from the conditioning signal $c$ (timestep embedding + text embedding):
+AdaLN-Zero replaces the learnable \(\gamma, \beta\) with values regressed from the conditioning signal \(c\) (timestep embedding + text embedding):
 
 $$
 \gamma, \beta, \alpha = \text{MLP}(c)
@@ -189,20 +189,20 @@ $$
 \text{AdaLN}(x, c) = (1 + \gamma) \cdot \frac{x - \mu}{\sigma} + \beta
 $$
 
-The $\alpha$ parameter gates the residual connection:
+The \(\alpha\) parameter gates the residual connection:
 
 $$
 x_{out} = x + \alpha \cdot \text{Block}(\text{AdaLN}(x, c))
 $$
 
-At initialization, $\alpha = 0$, meaning each transformer block starts as an identity function. This "zero initialization" stabilizes training for very deep transformers.
+At initialization, \(\alpha = 0\), meaning each transformer block starts as an identity function. This "zero initialization" stabilizes training for very deep transformers.
 
 ### 2.3 Personalization Model
 
 V7 ships with personalization enabled by default. This feature learns a per-user style embedding based on the user's generation history and preferences.
 
 The likely mechanism:
-1. User's past generations and ratings are encoded into a style vector $s_{\text{user}} \in \mathbb{R}^{d}$
+1. User's past generations and ratings are encoded into a style vector \(s_{\text{user}} \in \mathbb{R}^{d}\)
 2. This vector is concatenated with or added to the text conditioning before cross-attention
 3. The model learns to associate style vectors with visual preferences
 4. Over time, the model adapts to produce outputs closer to what each user prefers
@@ -332,7 +332,7 @@ The preview workflow costs **30-60% less** on average and produces higher user s
 | Variation (subtle) | 1.0 fast hr | ~$0.07 | ~30 sec |
 | Variation (strong) | 1.0 fast hr | ~$0.07 | ~30 sec |
 
-At the Pro plan ($30/month for 30 fast hours), one fast hour costs approximately $1.00, and standard generation consumes 1.0 fast hours. The Mega plan ($60/month for 60 fast hours) brings this to ~$1.00/fast-hr as well, but with double the pool.
+At the Pro plan ($30/month for 30 fast hours), one fast hour costs approximately \(1.00, and standard generation consumes 1.0 fast hours. The Mega plan (\)60/month for 60 fast hours) brings this to ~$1.00/fast-hr as well, but with double the pool.
 
 ---
 
@@ -379,7 +379,7 @@ $$
 \mathcal{L}_{\text{identity}} = 1 - \cos\bigl(\text{FaceEmbed}(x_{\text{gen}}), \; \text{FaceEmbed}(x_{\text{ref}})\bigr)
 $$
 
-where $\text{FaceEmbed}$ is a frozen anime face encoder that maps faces to identity vectors. Minimizing this loss ensures generated faces match reference identities.
+where \(\text{FaceEmbed}\) is a frozen anime face encoder that maps faces to identity vectors. Minimizing this loss ensures generated faces match reference identities.
 
 **2. Curated training data with character tags.** Instead of training on random anime images, Niji 7's data was tagged with character identifiers. The model learns that the same character tag should produce the same visual appearance:
 
@@ -470,7 +470,7 @@ $$
 \mathcal{L}_{\text{style}} = -\log \frac{\exp(\text{sim}(s_i, s_j^+) / \tau)}{\sum_k \exp(\text{sim}(s_i, s_k) / \tau)}
 $$
 
-where $s_i$ and $s_j^+$ are style embeddings of images with the same style but different content, and $s_k$ includes negatives (same content, different style). This encourages the encoder to capture style invariants.
+where \(s_i\) and \(s_j^+\) are style embeddings of images with the same style but different content, and \(s_k\) includes negatives (same content, different style). This encourages the encoder to capture style invariants.
 
 ### 5.2 --sref Weight Control
 
@@ -1294,10 +1294,10 @@ The core economic argument for reference frames is that image generation is *che
 **Let's formalize this.**
 
 Define:
-- $C_I$ = cost of one image generation (Draft Mode)
-- $C_V$ = cost of one video generation
-- $p$ = probability that a random T2V generation satisfies the user
-- $n$ = number of image variations generated for preview
+- \(C_I\) = cost of one image generation (Draft Mode)
+- \(C_V\) = cost of one video generation
+- \(p\) = probability that a random T2V generation satisfies the user
+- \(n\) = number of image variations generated for preview
 
 **Strategy A: Direct T2V (no preview)**
 
@@ -1307,7 +1307,7 @@ $$
 E[\text{Cost}_A] = \frac{C_V}{p}
 $$
 
-If $p = 0.33$ (user accepts 1 in 3 attempts):
+If \(p = 0.33\) (user accepts 1 in 3 attempts):
 
 $$
 E[\text{Cost}_A] = \frac{\$0.75}{0.33} = \$2.27
@@ -1315,19 +1315,19 @@ $$
 
 **Strategy B: Preview with reference frames (I2V)**
 
-Let $p_I$ = probability that at least one of $n$ images is acceptable, and $p_{V|I}$ = probability that I2V from a chosen image is acceptable (higher than $p$ because visual identity is locked in).
+Let \(p_I\) = probability that at least one of \(n\) images is acceptable, and \(p_{V|I}\) = probability that I2V from a chosen image is acceptable (higher than \(p\) because visual identity is locked in).
 
 $$
 p_I = 1 - (1 - p_{\text{single image}})^n
 $$
 
-For $n = 8$ images and $p_{\text{single image}} = 0.5$:
+For \(n = 8\) images and \(p_{\text{single image}} = 0.5\):
 
 $$
 p_I = 1 - (1 - 0.5)^8 = 1 - 0.0039 = 0.996
 $$
 
-With a good reference frame, $p_{V|I} \approx 0.7$ (much higher than $p = 0.33$ because the visual identity is already approved).
+With a good reference frame, \(p_{V|I} \approx 0.7\) (much higher than \(p = 0.33\) because the visual identity is already approved).
 
 $$
 E[\text{Cost}_B] = n \cdot C_I + \frac{C_V}{p_{V|I}}
@@ -1349,7 +1349,7 @@ The preview workflow saves **49% per accepted generation**.
 
 How many preview images should you generate? More previews increase the probability of finding a good frame, but add cost.
 
-The marginal value of the $n$-th preview image is:
+The marginal value of the \(n\)-th preview image is:
 
 $$
 \text{Marginal value}(n) = C_V \cdot \frac{(1 - p_{\text{single}})^{n-1} \cdot p_{\text{single}}}{p_{V|I}} - C_I
@@ -1361,7 +1361,7 @@ $$
 C_V \cdot \frac{(1 - p_{\text{single}})^{n-1} \cdot p_{\text{single}}}{p_{V|I}} > C_I
 $$
 
-Solving for the break-even $n^*$:
+Solving for the break-even \(n^*\):
 
 $$
 (1 - p_{\text{single}})^{n^* - 1} > \frac{C_I \cdot p_{V|I}}{C_V \cdot p_{\text{single}}}
@@ -1371,7 +1371,7 @@ $$
 n^* < 1 + \frac{\log\left(\frac{C_I \cdot p_{V|I}}{C_V \cdot p_{\text{single}}}\right)}{\log(1 - p_{\text{single}})}
 $$
 
-For $C_I = \$0.01, C_V = \$0.75, p_{\text{single}} = 0.5, p_{V|I} = 0.7$:
+For \(C_I = \\)0.01, C_V = \$0.75, p_{\text{single}} = 0.5, p_{V|I} = 0.7$:
 
 $$
 n^* < 1 + \frac{\log(0.01 \times 0.7 / (0.75 \times 0.5))}{\log(0.5)} = 1 + \frac{\log(0.0187)}{\log(0.5)}
@@ -1389,11 +1389,11 @@ For a single 5-second video generation:
 
 | Strategy | Image Cost | Video Cost | Expected Attempts | Total Cost |
 |---|---|---|---|---|
-| Direct T2V (Veo 3.1 Fast) | $0 | $0.75/attempt | 3.0 | **$2.27** |
-| Direct T2V (Kling 3.0) | $0 | $0.60/attempt | 3.0 | **$1.82** |
-| 8 Draft + I2V (Veo 3.1 Fast) | $0.08 | $0.75/attempt | 1.43 | **$1.15** |
-| 8 Draft + I2V (Kling 3.0) | $0.08 | $0.60/attempt | 1.43 | **$0.94** |
-| 8 Draft + I2V (Wan 2.2 self) | $0.08 | $0.04/attempt | 1.43 | **$0.14** |
+| Direct T2V (Veo 3.1 Fast) | $0 | \(0.75/attempt | 3.0 | **\)2.27** |
+| Direct T2V (Kling 3.0) | $0 | \(0.60/attempt | 3.0 | **\)1.82** |
+| 8 Draft + I2V (Veo 3.1 Fast) | $0.08 | \(0.75/attempt | 1.43 | **\)1.15** |
+| 8 Draft + I2V (Kling 3.0) | $0.08 | \(0.60/attempt | 1.43 | **\)0.94** |
+| 8 Draft + I2V (Wan 2.2 self) | $0.08 | \(0.04/attempt | 1.43 | **\)0.14** |
 
 The preview-then-commit approach with self-hosted Wan 2.2 brings the cost to **$0.14 per accepted video** --- an order of magnitude cheaper than direct T2V with commercial APIs.
 
@@ -1472,7 +1472,7 @@ $$
 where:
 - The first term is standard cross-attention with text embeddings
 - The second term is cross-attention with image embeddings from a CLIP vision encoder
-- $\lambda$ is a scaling factor controlling image influence
+- \(\lambda\) is a scaling factor controlling image influence
 
 **IP-Adapter architecture:**
 
@@ -1498,7 +1498,7 @@ Text Prompt → T5/CLIP Text → K_text, V_text
 | Controls | Style transfer | Character identity | Both (configurable) |
 | Face preservation | Weak | Strong | Moderate to strong |
 | Pose influence | None | None | Can combine with ControlNet |
-| Fine-grained control | --sw weight | --cw weight | $\lambda$ weight + per-layer |
+| Fine-grained control | --sw weight | --cw weight | \(\lambda\) weight + per-layer |
 
 ### 8.3 Using ControlNet + IP-Adapter for Reference Frames
 
@@ -1954,7 +1954,7 @@ For a 6-shot, 30-second product demo:
 | **Total with Kling** | | **$3.78** |
 | **Total with Wan (self-hosted)** | | **$0.42** |
 
-A professional-quality 30-second multi-shot video for **$3.78** (Kling) or **$0.42** (self-hosted Wan). Compare to stock video licensing ($50-500) or traditional production ($5,000-50,000+).
+A professional-quality 30-second multi-shot video for **\(3.78** (Kling) or **\)0.42** (self-hosted Wan). Compare to stock video licensing (\(50-500) or traditional production (\)5,000-50,000+).
 
 ---
 

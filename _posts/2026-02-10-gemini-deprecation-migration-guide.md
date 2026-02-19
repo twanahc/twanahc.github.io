@@ -419,19 +419,19 @@ The thinking tokens are billed but typically not returned in the API response (t
 
 ### Mathematical Analysis: Compute-Quality Tradeoff
 
-Let $C_0$ be the compute cost of a zero-thinking inference and $Q_0$ be its quality score on a given task. Adding $k$ thinking steps increases compute by a factor and quality by a diminishing-returns function:
+Let \(C_0\) be the compute cost of a zero-thinking inference and \(Q_0\) be its quality score on a given task. Adding \(k\) thinking steps increases compute by a factor and quality by a diminishing-returns function:
 
 $$C(k) = C_0 \cdot (1 + \beta k)$$
 
-where $\beta \approx 0.5$ (each thinking step costs about half of the base inference).
+where \(\beta \approx 0.5\) (each thinking step costs about half of the base inference).
 
 $$Q(k) = Q_0 + (Q_{\max} - Q_0) \cdot (1 - e^{-\gamma k})$$
 
-where $Q_{\max}$ is the maximum achievable quality and $\gamma$ is a task-dependent rate constant.
+where \(Q_{\max}\) is the maximum achievable quality and \(\gamma\) is a task-dependent rate constant.
 
-**For simple tasks** (metadata generation, basic classification): $\gamma$ is high (diminishing returns kick in fast), meaning even 1-2 thinking steps capture most of the quality improvement.
+**For simple tasks** (metadata generation, basic classification): \(\gamma\) is high (diminishing returns kick in fast), meaning even 1-2 thinking steps capture most of the quality improvement.
 
-**For complex tasks** (storyboard decomposition, nuanced quality scoring): $\gamma$ is low (quality continues to improve with more thinking), making higher budgets worthwhile.
+**For complex tasks** (storyboard decomposition, nuanced quality scoring): \(\gamma\) is low (quality continues to improve with more thinking), making higher budgets worthwhile.
 
 ### Empirical Benchmarks by Task Type
 
@@ -514,9 +514,9 @@ For any task, the optimal thinking budget minimizes total cost including the cos
 $$\text{Total Cost}(k) = C(k) + P_{\text{error}}(k) \cdot C_{\text{error}}$$
 
 where:
-- $C(k)$ is the inference cost with $k$ thinking steps
-- $P_{\text{error}}(k)$ is the probability of an error at thinking level $k$
-- $C_{\text{error}}$ is the cost of an error (regeneration cost, manual review cost, user churn cost)
+- \(C(k)\) is the inference cost with \(k\) thinking steps
+- \(P_{\text{error}}(k)\) is the probability of an error at thinking level \(k\)
+- \(C_{\text{error}}\) is the cost of an error (regeneration cost, manual review cost, user churn cost)
 
 Taking the derivative and setting to zero:
 
@@ -524,16 +524,16 @@ $$\frac{dC}{dk} = -\frac{dP_{\text{error}}}{dk} \cdot C_{\text{error}}$$
 
 $$C_0 \cdot \beta = \gamma \cdot (1 - Q_0/Q_{\max}) \cdot e^{-\gamma k^*} \cdot C_{\text{error}}$$
 
-Solving for optimal $k^*$:
+Solving for optimal \(k^*\):
 
 $$k^* = \frac{1}{\gamma} \ln\left(\frac{\gamma \cdot (1 - Q_0/Q_{\max}) \cdot C_{\text{error}}}{C_0 \cdot \beta}\right)$$
 
 **Worked example for content moderation**:
-- $C_0 = \$0.00025$ (base cost)
-- $\beta = 0.5$
-- $\gamma = 1.2$ (quality saturates relatively quickly)
-- $Q_0/Q_{\max} = 0.94/0.98 = 0.959$
-- $C_{\text{error}} = \$0.50$ (cost of a missed moderation flag: manual review + potential user harm)
+- \(C_0 = \\)0.00025$ (base cost)
+- \(\beta = 0.5\)
+- \(\gamma = 1.2\) (quality saturates relatively quickly)
+- \(Q_0/Q_{\max} = 0.94/0.98 = 0.959\)
+- \(C_{\text{error}} = \\)0.50$ (cost of a missed moderation flag: manual review + potential user harm)
 
 $$k^* = \frac{1}{1.2} \ln\left(\frac{1.2 \times 0.041 \times 0.50}{0.00025 \times 0.5}\right) = \frac{1}{1.2} \ln\left(\frac{0.0246}{0.000125}\right) = \frac{1}{1.2} \ln(196.8) = \frac{5.28}{1.2} = 4.4$$
 
@@ -1086,28 +1086,28 @@ Let's model the monthly cost for a platform processing generations at three scal
 
 | Model | Input Cost | Output Cost | Thinking Cost | Total/Month |
 |---|---|---|---|---|
-| 2.0 Flash | $30.35 | $15.20 | $0 | **$45.55** |
-| 2.5 Flash (with thinking) | $45.53 | $22.80 | $11.55 | **$79.88** |
-| 2.5 Flash (no thinking) | $45.53 | $22.80 | $0 | **$68.33** |
-| 2.5 Flash-Lite | $22.76 | $11.40 | $0 | **$34.16** |
+| 2.0 Flash | $30.35 | $15.20 | \(0 | **\)45.55** |
+| 2.5 Flash (with thinking) | $45.53 | $22.80 | \(11.55 | **\)79.88** |
+| 2.5 Flash (no thinking) | $45.53 | $22.80 | \(0 | **\)68.33** |
+| 2.5 Flash-Lite | $22.76 | $11.40 | \(0 | **\)34.16** |
 
 **Monthly cost at 100K generations/month**:
 
 | Model | Input Cost | Output Cost | Thinking Cost | Total/Month |
 |---|---|---|---|---|
-| 2.0 Flash | $303.50 | $152.00 | $0 | **$455.50** |
-| 2.5 Flash (with thinking) | $455.25 | $228.00 | $115.50 | **$798.75** |
-| 2.5 Flash (no thinking) | $455.25 | $228.00 | $0 | **$683.25** |
-| 2.5 Flash-Lite | $227.63 | $114.00 | $0 | **$341.63** |
+| 2.0 Flash | $303.50 | $152.00 | \(0 | **\)455.50** |
+| 2.5 Flash (with thinking) | $455.25 | $228.00 | \(115.50 | **\)798.75** |
+| 2.5 Flash (no thinking) | $455.25 | $228.00 | \(0 | **\)683.25** |
+| 2.5 Flash-Lite | $227.63 | $114.00 | \(0 | **\)341.63** |
 
 **Monthly cost at 1M generations/month**:
 
 | Model | Input Cost | Output Cost | Thinking Cost | Total/Month |
 |---|---|---|---|---|
-| 2.0 Flash | $3,035 | $1,520 | $0 | **$4,555** |
-| 2.5 Flash (with thinking) | $4,553 | $2,280 | $1,155 | **$7,988** |
-| 2.5 Flash (no thinking) | $4,553 | $2,280 | $0 | **$6,833** |
-| 2.5 Flash-Lite | $2,276 | $1,140 | $0 | **$3,416** |
+| 2.0 Flash | $3,035 | $1,520 | \(0 | **\)4,555** |
+| 2.5 Flash (with thinking) | $4,553 | $2,280 | \(1,155 | **\)7,988** |
+| 2.5 Flash (no thinking) | $4,553 | $2,280 | \(0 | **\)6,833** |
+| 2.5 Flash-Lite | $2,276 | $1,140 | \(0 | **\)3,416** |
 
 ### The True Cost: Including Quality Savings
 
@@ -1117,15 +1117,15 @@ The raw token cost comparison makes 2.5 Flash look 50-75% more expensive. But fa
 
 At 100K generations/month with an average video generation cost of $0.15:
 
-- **2.0 Flash**: 17.1% false negatives $\times$ 100K $\times$ $0.15 = $2,565 wasted on unnecessary regeneration
-- **2.5 Flash**: 10.8% false negatives $\times$ 100K $\times$ $0.15 = $1,620 wasted
+- **2.0 Flash**: 17.1% false negatives \(\times\) 100K \(\times\) $0.15 = $2,565 wasted on unnecessary regeneration
+- **2.5 Flash**: 10.8% false negatives \(\times\) 100K \(\times\) $0.15 = $1,620 wasted
 
 Savings: $945/month from better quality scoring alone.
 
 **Moderation cost savings**: Better moderation accuracy reduces manual review volume. If manual review costs $0.10 per flagged video and the false positive rate drops from 8.7% to 3.2%:
 
-- **2.0 Flash**: 8.7% false positives $\times$ 100K $\times$ $0.10 = $870/month in manual review
-- **2.5 Flash**: 3.2% false positives $\times$ 100K $\times$ $0.10 = $320/month
+- **2.0 Flash**: 8.7% false positives \(\times\) 100K \(\times\) $0.10 = $870/month in manual review
+- **2.5 Flash**: 3.2% false positives \(\times\) 100K \(\times\) $0.10 = $320/month
 
 Savings: $550/month from better moderation.
 
@@ -1133,8 +1133,8 @@ Savings: $550/month from better moderation.
 
 | Model | Token Cost | Regeneration Waste | Review Cost | Effective Total |
 |---|---|---|---|---|
-| 2.0 Flash | $455.50 | $2,565 | $870 | **$3,890.50** |
-| 2.5 Flash (with thinking) | $798.75 | $1,620 | $320 | **$2,738.75** |
+| 2.0 Flash | $455.50 | $2,565 | \(870 | **\)3,890.50** |
+| 2.5 Flash (with thinking) | $798.75 | $1,620 | \(320 | **\)2,738.75** |
 
 **2.5 Flash with thinking is 30% cheaper in effective total cost**, despite being 75% more expensive in raw token cost. The quality improvement more than pays for itself.
 

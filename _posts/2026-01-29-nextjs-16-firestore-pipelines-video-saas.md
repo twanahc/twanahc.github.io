@@ -3,6 +3,7 @@ layout: post
 title: "Next.js 16 + Firestore Pipelines: The 2026 Stack for Media-Heavy AI Platforms"
 date: 2026-01-29
 category: infrastructure
+mathjax: false
 ---
 
 Two releases from late 2025 / early 2026 solve the two biggest pain points in building media-heavy SaaS: frontend performance and database query complexity. Next.js 16 shipped Cache Components and stable Turbopack. Firestore announced Pipeline Operations with 100+ new query capabilities.
