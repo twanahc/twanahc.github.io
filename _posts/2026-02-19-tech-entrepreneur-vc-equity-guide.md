@@ -55,18 +55,18 @@ Second, the **General Partners** (GPs). These are the people whose names are on 
 
 Third, there is you: the **startup founder**. You receive the money. You build the thing. Ideally, you make everyone rich.
 
-The economics work like this. The GP charges the LPs a **management fee**, typically **2% of the fund size per year**. On a $100M fund, that is $2M per year. Over a 10-year fund life, that is $20M. This pays for salaries, offices, flights to Demo Day, and all the operational costs of running the firm. Then, when the fund generates returns — when startups get acquired or go public — the GP takes **carried interest** (or "carry"), typically **20% of the profits**. The LPs get the remaining 80%.
+The economics work like this. The GP charges the LPs a **management fee**, typically **2% of the fund size per year**. On a \$100M fund, that is \$2M per year. Over a 10-year fund life, that is \$20M. This pays for salaries, offices, flights to Demo Day, and all the operational costs of running the firm. Then, when the fund generates returns — when startups get acquired or go public — the GP takes **carried interest** (or "carry"), typically **20% of the profits**. The LPs get the remaining 80%.
 
-Let us make this concrete. Say a GP raises a $100M fund. Over 10 years:
+Let us make this concrete. Say a GP raises a \$100M fund. Over 10 years:
 
-- Management fees: ~$20M total (2% x $100M x 10 years, though the fee basis often steps down after the investment period)
-- The GP invests the remaining ~$80M into startups
-- Suppose the fund returns $300M total to the LPs
-- Profit = $300M - $100M = $200M
-- GP carry = 20% x $200M = $40M
-- LPs get: $300M - $40M = $260M (a 2.6x return on their $100M)
+- Management fees: ~\$20M total (2% x \$100M x 10 years, though the fee basis often steps down after the investment period)
+- The GP invests the remaining ~\$80M into startups
+- Suppose the fund returns \$300M total to the LPs
+- Profit = \$300M - \$100M = \$200M
+- GP carry = 20% x \$200M = \$40M
+- LPs get: \$300M - \$40M = \$260M (a 2.6x return on their \$100M)
 
-Why does this matter to you? Because it tells you what drives VC behavior. The GP makes money in two ways: management fees (which are guaranteed, regardless of performance) and carry (which requires actual returns). A partner at a top firm might earn $500K–$2M per year from management fees alone. Carry is where the real wealth is — but only if the fund performs.
+Why does this matter to you? Because it tells you what drives VC behavior. The GP makes money in two ways: management fees (which are guaranteed, regardless of performance) and carry (which requires actual returns). A partner at a top firm might earn \$500K–\$2M per year from management fees alone. Carry is where the real wealth is — but only if the fund performs.
 
 This creates an important dynamic: **VCs have a fiduciary duty to their LPs, not to you.** Their legal obligation is to maximize returns for the people who gave them money. You are the vehicle through which they fulfill that obligation. This is not cynicism. It is the structural reality of the relationship, and understanding it will save you from a lot of confusion about why your VC behaves the way they do.
 
@@ -82,22 +82,22 @@ Here is what a typical fund portfolio looks like. Out of, say, 30 investments:
 
 | Outcome | Number of Companies | Return Multiple | Contribution to Fund |
 |---------|-------------------|-----------------|---------------------|
-| Total loss | ~10 | 0x | $0 |
+| Total loss | ~10 | 0x | \$0 |
 | Mostly dead (acqui-hire, fire sale) | ~10 | 0.1-0.5x | Negligible |
 | Modest return | ~5 | 1-3x | Small |
 | Good return | ~3 | 3-10x | Moderate |
 | Home run | ~2 | 10-50x | Most of the fund's returns |
 | Unicorn | 0-1 | 50-100x+ | Could return the entire fund alone |
 
-Let us do the math. A $100M fund (investing ~$80M after fees) needs to return **at least $300M** to be considered a good fund (a 3x net return to LPs). Most of the 30 investments will return nothing or nearly nothing. The fund's entire performance hinges on those 2-3 companies that generate 10x+ returns.
+Let us do the math. A \$100M fund (investing ~\$80M after fees) needs to return **at least \$300M** to be considered a good fund (a 3x net return to LPs). Most of the 30 investments will return nothing or nearly nothing. The fund's entire performance hinges on those 2-3 companies that generate 10x+ returns.
 
-Now consider what this means for you as a founder seeking investment. If a VC invests $3M into your company at a $15M valuation (buying 20% ownership), they need your company to generate a return large enough to matter to their fund. If their fund is $100M, they need your company to eventually be worth enough that their 20% (which will be diluted in later rounds — maybe down to 10%) represents a significant chunk of that $300M target.
+Now consider what this means for you as a founder seeking investment. If a VC invests \$3M into your company at a \$15M valuation (buying 20% ownership), they need your company to generate a return large enough to matter to their fund. If their fund is \$100M, they need your company to eventually be worth enough that their 20% (which will be diluted in later rounds — maybe down to 10%) represents a significant chunk of that \$300M target.
 
-Say their stake gets diluted to 10% by the time you exit. For your company to return $30M to the fund (10x on their $3M investment), you need to exit at $300M. That is a meaningful outcome but not fund-defining. For your company to "return the fund" — the holy grail for a VC — you need to exit at $1B+ so their 10% is worth $100M+.
+Say their stake gets diluted to 10% by the time you exit. For your company to return \$30M to the fund (10x on their \$3M investment), you need to exit at \$300M. That is a meaningful outcome but not fund-defining. For your company to "return the fund" — the holy grail for a VC — you need to exit at \$1B+ so their 10% is worth \$100M+.
 
-This is why **VCs do not care about your "nice lifestyle business."** If you are building a company that will comfortably generate $5M per year in profit and you want to run it for 20 years, that is a fantastic personal outcome. But it does nothing for the VC's fund. They need billion-dollar exits. They need you to swing for the fences.
+This is why **VCs do not care about your "nice lifestyle business."** If you are building a company that will comfortably generate \$5M per year in profit and you want to run it for 20 years, that is a fantastic personal outcome. But it does nothing for the VC's fund. They need billion-dollar exits. They need you to swing for the fences.
 
-This creates a fundamental **misalignment** that permeates the entire founder-VC relationship. You might be perfectly happy with a $50M acquisition. Your VC would rather you turn that down and keep going, because a $50M exit on their $3M investment returns only $5M to a $100M fund — it barely moves the needle. They want you to keep playing the game for a shot at a $500M or $1B outcome, even if that means a higher probability of total failure.
+This creates a fundamental **misalignment** that permeates the entire founder-VC relationship. You might be perfectly happy with a \$50M acquisition. Your VC would rather you turn that down and keep going, because a \$50M exit on their \$3M investment returns only \$5M to a \$100M fund — it barely moves the needle. They want you to keep playing the game for a shot at a \$500M or \$1B outcome, even if that means a higher probability of total failure.
 
 Understand this math cold. It explains almost every confusing VC behavior you will ever encounter.
 
@@ -109,9 +109,9 @@ Ask a VC what they look for and they will recite some version of: "team, market,
 
 **Team.** VCs are betting on people, especially at the early stages when the product barely exists. They want founders who are (a) deeply knowledgeable about the problem space, (b) relentlessly resourceful, and (c) able to recruit great people. Technical founders get a boost here — if you built the thing yourself, that signals capability and conviction. But VCs also want to see that you can communicate clearly, sell a vision, and lead a team. The "brilliant but cannot talk to humans" stereotype is not an asset. It is a risk factor.
 
-**Market.** This is about the Total Addressable Market (TAM) — the total revenue opportunity if you captured 100% of the market. VCs want TAMs of $1B+ because that is the only way to generate the returns their fund model requires. But here is the nuance: the best companies create or redefine markets. Uber's TAM was not "the taxi market" — it was "all urban transportation." Airbnb's TAM was not "cheap hotels" — it was "all short-term accommodation." If your market looks small today, you need a credible narrative for why it will be enormous tomorrow.
+**Market.** This is about the Total Addressable Market (TAM) — the total revenue opportunity if you captured 100% of the market. VCs want TAMs of \$1B+ because that is the only way to generate the returns their fund model requires. But here is the nuance: the best companies create or redefine markets. Uber's TAM was not "the taxi market" — it was "all urban transportation." Airbnb's TAM was not "cheap hotels" — it was "all short-term accommodation." If your market looks small today, you need a credible narrative for why it will be enormous tomorrow.
 
-**Traction.** Evidence that the thing works and people want it. At the earliest stages, this might be user interviews, waitlist signups, or a working prototype with a few dozen users. At later stages, it is revenue, growth rate, retention, and unit economics. Revenue growth rate matters more than absolute revenue. A company doing $20K/month MRR growing 20% month-over-month is more exciting to a VC than a company doing $100K/month MRR growing 5% month-over-month, because the first company will overtake the second within a year.
+**Traction.** Evidence that the thing works and people want it. At the earliest stages, this might be user interviews, waitlist signups, or a working prototype with a few dozen users. At later stages, it is revenue, growth rate, retention, and unit economics. Revenue growth rate matters more than absolute revenue. A company doing \$20K/month MRR growing 20% month-over-month is more exciting to a VC than a company doing \$100K/month MRR growing 5% month-over-month, because the first company will overtake the second within a year.
 
 **Defensibility.** Why will this be hard to copy? Network effects (the product gets better as more people use it), proprietary data (you have training data or datasets nobody else can get), technical moats (you solved a genuinely hard problem), regulatory advantages (you have licenses or approvals that take years to obtain), or switching costs (your users' data and workflows are so embedded in your product that leaving is painful). Pure technology is rarely a durable moat — someone can replicate most code in 6-12 months. But technology combined with data, distribution, or network effects can be extremely defensible.
 
@@ -127,19 +127,19 @@ The patterns they match on include: pedigree (Stanford/MIT, Google/Meta/Stripe a
 
 Not all money is the same. Here is the landscape, roughly ordered by stage:
 
-**Angel Investors.** Individuals investing their own money, typically $10K-$250K. Former founders, executives, domain experts. The best angels bring genuine expertise and connections. The worst bring nothing but opinions. Angels usually invest via SAFEs (we will cover these later) and expect less formality. They typically cannot lead a round or set terms.
+**Angel Investors.** Individuals investing their own money, typically \$10K-\$250K. Former founders, executives, domain experts. The best angels bring genuine expertise and connections. The worst bring nothing but opinions. Angels usually invest via SAFEs (we will cover these later) and expect less formality. They typically cannot lead a round or set terms.
 
-**Pre-Seed Funds.** Small funds ($10M-$50M) that invest $100K-$500K at the earliest stages — sometimes just a team and an idea. Examples: Precursor Ventures, Hustle Fund. They are comfortable with extreme risk and minimal traction. They often focus on specific theses (developer tools, AI, climate) and can be very hands-on.
+**Pre-Seed Funds.** Small funds (\$10M-\$50M) that invest \$100K-\$500K at the earliest stages — sometimes just a team and an idea. Examples: Precursor Ventures, Hustle Fund. They are comfortable with extreme risk and minimal traction. They often focus on specific theses (developer tools, AI, climate) and can be very hands-on.
 
-**Seed Funds.** Funds ($50M-$300M) investing $500K-$3M. This is where the fundraising process starts feeling "real." You will likely need a deck, some traction, and a clear plan. Examples: First Round Capital, Floodgate, Homebrew. They typically want to see product-market fit signals — users who love the product, even if there are not many of them yet.
+**Seed Funds.** Funds (\$50M-\$300M) investing \$500K-\$3M. This is where the fundraising process starts feeling "real." You will likely need a deck, some traction, and a clear plan. Examples: First Round Capital, Floodgate, Homebrew. They typically want to see product-market fit signals — users who love the product, even if there are not many of them yet.
 
-**Series A Firms.** The big step up. Funds ($300M-$2B+) investing $5M-$20M. They want meaningful traction: typically $1M+ ARR (Annual Recurring Revenue, which is just your monthly recurring revenue times 12) with strong growth. This is where governance gets real — they will want a board seat, information rights, and protective provisions. Examples: Andreessen Horowitz (a16z), Sequoia, Benchmark.
+**Series A Firms.** The big step up. Funds (\$300M-\$2B+) investing \$5M-\$20M. They want meaningful traction: typically \$1M+ ARR (Annual Recurring Revenue, which is just your monthly recurring revenue times 12) with strong growth. This is where governance gets real — they will want a board seat, information rights, and protective provisions. Examples: Andreessen Horowitz (a16z), Sequoia, Benchmark.
 
-**Series B/C/Growth Firms.** Even larger checks ($20M-$100M+) for companies with proven business models that need capital to scale. The conversation shifts from "can this work?" to "how fast can this grow?" and "what are the unit economics?" Examples: General Catalyst, Tiger Global, Coatue.
+**Series B/C/Growth Firms.** Even larger checks (\$20M-\$100M+) for companies with proven business models that need capital to scale. The conversation shifts from "can this work?" to "how fast can this grow?" and "what are the unit economics?" Examples: General Catalyst, Tiger Global, Coatue.
 
 **Corporate VC (CVC).** The investment arms of large corporations: Google Ventures, Salesforce Ventures, Intel Capital. CVCs can offer strategic value (distribution, partnerships, technical resources) but come with strings. Your competitor's corporate parent might get board observation rights or information about your roadmap. They may also lose interest if the parent company's strategy shifts. Use CVCs carefully: take their money when the strategic alignment is genuine and short-term, but do not depend on them.
 
-The practical takeaway: match the investor to your stage. Pitching Sequoia when you have no revenue is (usually) a waste of everyone's time. Pitching an angel when you need $10M is, too. Build relationships one stage ahead — talk to Series A investors when you are raising your seed, so they know your story when you are ready.
+The practical takeaway: match the investor to your stage. Pitching Sequoia when you have no revenue is (usually) a waste of everyone's time. Pitching an angel when you need \$10M is, too. Build relationships one stage ahead — talk to Series A investors when you are raising your seed, so they know your story when you are ready.
 
 ---
 
@@ -151,24 +151,24 @@ Timing matters more than most founders realize. Raise too early and you will giv
 
 Here are rough benchmarks by stage. These are not rules — they are central tendencies that shift by market, sector, and era:
 
-**Pre-Seed (raising $250K-$1M)**
+**Pre-Seed (raising \$250K-\$1M)**
 - You have: a team, a clear problem statement, possibly a prototype
 - Traction: user interviews, waitlist, early alpha users
-- Valuation: $3M-$10M pre-money
+- Valuation: \$3M-\$10M pre-money
 
-**Seed (raising $1M-$4M)**
+**Seed (raising \$1M-\$4M)**
 - You have: a working product with real users
-- Traction: $10K-$50K MRR, or strong engagement metrics for non-revenue models
-- Valuation: $8M-$20M pre-money
+- Traction: \$10K-\$50K MRR, or strong engagement metrics for non-revenue models
+- Valuation: \$8M-\$20M pre-money
 
-**Series A (raising $5M-$20M)**
+**Series A (raising \$5M-\$20M)**
 - You have: product-market fit and a scalable go-to-market motion
-- Traction: $100K+ MRR, ideally $1M+ ARR, with consistent month-over-month growth (15%+ for the strongest companies)
-- Valuation: $30M-$100M pre-money
+- Traction: \$100K+ MRR, ideally \$1M+ ARR, with consistent month-over-month growth (15%+ for the strongest companies)
+- Valuation: \$30M-\$100M pre-money
 
 The general principle: **raise when you have leverage, not when you need money.** Leverage means you have strong momentum (growing fast), multiple interested investors (competition drives terms in your favor), or enough runway that you can walk away from a bad deal.
 
-Raising too early is the more common mistake among technical founders. You have an idea, maybe some early code, and someone offers you money. The temptation is obvious. But if you raise $500K at a $4M pre-money valuation, you have given away 11% of your company before you have proven anything. If you waited six months, built the product, got 50 paying customers, and then raised $1.5M at a $12M pre-money valuation, you would give away 11% but have 3x the capital. The math strongly favors patience, as long as you can afford to be patient (i.e., you have savings, consulting income, or a grant to bridge the gap).
+Raising too early is the more common mistake among technical founders. You have an idea, maybe some early code, and someone offers you money. The temptation is obvious. But if you raise \$500K at a \$4M pre-money valuation, you have given away 11% of your company before you have proven anything. If you waited six months, built the product, got 50 paying customers, and then raised \$1.5M at a \$12M pre-money valuation, you would give away 11% but have 3x the capital. The math strongly favors patience, as long as you can afford to be patient (i.e., you have savings, consulting income, or a grant to bridge the gap).
 
 Raising too late is the other failure mode. If you have 3 months of runway left and you start fundraising, you are in trouble. Fundraising typically takes 3-6 months. VCs can smell desperation. If they know you are running out of money, they will either pass (why invest in a sinking ship?) or offer predatory terms (because they know you cannot say no).
 
@@ -180,17 +180,17 @@ The standard advice is to raise **18-24 months of runway.** Runway is the number
 
 **Monthly burn rate** = total monthly expenses - total monthly revenue
 
-If you spend $80K/month (salaries, rent, servers, software) and earn $15K/month in revenue, your burn rate is $65K/month. To get 18 months of runway, you need: $65K x 18 = $1.17M.
+If you spend \$80K/month (salaries, rent, servers, software) and earn \$15K/month in revenue, your burn rate is \$65K/month. To get 18 months of runway, you need: \$65K x 18 = \$1.17M.
 
 But you should plan for your burn rate to increase. You are raising money to grow, which means hiring, which means higher expenses. A reasonable approach: model your burn rate 6 months out (after you have made the hires you plan to make with the new capital) and use that number.
 
-If your current burn is $65K/month but you plan to hire 3 engineers ($15K/month each fully loaded), your projected burn becomes $110K/month. For 18 months of runway at the projected rate: $110K x 18 = $1.98M. Round up to $2M.
+If your current burn is \$65K/month but you plan to hire 3 engineers (\$15K/month each fully loaded), your projected burn becomes \$110K/month. For 18 months of runway at the projected rate: \$110K x 18 = \$1.98M. Round up to \$2M.
 
 There is a tension here. Raising more money gives you more runway, which reduces existential risk. But raising more money usually means either (a) giving away more equity at the same valuation, or (b) needing a higher valuation to limit dilution, which sets a higher bar for your next round.
 
-The relationship between amount raised and valuation is roughly: investors typically want to own **15-25% of the company** in a given round. So if you raise $2M and the investor wants 20% ownership, the implied post-money valuation is $10M (and the pre-money is $8M). If you raise $4M and the investor still wants 20%, the post-money is $20M (pre-money $16M). A higher valuation is not free — it means your next round (Series A or B) needs to be at an even higher valuation, or you face a "down round" (covered later), which is painful.
+The relationship between amount raised and valuation is roughly: investors typically want to own **15-25% of the company** in a given round. So if you raise \$2M and the investor wants 20% ownership, the implied post-money valuation is \$10M (and the pre-money is \$8M). If you raise \$4M and the investor still wants 20%, the post-money is \$20M (pre-money \$16M). A higher valuation is not free — it means your next round (Series A or B) needs to be at an even higher valuation, or you face a "down round" (covered later), which is painful.
 
-Rule of thumb: raise enough to hit the milestones that will make your next round a no-brainer, plus a buffer. If you need $1M ARR for a Series A, and you are at $100K ARR, figure out what it takes to get to $1M ARR (hiring, marketing spend, time) and raise for that plus 6 months of cushion.
+Rule of thumb: raise enough to hit the milestones that will make your next round a no-brainer, plus a buffer. If you need \$1M ARR for a Series A, and you are at \$100K ARR, figure out what it takes to get to \$1M ARR (hiring, marketing spend, time) and raise for that plus 6 months of cushion.
 
 ---
 
@@ -202,9 +202,9 @@ Valuation is where the math meets the vibes. Let us start with the mechanics and
 
 > Post-money = Pre-money + Investment Amount
 
-Example: you negotiate a $10M pre-money valuation and raise $2M. The post-money valuation is $12M. The investor owns $2M / $12M = **16.67%** of the company. You (and any existing shareholders) own the remaining 83.33%.
+Example: you negotiate a \$10M pre-money valuation and raise \$2M. The post-money valuation is \$12M. The investor owns \$2M / \$12M = **16.67%** of the company. You (and any existing shareholders) own the remaining 83.33%.
 
-Another example to make sure this is crisp. If you have 10 million shares outstanding before the round, each share is worth $1 (pre-money $10M / 10M shares). The investor puts in $2M, which buys 2M new shares at $1 each. Now there are 12M total shares. Investor owns 2M / 12M = 16.67%. Your 10M shares are now worth $10M / $12M of the company = 83.33%.
+Another example to make sure this is crisp. If you have 10 million shares outstanding before the round, each share is worth \$1 (pre-money \$10M / 10M shares). The investor puts in \$2M, which buys 2M new shares at \$1 each. Now there are 12M total shares. Investor owns 2M / 12M = 16.67%. Your 10M shares are now worth \$10M / \$12M of the company = 83.33%.
 
 **How valuations are set in practice:**
 
@@ -212,15 +212,15 @@ At the earliest stages (pre-seed, seed), valuation is largely a function of (a) 
 
 At later stages (Series A and beyond), valuations become more quantitative. Common approaches:
 
-- **Revenue multiples.** SaaS companies might be valued at 10-30x their ARR, depending on growth rate, market size, and retention. A company doing $2M ARR growing 3x year-over-year might command a 25x multiple = $50M valuation.
-- **Comparable company analysis.** What did similar companies raise at recently? If three competitors raised Series A rounds at $40-60M valuations, you are probably in that band.
+- **Revenue multiples.** SaaS companies might be valued at 10-30x their ARR, depending on growth rate, market size, and retention. A company doing \$2M ARR growing 3x year-over-year might command a 25x multiple = \$50M valuation.
+- **Comparable company analysis.** What did similar companies raise at recently? If three competitors raised Series A rounds at \$40-60M valuations, you are probably in that band.
 - **DCF (Discounted Cash Flow).** Rare at early stages because the projections are pure fiction, but occasionally used at growth stages.
 
 **Why a higher valuation is not always better.** This is counterintuitive. You might think "get the highest valuation possible to minimize dilution." But consider:
 
-If you raise your seed at a $20M pre-money valuation, your Series A needs to be at a significantly higher valuation — say $60M+ — to avoid a "down round." A down round means your Series A valuation is *lower* than your seed valuation. This is devastating for several reasons: it triggers anti-dilution protections (which dilute founders, covered in the term sheet section), it demoralizes your team (their equity is worth less than they thought), and it signals to the market that something went wrong.
+If you raise your seed at a \$20M pre-money valuation, your Series A needs to be at a significantly higher valuation — say \$60M+ — to avoid a "down round." A down round means your Series A valuation is *lower* than your seed valuation. This is devastating for several reasons: it triggers anti-dilution protections (which dilute founders, covered in the term sheet section), it demoralizes your team (their equity is worth less than they thought), and it signals to the market that something went wrong.
 
-A seed valuation of $12M with strong growth to a $50M Series A is a much healthier trajectory than a $20M seed followed by a flat or down $20M Series A. Be ambitious but honest. The right valuation is the one that gives you enough capital with acceptable dilution and sets you up for a clean next round.
+A seed valuation of \$12M with strong growth to a \$50M Series A is a much healthier trajectory than a \$20M seed followed by a flat or down \$20M Series A. Be ambitious but honest. The right valuation is the one that gives you enough capital with acceptable dilution and sets you up for a clean next round.
 
 ---
 
@@ -238,20 +238,20 @@ In a **liquidation event** (sale of the company, IPO, or winding down), the inve
 
 **Example — 1x Non-Participating:**
 
-- Investor puts in $5M for 20% of the company
-- Company sells for $100M
-- Option A: take $5M back (1x preference)
-- Option B: convert and take 20% of $100M = $20M
-- Investor chooses Option B: $20M
-- Founders/employees split the remaining 80%: $80M
+- Investor puts in \$5M for 20% of the company
+- Company sells for \$100M
+- Option A: take \$5M back (1x preference)
+- Option B: convert and take 20% of \$100M = \$20M
+- Investor chooses Option B: \$20M
+- Founders/employees split the remaining 80%: \$80M
 
 Now change the exit price:
 
-- Company sells for $15M
-- Option A: take $5M back (1x preference)
-- Option B: convert and take 20% of $15M = $3M
-- Investor chooses Option A: $5M
-- Founders/employees split: $10M
+- Company sells for \$15M
+- Option A: take \$5M back (1x preference)
+- Option B: convert and take 20% of \$15M = \$3M
+- Investor chooses Option A: \$5M
+- Founders/employees split: \$10M
 
 The liquidation preference protects the investor's downside. In a bad outcome, they get their money back before anyone else. In a good outcome, they convert and share proportionally. This is fair and standard. **Accept 1x non-participating without much negotiation.**
 
@@ -261,24 +261,24 @@ With participating preferred, the investor gets their money back first (1x) AND 
 
 **Example — 1x Participating:**
 
-- Investor puts in $5M for 20% of the company
-- Company sells for $30M
-- Step 1: Investor takes $5M off the top (1x preference)
-- Step 2: Remaining $25M is split pro-rata. Investor gets 20% of $25M = $5M
-- Investor total: $5M + $5M = $10M (33% of proceeds, despite owning 20%)
-- Founders/employees get: $20M (67%, despite owning 80%)
+- Investor puts in \$5M for 20% of the company
+- Company sells for \$30M
+- Step 1: Investor takes \$5M off the top (1x preference)
+- Step 2: Remaining \$25M is split pro-rata. Investor gets 20% of \$25M = \$5M
+- Investor total: \$5M + \$5M = \$10M (33% of proceeds, despite owning 20%)
+- Founders/employees get: \$20M (67%, despite owning 80%)
 
-At a $100M exit:
-- Step 1: Investor takes $5M
-- Step 2: Investor gets 20% of $95M = $19M
-- Investor total: $24M (24% of proceeds vs 20% ownership)
-- Founders/employees: $76M
+At a \$100M exit:
+- Step 1: Investor takes \$5M
+- Step 2: Investor gets 20% of \$95M = \$19M
+- Investor total: \$24M (24% of proceeds vs 20% ownership)
+- Founders/employees: \$76M
 
 Participating preferred is bad for founders at every exit price. **Push back hard on this.** If an investor insists, negotiate a cap (e.g., participating up to 3x, then converts to common). But the standard is 1x non-participating, and any deviation should require a concession elsewhere.
 
 **Anti-Dilution Protection.** If the company raises a future round at a lower valuation (a down round), anti-dilution provisions adjust the conversion price of the existing investor's preferred shares, effectively giving them more shares for the same investment. There are two flavors:
 
-**Full ratchet:** the conversion price drops to the new round's price, regardless of how much is raised. This is extremely aggressive and rare. Example: investor bought shares at $10/share. The next round prices shares at $5/share. Full ratchet reprices all the investor's shares to $5, doubling their share count. This massively dilutes founders.
+**Full ratchet:** the conversion price drops to the new round's price, regardless of how much is raised. This is extremely aggressive and rare. Example: investor bought shares at \$10/share. The next round prices shares at \$5/share. Full ratchet reprices all the investor's shares to \$5, doubling their share count. This massively dilutes founders.
 
 **Weighted average:** the conversion price is adjusted based on a formula that accounts for how many shares are issued in the down round relative to the total. This is much more founder-friendly and is the standard. The dilution is proportional to the severity of the down round, not a cliff.
 
@@ -317,7 +317,7 @@ A **convertible note** is a loan. You borrow money from the investor, and instea
 
 - **Interest rate:** Usually 2-8%. The interest accrues and converts into additional equity.
 - **Maturity date:** When the loan comes due if no conversion happens (typically 18-24 months). If the note matures without a conversion event, the investor can technically demand their money back. In practice, this is usually renegotiated.
-- **Valuation cap:** A maximum valuation at which the note converts. If the cap is $10M and your Series A is at $50M, the note converts at the $10M valuation, giving the investor more shares.
+- **Valuation cap:** A maximum valuation at which the note converts. If the cap is \$10M and your Series A is at \$50M, the note converts at the \$10M valuation, giving the investor more shares.
 - **Discount:** A percentage discount on the Series A price. A 20% discount means the note converts at 80% of whatever the Series A investors pay.
 
 A **SAFE** (Simple Agreement for Future Equity) was created by Y Combinator to simplify this further. It is not a loan — there is no interest, no maturity date, no repayment obligation. It is a contract that says: "I give you money now, and in the future when you raise a priced round, this money converts into equity."
@@ -331,23 +331,23 @@ A SAFE can have a cap only, a discount only, or both (in which case the investor
 
 **Conversion Example (Post-Money SAFE):**
 
-You raise $1M on a post-money SAFE with a $10M valuation cap. Then you raise a Series A at a $40M pre-money valuation.
+You raise \$1M on a post-money SAFE with a \$10M valuation cap. Then you raise a Series A at a \$40M pre-money valuation.
 
-- The SAFE converts as if the company were valued at $10M (the cap) at the time of conversion
-- $1M / $10M = the SAFE holders get 10% of the company (on a post-money basis at the time the SAFE was issued)
+- The SAFE converts as if the company were valued at \$10M (the cap) at the time of conversion
+- \$1M / \$10M = the SAFE holders get 10% of the company (on a post-money basis at the time the SAFE was issued)
 - The Series A then prices on top of this
 
-If you had used a pre-money SAFE with a $10M cap, the math is slightly different because the cap refers to the pre-money valuation excluding other SAFEs, which can create stacking effects. Post-money SAFEs are cleaner because each investor knows exactly what percentage they are buying.
+If you had used a pre-money SAFE with a \$10M cap, the math is slightly different because the cap refers to the pre-money valuation excluding other SAFEs, which can create stacking effects. Post-money SAFEs are cleaner because each investor knows exactly what percentage they are buying.
 
 **Conversion Example with Discount:**
 
-You raise $500K on a SAFE with a 20% discount and no cap. Your Series A prices shares at $10/share. The SAFE converts at $10 x (1 - 0.20) = $8/share. So the $500K buys 62,500 shares instead of the 50,000 shares a Series A investor would get for the same money.
+You raise \$500K on a SAFE with a 20% discount and no cap. Your Series A prices shares at \$10/share. The SAFE converts at \$10 x (1 - 0.20) = \$8/share. So the \$500K buys 62,500 shares instead of the 50,000 shares a Series A investor would get for the same money.
 
 **When to use SAFEs vs. Convertible Notes vs. Priced Rounds:**
 
-- **SAFEs** for pre-seed and early seed when you want speed and simplicity. Low legal costs ($0-$5K).
-- **Convertible notes** if investors insist (some institutional investors prefer the additional protections of a note). Legal costs: $5-$15K.
-- **Priced round** for seed rounds of $2M+ and all later stages. You need a full term sheet and preferred stock purchase agreement. Legal costs: $15-$40K+.
+- **SAFEs** for pre-seed and early seed when you want speed and simplicity. Low legal costs (\$0-\$5K).
+- **Convertible notes** if investors insist (some institutional investors prefer the additional protections of a note). Legal costs: \$5-\$15K.
+- **Priced round** for seed rounds of \$2M+ and all later stages. You need a full term sheet and preferred stock purchase agreement. Legal costs: \$15-\$40K+.
 
 YC loves SAFEs because they align incentives in a clean way: the founder gets money fast, the investor gets a fair conversion, and nobody wastes time or money on legal negotiations at a stage where the company might pivot entirely.
 
@@ -400,11 +400,11 @@ There are two types:
 
 The **exercise price** is set by a **409A valuation** — an independent appraisal of the company's fair market value. This is required by the IRS (the "409A" refers to Section 409A of the Internal Revenue Code). The 409A valuation is almost always much lower than the preferred stock price (the price VCs pay), because common stock lacks the liquidation preferences and other protections of preferred stock. A typical 409A might be 25-35% of the preferred price.
 
-Example: your Series A prices preferred shares at $10/share. The 409A might value common stock at $3/share. Employees receiving options have an exercise price of $3/share. If the company eventually goes public at $50/share, the employee's profit is $47/share.
+Example: your Series A prices preferred shares at \$10/share. The 409A might value common stock at \$3/share. Employees receiving options have an exercise price of \$3/share. If the company eventually goes public at \$50/share, the employee's profit is \$47/share.
 
 **The Tax Trap (AMT).** If an employee exercises ISOs while the company is still private, the difference between the exercise price and the fair market value at the time of exercise is treated as income for AMT purposes, even though the employee has not actually received any cash. This can create a massive tax bill on paper gains.
 
-Example: employee exercises 100,000 ISOs at $1/share (exercise price) when the 409A fair market value is $10/share. The spread is $9/share x 100,000 = $900,000 of AMT income. Depending on the employee's total income and state, this could generate a six-figure tax bill — for shares they cannot even sell yet because the company is private.
+Example: employee exercises 100,000 ISOs at \$1/share (exercise price) when the 409A fair market value is \$10/share. The spread is \$9/share x 100,000 = \$900,000 of AMT income. Depending on the employee's total income and state, this could generate a six-figure tax bill — for shares they cannot even sell yet because the company is private.
 
 This is why **early exercise** (exercising options immediately when granted, before the 409A goes up) paired with an **83(b) election** is so valuable. I will cover 83(b) elections in Part 4.
 
@@ -430,11 +430,11 @@ Here is why this matters. The option pool comes out of the founders' shares, not
 
 **Example — The Option Pool Shuffle:**
 
-Suppose you have 8M shares outstanding (all founder shares). A VC offers to invest $4M at a $16M pre-money valuation.
+Suppose you have 8M shares outstanding (all founder shares). A VC offers to invest \$4M at a \$16M pre-money valuation.
 
 Without an option pool:
-- Pre-money: $16M / 8M shares = $2/share
-- New investor shares: $4M / $2 = 2M shares
+- Pre-money: \$16M / 8M shares = \$2/share
+- New investor shares: \$4M / \$2 = 2M shares
 - Post-money: 10M total shares
 - Founders: 8M / 10M = 80%
 - Investor: 2M / 10M = 20%
@@ -443,15 +443,15 @@ Now the VC says they want a 15% option pool created before closing:
 
 - 15% of post-money (10M shares) = 1.5M shares for the option pool
 - These 1.5M shares are carved out of the pre-money (from the founder side)
-- The $16M pre-money now covers: 8M founder shares + 1.5M option pool shares = 9.5M pre-money shares
-- Price per share: $16M / 9.5M = $1.684/share (lower!)
-- Investor gets: $4M / $1.684 = 2.376M shares
+- The \$16M pre-money now covers: 8M founder shares + 1.5M option pool shares = 9.5M pre-money shares
+- Price per share: \$16M / 9.5M = \$1.684/share (lower!)
+- Investor gets: \$4M / \$1.684 = 2.376M shares
 - Post-money total: 9.5M + 2.376M = 11.876M shares
 - Founders: 8M / 11.876M = 67.4%
 - Option pool: 1.5M / 11.876M = 12.6%
 - Investor: 2.376M / 11.876M = 20.0%
 
-Notice what happened. The VC still gets 20% — that was the deal. But the founders went from 80% to 67.4%, not 80%. The option pool diluted *only the founders*. The "real" pre-money valuation for the founders is effectively $16M - the option pool value, which is closer to $13.3M.
+Notice what happened. The VC still gets 20% — that was the deal. But the founders went from 80% to 67.4%, not 80%. The option pool diluted *only the founders*. The "real" pre-money valuation for the founders is effectively \$16M - the option pool value, which is closer to \$13.3M.
 
 **How to push back:** negotiate the option pool size based on a realistic 18-month hiring plan, not an arbitrary percentage. If you only plan to hire 5 people in the next 18 months, you might only need a 10% pool, not 20%. Every percentage point of unnecessary option pool comes directly out of your pocket.
 
@@ -475,19 +475,19 @@ Two co-founders split equity 50/50. The company issues 10M shares total.
 
 **Seed Round:**
 
-The company raises $2M on a $8M pre-money valuation. The investors also require a 10% option pool.
+The company raises \$2M on a \$8M pre-money valuation. The investors also require a 10% option pool.
 
-- Option pool: 10% of post-money. Post-money = $8M + $2M = $10M. So 10% = $1M worth of shares.
+- Option pool: 10% of post-money. Post-money = \$8M + \$2M = \$10M. So 10% = \$1M worth of shares.
 - Price per share: we need to account for the option pool being created pre-money.
 - Pre-money shares: 10M existing + new option pool shares. Let the option pool be X shares.
 - Post-money shares: 10M + X + investor shares.
 - Option pool must be 10% of post-money: X / (10M + X + investor shares) = 10%.
-- Investor ownership: $2M / $10M = 20%.
+- Investor ownership: \$2M / \$10M = 20%.
 - Solving: investors get 20%, option pool gets 10%, founders get 70%.
 - Total post-money shares: let us call it S. Founders = 10M shares = 70% of S. So S = 10M / 0.70 = 14,285,714.
 - Option pool: 10% x 14,285,714 = 1,428,571 shares.
 - Investor shares: 20% x 14,285,714 = 2,857,143 shares.
-- Price per share: $2M / 2,857,143 = $0.70/share.
+- Price per share: \$2M / 2,857,143 = \$0.70/share.
 
 | Shareholder | Shares | Ownership |
 |-------------|--------|-----------|
@@ -497,21 +497,21 @@ The company raises $2M on a $8M pre-money valuation. The investors also require 
 | Seed Investors | 2,857,143 | 20.0% |
 | **Total** | **14,285,714** | **100.0%** |
 
-Each founder went from 50% to 35%. That is 30% relative dilution. It hurts, but the per-share value is now $0.70 (vs. essentially $0 before).
+Each founder went from 50% to 35%. That is 30% relative dilution. It hurts, but the per-share value is now \$0.70 (vs. essentially \$0 before).
 
 **Series A:**
 
-The company raises $10M at a $30M pre-money valuation. The Series A lead requires expanding the option pool to 15% post-money. Currently the option pool has 1,428,571 shares. Some have been granted (say 500,000 to early employees), leaving 928,571 unallocated.
+The company raises \$10M at a \$30M pre-money valuation. The Series A lead requires expanding the option pool to 15% post-money. Currently the option pool has 1,428,571 shares. Some have been granted (say 500,000 to early employees), leaving 928,571 unallocated.
 
-- Post-money: $30M + $10M = $40M.
+- Post-money: \$30M + \$10M = \$40M.
 - 15% option pool post-money = need option pool to be 15% of total shares.
-- Series A investor ownership: $10M / $40M = 25%.
+- Series A investor ownership: \$10M / \$40M = 25%.
 - Founders + seed + existing option grants take up the rest: 100% - 25% - 15% = 60%.
 - Current non-pool shares: 10M (founders) + 2,857,143 (seed) + 500,000 (granted options) = 13,357,143 shares.
 - These represent 60% of post-money. Total post-money shares: 13,357,143 / 0.60 = 22,261,905.
 - New option pool shares needed: 15% x 22,261,905 = 3,339,286 total pool. Subtract unallocated existing pool of 928,571 = 2,410,715 new shares.
 - Series A investor shares: 25% x 22,261,905 = 5,565,476 shares.
-- Price per share: $10M / 5,565,476 = $1.797/share.
+- Price per share: \$10M / 5,565,476 = \$1.797/share.
 
 | Shareholder | Shares | Ownership |
 |-------------|--------|-----------|
@@ -523,30 +523,30 @@ The company raises $10M at a $30M pre-money valuation. The Series A lead require
 | Series A Investors | 5,565,476 | 25.0% |
 | **Total** | **22,261,905** | **100.0%** |
 
-Each founder is now at 22.5%. Their shares have not changed (still 5M each), but the total pie has grown. The good news: each share is now worth $1.80 instead of $0.70. Each founder's stake is worth $9M (5M x $1.80), up from $3.5M post-seed.
+Each founder is now at 22.5%. Their shares have not changed (still 5M each), but the total pie has grown. The good news: each share is now worth \$1.80 instead of \$0.70. Each founder's stake is worth \$9M (5M x \$1.80), up from \$3.5M post-seed.
 
 **Series B:**
 
-The company raises $30M at a $120M pre-money valuation. Option pool refreshed to 12% post-money.
+The company raises \$30M at a \$120M pre-money valuation. Option pool refreshed to 12% post-money.
 
-- Post-money: $150M.
-- Series B ownership: $30M / $150M = 20%.
+- Post-money: \$150M.
+- Series B ownership: \$30M / \$150M = 20%.
 - Option pool: 12% of post-money.
 - Everyone else: 100% - 20% - 12% = 68%.
 
 Skipping the full share math and jumping to the ownership table:
 
-| Shareholder | Ownership | Value at $150M |
+| Shareholder | Ownership | Value at \$150M |
 |-------------|-----------|----------------|
-| Founder A | 15.3% | $22.95M |
-| Founder B | 15.3% | $22.95M |
-| Early Employees | ~3% | ~$4.5M |
-| Option Pool | 12.0% | $18.0M |
-| Seed Investors | 8.7% | $13.05M |
-| Series A Investors | 17.0% | $25.5M |
-| Series B Investors | 20.0% | $30.0M |
+| Founder A | 15.3% | \$22.95M |
+| Founder B | 15.3% | \$22.95M |
+| Early Employees | ~3% | ~\$4.5M |
+| Option Pool | 12.0% | \$18.0M |
+| Seed Investors | 8.7% | \$13.05M |
+| Series A Investors | 17.0% | \$25.5M |
+| Series B Investors | 20.0% | \$30.0M |
 
-Each founder started at 50% and is now at ~15% after three rounds. This is normal. If the company reaches a $500M exit, each founder's 15% is worth $75M. Dilution is not inherently bad — dilution with increasing per-share value is the whole game.
+Each founder started at 50% and is now at ~15% after three rounds. This is normal. If the company reaches a \$500M exit, each founder's 15% is worth \$75M. Dilution is not inherently bad — dilution with increasing per-share value is the whole game.
 
 **Keep your cap table clean.** This means: no informal equity promises (everything in writing), no complex share structures that confuse future investors, proper documentation for every grant and transfer, and use proper cap table management software (Carta, Pulley, or AngelList) instead of a spreadsheet that one person maintains.
 
@@ -598,11 +598,11 @@ Let us return to the power law math from Part 1 and trace its implications for y
 
 **When your interests diverge:**
 
-**Outcome size.** You might be thrilled with a $30M acquisition that makes you personally wealthy. Your VC is not. On their $3M investment, a $30M exit returns maybe $6M (20% ownership). For a $200M fund, that is noise. They would rather you reject the offer and keep swinging for a $300M+ outcome, even if that means a higher probability of total failure. Your personal risk tolerance and the fund's required returns are in direct conflict here.
+**Outcome size.** You might be thrilled with a \$30M acquisition that makes you personally wealthy. Your VC is not. On their \$3M investment, a \$30M exit returns maybe \$6M (20% ownership). For a \$200M fund, that is noise. They would rather you reject the offer and keep swinging for a \$300M+ outcome, even if that means a higher probability of total failure. Your personal risk tolerance and the fund's required returns are in direct conflict here.
 
 **Timeline.** Most VC funds have a 10-year life (sometimes with 2-3 year extensions). If they invested in your seed round in year 3 of their fund, they need you to exit by year 10-13. If you are building a slow-growing, durable business that will be most valuable in 15 years, there is a mismatch. The VC may push you toward a premature exit or an acquisition you do not want.
 
-**Growth vs. profitability.** VCs typically want you to prioritize growth over profitability, because growth is what drives valuation multiples. "Spend the money. Grow faster. We will raise more." This advice can be correct (invest aggressively when you have product-market fit and a scalable channel) or catastrophic (burn cash on growth that does not stick while the market tightens). The VC's downside is capped at their investment — they lose $3M, which is 1-3% of their fund. Your downside is your company, your equity, and years of your life.
+**Growth vs. profitability.** VCs typically want you to prioritize growth over profitability, because growth is what drives valuation multiples. "Spend the money. Grow faster. We will raise more." This advice can be correct (invest aggressively when you have product-market fit and a scalable channel) or catastrophic (burn cash on growth that does not stick while the market tightens). The VC's downside is capped at their investment — they lose \$3M, which is 1-3% of their fund. Your downside is your company, your equity, and years of your life.
 
 **Competing portfolio companies.** Some VCs invest in multiple companies in the same space. They may frame this as "we are betting on the market." In practice, it means they have options and you have a competitor who knows your investor's thinking. Most term sheets include a clause about competitive investments — read it carefully.
 
@@ -647,7 +647,7 @@ Some founders — most famously, Mark Zuckerberg — have taken less money or le
 
 ## 16. The Down Round
 
-A **down round** occurs when a company raises money at a valuation lower than its previous round. If your Series A was at a $50M pre-money and your Series B is at a $35M pre-money, that is a down round.
+A **down round** occurs when a company raises money at a valuation lower than its previous round. If your Series A was at a \$50M pre-money and your Series B is at a \$35M pre-money, that is a down round.
 
 Why it is devastating:
 
@@ -660,7 +660,7 @@ Why it is devastating:
 **How to avoid it:**
 
 - Do not raise at an inflated valuation in the first place. The number one cause of down rounds is an up round that was too high.
-- Hit your milestones. If you told investors you would be at $2M ARR in 18 months, get there.
+- Hit your milestones. If you told investors you would be at \$2M ARR in 18 months, get there.
 - Manage your burn rate so you do not need to raise from a position of weakness.
 - If you are heading toward a down round, consider alternatives: bridge financing from existing investors (a small note to extend runway), revenue-based financing, or cost-cutting to reach profitability.
 - If a down round is unavoidable, negotiate hard on the anti-dilution adjustment. Push for broad-based weighted average (the most founder-friendly standard), and ask investors to waive or reduce anti-dilution to preserve the cap table.
@@ -679,9 +679,9 @@ Here is what VCs check and what you should have in order:
 
 **Proper Incorporation.** For US-based startups seeking VC investment, the standard is a **Delaware C-Corporation.** Not an LLC, not an S-corp, not incorporated in your home state (unless that is Delaware). There are specific, practical reasons for this: Delaware has well-established corporate law, VCs are structured to invest in C-corps (not LLCs), and the convertible preferred stock that VCs require is a C-corp instrument. If you are incorporated as anything else, you will need to convert, which costs time and legal fees.
 
-**83(b) Elections.** When founders receive shares subject to vesting, there is a tax event. Without an 83(b) election, the IRS treats each vesting tranche as taxable income at the then-current fair market value. If your shares are worth $0.001 each at founding but $5 each when they vest three years later, you owe income tax on $5/share at each vesting date.
+**83(b) Elections.** When founders receive shares subject to vesting, there is a tax event. Without an 83(b) election, the IRS treats each vesting tranche as taxable income at the then-current fair market value. If your shares are worth \$0.001 each at founding but \$5 each when they vest three years later, you owe income tax on \$5/share at each vesting date.
 
-An **83(b) election** tells the IRS: "I want to be taxed on the full value of these shares *now*, at the current (very low) value, rather than as they vest." If you file within 30 days of receiving the shares, you pay taxes on $0.001/share for all shares, even though most have not vested yet. If the shares increase in value, all future gains are taxed at capital gains rates when you eventually sell.
+An **83(b) election** tells the IRS: "I want to be taxed on the full value of these shares *now*, at the current (very low) value, rather than as they vest." If you file within 30 days of receiving the shares, you pay taxes on \$0.001/share for all shares, even though most have not vested yet. If the shares increase in value, all future gains are taxed at capital gains rates when you eventually sell.
 
 **This is a 30-day deadline with no exceptions.** Miss it and you cannot undo the damage. It is one of the most important administrative tasks at company founding. VCs will check that all founders filed their 83(b) elections. If you did not, it is a red flag (it suggests sloppy corporate governance) and it creates a personal tax liability for the affected founders.
 
@@ -726,7 +726,7 @@ The best BATNA is not needing the money at all. Companies that are growing fast 
 - Right of first refusal
 - The existence of a liquidation preference (some preference is standard in any preferred stock deal)
 
-**When to use a lawyer:** Always. From the moment you receive a term sheet, have a lawyer who specializes in startup financing review it. This is not optional. A good startup lawyer costs $15-40K for a financing round, and they will pay for themselves by catching unfavorable terms that would cost you millions later. Use a firm that has done hundreds of startup deals — Wilson Sonsini, Cooley, Gunderson Dettmer, Fenwick & West, or Goodwin Procter are the usual names. Do not use your uncle's real estate attorney.
+**When to use a lawyer:** Always. From the moment you receive a term sheet, have a lawyer who specializes in startup financing review it. This is not optional. A good startup lawyer costs \$15-40K for a financing round, and they will pay for themselves by catching unfavorable terms that would cost you millions later. Use a firm that has done hundreds of startup deals — Wilson Sonsini, Cooley, Gunderson Dettmer, Fenwick & West, or Goodwin Procter are the usual names. Do not use your uncle's real estate attorney.
 
 Your lawyer reviews the terms and gives you advice. You make the decisions. Some founders defer entirely to their lawyers, which can kill deals (lawyers are trained to minimize risk, not to optimize for your specific situation). Other founders ignore their lawyers entirely, which is how you end up with participating preferred and full ratchet anti-dilution. Find the balance.
 
@@ -756,7 +756,7 @@ Here is something that catches first-time founders off guard: VCs will extensive
 How to diligence a VC:
 
 - **Talk to their portfolio founders.** Not just the ones on their website (those are the success stories). Find founders whose companies failed or were acqui-hired. How did the VC behave when things got hard? Did they help, disappear, or make things worse? Did they push for premature exits? Were they supportive of pivots?
-- **Check their fund structure.** How old is the fund? A VC investing from a fund that is already 7 years old may push you toward a fast exit. How large is the fund? A partner at a $2B fund will not spend much time on your $2M seed investment.
+- **Check their fund structure.** How old is the fund? A VC investing from a fund that is already 7 years old may push you toward a fast exit. How large is the fund? A partner at a \$2B fund will not spend much time on your \$2M seed investment.
 - **Ask about their decision-making process.** How many partners need to approve? What is their typical timeline from first meeting to term sheet? A VC that takes 4 months to make a decision is not ideal when you are running a tight fundraise process.
 - **Google them.** Search for their name plus "founder" or "startup" to find any public conflicts or concerns.
 
@@ -813,7 +813,7 @@ If you have read this far, you now have a working understanding of how venture c
 
 4. **Protect your control.** Board composition, voting rights, protective provisions — these are not boilerplate. They determine who makes the decisions that matter. Pay attention.
 
-5. **Think in terms of dilution, not valuation.** A $20M valuation means nothing if your terms are terrible. Focus on ownership percentage, liquidation preferences, and control rights. Those are what determine your outcome.
+5. **Think in terms of dilution, not valuation.** A \$20M valuation means nothing if your terms are terrible. Focus on ownership percentage, liquidation preferences, and control rights. Those are what determine your outcome.
 
 6. **Do the math.** Run the cap table forward. Model the liquidation waterfall. Understand what your equity is actually worth under different exit scenarios. The math is not hard. Ignoring it is expensive.
 
