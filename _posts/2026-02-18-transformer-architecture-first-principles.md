@@ -192,7 +192,7 @@ The attention mechanism has a beautiful geometric interpretation that makes the 
 <svg viewBox="0 0 700 380" xmlns="http://www.w3.org/2000/svg" style="max-width:700px; width:100%; height:auto; display:block; margin:2em auto;">
   <defs>
     <marker id="arrowhead" markerWidth="10" markerHeight="7" refX="10" refY="3.5" orient="auto">
-      <polygon points="0 0, 10 3.5, 0 7" fill="#555"/>
+      <polygon points="0 0, 10 3.5, 0 7" fill="#999"/>
     </marker>
     <marker id="arrowblue" markerWidth="10" markerHeight="7" refX="10" refY="3.5" orient="auto">
       <polygon points="0 0, 10 3.5, 0 7" fill="#2563eb"/>
@@ -206,11 +206,11 @@ The attention mechanism has a beautiful geometric interpretation that makes the 
   </defs>
 
   <!-- Title -->
-  <text x="350" y="25" text-anchor="middle" font-size="16" font-weight="bold" fill="#1e293b">Attention as Soft Dictionary Lookup</text>
+  <text x="350" y="25" text-anchor="middle" font-size="16" font-weight="bold" fill="#d4d4d4">Attention as Soft Dictionary Lookup</text>
 
   <!-- Left panel: Query-Key space -->
-  <rect x="20" y="40" width="300" height="300" rx="8" fill="#f8fafc" stroke="#e2e8f0" stroke-width="1.5"/>
-  <text x="170" y="65" text-anchor="middle" font-size="13" font-weight="bold" fill="#475569">Query-Key Space (d_k dimensions)</text>
+  <rect x="20" y="40" width="300" height="300" rx="8" fill="#1e1e1e" stroke="#444" stroke-width="1.5"/>
+  <text x="170" y="65" text-anchor="middle" font-size="13" font-weight="bold" fill="#b0b8c4">Query-Key Space (d_k dimensions)</text>
 
   <!-- Query vector -->
   <line x1="170" y1="200" x2="280" y2="110" stroke="#2563eb" stroke-width="2.5" marker-end="url(#arrowblue)"/>
@@ -231,26 +231,26 @@ The attention mechanism has a beautiful geometric interpretation that makes the 
   <text x="230" y="168" font-size="10" fill="#9333ea">small angle</text>
 
   <!-- Origin dot -->
-  <circle cx="170" cy="200" r="3" fill="#1e293b"/>
+  <circle cx="170" cy="200" r="3" fill="#d4d4d4"/>
 
   <!-- Right panel: Output construction -->
-  <rect x="380" y="40" width="300" height="300" rx="8" fill="#f8fafc" stroke="#e2e8f0" stroke-width="1.5"/>
-  <text x="530" y="65" text-anchor="middle" font-size="13" font-weight="bold" fill="#475569">Value Aggregation</text>
+  <rect x="380" y="40" width="300" height="300" rx="8" fill="#1e1e1e" stroke="#444" stroke-width="1.5"/>
+  <text x="530" y="65" text-anchor="middle" font-size="13" font-weight="bold" fill="#b0b8c4">Value Aggregation</text>
 
   <!-- Softmax weights -->
-  <rect x="405" y="85" width="250" height="70" rx="5" fill="#eff6ff" stroke="#bfdbfe" stroke-width="1"/>
-  <text x="530" y="105" text-anchor="middle" font-size="12" fill="#1e40af">softmax(q_i · k_j / sqrt(d_k))</text>
-  <text x="530" y="125" text-anchor="middle" font-size="14" fill="#1e40af" font-weight="bold">alpha_1 = 0.72   alpha_2 = 0.03   alpha_3 = 0.25</text>
-  <text x="530" y="145" text-anchor="middle" font-size="10" fill="#64748b">weights sum to 1 (probability distribution)</text>
+  <rect x="405" y="85" width="250" height="70" rx="5" fill="#1a2744" stroke="#2563eb" stroke-width="1"/>
+  <text x="530" y="105" text-anchor="middle" font-size="12" fill="#60a5fa">softmax(q_i · k_j / sqrt(d_k))</text>
+  <text x="530" y="125" text-anchor="middle" font-size="14" fill="#60a5fa" font-weight="bold">alpha_1 = 0.72   alpha_2 = 0.03   alpha_3 = 0.25</text>
+  <text x="530" y="145" text-anchor="middle" font-size="10" fill="#999">weights sum to 1 (probability distribution)</text>
 
   <!-- Value vectors -->
-  <rect x="410" y="175" width="70" height="40" rx="4" fill="#dcfce7" stroke="#16a34a" stroke-width="1.5"/>
+  <rect x="410" y="175" width="70" height="40" rx="4" fill="#14332a" stroke="#16a34a" stroke-width="1.5"/>
   <text x="445" y="200" text-anchor="middle" font-size="12" fill="#16a34a" font-weight="bold">v_1</text>
 
-  <rect x="495" y="175" width="70" height="40" rx="4" fill="#dcfce7" stroke="#16a34a" stroke-width="1.5"/>
+  <rect x="495" y="175" width="70" height="40" rx="4" fill="#14332a" stroke="#16a34a" stroke-width="1.5"/>
   <text x="530" y="200" text-anchor="middle" font-size="12" fill="#16a34a" font-weight="bold">v_2</text>
 
-  <rect x="580" y="175" width="70" height="40" rx="4" fill="#dcfce7" stroke="#16a34a" stroke-width="1.5"/>
+  <rect x="580" y="175" width="70" height="40" rx="4" fill="#14332a" stroke="#16a34a" stroke-width="1.5"/>
   <text x="615" y="200" text-anchor="middle" font-size="12" fill="#16a34a" font-weight="bold">v_3</text>
 
   <!-- Weighted sum arrows -->
@@ -258,7 +258,7 @@ The attention mechanism has a beautiful geometric interpretation that makes the 
   <text x="455" y="245" font-size="10" fill="#16a34a">x 0.72</text>
 
   <line x1="530" y1="215" x2="515" y2="268" stroke="#16a34a" stroke-width="1" marker-end="url(#arrowgreen)" stroke-dasharray="4,3"/>
-  <text x="535" y="248" font-size="10" fill="#94a3b8">x 0.03</text>
+  <text x="535" y="248" font-size="10" fill="#888">x 0.03</text>
 
   <line x1="615" y1="215" x2="530" y2="268" stroke="#16a34a" stroke-width="1.5" marker-end="url(#arrowgreen)"/>
   <text x="585" y="248" font-size="10" fill="#16a34a">x 0.25</text>
@@ -269,8 +269,8 @@ The attention mechanism has a beautiful geometric interpretation that makes the 
   <text x="530" y="306" text-anchor="middle" font-size="11" fill="#bfdbfe">context-aware output</text>
 
   <!-- Arrow connecting panels -->
-  <line x1="325" y1="200" x2="375" y2="200" stroke="#94a3b8" stroke-width="2" marker-end="url(#arrowhead)" stroke-dasharray="6,3"/>
-  <text x="350" y="190" text-anchor="middle" font-size="10" fill="#94a3b8">scores</text>
+  <line x1="325" y1="200" x2="375" y2="200" stroke="#888" stroke-width="2" marker-end="url(#arrowhead)" stroke-dasharray="6,3"/>
+  <text x="350" y="190" text-anchor="middle" font-size="10" fill="#888">scores</text>
 </svg>
 
 **Think of attention as a soft dictionary lookup.** In a regular dictionary (hash map), you provide a query key and get back exactly one value. In attention, the query $q_i$ is compared against all keys $k_1, \ldots, k_n$. Instead of returning the value of the single best match, attention returns a **weighted combination** of all values, with weights proportional to how well each key matches the query.
@@ -464,40 +464,39 @@ This naturally encodes relative position $j - i$ into the attention score. The a
 We now have all the ingredients to build a complete transformer block. Each block contains two sub-layers: multi-head self-attention and a position-wise feed-forward network, each wrapped with a residual connection and layer normalization.
 
 <svg viewBox="0 0 480 680" xmlns="http://www.w3.org/2000/svg" style="max-width:480px; width:100%; height:auto; display:block; margin:2em auto;">
-  <!-- Background -->
-  <rect x="0" y="0" width="480" height="680" fill="#ffffff"/>
+  <!-- Background removed for dark theme -->
 
   <!-- Input -->
-  <rect x="160" y="10" width="160" height="36" rx="6" fill="#e0f2fe" stroke="#0284c7" stroke-width="1.5"/>
-  <text x="240" y="33" text-anchor="middle" font-size="13" fill="#0c4a6e" font-weight="bold">Input X (n x d)</text>
+  <rect x="160" y="10" width="160" height="36" rx="6" fill="#0c2d4a" stroke="#0284c7" stroke-width="1.5"/>
+  <text x="240" y="33" text-anchor="middle" font-size="13" fill="#7dd3fc" font-weight="bold">Input X (n x d)</text>
 
   <!-- Arrow down -->
-  <line x1="240" y1="46" x2="240" y2="70" stroke="#64748b" stroke-width="1.5" marker-end="url(#arrowhead)"/>
+  <line x1="240" y1="46" x2="240" y2="70" stroke="#999" stroke-width="1.5" marker-end="url(#arrowhead)"/>
 
   <!-- Add positional encoding -->
-  <rect x="145" y="72" width="190" height="32" rx="6" fill="#fef3c7" stroke="#d97706" stroke-width="1.5"/>
-  <text x="240" y="93" text-anchor="middle" font-size="12" fill="#92400e">+ Positional Encoding</text>
+  <rect x="145" y="72" width="190" height="32" rx="6" fill="#3d2e0a" stroke="#d97706" stroke-width="1.5"/>
+  <text x="240" y="93" text-anchor="middle" font-size="12" fill="#fbbf24">+ Positional Encoding</text>
 
   <!-- Arrow down -->
-  <line x1="240" y1="104" x2="240" y2="128" stroke="#64748b" stroke-width="1.5" marker-end="url(#arrowhead)"/>
+  <line x1="240" y1="104" x2="240" y2="128" stroke="#999" stroke-width="1.5" marker-end="url(#arrowhead)"/>
 
   <!-- Block outline -->
-  <rect x="40" y="130" width="400" height="510" rx="12" fill="none" stroke="#94a3b8" stroke-width="2" stroke-dasharray="8,4"/>
-  <text x="60" y="155" font-size="12" fill="#94a3b8" font-style="italic">Transformer Block (repeat N times)</text>
+  <rect x="40" y="130" width="400" height="510" rx="12" fill="none" stroke="#888" stroke-width="2" stroke-dasharray="8,4"/>
+  <text x="60" y="155" font-size="12" fill="#888" font-style="italic">Transformer Block (repeat N times)</text>
 
   <!-- Layer Norm 1 -->
-  <rect x="140" y="168" width="200" height="36" rx="6" fill="#f3e8ff" stroke="#9333ea" stroke-width="1.5"/>
-  <text x="240" y="191" text-anchor="middle" font-size="12" fill="#6b21a8" font-weight="bold">Layer Norm</text>
+  <rect x="140" y="168" width="200" height="36" rx="6" fill="#2d1a47" stroke="#9333ea" stroke-width="1.5"/>
+  <text x="240" y="191" text-anchor="middle" font-size="12" fill="#c084fc" font-weight="bold">Layer Norm</text>
 
   <!-- Arrow -->
-  <line x1="240" y1="204" x2="240" y2="228" stroke="#64748b" stroke-width="1.5" marker-end="url(#arrowhead)"/>
+  <line x1="240" y1="204" x2="240" y2="228" stroke="#999" stroke-width="1.5" marker-end="url(#arrowhead)"/>
 
   <!-- Multi-Head Attention -->
-  <rect x="110" y="230" width="260" height="44" rx="6" fill="#dbeafe" stroke="#2563eb" stroke-width="2"/>
-  <text x="240" y="257" text-anchor="middle" font-size="13" fill="#1e40af" font-weight="bold">Multi-Head Self-Attention</text>
+  <rect x="110" y="230" width="260" height="44" rx="6" fill="#172554" stroke="#2563eb" stroke-width="2"/>
+  <text x="240" y="257" text-anchor="middle" font-size="13" fill="#60a5fa" font-weight="bold">Multi-Head Self-Attention</text>
 
   <!-- Arrow -->
-  <line x1="240" y1="274" x2="240" y2="300" stroke="#64748b" stroke-width="1.5" marker-end="url(#arrowhead)"/>
+  <line x1="240" y1="274" x2="240" y2="300" stroke="#999" stroke-width="1.5" marker-end="url(#arrowhead)"/>
 
   <!-- Residual connection 1 -->
   <line x1="100" y1="165" x2="100" y2="310" stroke="#f97316" stroke-width="2" stroke-dasharray="5,3"/>
@@ -505,25 +504,25 @@ We now have all the ingredients to build a complete transformer block. Each bloc
   <text x="82" y="240" font-size="10" fill="#f97316" transform="rotate(-90, 82, 240)" text-anchor="middle">residual</text>
 
   <!-- Add node 1 -->
-  <circle cx="218" cy="310" r="14" fill="#fff7ed" stroke="#f97316" stroke-width="2"/>
+  <circle cx="218" cy="310" r="14" fill="#3d1f00" stroke="#f97316" stroke-width="2"/>
   <text x="218" y="315" text-anchor="middle" font-size="16" fill="#f97316" font-weight="bold">+</text>
 
   <!-- Arrow -->
-  <line x1="240" y1="324" x2="240" y2="360" stroke="#64748b" stroke-width="1.5" marker-end="url(#arrowhead)"/>
+  <line x1="240" y1="324" x2="240" y2="360" stroke="#999" stroke-width="1.5" marker-end="url(#arrowhead)"/>
 
   <!-- Layer Norm 2 -->
-  <rect x="140" y="362" width="200" height="36" rx="6" fill="#f3e8ff" stroke="#9333ea" stroke-width="1.5"/>
-  <text x="240" y="385" text-anchor="middle" font-size="12" fill="#6b21a8" font-weight="bold">Layer Norm</text>
+  <rect x="140" y="362" width="200" height="36" rx="6" fill="#2d1a47" stroke="#9333ea" stroke-width="1.5"/>
+  <text x="240" y="385" text-anchor="middle" font-size="12" fill="#c084fc" font-weight="bold">Layer Norm</text>
 
   <!-- Arrow -->
-  <line x1="240" y1="398" x2="240" y2="422" stroke="#64748b" stroke-width="1.5" marker-end="url(#arrowhead)"/>
+  <line x1="240" y1="398" x2="240" y2="422" stroke="#999" stroke-width="1.5" marker-end="url(#arrowhead)"/>
 
   <!-- FFN -->
-  <rect x="110" y="424" width="260" height="44" rx="6" fill="#dcfce7" stroke="#16a34a" stroke-width="2"/>
-  <text x="240" y="451" text-anchor="middle" font-size="13" fill="#166534" font-weight="bold">Feed-Forward Network</text>
+  <rect x="110" y="424" width="260" height="44" rx="6" fill="#14332a" stroke="#16a34a" stroke-width="2"/>
+  <text x="240" y="451" text-anchor="middle" font-size="13" fill="#4ade80" font-weight="bold">Feed-Forward Network</text>
 
   <!-- Arrow -->
-  <line x1="240" y1="468" x2="240" y2="494" stroke="#64748b" stroke-width="1.5" marker-end="url(#arrowhead)"/>
+  <line x1="240" y1="468" x2="240" y2="494" stroke="#999" stroke-width="1.5" marker-end="url(#arrowhead)"/>
 
   <!-- Residual connection 2 -->
   <line x1="100" y1="358" x2="100" y2="504" stroke="#f97316" stroke-width="2" stroke-dasharray="5,3"/>
@@ -531,21 +530,21 @@ We now have all the ingredients to build a complete transformer block. Each bloc
   <text x="82" y="434" font-size="10" fill="#f97316" transform="rotate(-90, 82, 434)" text-anchor="middle">residual</text>
 
   <!-- Add node 2 -->
-  <circle cx="218" cy="504" r="14" fill="#fff7ed" stroke="#f97316" stroke-width="2"/>
+  <circle cx="218" cy="504" r="14" fill="#3d1f00" stroke="#f97316" stroke-width="2"/>
   <text x="218" y="509" text-anchor="middle" font-size="16" fill="#f97316" font-weight="bold">+</text>
 
   <!-- Arrow out -->
-  <line x1="240" y1="518" x2="240" y2="560" stroke="#64748b" stroke-width="1.5" marker-end="url(#arrowhead)"/>
+  <line x1="240" y1="518" x2="240" y2="560" stroke="#999" stroke-width="1.5" marker-end="url(#arrowhead)"/>
 
   <!-- Output -->
-  <rect x="150" y="562" width="180" height="36" rx="6" fill="#e0f2fe" stroke="#0284c7" stroke-width="1.5"/>
-  <text x="240" y="585" text-anchor="middle" font-size="13" fill="#0c4a6e" font-weight="bold">Output Y (n x d)</text>
+  <rect x="150" y="562" width="180" height="36" rx="6" fill="#0c2d4a" stroke="#0284c7" stroke-width="1.5"/>
+  <text x="240" y="585" text-anchor="middle" font-size="13" fill="#7dd3fc" font-weight="bold">Output Y (n x d)</text>
 
   <!-- FFN detail box -->
-  <rect x="310" y="570" width="155" height="55" rx="6" fill="#f0fdf4" stroke="#86efac" stroke-width="1"/>
-  <text x="387" y="588" text-anchor="middle" font-size="10" fill="#166534" font-weight="bold">FFN detail:</text>
-  <text x="387" y="603" text-anchor="middle" font-size="10" fill="#166534">Linear(d, 4d)</text>
-  <text x="387" y="616" text-anchor="middle" font-size="10" fill="#166534">GELU / Linear(4d, d)</text>
+  <rect x="310" y="570" width="155" height="55" rx="6" fill="#14332a" stroke="#86efac" stroke-width="1"/>
+  <text x="387" y="588" text-anchor="middle" font-size="10" fill="#4ade80" font-weight="bold">FFN detail:</text>
+  <text x="387" y="603" text-anchor="middle" font-size="10" fill="#4ade80">Linear(d, 4d)</text>
+  <text x="387" y="616" text-anchor="middle" font-size="10" fill="#4ade80">GELU / Linear(4d, d)</text>
 </svg>
 
 ### Residual Connections: Gradient Highways

@@ -172,21 +172,21 @@ This slides each point horizontally by an amount proportional to its $y$-coordin
 <svg viewBox="-130 -130 520 260" xmlns="http://www.w3.org/2000/svg" style="max-width:600px; display:block; margin:auto;">
   <!-- Original square -->
   <g transform="translate(0,0)">
-    <text x="-10" y="-115" font-size="12" fill="#333" text-anchor="middle">Original</text>
-    <line x1="-100" y1="0" x2="100" y2="0" stroke="#ccc" stroke-width="0.5"/>
-    <line x1="0" y1="-100" x2="0" y2="100" stroke="#ccc" stroke-width="0.5"/>
+    <text x="-10" y="-115" font-size="12" fill="#d4d4d4" text-anchor="middle">Original</text>
+    <line x1="-100" y1="0" x2="100" y2="0" stroke="#444" stroke-width="0.5"/>
+    <line x1="0" y1="-100" x2="0" y2="100" stroke="#444" stroke-width="0.5"/>
     <rect x="-40" y="-40" width="80" height="80" fill="rgba(52,152,219,0.15)" stroke="#3498db" stroke-width="1.5"/>
     <circle cx="40" cy="-40" r="3" fill="#e74c3c"/>
     <text x="50" y="-42" font-size="10" fill="#e74c3c">(1,1)</text>
   </g>
   <!-- Rotated (45 degrees) -->
   <g transform="translate(260,0)">
-    <text x="-10" y="-115" font-size="12" fill="#333" text-anchor="middle">Rotation (45°)</text>
-    <line x1="-100" y1="0" x2="100" y2="0" stroke="#ccc" stroke-width="0.5"/>
-    <line x1="0" y1="-100" x2="0" y2="100" stroke="#ccc" stroke-width="0.5"/>
+    <text x="-10" y="-115" font-size="12" fill="#d4d4d4" text-anchor="middle">Rotation (45°)</text>
+    <line x1="-100" y1="0" x2="100" y2="0" stroke="#444" stroke-width="0.5"/>
+    <line x1="0" y1="-100" x2="0" y2="100" stroke="#444" stroke-width="0.5"/>
     <polygon points="0,-56.6 56.6,0 0,56.6 -56.6,0" fill="rgba(46,204,113,0.15)" stroke="#2ecc71" stroke-width="1.5"/>
     <circle cx="0" cy="-56.6" r="3" fill="#e74c3c"/>
-    <text x="8" y="-58" font-size="10" fill="#e74c3c">(0, √2)</text>
+    <text x="8" y="-58" font-size="10" fill="#e74c3c">(0, &#x221A;2)</text>
   </g>
 </svg>
 
@@ -419,38 +419,38 @@ This is why the unit circle maps to an ellipse. $V^T$ rotates the circle (still 
   <!-- Step 1: Unit circle -->
   <g transform="translate(60,50)">
     <ellipse cx="0" cy="0" rx="40" ry="40" fill="rgba(52,152,219,0.15)" stroke="#3498db" stroke-width="1.5"/>
-    <line x1="-50" y1="0" x2="50" y2="0" stroke="#ccc" stroke-width="0.5"/>
-    <line x1="0" y1="-50" x2="0" y2="50" stroke="#ccc" stroke-width="0.5"/>
-    <text x="-15" y="65" font-size="11" fill="#333">Unit circle</text>
+    <line x1="-50" y1="0" x2="50" y2="0" stroke="#444" stroke-width="0.5"/>
+    <line x1="0" y1="-50" x2="0" y2="50" stroke="#444" stroke-width="0.5"/>
+    <text x="-15" y="65" font-size="11" fill="#d4d4d4">Unit circle</text>
   </g>
-  <text x="120" y="55" font-size="18" fill="#666">→</text>
-  <text x="115" y="40" font-size="10" fill="#666">V^T</text>
+  <text x="120" y="55" font-size="18" fill="#999">&#x2192;</text>
+  <text x="115" y="40" font-size="10" fill="#999">V&#x1d40;</text>
   <!-- Step 2: Rotated circle (still a circle) -->
   <g transform="translate(190,50)">
     <ellipse cx="0" cy="0" rx="40" ry="40" fill="rgba(46,204,113,0.15)" stroke="#2ecc71" stroke-width="1.5"/>
-    <line x1="-50" y1="0" x2="50" y2="0" stroke="#ccc" stroke-width="0.5"/>
-    <line x1="0" y1="-50" x2="0" y2="50" stroke="#ccc" stroke-width="0.5"/>
-    <text x="-10" y="65" font-size="11" fill="#333">Rotated</text>
+    <line x1="-50" y1="0" x2="50" y2="0" stroke="#444" stroke-width="0.5"/>
+    <line x1="0" y1="-50" x2="0" y2="50" stroke="#444" stroke-width="0.5"/>
+    <text x="-10" y="65" font-size="11" fill="#d4d4d4">Rotated</text>
   </g>
-  <text x="250" y="55" font-size="18" fill="#666">→</text>
-  <text x="248" y="40" font-size="10" fill="#666">Σ</text>
+  <text x="250" y="55" font-size="18" fill="#999">&#x2192;</text>
+  <text x="248" y="40" font-size="10" fill="#999">&#x3A3;</text>
   <!-- Step 3: Axis-aligned ellipse -->
   <g transform="translate(330,50)">
     <ellipse cx="0" cy="0" rx="55" ry="25" fill="rgba(231,76,60,0.15)" stroke="#e74c3c" stroke-width="1.5"/>
-    <line x1="-65" y1="0" x2="65" y2="0" stroke="#ccc" stroke-width="0.5"/>
-    <line x1="0" y1="-50" x2="0" y2="50" stroke="#ccc" stroke-width="0.5"/>
-    <text x="-10" y="65" font-size="11" fill="#333">Scaled</text>
+    <line x1="-65" y1="0" x2="65" y2="0" stroke="#444" stroke-width="0.5"/>
+    <line x1="0" y1="-50" x2="0" y2="50" stroke="#444" stroke-width="0.5"/>
+    <text x="-10" y="65" font-size="11" fill="#d4d4d4">Scaled</text>
     <text x="58" y="-4" font-size="10" fill="#e74c3c">σ₁</text>
     <text x="4" y="-27" font-size="10" fill="#e74c3c">σ₂</text>
   </g>
-  <text x="400" y="55" font-size="18" fill="#666">→</text>
-  <text x="398" y="40" font-size="10" fill="#666">U</text>
+  <text x="400" y="55" font-size="18" fill="#999">&#x2192;</text>
+  <text x="398" y="40" font-size="10" fill="#999">U</text>
   <!-- Step 4: Rotated ellipse -->
   <g transform="translate(470,50)">
     <ellipse cx="0" cy="0" rx="55" ry="25" fill="rgba(155,89,182,0.15)" stroke="#9b59b6" stroke-width="1.5" transform="rotate(-30)"/>
-    <line x1="-65" y1="0" x2="65" y2="0" stroke="#ccc" stroke-width="0.5"/>
-    <line x1="0" y1="-50" x2="0" y2="50" stroke="#ccc" stroke-width="0.5"/>
-    <text x="-10" y="65" font-size="11" fill="#333">Final</text>
+    <line x1="-65" y1="0" x2="65" y2="0" stroke="#444" stroke-width="0.5"/>
+    <line x1="0" y1="-50" x2="0" y2="50" stroke="#444" stroke-width="0.5"/>
+    <text x="-10" y="65" font-size="11" fill="#d4d4d4">Final</text>
   </g>
 </svg>
 

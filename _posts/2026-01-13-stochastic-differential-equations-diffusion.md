@@ -52,18 +52,18 @@ From these properties, several remarkable consequences follow:
 
 This nowhere-differentiability is not a mathematical pathology --- it is the fundamental reason why stochastic calculus must be rebuilt from scratch rather than adapted from ordinary calculus.
 
-<svg viewBox="0 0 700 350" xmlns="http://www.w3.org/2000/svg" style="background: white; max-width: 700px; display: block; margin: 2em auto;">
+<svg viewBox="0 0 700 350" xmlns="http://www.w3.org/2000/svg" style="max-width: 700px; display: block; margin: 2em auto;">
   <defs>
     <marker id="arrowBM" markerWidth="10" markerHeight="7" refX="10" refY="3.5" orient="auto">
-      <polygon points="0 0, 10 3.5, 0 7" fill="#333"/>
+      <polygon points="0 0, 10 3.5, 0 7" fill="#d4d4d4"/>
     </marker>
   </defs>
-  <text x="350" y="25" text-anchor="middle" font-size="14" font-weight="bold" fill="#333">Brownian Motion: Key Properties</text>
+  <text x="350" y="25" text-anchor="middle" font-size="14" font-weight="bold" fill="#d4d4d4">Brownian Motion: Key Properties</text>
   <!-- Axes -->
-  <line x1="60" y1="180" x2="660" y2="180" stroke="#333" stroke-width="1" marker-end="url(#arrowBM)"/>
-  <line x1="60" y1="320" x2="60" y2="40" stroke="#333" stroke-width="1" marker-end="url(#arrowBM)"/>
-  <text x="660" y="200" text-anchor="end" font-size="12" fill="#333">t</text>
-  <text x="40" y="45" text-anchor="middle" font-size="12" fill="#333">W(t)</text>
+  <line x1="60" y1="180" x2="660" y2="180" stroke="#d4d4d4" stroke-width="1" marker-end="url(#arrowBM)"/>
+  <line x1="60" y1="320" x2="60" y2="40" stroke="#d4d4d4" stroke-width="1" marker-end="url(#arrowBM)"/>
+  <text x="660" y="200" text-anchor="end" font-size="12" fill="#d4d4d4">t</text>
+  <text x="40" y="45" text-anchor="middle" font-size="12" fill="#d4d4d4">W(t)</text>
   <!-- Sample path (jagged) -->
   <polyline points="60,180 80,175 95,185 110,170 125,180 140,165 155,175 170,155 185,160 200,140 215,150 230,135 245,145 260,130 275,140 290,125 305,135 320,120 335,130 350,115 365,125 380,110 395,120 410,100 425,115 440,95 455,105 470,90 485,100 500,85 515,95 530,80 545,95 560,75 575,90 590,70 605,85 620,65 635,80" fill="none" stroke="#2196F3" stroke-width="1.8"/>
   <!-- Standard deviation envelope -->
@@ -72,8 +72,8 @@ This nowhere-differentiability is not a mathematical pathology --- it is the fun
   <text x="645" y="82" font-size="10" fill="#F44336">+√t</text>
   <text x="645" y="278" font-size="10" fill="#F44336">-√t</text>
   <!-- Labels -->
-  <text x="350" y="310" text-anchor="middle" font-size="11" fill="#666">Continuous but nowhere differentiable. Std. dev. grows as √t.</text>
-  <text x="350" y="330" text-anchor="middle" font-size="11" fill="#666">Increments W(t)-W(s) ~ N(0, t-s) are independent for non-overlapping intervals.</text>
+  <text x="350" y="310" text-anchor="middle" font-size="11" fill="#999">Continuous but nowhere differentiable. Std. dev. grows as √t.</text>
+  <text x="350" y="330" text-anchor="middle" font-size="11" fill="#999">Increments W(t)-W(s) ~ N(0, t-s) are independent for non-overlapping intervals.</text>
 </svg>
 
 ---

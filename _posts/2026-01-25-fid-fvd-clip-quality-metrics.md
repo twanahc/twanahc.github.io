@@ -113,56 +113,55 @@ This gives us the standard FID formula:
 $$\text{FID} = \|\mu_r - \mu_g\|^2 + \text{Tr}\left(\Sigma_r + \Sigma_g - 2(\Sigma_r \Sigma_g)^{1/2}\right)$$
 
 <svg viewBox="0 0 740 480" xmlns="http://www.w3.org/2000/svg" style="max-width:740px; margin: 2em auto; display: block;">
-  <rect width="740" height="480" fill="white"/>
 
-  <text x="370" y="30" font-family="Georgia, serif" font-size="16" fill="#333" text-anchor="middle" font-weight="bold">FID Computation Pipeline</text>
+  <text x="370" y="30" font-family="Georgia, serif" font-size="16" fill="#d4d4d4" text-anchor="middle" font-weight="bold">FID Computation Pipeline</text>
 
   <!-- Real images box -->
   <rect x="30" y="60" width="140" height="60" rx="8" fill="#e3f2fd" stroke="#4fc3f7" stroke-width="2"/>
-  <text x="100" y="85" font-family="Georgia, serif" font-size="13" fill="#333" text-anchor="middle">Real Images</text>
-  <text x="100" y="105" font-family="monospace" font-size="11" fill="#666" text-anchor="middle">N = 50,000</text>
+  <text x="100" y="85" font-family="Georgia, serif" font-size="13" fill="#d4d4d4" text-anchor="middle">Real Images</text>
+  <text x="100" y="105" font-family="monospace" font-size="11" fill="#999" text-anchor="middle">N = 50,000</text>
 
   <!-- Generated images box -->
   <rect x="30" y="360" width="140" height="60" rx="8" fill="#fce4ec" stroke="#ef5350" stroke-width="2"/>
-  <text x="100" y="385" font-family="Georgia, serif" font-size="13" fill="#333" text-anchor="middle">Generated Images</text>
-  <text x="100" y="405" font-family="monospace" font-size="11" fill="#666" text-anchor="middle">N = 50,000</text>
+  <text x="100" y="385" font-family="Georgia, serif" font-size="13" fill="#d4d4d4" text-anchor="middle">Generated Images</text>
+  <text x="100" y="405" font-family="monospace" font-size="11" fill="#999" text-anchor="middle">N = 50,000</text>
 
   <!-- InceptionV3 boxes -->
   <rect x="220" y="60" width="140" height="60" rx="8" fill="#f3e5f5" stroke="#ab47bc" stroke-width="2"/>
-  <text x="290" y="85" font-family="Georgia, serif" font-size="13" fill="#333" text-anchor="middle">InceptionV3</text>
-  <text x="290" y="105" font-family="monospace" font-size="11" fill="#666" text-anchor="middle">pool-2048</text>
+  <text x="290" y="85" font-family="Georgia, serif" font-size="13" fill="#d4d4d4" text-anchor="middle">InceptionV3</text>
+  <text x="290" y="105" font-family="monospace" font-size="11" fill="#999" text-anchor="middle">pool-2048</text>
 
   <rect x="220" y="360" width="140" height="60" rx="8" fill="#f3e5f5" stroke="#ab47bc" stroke-width="2"/>
-  <text x="290" y="385" font-family="Georgia, serif" font-size="13" fill="#333" text-anchor="middle">InceptionV3</text>
-  <text x="290" y="405" font-family="monospace" font-size="11" fill="#666" text-anchor="middle">pool-2048</text>
+  <text x="290" y="385" font-family="Georgia, serif" font-size="13" fill="#d4d4d4" text-anchor="middle">InceptionV3</text>
+  <text x="290" y="405" font-family="monospace" font-size="11" fill="#999" text-anchor="middle">pool-2048</text>
 
   <!-- Feature vectors -->
   <rect x="410" y="60" width="130" height="60" rx="8" fill="#e8f5e9" stroke="#8bc34a" stroke-width="2"/>
-  <text x="475" y="80" font-family="Georgia, serif" font-size="12" fill="#333" text-anchor="middle">Features</text>
-  <text x="475" y="97" font-family="monospace" font-size="10" fill="#666" text-anchor="middle">f_r ∈ R^2048</text>
-  <text x="475" y="112" font-family="monospace" font-size="10" fill="#666" text-anchor="middle">N x 2048 matrix</text>
+  <text x="475" y="80" font-family="Georgia, serif" font-size="12" fill="#d4d4d4" text-anchor="middle">Features</text>
+  <text x="475" y="97" font-family="monospace" font-size="10" fill="#999" text-anchor="middle">f_r ∈ ℝ²⁰⁴⁸</text>
+  <text x="475" y="112" font-family="monospace" font-size="10" fill="#999" text-anchor="middle">N x 2048 matrix</text>
 
   <rect x="410" y="360" width="130" height="60" rx="8" fill="#e8f5e9" stroke="#8bc34a" stroke-width="2"/>
-  <text x="475" y="380" font-family="Georgia, serif" font-size="12" fill="#333" text-anchor="middle">Features</text>
-  <text x="475" y="397" font-family="monospace" font-size="10" fill="#666" text-anchor="middle">f_g ∈ R^2048</text>
-  <text x="475" y="412" font-family="monospace" font-size="10" fill="#666" text-anchor="middle">N x 2048 matrix</text>
+  <text x="475" y="380" font-family="Georgia, serif" font-size="12" fill="#d4d4d4" text-anchor="middle">Features</text>
+  <text x="475" y="397" font-family="monospace" font-size="10" fill="#999" text-anchor="middle">f_g ∈ ℝ²⁰⁴⁸</text>
+  <text x="475" y="412" font-family="monospace" font-size="10" fill="#999" text-anchor="middle">N x 2048 matrix</text>
 
   <!-- Statistics -->
   <rect x="570" y="60" width="140" height="60" rx="8" fill="#fff3e0" stroke="#ffa726" stroke-width="2"/>
-  <text x="640" y="80" font-family="Georgia, serif" font-size="12" fill="#333" text-anchor="middle">Fit Gaussian</text>
-  <text x="640" y="97" font-family="monospace" font-size="10" fill="#666" text-anchor="middle">μ_r, Σ_r</text>
-  <text x="640" y="112" font-family="monospace" font-size="10" fill="#666" text-anchor="middle">2048 + 2048²</text>
+  <text x="640" y="80" font-family="Georgia, serif" font-size="12" fill="#d4d4d4" text-anchor="middle">Fit Gaussian</text>
+  <text x="640" y="97" font-family="monospace" font-size="10" fill="#999" text-anchor="middle">μ_r, Σ_r</text>
+  <text x="640" y="112" font-family="monospace" font-size="10" fill="#999" text-anchor="middle">2048 + 2048²</text>
 
   <rect x="570" y="360" width="140" height="60" rx="8" fill="#fff3e0" stroke="#ffa726" stroke-width="2"/>
-  <text x="640" y="380" font-family="Georgia, serif" font-size="12" fill="#333" text-anchor="middle">Fit Gaussian</text>
-  <text x="640" y="397" font-family="monospace" font-size="10" fill="#666" text-anchor="middle">μ_g, Σ_g</text>
-  <text x="640" y="412" font-family="monospace" font-size="10" fill="#666" text-anchor="middle">2048 + 2048²</text>
+  <text x="640" y="380" font-family="Georgia, serif" font-size="12" fill="#d4d4d4" text-anchor="middle">Fit Gaussian</text>
+  <text x="640" y="397" font-family="monospace" font-size="10" fill="#999" text-anchor="middle">μ_g, Σ_g</text>
+  <text x="640" y="412" font-family="monospace" font-size="10" fill="#999" text-anchor="middle">2048 + 2048²</text>
 
   <!-- Frechet Distance box -->
   <rect x="490" y="195" width="220" height="90" rx="10" fill="#e8eaf6" stroke="#5c6bc0" stroke-width="2.5"/>
-  <text x="600" y="222" font-family="Georgia, serif" font-size="14" fill="#333" text-anchor="middle" font-weight="bold">Frechet Distance</text>
-  <text x="600" y="245" font-family="monospace" font-size="10" fill="#444" text-anchor="middle">||μ_r - μ_g||² +</text>
-  <text x="600" y="262" font-family="monospace" font-size="10" fill="#444" text-anchor="middle">Tr(Σ_r + Σ_g - 2(Σ_rΣ_g)^½)</text>
+  <text x="600" y="222" font-family="Georgia, serif" font-size="14" fill="#d4d4d4" text-anchor="middle" font-weight="bold">Frechet Distance</text>
+  <text x="600" y="245" font-family="monospace" font-size="10" fill="#ccc" text-anchor="middle">||μ_r - μ_g||² +</text>
+  <text x="600" y="262" font-family="monospace" font-size="10" fill="#ccc" text-anchor="middle">Tr(Σ_r + Σ_g - 2(Σ_rΣ_g)^½)</text>
   <text x="600" y="278" font-family="Georgia, serif" font-size="12" fill="#5c6bc0" text-anchor="middle" font-weight="bold">= FID score</text>
 
   <!-- Arrows -->
@@ -413,37 +412,36 @@ FVD inherits all of FID's limitations plus additional ones:
 How well does FVD predict what humans actually prefer? Studies have found moderate-to-good correlation, but with important caveats:
 
 <svg viewBox="0 0 700 450" xmlns="http://www.w3.org/2000/svg" style="max-width:700px; margin: 2em auto; display: block;">
-  <rect width="700" height="450" fill="white"/>
 
-  <text x="350" y="28" font-family="Georgia, serif" font-size="16" fill="#333" text-anchor="middle" font-weight="bold">FVD vs. Human Preference (Illustrative)</text>
+  <text x="350" y="28" font-family="Georgia, serif" font-size="16" fill="#d4d4d4" text-anchor="middle" font-weight="bold">FVD vs. Human Preference (Illustrative)</text>
 
   <!-- Axes -->
-  <line x1="80" y1="380" x2="660" y2="380" stroke="#333" stroke-width="1.5"/>
-  <line x1="80" y1="380" x2="80" y2="50" stroke="#333" stroke-width="1.5"/>
+  <line x1="80" y1="380" x2="660" y2="380" stroke="#d4d4d4" stroke-width="1.5"/>
+  <line x1="80" y1="380" x2="80" y2="50" stroke="#d4d4d4" stroke-width="1.5"/>
 
   <!-- Gridlines -->
-  <line x1="80" y1="314" x2="660" y2="314" stroke="#eee" stroke-width="0.8"/>
-  <line x1="80" y1="248" x2="660" y2="248" stroke="#eee" stroke-width="0.8"/>
-  <line x1="80" y1="182" x2="660" y2="182" stroke="#eee" stroke-width="0.8"/>
-  <line x1="80" y1="116" x2="660" y2="116" stroke="#eee" stroke-width="0.8"/>
+  <line x1="80" y1="314" x2="660" y2="314" stroke="#333" stroke-width="0.8"/>
+  <line x1="80" y1="248" x2="660" y2="248" stroke="#333" stroke-width="0.8"/>
+  <line x1="80" y1="182" x2="660" y2="182" stroke="#333" stroke-width="0.8"/>
+  <line x1="80" y1="116" x2="660" y2="116" stroke="#333" stroke-width="0.8"/>
 
   <!-- Y-axis labels -->
-  <text x="70" y="385" font-family="monospace" font-size="11" fill="#666" text-anchor="end">40%</text>
-  <text x="70" y="319" font-family="monospace" font-size="11" fill="#666" text-anchor="end">50%</text>
-  <text x="70" y="253" font-family="monospace" font-size="11" fill="#666" text-anchor="end">60%</text>
-  <text x="70" y="187" font-family="monospace" font-size="11" fill="#666" text-anchor="end">70%</text>
-  <text x="70" y="121" font-family="monospace" font-size="11" fill="#666" text-anchor="end">80%</text>
+  <text x="70" y="385" font-family="monospace" font-size="11" fill="#999" text-anchor="end">40%</text>
+  <text x="70" y="319" font-family="monospace" font-size="11" fill="#999" text-anchor="end">50%</text>
+  <text x="70" y="253" font-family="monospace" font-size="11" fill="#999" text-anchor="end">60%</text>
+  <text x="70" y="187" font-family="monospace" font-size="11" fill="#999" text-anchor="end">70%</text>
+  <text x="70" y="121" font-family="monospace" font-size="11" fill="#999" text-anchor="end">80%</text>
 
   <!-- X-axis labels -->
-  <text x="80" y="400" font-family="monospace" font-size="11" fill="#666" text-anchor="middle">0</text>
-  <text x="225" y="400" font-family="monospace" font-size="11" fill="#666" text-anchor="middle">200</text>
-  <text x="370" y="400" font-family="monospace" font-size="11" fill="#666" text-anchor="middle">400</text>
-  <text x="515" y="400" font-family="monospace" font-size="11" fill="#666" text-anchor="middle">600</text>
-  <text x="660" y="400" font-family="monospace" font-size="11" fill="#666" text-anchor="middle">800</text>
+  <text x="80" y="400" font-family="monospace" font-size="11" fill="#999" text-anchor="middle">0</text>
+  <text x="225" y="400" font-family="monospace" font-size="11" fill="#999" text-anchor="middle">200</text>
+  <text x="370" y="400" font-family="monospace" font-size="11" fill="#999" text-anchor="middle">400</text>
+  <text x="515" y="400" font-family="monospace" font-size="11" fill="#999" text-anchor="middle">600</text>
+  <text x="660" y="400" font-family="monospace" font-size="11" fill="#999" text-anchor="middle">800</text>
 
   <!-- Axis titles -->
-  <text x="370" y="430" font-family="Georgia, serif" font-size="13" fill="#333" text-anchor="middle">FVD (lower is better)</text>
-  <text x="25" y="215" font-family="Georgia, serif" font-size="13" fill="#333" text-anchor="middle" transform="rotate(-90 25 215)">Human Win Rate (%)</text>
+  <text x="370" y="430" font-family="Georgia, serif" font-size="13" fill="#d4d4d4" text-anchor="middle">FVD (lower is better)</text>
+  <text x="25" y="215" font-family="Georgia, serif" font-size="13" fill="#d4d4d4" text-anchor="middle" transform="rotate(-90 25 215)">Human Win Rate (%)</text>
 
   <!-- Trend line (negative correlation) -->
   <line x1="105" y1="100" x2="640" y2="370" stroke="#4fc3f7" stroke-width="2" stroke-dasharray="8,4" opacity="0.5"/>
@@ -483,8 +481,8 @@ How well does FVD predict what humans actually prefer? Studies have found modera
   <text x="495" y="204" font-family="Georgia, serif" font-size="10" fill="#999">(artistic style)</text>
 
   <!-- Correlation annotation -->
-  <rect x="420" y="55" width="230" height="45" rx="4" fill="white" stroke="#ddd" stroke-width="1"/>
-  <text x="535" y="73" font-family="Georgia, serif" font-size="12" fill="#333" text-anchor="middle">Spearman ρ ≈ -0.75</text>
+  <rect x="420" y="55" width="230" height="45" rx="4" fill="#1e1e1e" stroke="#444" stroke-width="1"/>
+  <text x="535" y="73" font-family="Georgia, serif" font-size="12" fill="#d4d4d4" text-anchor="middle">Spearman ρ ≈ -0.75</text>
   <text x="535" y="90" font-family="Georgia, serif" font-size="11" fill="#999" text-anchor="middle">Moderate-strong correlation</text>
 </svg>
 
@@ -649,11 +647,11 @@ Reported metrics vary wildly across papers due to different evaluation protocols
   <!-- Ring at 100% -->
   <polygon points="350,110 512,218 462,397 238,397 188,218" fill="none" stroke="#e0e0e0" stroke-width="0.8"/>
   <!-- Ring at 75% -->
-  <polygon points="350,153 471,230 434,364 266,364 229,230" fill="none" stroke="#eee" stroke-width="0.8"/>
+  <polygon points="350,153 471,230 434,364 266,364 229,230" fill="none" stroke="#333" stroke-width="0.8"/>
   <!-- Ring at 50% -->
-  <polygon points="350,195 431,243 405,330 295,330 269,243" fill="none" stroke="#eee" stroke-width="0.8"/>
+  <polygon points="350,195 431,243 405,330 295,330 269,243" fill="none" stroke="#333" stroke-width="0.8"/>
   <!-- Ring at 25% -->
-  <polygon points="350,238 391,256 378,297 322,297 310,256" fill="none" stroke="#eee" stroke-width="0.8"/>
+  <polygon points="350,238 391,256 378,297 322,297 310,256" fill="none" stroke="#333" stroke-width="0.8"/>
 
   <!-- Axes lines -->
   <line x1="350" y1="280" x2="350" y2="110" stroke="#ccc" stroke-width="1"/>
@@ -663,7 +661,7 @@ Reported metrics vary wildly across papers due to different evaluation protocols
   <line x1="350" y1="280" x2="188" y2="218" stroke="#ccc" stroke-width="1"/>
 
   <!-- Axis labels -->
-  <text x="350" y="98" font-family="Georgia, serif" font-size="12" fill="#333" text-anchor="middle">FVD (inv.)</text>
+  <text x="350" y="98" font-family="Georgia, serif" font-size="12" fill="#d4d4d4" text-anchor="middle">FVD (inv.)</text>
   <text x="525" y="215" font-family="Georgia, serif" font-size="12" fill="#333" text-anchor="start">CLIP Score</text>
   <text x="475" y="412" font-family="Georgia, serif" font-size="12" fill="#333" text-anchor="start">Resolution</text>
   <text x="180" y="412" font-family="Georgia, serif" font-size="12" fill="#333" text-anchor="end">Motion</text>
@@ -704,7 +702,7 @@ Reported metrics vary wildly across papers due to different evaluation protocols
   <circle cx="253" cy="243" r="4" fill="#8bc34a"/>
 
   <!-- Legend -->
-  <rect x="490" y="430" width="195" height="60" rx="5" fill="white" stroke="#ddd" stroke-width="1"/>
+  <rect x="490" y="430" width="195" height="60" rx="5" fill="#1e1e1e" stroke="#444" stroke-width="1"/>
   <line x1="503" y1="448" x2="533" y2="448" stroke="#4fc3f7" stroke-width="2.5"/>
   <text x="540" y="452" font-family="Georgia, serif" font-size="12" fill="#333">Veo 3.1</text>
   <line x1="503" y1="468" x2="533" y2="468" stroke="#ef5350" stroke-width="2"/>

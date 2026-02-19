@@ -66,18 +66,18 @@ $$y_{n+1} = y_n + h \, f(t_n, y_n)$$
 
 Geometrically, at each step we compute the slope $f(t_n, y_n)$ at the current point, draw a straight line with that slope for a distance $h$, and call the endpoint our new approximation. We are following the tangent line instead of the actual curve.
 
-<svg viewBox="0 0 700 350" xmlns="http://www.w3.org/2000/svg" style="background: white; max-width: 700px; display: block; margin: 2em auto;">
+<svg viewBox="0 0 700 350" xmlns="http://www.w3.org/2000/svg" style="max-width: 700px; display: block; margin: 2em auto;">
   <defs>
     <marker id="arrowE" markerWidth="10" markerHeight="7" refX="10" refY="3.5" orient="auto">
-      <polygon points="0 0, 10 3.5, 0 7" fill="#333"/>
+      <polygon points="0 0, 10 3.5, 0 7" fill="#d4d4d4"/>
     </marker>
   </defs>
-  <text x="350" y="25" text-anchor="middle" font-size="14" font-weight="bold" fill="#333">Euler's Method: Following Tangent Lines</text>
+  <text x="350" y="25" text-anchor="middle" font-size="14" font-weight="bold" fill="#d4d4d4">Euler's Method: Following Tangent Lines</text>
   <!-- Axes -->
-  <line x1="60" y1="300" x2="660" y2="300" stroke="#333" stroke-width="1.5" marker-end="url(#arrowE)"/>
-  <line x1="60" y1="300" x2="60" y2="40" stroke="#333" stroke-width="1.5" marker-end="url(#arrowE)"/>
-  <text x="660" y="320" text-anchor="end" font-size="12" fill="#333">t</text>
-  <text x="45" y="45" text-anchor="middle" font-size="12" fill="#333">y</text>
+  <line x1="60" y1="300" x2="660" y2="300" stroke="#d4d4d4" stroke-width="1.5" marker-end="url(#arrowE)"/>
+  <line x1="60" y1="300" x2="60" y2="40" stroke="#d4d4d4" stroke-width="1.5" marker-end="url(#arrowE)"/>
+  <text x="660" y="320" text-anchor="end" font-size="12" fill="#d4d4d4">t</text>
+  <text x="45" y="45" text-anchor="middle" font-size="12" fill="#d4d4d4">y</text>
   <!-- True curve -->
   <path d="M 80,260 Q 200,180 320,120 Q 440,80 600,70" fill="none" stroke="#2196F3" stroke-width="2.5"/>
   <text x="610" y="65" font-size="11" fill="#2196F3">True solution y(t)</text>
@@ -99,10 +99,10 @@ Geometrically, at each step we compute the slope $f(t_n, y_n)$ at the current po
   <line x1="600" y1="70" x2="600" y2="115" stroke="#9C27B0" stroke-width="1.5"/>
   <text x="625" y="95" font-size="10" fill="#9C27B0">Error</text>
   <!-- h label -->
-  <line x1="80" y1="310" x2="220" y2="310" stroke="#333" stroke-width="1"/>
-  <line x1="80" y1="305" x2="80" y2="315" stroke="#333" stroke-width="1"/>
-  <line x1="220" y1="305" x2="220" y2="315" stroke="#333" stroke-width="1"/>
-  <text x="150" y="328" text-anchor="middle" font-size="11" fill="#333">h (step size)</text>
+  <line x1="80" y1="310" x2="220" y2="310" stroke="#d4d4d4" stroke-width="1"/>
+  <line x1="80" y1="305" x2="80" y2="315" stroke="#d4d4d4" stroke-width="1"/>
+  <line x1="220" y1="305" x2="220" y2="315" stroke="#d4d4d4" stroke-width="1"/>
+  <text x="150" y="328" text-anchor="middle" font-size="11" fill="#d4d4d4">h (step size)</text>
 </svg>
 
 The method is embarrassingly simple, and that is both its strength (easy to understand and implement) and its weakness (the error accumulates quickly).

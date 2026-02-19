@@ -71,28 +71,28 @@ The implications are profound:
 
 3. **Compression is not lossy in the way you might expect.** Reducing from 786,432 to 512 dimensions does not lose 99.9% of the information, because 99.9% of the ambient dimensions were noise anyway.
 
-<svg viewBox="0 0 700 400" xmlns="http://www.w3.org/2000/svg" style="background: white; max-width: 700px; display: block; margin: 2em auto;">
+<svg viewBox="0 0 700 400" xmlns="http://www.w3.org/2000/svg" style="max-width: 700px; display: block; margin: 2em auto;">
   <defs>
     <marker id="arrow1" markerWidth="10" markerHeight="7" refX="10" refY="3.5" orient="auto">
-      <polygon points="0 0, 10 3.5, 0 7" fill="#333"/>
+      <polygon points="0 0, 10 3.5, 0 7" fill="#d4d4d4"/>
     </marker>
   </defs>
   <!-- Title -->
-  <text x="350" y="25" text-anchor="middle" font-family="Arial, sans-serif" font-size="16" font-weight="bold" fill="#333">The Manifold Hypothesis: Data Lives on a Low-D Surface</text>
+  <text x="350" y="25" text-anchor="middle" font-family="Arial, sans-serif" font-size="16" font-weight="bold" fill="#d4d4d4">The Manifold Hypothesis: Data Lives on a Low-D Surface</text>
   <!-- Ambient space box -->
-  <rect x="30" y="40" width="300" height="320" rx="8" fill="#f5f5f5" stroke="#ccc" stroke-width="1"/>
-  <text x="180" y="65" text-anchor="middle" font-family="Arial, sans-serif" font-size="13" fill="#666">Ambient Space R^D</text>
+  <rect x="30" y="40" width="300" height="320" rx="8" fill="#1e1e1e" stroke="#444" stroke-width="1"/>
+  <text x="180" y="65" text-anchor="middle" font-family="Arial, sans-serif" font-size="13" fill="#999">Ambient Space ℝᴰ</text>
   <!-- Random noise dots -->
-  <circle cx="50" cy="100" r="3" fill="#ddd"/>
-  <circle cx="90" cy="320" r="3" fill="#ddd"/>
-  <circle cx="270" cy="140" r="3" fill="#ddd"/>
-  <circle cx="300" cy="300" r="3" fill="#ddd"/>
-  <circle cx="150" cy="90" r="3" fill="#ddd"/>
-  <circle cx="200" cy="340" r="3" fill="#ddd"/>
-  <circle cx="60" cy="250" r="3" fill="#ddd"/>
-  <circle cx="310" cy="200" r="3" fill="#ddd"/>
-  <text x="310" y="95" font-family="Arial, sans-serif" font-size="10" fill="#aaa">noise</text>
-  <text x="50" cy="280" font-family="Arial, sans-serif" font-size="10" fill="#aaa">noise</text>
+  <circle cx="50" cy="100" r="3" fill="#444"/>
+  <circle cx="90" cy="320" r="3" fill="#444"/>
+  <circle cx="270" cy="140" r="3" fill="#444"/>
+  <circle cx="300" cy="300" r="3" fill="#444"/>
+  <circle cx="150" cy="90" r="3" fill="#444"/>
+  <circle cx="200" cy="340" r="3" fill="#444"/>
+  <circle cx="60" cy="250" r="3" fill="#444"/>
+  <circle cx="310" cy="200" r="3" fill="#444"/>
+  <text x="310" y="95" font-family="Arial, sans-serif" font-size="10" fill="#666">noise</text>
+  <text x="50" cy="280" font-family="Arial, sans-serif" font-size="10" fill="#666">noise</text>
   <!-- Manifold curve -->
   <path d="M 60,180 C 100,120 140,250 180,200 S 250,150 300,220" fill="none" stroke="#4fc3f7" stroke-width="3"/>
   <text x="160" y="275" text-anchor="middle" font-family="Arial, sans-serif" font-size="12" fill="#4fc3f7" font-weight="bold">Data Manifold M</text>
@@ -104,11 +104,11 @@ The implications are profound:
   <circle cx="240" cy="178" r="5" fill="#4fc3f7"/>
   <circle cx="280" cy="210" r="5" fill="#4fc3f7"/>
   <!-- Arrow to latent space -->
-  <line x1="340" y1="200" x2="400" y2="200" stroke="#333" stroke-width="2" marker-end="url(#arrow1)"/>
-  <text x="370" y="190" text-anchor="middle" font-family="Arial, sans-serif" font-size="11" fill="#333">E(x)</text>
+  <line x1="340" y1="200" x2="400" y2="200" stroke="#d4d4d4" stroke-width="2" marker-end="url(#arrow1)"/>
+  <text x="370" y="190" text-anchor="middle" font-family="Arial, sans-serif" font-size="11" fill="#d4d4d4">E(x)</text>
   <!-- Latent space -->
-  <rect x="410" y="80" width="260" height="240" rx="8" fill="#f0f8ff" stroke="#4fc3f7" stroke-width="2"/>
-  <text x="540" y="105" text-anchor="middle" font-family="Arial, sans-serif" font-size="13" fill="#4fc3f7" font-weight="bold">Latent Space R^d</text>
+  <rect x="410" y="80" width="260" height="240" rx="8" fill="#162030" stroke="#4fc3f7" stroke-width="2"/>
+  <text x="540" y="105" text-anchor="middle" font-family="Arial, sans-serif" font-size="13" fill="#4fc3f7" font-weight="bold">Latent Space ℝᵈ</text>
   <!-- Latent points spread nicely -->
   <circle cx="450" cy="160" r="6" fill="#4fc3f7"/>
   <circle cx="480" cy="180" r="6" fill="#4fc3f7"/>
@@ -117,8 +117,8 @@ The implications are profound:
   <circle cx="575" cy="230" r="6" fill="#4fc3f7"/>
   <circle cx="610" cy="250" r="6" fill="#4fc3f7"/>
   <!-- Labels -->
-  <text x="540" y="290" text-anchor="middle" font-family="Arial, sans-serif" font-size="11" fill="#666">d = 4 to 512 dimensions</text>
-  <text x="540" y="305" text-anchor="middle" font-family="Arial, sans-serif" font-size="11" fill="#666">Dense, structured, navigable</text>
+  <text x="540" y="290" text-anchor="middle" font-family="Arial, sans-serif" font-size="11" fill="#999">d = 4 to 512 dimensions</text>
+  <text x="540" y="305" text-anchor="middle" font-family="Arial, sans-serif" font-size="11" fill="#999">Dense, structured, navigable</text>
   <!-- Dimension labels -->
   <text x="180" y="355" text-anchor="middle" font-family="Arial, sans-serif" font-size="11" fill="#999">D = 786,432 dimensions</text>
   <text x="180" y="370" text-anchor="middle" font-family="Arial, sans-serif" font-size="11" fill="#999">~99.99% empty</text>
@@ -345,12 +345,12 @@ For non-unit vectors, we can either normalize first and then scale, or apply SLE
 
 **No norm collapse.** Unlike LERP, the midpoint has the same norm as the endpoints. This avoids the "dip toward the origin" problem.
 
-<svg viewBox="0 0 700 420" xmlns="http://www.w3.org/2000/svg" style="background: white; max-width: 700px; display: block; margin: 2em auto;">
-  <text x="350" y="25" text-anchor="middle" font-family="Arial, sans-serif" font-size="16" font-weight="bold" fill="#333">LERP vs SLERP: Interpolation on a Circle</text>
+<svg viewBox="0 0 700 420" xmlns="http://www.w3.org/2000/svg" style="max-width: 700px; display: block; margin: 2em auto;">
+  <text x="350" y="25" text-anchor="middle" font-family="Arial, sans-serif" font-size="16" font-weight="bold" fill="#d4d4d4">LERP vs SLERP: Interpolation on a Circle</text>
   <!-- Left diagram - LERP -->
   <text x="175" y="55" text-anchor="middle" font-family="Arial, sans-serif" font-size="14" font-weight="bold" fill="#ef5350">Linear Interpolation (LERP)</text>
   <!-- Circle -->
-  <circle cx="175" cy="235" r="130" fill="none" stroke="#e0e0e0" stroke-width="1.5" stroke-dasharray="4,3"/>
+  <circle cx="175" cy="235" r="130" fill="none" stroke="#444" stroke-width="1.5" stroke-dasharray="4,3"/>
   <!-- Origin -->
   <circle cx="175" cy="235" r="3" fill="#999"/>
   <text x="185" y="250" font-family="Arial, sans-serif" font-size="10" fill="#999">origin</text>
@@ -374,7 +374,7 @@ For non-unit vectors, we can either normalize first and then scale, or apply SLE
   <!-- Right diagram - SLERP -->
   <text x="525" y="55" text-anchor="middle" font-family="Arial, sans-serif" font-size="14" font-weight="bold" fill="#4fc3f7">Spherical Interpolation (SLERP)</text>
   <!-- Circle -->
-  <circle cx="525" cy="235" r="130" fill="none" stroke="#e0e0e0" stroke-width="1.5" stroke-dasharray="4,3"/>
+  <circle cx="525" cy="235" r="130" fill="none" stroke="#444" stroke-width="1.5" stroke-dasharray="4,3"/>
   <!-- Origin -->
   <circle cx="525" cy="235" r="3" fill="#999"/>
   <text x="535" y="250" font-family="Arial, sans-serif" font-size="10" fill="#999">origin</text>
@@ -396,7 +396,7 @@ For non-unit vectors, we can either normalize first and then scale, or apply SLE
   <text x="525" y="330" text-anchor="middle" font-family="Arial, sans-serif" font-size="11" fill="#4fc3f7">Constant norm throughout</text>
   <text x="525" y="345" text-anchor="middle" font-family="Arial, sans-serif" font-size="11" fill="#4fc3f7">Stays on the data manifold</text>
   <!-- Divider -->
-  <line x1="350" y1="45" x2="350" y2="380" stroke="#e0e0e0" stroke-width="1" stroke-dasharray="6,4"/>
+  <line x1="350" y1="45" x2="350" y2="380" stroke="#444" stroke-width="1" stroke-dasharray="6,4"/>
 </svg>
 
 ---
@@ -556,29 +556,29 @@ Examples for video:
 | "warm color" | Warm-graded footage | Neutral footage | Color grading in latent space |
 | "dynamic camera" | Moving camera shots | Static camera shots | Add camera motion feel |
 
-<svg viewBox="0 0 700 500" xmlns="http://www.w3.org/2000/svg" style="background: white; max-width: 700px; display: block; margin: 2em auto;">
-  <text x="350" y="25" text-anchor="middle" font-family="Arial, sans-serif" font-size="16" font-weight="bold" fill="#333">Style Arithmetic in Latent Space</text>
+<svg viewBox="0 0 700 500" xmlns="http://www.w3.org/2000/svg" style="max-width: 700px; display: block; margin: 2em auto;">
+  <text x="350" y="25" text-anchor="middle" font-family="Arial, sans-serif" font-size="16" font-weight="bold" fill="#d4d4d4">Style Arithmetic in Latent Space</text>
   <!-- Axes -->
   <defs>
     <marker id="arrowStyle" markerWidth="8" markerHeight="6" refX="8" refY="3" orient="auto">
       <polygon points="0 0, 8 3, 0 6" fill="#999"/>
     </marker>
   </defs>
-  <line x1="60" y1="440" x2="660" y2="440" stroke="#ccc" stroke-width="1" marker-end="url(#arrowStyle)"/>
-  <line x1="60" y1="440" x2="60" y2="50" stroke="#ccc" stroke-width="1" marker-end="url(#arrowStyle)"/>
+  <line x1="60" y1="440" x2="660" y2="440" stroke="#444" stroke-width="1" marker-end="url(#arrowStyle)"/>
+  <line x1="60" y1="440" x2="60" y2="50" stroke="#444" stroke-width="1" marker-end="url(#arrowStyle)"/>
   <text x="660" y="460" text-anchor="end" font-family="Arial, sans-serif" font-size="12" fill="#999">Content axis</text>
   <text x="30" y="55" text-anchor="middle" font-family="Arial, sans-serif" font-size="12" fill="#999" transform="rotate(-90, 30, 200)">Style axis</text>
   <!-- Grid -->
-  <line x1="60" y1="340" x2="650" y2="340" stroke="#f0f0f0" stroke-width="1"/>
-  <line x1="60" y1="240" x2="650" y2="240" stroke="#f0f0f0" stroke-width="1"/>
-  <line x1="60" y1="140" x2="650" y2="140" stroke="#f0f0f0" stroke-width="1"/>
-  <line x1="210" y1="50" x2="210" y2="440" stroke="#f0f0f0" stroke-width="1"/>
-  <line x1="360" y1="50" x2="360" y2="440" stroke="#f0f0f0" stroke-width="1"/>
-  <line x1="510" y1="50" x2="510" y2="440" stroke="#f0f0f0" stroke-width="1"/>
+  <line x1="60" y1="340" x2="650" y2="340" stroke="#222" stroke-width="1"/>
+  <line x1="60" y1="240" x2="650" y2="240" stroke="#222" stroke-width="1"/>
+  <line x1="60" y1="140" x2="650" y2="140" stroke="#222" stroke-width="1"/>
+  <line x1="210" y1="50" x2="210" y2="440" stroke="#222" stroke-width="1"/>
+  <line x1="360" y1="50" x2="360" y2="440" stroke="#222" stroke-width="1"/>
+  <line x1="510" y1="50" x2="510" y2="440" stroke="#222" stroke-width="1"/>
   <!-- Neutral style, Subject A: z_neutral -->
-  <circle cx="200" cy="360" r="12" fill="#e0e0e0" stroke="#999" stroke-width="2"/>
-  <text x="200" y="365" text-anchor="middle" font-family="Arial, sans-serif" font-size="10" fill="#666">A</text>
-  <text x="200" y="395" text-anchor="middle" font-family="Arial, sans-serif" font-size="11" fill="#666">z_neutral</text>
+  <circle cx="200" cy="360" r="12" fill="#2a2a2a" stroke="#999" stroke-width="2"/>
+  <text x="200" y="365" text-anchor="middle" font-family="Arial, sans-serif" font-size="10" fill="#999">A</text>
+  <text x="200" y="395" text-anchor="middle" font-family="Arial, sans-serif" font-size="11" fill="#999">z_neutral</text>
   <text x="200" y="410" text-anchor="middle" font-family="Arial, sans-serif" font-size="10" fill="#999">(subject A, neutral style)</text>
   <!-- Style reference: z_style -->
   <circle cx="200" cy="140" r="12" fill="#ef5350" stroke="#c62828" stroke-width="2"/>
@@ -607,8 +607,8 @@ Examples for video:
   <line x1="215" y1="360" x2="485" y2="360" stroke="#999" stroke-width="1" stroke-dasharray="4,4"/>
   <line x1="215" y1="140" x2="485" y2="140" stroke="#999" stroke-width="1" stroke-dasharray="4,4"/>
   <!-- Formula -->
-  <rect x="130" y="445" width="440" height="40" rx="5" fill="#f8f8f8" stroke="#ddd" stroke-width="1"/>
-  <text x="350" y="470" text-anchor="middle" font-family="monospace" font-size="13" fill="#333">z_output = z_content + (z_style - z_neutral)</text>
+  <rect x="130" y="445" width="440" height="40" rx="5" fill="#1e1e1e" stroke="#444" stroke-width="1"/>
+  <text x="350" y="470" text-anchor="middle" font-family="monospace" font-size="13" fill="#d4d4d4">z_output = z_content + (z_style - z_neutral)</text>
 </svg>
 
 ### Composing Multiple Attributes

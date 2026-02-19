@@ -189,23 +189,21 @@ CFG takes this difference vector and scales it:
 $$\hat{\epsilon} = \epsilon_\theta(x_t, \emptyset) + s \cdot \Delta$$
 
 <svg viewBox="0 0 700 400" xmlns="http://www.w3.org/2000/svg" style="max-width:700px; margin: 2em auto; display: block;">
-  <rect width="700" height="400" fill="white"/>
-
   <!-- Grid -->
   <defs>
     <pattern id="grid1" width="40" height="40" patternUnits="userSpaceOnUse">
-      <path d="M 40 0 L 0 0 0 40" fill="none" stroke="#e8e8e8" stroke-width="0.5"/>
+      <path d="M 40 0 L 0 0 0 40" fill="none" stroke="#333" stroke-width="0.5"/>
     </pattern>
   </defs>
   <rect width="700" height="400" fill="url(#grid1)"/>
 
   <!-- Origin -->
-  <circle cx="200" cy="280" r="5" fill="#333"/>
-  <text x="188" y="305" font-family="Georgia, serif" font-size="14" fill="#333">x_t</text>
+  <circle cx="200" cy="280" r="5" fill="#d4d4d4"/>
+  <text x="188" y="305" font-family="Georgia, serif" font-size="14" fill="#d4d4d4">x_t</text>
 
   <!-- Unconditional vector -->
   <line x1="200" y1="280" x2="380" y2="200" stroke="#9e9e9e" stroke-width="2.5" marker-end="url(#arrowGray)"/>
-  <text x="260" y="260" font-family="Georgia, serif" font-size="13" fill="#757575">ε(x_t, ∅)</text>
+  <text x="260" y="260" font-family="Georgia, serif" font-size="13" fill="#999">ε(x_t, ∅)</text>
 
   <!-- Conditional vector -->
   <line x1="200" y1="280" x2="420" y2="160" stroke="#4fc3f7" stroke-width="2.5" marker-end="url(#arrowBlue)"/>
@@ -252,18 +250,18 @@ $$\hat{\epsilon} = \epsilon_\theta(x_t, \emptyset) + s \cdot \Delta$$
   </defs>
 
   <!-- Legend -->
-  <rect x="20" y="15" width="260" height="130" rx="6" fill="white" stroke="#ddd" stroke-width="1"/>
-  <text x="35" y="38" font-family="Georgia, serif" font-size="13" fill="#333" font-weight="bold">Vector Interpretation of CFG</text>
+  <rect x="20" y="15" width="260" height="130" rx="6" fill="#1e1e1e" stroke="#444" stroke-width="1"/>
+  <text x="35" y="38" font-family="Georgia, serif" font-size="13" fill="#d4d4d4" font-weight="bold">Vector Interpretation of CFG</text>
   <line x1="35" y1="55" x2="65" y2="55" stroke="#9e9e9e" stroke-width="2.5"/>
-  <text x="72" y="59" font-family="Georgia, serif" font-size="12" fill="#555">Unconditional ε(x_t, ∅)</text>
+  <text x="72" y="59" font-family="Georgia, serif" font-size="12" fill="#999">Unconditional ε(x_t, ∅)</text>
   <line x1="35" y1="75" x2="65" y2="75" stroke="#4fc3f7" stroke-width="2.5"/>
-  <text x="72" y="79" font-family="Georgia, serif" font-size="12" fill="#555">Conditional ε(x_t, c) [s=1]</text>
+  <text x="72" y="79" font-family="Georgia, serif" font-size="12" fill="#999">Conditional ε(x_t, c) [s=1]</text>
   <line x1="35" y1="95" x2="65" y2="95" stroke="#8bc34a" stroke-width="2" stroke-dasharray="6,3"/>
-  <text x="72" y="99" font-family="Georgia, serif" font-size="12" fill="#555">Conditioning delta Δ</text>
+  <text x="72" y="99" font-family="Georgia, serif" font-size="12" fill="#999">Conditioning delta Δ</text>
   <line x1="35" y1="115" x2="65" y2="115" stroke="#ef5350" stroke-width="2" stroke-dasharray="8,4"/>
-  <text x="72" y="119" font-family="Georgia, serif" font-size="12" fill="#555">Guided predictions (s > 1)</text>
+  <text x="72" y="119" font-family="Georgia, serif" font-size="12" fill="#999">Guided predictions (s > 1)</text>
   <line x1="35" y1="135" x2="65" y2="135" stroke="#ffa726" stroke-width="2" stroke-dasharray="8,4"/>
-  <text x="72" y="139" font-family="Georgia, serif" font-size="12" fill="#555">Higher s = more amplification</text>
+  <text x="72" y="139" font-family="Georgia, serif" font-size="12" fill="#999">Higher s = more amplification</text>
 </svg>
 
 At $s = 1$, you get the standard conditional prediction. As $s$ increases, you extrapolate further along the conditioning direction. The model generates outputs that are "more conditional than conditional" --- sharper, more specific, more saturated.
@@ -303,39 +301,38 @@ As guidance scale $s$ increases:
 4. **CLIP score increases** with $s$, reflecting better prompt adherence, until artifacts cause CLIP to degrade.
 
 <svg viewBox="0 0 700 420" xmlns="http://www.w3.org/2000/svg" style="max-width:700px; margin: 2em auto; display: block;">
-  <rect width="700" height="420" fill="white"/>
 
-  <text x="350" y="28" font-family="Georgia, serif" font-size="16" fill="#333" text-anchor="middle" font-weight="bold">FID vs. Guidance Scale</text>
+  <text x="350" y="28" font-family="Georgia, serif" font-size="16" fill="#d4d4d4" text-anchor="middle" font-weight="bold">FID vs. Guidance Scale</text>
 
   <!-- Axes -->
-  <line x1="80" y1="360" x2="660" y2="360" stroke="#333" stroke-width="1.5"/>
-  <line x1="80" y1="360" x2="80" y2="50" stroke="#333" stroke-width="1.5"/>
+  <line x1="80" y1="360" x2="660" y2="360" stroke="#d4d4d4" stroke-width="1.5"/>
+  <line x1="80" y1="360" x2="80" y2="50" stroke="#d4d4d4" stroke-width="1.5"/>
 
   <!-- Gridlines -->
-  <line x1="80" y1="295" x2="660" y2="295" stroke="#eee" stroke-width="0.8"/>
-  <line x1="80" y1="230" x2="660" y2="230" stroke="#eee" stroke-width="0.8"/>
-  <line x1="80" y1="165" x2="660" y2="165" stroke="#eee" stroke-width="0.8"/>
-  <line x1="80" y1="100" x2="660" y2="100" stroke="#eee" stroke-width="0.8"/>
+  <line x1="80" y1="295" x2="660" y2="295" stroke="#333" stroke-width="0.8"/>
+  <line x1="80" y1="230" x2="660" y2="230" stroke="#333" stroke-width="0.8"/>
+  <line x1="80" y1="165" x2="660" y2="165" stroke="#333" stroke-width="0.8"/>
+  <line x1="80" y1="100" x2="660" y2="100" stroke="#333" stroke-width="0.8"/>
 
   <!-- Y-axis labels -->
-  <text x="70" y="365" font-family="monospace" font-size="11" fill="#666" text-anchor="end">0</text>
-  <text x="70" y="300" font-family="monospace" font-size="11" fill="#666" text-anchor="end">5</text>
-  <text x="70" y="235" font-family="monospace" font-size="11" fill="#666" text-anchor="end">10</text>
-  <text x="70" y="170" font-family="monospace" font-size="11" fill="#666" text-anchor="end">15</text>
-  <text x="70" y="105" font-family="monospace" font-size="11" fill="#666" text-anchor="end">20</text>
+  <text x="70" y="365" font-family="monospace" font-size="11" fill="#999" text-anchor="end">0</text>
+  <text x="70" y="300" font-family="monospace" font-size="11" fill="#999" text-anchor="end">5</text>
+  <text x="70" y="235" font-family="monospace" font-size="11" fill="#999" text-anchor="end">10</text>
+  <text x="70" y="170" font-family="monospace" font-size="11" fill="#999" text-anchor="end">15</text>
+  <text x="70" y="105" font-family="monospace" font-size="11" fill="#999" text-anchor="end">20</text>
 
   <!-- X-axis labels -->
-  <text x="80" y="385" font-family="monospace" font-size="11" fill="#666" text-anchor="middle">0</text>
-  <text x="174" y="385" font-family="monospace" font-size="11" fill="#666" text-anchor="middle">2</text>
-  <text x="268" y="385" font-family="monospace" font-size="11" fill="#666" text-anchor="middle">4</text>
-  <text x="362" y="385" font-family="monospace" font-size="11" fill="#666" text-anchor="middle">6</text>
-  <text x="456" y="385" font-family="monospace" font-size="11" fill="#666" text-anchor="middle">8</text>
-  <text x="550" y="385" font-family="monospace" font-size="11" fill="#666" text-anchor="middle">10</text>
-  <text x="644" y="385" font-family="monospace" font-size="11" fill="#666" text-anchor="middle">12</text>
+  <text x="80" y="385" font-family="monospace" font-size="11" fill="#999" text-anchor="middle">0</text>
+  <text x="174" y="385" font-family="monospace" font-size="11" fill="#999" text-anchor="middle">2</text>
+  <text x="268" y="385" font-family="monospace" font-size="11" fill="#999" text-anchor="middle">4</text>
+  <text x="362" y="385" font-family="monospace" font-size="11" fill="#999" text-anchor="middle">6</text>
+  <text x="456" y="385" font-family="monospace" font-size="11" fill="#999" text-anchor="middle">8</text>
+  <text x="550" y="385" font-family="monospace" font-size="11" fill="#999" text-anchor="middle">10</text>
+  <text x="644" y="385" font-family="monospace" font-size="11" fill="#999" text-anchor="middle">12</text>
 
   <!-- Axis titles -->
-  <text x="370" y="410" font-family="Georgia, serif" font-size="13" fill="#333" text-anchor="middle">Guidance Scale (s)</text>
-  <text x="25" y="210" font-family="Georgia, serif" font-size="13" fill="#333" text-anchor="middle" transform="rotate(-90 25 210)">FID (lower is better)</text>
+  <text x="370" y="410" font-family="Georgia, serif" font-size="13" fill="#d4d4d4" text-anchor="middle">Guidance Scale (s)</text>
+  <text x="25" y="210" font-family="Georgia, serif" font-size="13" fill="#d4d4d4" text-anchor="middle" transform="rotate(-90 25 210)">FID (lower is better)</text>
 
   <!-- FID curve - U-shaped: starts high, drops, then rises -->
   <!-- Points: s=0 FID=18, s=1 FID=12, s=2 FID=7, s=3 FID=4.5, s=4 FID=3.2, s=5 FID=3.0, s=6 FID=3.5, s=7 FID=4.5, s=8 FID=6, s=10 FID=10, s=12 FID=15 -->
@@ -349,12 +346,12 @@ As guidance scale $s$ increases:
   <!-- Annotation: underfitting region -->
   <text x="140" y="80" font-family="Georgia, serif" font-size="11" fill="#999" text-anchor="middle">Weak conditioning</text>
   <text x="140" y="94" font-family="Georgia, serif" font-size="11" fill="#999" text-anchor="middle">(blurry outputs)</text>
-  <line x1="140" y1="100" x2="140" y2="195" stroke="#ccc" stroke-width="1" stroke-dasharray="4,3"/>
+  <line x1="140" y1="100" x2="140" y2="195" stroke="#444" stroke-width="1" stroke-dasharray="4,3"/>
 
   <!-- Annotation: overfitting region -->
   <text x="560" y="80" font-family="Georgia, serif" font-size="11" fill="#999" text-anchor="middle">Over-saturation</text>
   <text x="560" y="94" font-family="Georgia, serif" font-size="11" fill="#999" text-anchor="middle">(artifacts)</text>
-  <line x1="560" y1="100" x2="560" y2="225" stroke="#ccc" stroke-width="1" stroke-dasharray="4,3"/>
+  <line x1="560" y1="100" x2="560" y2="225" stroke="#444" stroke-width="1" stroke-dasharray="4,3"/>
 
   <!-- Data points -->
   <circle cx="80" cy="126" r="3" fill="#4fc3f7"/>
@@ -370,39 +367,38 @@ As guidance scale $s$ increases:
 </svg>
 
 <svg viewBox="0 0 700 420" xmlns="http://www.w3.org/2000/svg" style="max-width:700px; margin: 2em auto; display: block;">
-  <rect width="700" height="420" fill="white"/>
 
-  <text x="350" y="28" font-family="Georgia, serif" font-size="16" fill="#333" text-anchor="middle" font-weight="bold">Diversity (Recall) vs. Guidance Scale</text>
+  <text x="350" y="28" font-family="Georgia, serif" font-size="16" fill="#d4d4d4" text-anchor="middle" font-weight="bold">Diversity (Recall) vs. Guidance Scale</text>
 
   <!-- Axes -->
-  <line x1="80" y1="360" x2="660" y2="360" stroke="#333" stroke-width="1.5"/>
-  <line x1="80" y1="360" x2="80" y2="50" stroke="#333" stroke-width="1.5"/>
+  <line x1="80" y1="360" x2="660" y2="360" stroke="#d4d4d4" stroke-width="1.5"/>
+  <line x1="80" y1="360" x2="80" y2="50" stroke="#d4d4d4" stroke-width="1.5"/>
 
   <!-- Gridlines -->
-  <line x1="80" y1="298" x2="660" y2="298" stroke="#eee" stroke-width="0.8"/>
-  <line x1="80" y1="236" x2="660" y2="236" stroke="#eee" stroke-width="0.8"/>
-  <line x1="80" y1="174" x2="660" y2="174" stroke="#eee" stroke-width="0.8"/>
-  <line x1="80" y1="112" x2="660" y2="112" stroke="#eee" stroke-width="0.8"/>
+  <line x1="80" y1="298" x2="660" y2="298" stroke="#333" stroke-width="0.8"/>
+  <line x1="80" y1="236" x2="660" y2="236" stroke="#333" stroke-width="0.8"/>
+  <line x1="80" y1="174" x2="660" y2="174" stroke="#333" stroke-width="0.8"/>
+  <line x1="80" y1="112" x2="660" y2="112" stroke="#333" stroke-width="0.8"/>
 
   <!-- Y-axis labels -->
-  <text x="70" y="365" font-family="monospace" font-size="11" fill="#666" text-anchor="end">0.0</text>
-  <text x="70" y="303" font-family="monospace" font-size="11" fill="#666" text-anchor="end">0.2</text>
-  <text x="70" y="241" font-family="monospace" font-size="11" fill="#666" text-anchor="end">0.4</text>
-  <text x="70" y="179" font-family="monospace" font-size="11" fill="#666" text-anchor="end">0.6</text>
-  <text x="70" y="117" font-family="monospace" font-size="11" fill="#666" text-anchor="end">0.8</text>
+  <text x="70" y="365" font-family="monospace" font-size="11" fill="#999" text-anchor="end">0.0</text>
+  <text x="70" y="303" font-family="monospace" font-size="11" fill="#999" text-anchor="end">0.2</text>
+  <text x="70" y="241" font-family="monospace" font-size="11" fill="#999" text-anchor="end">0.4</text>
+  <text x="70" y="179" font-family="monospace" font-size="11" fill="#999" text-anchor="end">0.6</text>
+  <text x="70" y="117" font-family="monospace" font-size="11" fill="#999" text-anchor="end">0.8</text>
 
   <!-- X-axis labels -->
-  <text x="80" y="385" font-family="monospace" font-size="11" fill="#666" text-anchor="middle">0</text>
-  <text x="174" y="385" font-family="monospace" font-size="11" fill="#666" text-anchor="middle">2</text>
-  <text x="268" y="385" font-family="monospace" font-size="11" fill="#666" text-anchor="middle">4</text>
-  <text x="362" y="385" font-family="monospace" font-size="11" fill="#666" text-anchor="middle">6</text>
-  <text x="456" y="385" font-family="monospace" font-size="11" fill="#666" text-anchor="middle">8</text>
-  <text x="550" y="385" font-family="monospace" font-size="11" fill="#666" text-anchor="middle">10</text>
-  <text x="644" y="385" font-family="monospace" font-size="11" fill="#666" text-anchor="middle">12</text>
+  <text x="80" y="385" font-family="monospace" font-size="11" fill="#999" text-anchor="middle">0</text>
+  <text x="174" y="385" font-family="monospace" font-size="11" fill="#999" text-anchor="middle">2</text>
+  <text x="268" y="385" font-family="monospace" font-size="11" fill="#999" text-anchor="middle">4</text>
+  <text x="362" y="385" font-family="monospace" font-size="11" fill="#999" text-anchor="middle">6</text>
+  <text x="456" y="385" font-family="monospace" font-size="11" fill="#999" text-anchor="middle">8</text>
+  <text x="550" y="385" font-family="monospace" font-size="11" fill="#999" text-anchor="middle">10</text>
+  <text x="644" y="385" font-family="monospace" font-size="11" fill="#999" text-anchor="middle">12</text>
 
   <!-- Axis titles -->
-  <text x="370" y="410" font-family="Georgia, serif" font-size="13" fill="#333" text-anchor="middle">Guidance Scale (s)</text>
-  <text x="25" y="210" font-family="Georgia, serif" font-size="13" fill="#333" text-anchor="middle" transform="rotate(-90 25 210)">Recall (higher = more diverse)</text>
+  <text x="370" y="410" font-family="Georgia, serif" font-size="13" fill="#d4d4d4" text-anchor="middle">Guidance Scale (s)</text>
+  <text x="25" y="210" font-family="Georgia, serif" font-size="13" fill="#d4d4d4" text-anchor="middle" transform="rotate(-90 25 210)">Recall (higher = more diverse)</text>
 
   <!-- Diversity curve: monotonically decreasing, starts at 0.85, drops steeply then flattens -->
   <!-- Points: s=0: 0.85, s=1: 0.78, s=2: 0.65, s=3: 0.52, s=4: 0.42, s=5: 0.34, s=6: 0.28, s=7: 0.24, s=8: 0.20, s=10: 0.15, s=12: 0.12 -->
@@ -423,9 +419,9 @@ As guidance scale $s$ increases:
   <circle cx="644" cy="323" r="3" fill="#8bc34a"/>
 
   <!-- Annotation -->
-  <rect x="380" y="130" width="220" height="55" rx="4" fill="white" stroke="#ddd" stroke-width="1"/>
-  <text x="490" y="150" font-family="Georgia, serif" font-size="12" fill="#555" text-anchor="middle">Higher guidance = less diversity</text>
-  <text x="490" y="170" font-family="Georgia, serif" font-size="12" fill="#555" text-anchor="middle">Mode collapse at extreme scales</text>
+  <rect x="380" y="130" width="220" height="55" rx="4" fill="#1e1e1e" stroke="#444" stroke-width="1"/>
+  <text x="490" y="150" font-family="Georgia, serif" font-size="12" fill="#999" text-anchor="middle">Higher guidance = less diversity</text>
+  <text x="490" y="170" font-family="Georgia, serif" font-size="12" fill="#999" text-anchor="middle">Mode collapse at extreme scales</text>
 </svg>
 
 ### The Precision-Recall Perspective
@@ -566,39 +562,38 @@ $$s(t) = \begin{cases} s_\text{high} & \text{if } t > t_\text{switch} \\ s_\text
 where $t_\text{switch}$ is typically around $0.5T$ to $0.7T$.
 
 <svg viewBox="0 0 700 420" xmlns="http://www.w3.org/2000/svg" style="max-width:700px; margin: 2em auto; display: block;">
-  <rect width="700" height="420" fill="white"/>
 
-  <text x="350" y="28" font-family="Georgia, serif" font-size="16" fill="#333" text-anchor="middle" font-weight="bold">Dynamic Guidance Schedules</text>
+  <text x="350" y="28" font-family="Georgia, serif" font-size="16" fill="#d4d4d4" text-anchor="middle" font-weight="bold">Dynamic Guidance Schedules</text>
 
   <!-- Axes -->
-  <line x1="80" y1="360" x2="660" y2="360" stroke="#333" stroke-width="1.5"/>
-  <line x1="80" y1="360" x2="80" y2="50" stroke="#333" stroke-width="1.5"/>
+  <line x1="80" y1="360" x2="660" y2="360" stroke="#d4d4d4" stroke-width="1.5"/>
+  <line x1="80" y1="360" x2="80" y2="50" stroke="#d4d4d4" stroke-width="1.5"/>
 
   <!-- Gridlines -->
-  <line x1="80" y1="310" x2="660" y2="310" stroke="#eee" stroke-width="0.8"/>
-  <line x1="80" y1="260" x2="660" y2="260" stroke="#eee" stroke-width="0.8"/>
-  <line x1="80" y1="210" x2="660" y2="210" stroke="#eee" stroke-width="0.8"/>
-  <line x1="80" y1="160" x2="660" y2="160" stroke="#eee" stroke-width="0.8"/>
-  <line x1="80" y1="110" x2="660" y2="110" stroke="#eee" stroke-width="0.8"/>
+  <line x1="80" y1="310" x2="660" y2="310" stroke="#333" stroke-width="0.8"/>
+  <line x1="80" y1="260" x2="660" y2="260" stroke="#333" stroke-width="0.8"/>
+  <line x1="80" y1="210" x2="660" y2="210" stroke="#333" stroke-width="0.8"/>
+  <line x1="80" y1="160" x2="660" y2="160" stroke="#333" stroke-width="0.8"/>
+  <line x1="80" y1="110" x2="660" y2="110" stroke="#333" stroke-width="0.8"/>
 
   <!-- Y-axis labels (guidance scale) -->
-  <text x="70" y="365" font-family="monospace" font-size="11" fill="#666" text-anchor="end">1</text>
-  <text x="70" y="310" font-family="monospace" font-size="11" fill="#666" text-anchor="end">3</text>
-  <text x="70" y="260" font-family="monospace" font-size="11" fill="#666" text-anchor="end">5</text>
-  <text x="70" y="210" font-family="monospace" font-size="11" fill="#666" text-anchor="end">7</text>
-  <text x="70" y="160" font-family="monospace" font-size="11" fill="#666" text-anchor="end">9</text>
-  <text x="70" y="110" font-family="monospace" font-size="11" fill="#666" text-anchor="end">11</text>
+  <text x="70" y="365" font-family="monospace" font-size="11" fill="#999" text-anchor="end">1</text>
+  <text x="70" y="310" font-family="monospace" font-size="11" fill="#999" text-anchor="end">3</text>
+  <text x="70" y="260" font-family="monospace" font-size="11" fill="#999" text-anchor="end">5</text>
+  <text x="70" y="210" font-family="monospace" font-size="11" fill="#999" text-anchor="end">7</text>
+  <text x="70" y="160" font-family="monospace" font-size="11" fill="#999" text-anchor="end">9</text>
+  <text x="70" y="110" font-family="monospace" font-size="11" fill="#999" text-anchor="end">11</text>
 
   <!-- X-axis labels (denoising step, left=high noise, right=clean) -->
-  <text x="80" y="385" font-family="monospace" font-size="11" fill="#666" text-anchor="middle">T</text>
-  <text x="225" y="385" font-family="monospace" font-size="11" fill="#666" text-anchor="middle">0.75T</text>
-  <text x="370" y="385" font-family="monospace" font-size="11" fill="#666" text-anchor="middle">0.5T</text>
-  <text x="515" y="385" font-family="monospace" font-size="11" fill="#666" text-anchor="middle">0.25T</text>
-  <text x="660" y="385" font-family="monospace" font-size="11" fill="#666" text-anchor="middle">0</text>
+  <text x="80" y="385" font-family="monospace" font-size="11" fill="#999" text-anchor="middle">T</text>
+  <text x="225" y="385" font-family="monospace" font-size="11" fill="#999" text-anchor="middle">0.75T</text>
+  <text x="370" y="385" font-family="monospace" font-size="11" fill="#999" text-anchor="middle">0.5T</text>
+  <text x="515" y="385" font-family="monospace" font-size="11" fill="#999" text-anchor="middle">0.25T</text>
+  <text x="660" y="385" font-family="monospace" font-size="11" fill="#999" text-anchor="middle">0</text>
 
   <!-- Axis titles -->
-  <text x="370" y="410" font-family="Georgia, serif" font-size="13" fill="#333" text-anchor="middle">Denoising Progress (high noise --> clean)</text>
-  <text x="25" y="210" font-family="Georgia, serif" font-size="13" fill="#333" text-anchor="middle" transform="rotate(-90 25 210)">Guidance Scale s(t)</text>
+  <text x="370" y="410" font-family="Georgia, serif" font-size="13" fill="#d4d4d4" text-anchor="middle">Denoising Progress (high noise --> clean)</text>
+  <text x="25" y="210" font-family="Georgia, serif" font-size="13" fill="#d4d4d4" text-anchor="middle" transform="rotate(-90 25 210)">Guidance Scale s(t)</text>
 
   <!-- Constant schedule (baseline) -->
   <line x1="80" y1="210" x2="660" y2="210" stroke="#9e9e9e" stroke-width="2" stroke-dasharray="8,5"/>
@@ -615,15 +610,15 @@ where $t_\text{switch}$ is typically around $0.5T$ to $0.7T$.
   <line x1="370" y1="310" x2="660" y2="310" stroke="#8bc34a" stroke-width="2.5"/>
 
   <!-- Legend -->
-  <rect x="420" y="60" width="230" height="105" rx="6" fill="white" stroke="#ddd" stroke-width="1"/>
+  <rect x="420" y="60" width="230" height="105" rx="6" fill="#1e1e1e" stroke="#444" stroke-width="1"/>
   <line x1="435" y1="82" x2="475" y2="82" stroke="#9e9e9e" stroke-width="2" stroke-dasharray="8,5"/>
-  <text x="482" y="86" font-family="Georgia, serif" font-size="12" fill="#555">Constant (s = 7)</text>
+  <text x="482" y="86" font-family="Georgia, serif" font-size="12" fill="#999">Constant (s = 7)</text>
   <line x1="435" y1="105" x2="475" y2="105" stroke="#4fc3f7" stroke-width="2.5"/>
-  <text x="482" y="109" font-family="Georgia, serif" font-size="12" fill="#555">Linear decay</text>
+  <text x="482" y="109" font-family="Georgia, serif" font-size="12" fill="#999">Linear decay</text>
   <line x1="435" y1="128" x2="475" y2="128" stroke="#ef5350" stroke-width="2.5"/>
-  <text x="482" y="132" font-family="Georgia, serif" font-size="12" fill="#555">Cosine decay</text>
+  <text x="482" y="132" font-family="Georgia, serif" font-size="12" fill="#999">Cosine decay</text>
   <line x1="435" y1="151" x2="475" y2="151" stroke="#8bc34a" stroke-width="2.5"/>
-  <text x="482" y="155" font-family="Georgia, serif" font-size="12" fill="#555">Step function</text>
+  <text x="482" y="155" font-family="Georgia, serif" font-size="12" fill="#999">Step function</text>
 </svg>
 
 ### Why Dynamic Schedules Work

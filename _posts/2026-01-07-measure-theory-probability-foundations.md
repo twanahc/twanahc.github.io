@@ -108,27 +108,27 @@ The Borel sigma-algebra contains:
 
 It contains every set you will ever encounter in practice. It does **not** contain the Vitali set. Problem solved.
 
-<svg viewBox="0 0 700 320" xmlns="http://www.w3.org/2000/svg" style="background: white; max-width: 700px; display: block; margin: 2em auto;">
-  <text x="350" y="25" text-anchor="middle" font-size="15" font-weight="bold" fill="#333">Sigma-Algebra Hierarchy on Ω = ℝ</text>
+<svg viewBox="0 0 700 320" xmlns="http://www.w3.org/2000/svg" style="max-width: 700px; display: block; margin: 2em auto;">
+  <text x="350" y="25" text-anchor="middle" font-size="15" font-weight="bold" fill="#d4d4d4">Sigma-Algebra Hierarchy on Ω = ℝ</text>
   <!-- Power set -->
-  <ellipse cx="350" cy="175" rx="320" ry="130" fill="#f0f0f0" stroke="#999" stroke-width="1.5"/>
-  <text x="350" y="300" text-anchor="middle" font-size="13" fill="#666">Power set 2^ℝ (includes non-measurable sets like Vitali set)</text>
+  <ellipse cx="350" cy="175" rx="320" ry="130" fill="#1e1e1e" stroke="#999" stroke-width="1.5"/>
+  <text x="350" y="300" text-anchor="middle" font-size="13" fill="#999">Power set 2ℝ (includes non-measurable sets like Vitali set)</text>
   <!-- Borel -->
-  <ellipse cx="350" cy="175" rx="220" ry="95" fill="#ddeeff" stroke="#4488cc" stroke-width="2"/>
-  <text x="350" y="108" text-anchor="middle" font-size="13" fill="#336699">Borel σ-algebra B(ℝ)</text>
+  <ellipse cx="350" cy="175" rx="220" ry="95" fill="#162030" stroke="#4488cc" stroke-width="2"/>
+  <text x="350" y="108" text-anchor="middle" font-size="13" fill="#5599cc">Borel σ-algebra B(ℝ)</text>
   <!-- Open/Closed -->
-  <ellipse cx="280" cy="185" rx="90" ry="50" fill="#bbddff" stroke="#4488cc" stroke-width="1.5"/>
-  <text x="280" y="180" text-anchor="middle" font-size="12" fill="#336699">Open sets</text>
-  <text x="280" y="196" text-anchor="middle" font-size="12" fill="#336699">Closed sets</text>
-  <ellipse cx="430" cy="185" rx="80" ry="50" fill="#bbddff" stroke="#4488cc" stroke-width="1.5"/>
-  <text x="430" y="180" text-anchor="middle" font-size="12" fill="#336699">G_δ, F_σ</text>
-  <text x="430" y="196" text-anchor="middle" font-size="12" fill="#336699">sets</text>
+  <ellipse cx="280" cy="185" rx="90" ry="50" fill="#1a2a40" stroke="#4488cc" stroke-width="1.5"/>
+  <text x="280" y="180" text-anchor="middle" font-size="12" fill="#5599cc">Open sets</text>
+  <text x="280" y="196" text-anchor="middle" font-size="12" fill="#5599cc">Closed sets</text>
+  <ellipse cx="430" cy="185" rx="80" ry="50" fill="#1a2a40" stroke="#4488cc" stroke-width="1.5"/>
+  <text x="430" y="180" text-anchor="middle" font-size="12" fill="#5599cc">G_δ, F_σ</text>
+  <text x="430" y="196" text-anchor="middle" font-size="12" fill="#5599cc">sets</text>
   <!-- Intervals -->
-  <ellipse cx="280" cy="195" rx="45" ry="22" fill="#99ccff" stroke="#336699" stroke-width="1.5"/>
-  <text x="280" y="199" text-anchor="middle" font-size="11" fill="#003366">Intervals</text>
+  <ellipse cx="280" cy="195" rx="45" ry="22" fill="#1a3050" stroke="#5599cc" stroke-width="1.5"/>
+  <text x="280" y="199" text-anchor="middle" font-size="11" fill="#88bbee">Intervals</text>
   <!-- Trivial -->
-  <circle cx="280" cy="195" r="8" fill="#336699"/>
-  <text x="293" y="218" text-anchor="start" font-size="10" fill="#333">{∅, ℝ}</text>
+  <circle cx="280" cy="195" r="8" fill="#5599cc"/>
+  <text x="293" y="218" text-anchor="start" font-size="10" fill="#d4d4d4">{∅, ℝ}</text>
   <!-- Non-measurable region label -->
   <text x="625" y="155" text-anchor="middle" font-size="11" fill="#cc3333" font-style="italic">Vitali set</text>
   <text x="625" y="170" text-anchor="middle" font-size="11" fill="#cc3333" font-style="italic">lives here</text>
@@ -214,17 +214,17 @@ $$\int f \, d\mu = \int_0^\infty \mu(\{x : f(x) > y\}) \, dy$$
 
 This is the "layer cake" representation of the Lebesgue integral.
 
-<svg viewBox="0 0 700 550" xmlns="http://www.w3.org/2000/svg" style="background: white; max-width: 700px; display: block; margin: 2em auto;">
+<svg viewBox="0 0 700 550" xmlns="http://www.w3.org/2000/svg" style="max-width: 700px; display: block; margin: 2em auto;">
   <!-- Title -->
-  <text x="350" y="25" text-anchor="middle" font-size="15" font-weight="bold" fill="#333">Riemann vs Lebesgue Integration</text>
+  <text x="350" y="25" text-anchor="middle" font-size="15" font-weight="bold" fill="#d4d4d4">Riemann vs Lebesgue Integration</text>
 
   <!-- Left panel: Riemann -->
-  <text x="175" y="55" text-anchor="middle" font-size="14" font-weight="bold" fill="#333">Riemann: Slice the x-axis</text>
+  <text x="175" y="55" text-anchor="middle" font-size="14" font-weight="bold" fill="#d4d4d4">Riemann: Slice the x-axis</text>
   <!-- Axes -->
-  <line x1="40" y1="260" x2="320" y2="260" stroke="#333" stroke-width="1.5"/>
-  <line x1="40" y1="260" x2="40" y2="70" stroke="#333" stroke-width="1.5"/>
-  <text x="180" y="278" text-anchor="middle" font-size="12" fill="#333">x</text>
-  <text x="28" y="165" text-anchor="middle" font-size="12" fill="#333">y</text>
+  <line x1="40" y1="260" x2="320" y2="260" stroke="#d4d4d4" stroke-width="1.5"/>
+  <line x1="40" y1="260" x2="40" y2="70" stroke="#d4d4d4" stroke-width="1.5"/>
+  <text x="180" y="278" text-anchor="middle" font-size="12" fill="#d4d4d4">x</text>
+  <text x="28" y="165" text-anchor="middle" font-size="12" fill="#d4d4d4">y</text>
   <!-- Riemann bars -->
   <rect x="60" y="220" width="40" height="40" fill="#4488cc" fill-opacity="0.4" stroke="#4488cc" stroke-width="1"/>
   <rect x="100" y="180" width="40" height="80" fill="#4488cc" fill-opacity="0.4" stroke="#4488cc" stroke-width="1"/>
@@ -235,20 +235,20 @@ This is the "layer cake" representation of the Lebesgue integral.
   <!-- Curve -->
   <path d="M60,240 Q110,180 160,120 Q200,90 230,140 Q270,190 300,220" fill="none" stroke="#cc3333" stroke-width="2.5"/>
   <!-- Vertical slices annotation -->
-  <line x1="100" y1="260" x2="100" y2="265" stroke="#333" stroke-width="1"/>
-  <line x1="140" y1="260" x2="140" y2="265" stroke="#333" stroke-width="1"/>
-  <line x1="180" y1="260" x2="180" y2="265" stroke="#333" stroke-width="1"/>
-  <line x1="220" y1="260" x2="220" y2="265" stroke="#333" stroke-width="1"/>
-  <line x1="260" y1="260" x2="260" y2="265" stroke="#333" stroke-width="1"/>
+  <line x1="100" y1="260" x2="100" y2="265" stroke="#d4d4d4" stroke-width="1"/>
+  <line x1="140" y1="260" x2="140" y2="265" stroke="#d4d4d4" stroke-width="1"/>
+  <line x1="180" y1="260" x2="180" y2="265" stroke="#d4d4d4" stroke-width="1"/>
+  <line x1="220" y1="260" x2="220" y2="265" stroke="#d4d4d4" stroke-width="1"/>
+  <line x1="260" y1="260" x2="260" y2="265" stroke="#d4d4d4" stroke-width="1"/>
   <text x="175" y="295" text-anchor="middle" font-size="11" fill="#4488cc">Σ f(xᵢ*) · Δxᵢ</text>
 
   <!-- Right panel: Lebesgue -->
-  <text x="525" y="55" text-anchor="middle" font-size="14" font-weight="bold" fill="#333">Lebesgue: Slice the y-axis</text>
+  <text x="525" y="55" text-anchor="middle" font-size="14" font-weight="bold" fill="#d4d4d4">Lebesgue: Slice the y-axis</text>
   <!-- Axes -->
-  <line x1="390" y1="260" x2="670" y2="260" stroke="#333" stroke-width="1.5"/>
-  <line x1="390" y1="260" x2="390" y2="70" stroke="#333" stroke-width="1.5"/>
-  <text x="530" y="278" text-anchor="middle" font-size="12" fill="#333">x</text>
-  <text x="378" y="165" text-anchor="middle" font-size="12" fill="#333">y</text>
+  <line x1="390" y1="260" x2="670" y2="260" stroke="#d4d4d4" stroke-width="1.5"/>
+  <line x1="390" y1="260" x2="390" y2="70" stroke="#d4d4d4" stroke-width="1.5"/>
+  <text x="530" y="278" text-anchor="middle" font-size="12" fill="#d4d4d4">x</text>
+  <text x="378" y="165" text-anchor="middle" font-size="12" fill="#d4d4d4">y</text>
   <!-- Horizontal slices (colored bands) -->
   <rect x="408" y="220" width="242" height="20" fill="#cc7733" fill-opacity="0.15" stroke="none"/>
   <rect x="418" y="200" width="212" height="20" fill="#cc7733" fill-opacity="0.2" stroke="none"/>
@@ -266,20 +266,20 @@ This is the "layer cake" representation of the Lebesgue integral.
   <line x1="387" y1="160" x2="660" y2="160" stroke="#cc7733" stroke-width="0.5" stroke-dasharray="3,3"/>
   <line x1="387" y1="140" x2="660" y2="140" stroke="#cc7733" stroke-width="0.5" stroke-dasharray="3,3"/>
   <line x1="387" y1="120" x2="660" y2="120" stroke="#cc7733" stroke-width="0.5" stroke-dasharray="3,3"/>
-  <text x="525" y="295" text-anchor="middle" font-size="11" fill="#cc7733">∫₀^∞ μ({f > y}) dy</text>
+  <text x="525" y="295" text-anchor="middle" font-size="11" fill="#cc7733">∫₀∞ μ({f > y}) dy</text>
 
   <!-- Bottom explanation -->
-  <text x="350" y="330" text-anchor="middle" font-size="12" fill="#333">Riemann: partition the domain, sum heights × widths</text>
-  <text x="350" y="350" text-anchor="middle" font-size="12" fill="#333">Lebesgue: partition the range, sum heights × measure of level sets</text>
+  <text x="350" y="330" text-anchor="middle" font-size="12" fill="#d4d4d4">Riemann: partition the domain, sum heights × widths</text>
+  <text x="350" y="350" text-anchor="middle" font-size="12" fill="#d4d4d4">Lebesgue: partition the range, sum heights × measure of level sets</text>
 
   <!-- Pathological function example -->
-  <text x="350" y="385" text-anchor="middle" font-size="14" font-weight="bold" fill="#333">Why it matters: the Dirichlet function 1_Q(x)</text>
+  <text x="350" y="385" text-anchor="middle" font-size="14" font-weight="bold" fill="#d4d4d4">Why it matters: the Dirichlet function 1_Q(x)</text>
   <!-- Left: Riemann fails -->
   <text x="175" y="410" text-anchor="middle" font-size="13" fill="#cc3333">Riemann: UNDEFINED</text>
-  <line x1="40" y1="500" x2="320" y2="500" stroke="#333" stroke-width="1.5"/>
-  <line x1="40" y1="500" x2="40" y2="420" stroke="#333" stroke-width="1.5"/>
-  <text x="35" y="445" text-anchor="end" font-size="10" fill="#333">1</text>
-  <text x="35" y="500" text-anchor="end" font-size="10" fill="#333">0</text>
+  <line x1="40" y1="500" x2="320" y2="500" stroke="#d4d4d4" stroke-width="1.5"/>
+  <line x1="40" y1="500" x2="40" y2="420" stroke="#d4d4d4" stroke-width="1.5"/>
+  <text x="35" y="445" text-anchor="end" font-size="10" fill="#d4d4d4">1</text>
+  <text x="35" y="500" text-anchor="end" font-size="10" fill="#d4d4d4">0</text>
   <!-- Dense dots at both 0 and 1 -->
   <g fill="#4488cc" fill-opacity="0.5">
     <circle cx="55" cy="440" r="1.5"/><circle cx="65" cy="440" r="1.5"/><circle cx="75" cy="440" r="1.5"/><circle cx="85" cy="440" r="1.5"/><circle cx="95" cy="440" r="1.5"/><circle cx="105" cy="440" r="1.5"/><circle cx="115" cy="440" r="1.5"/><circle cx="125" cy="440" r="1.5"/><circle cx="135" cy="440" r="1.5"/><circle cx="145" cy="440" r="1.5"/><circle cx="155" cy="440" r="1.5"/><circle cx="165" cy="440" r="1.5"/><circle cx="175" cy="440" r="1.5"/><circle cx="185" cy="440" r="1.5"/><circle cx="195" cy="440" r="1.5"/><circle cx="205" cy="440" r="1.5"/><circle cx="215" cy="440" r="1.5"/><circle cx="225" cy="440" r="1.5"/><circle cx="235" cy="440" r="1.5"/><circle cx="245" cy="440" r="1.5"/><circle cx="255" cy="440" r="1.5"/><circle cx="265" cy="440" r="1.5"/><circle cx="275" cy="440" r="1.5"/><circle cx="285" cy="440" r="1.5"/><circle cx="295" cy="440" r="1.5"/><circle cx="305" cy="440" r="1.5"/>
@@ -287,21 +287,21 @@ This is the "layer cake" representation of the Lebesgue integral.
   <g fill="#cc3333" fill-opacity="0.5">
     <circle cx="60" cy="495" r="1.5"/><circle cx="70" cy="495" r="1.5"/><circle cx="80" cy="495" r="1.5"/><circle cx="90" cy="495" r="1.5"/><circle cx="100" cy="495" r="1.5"/><circle cx="110" cy="495" r="1.5"/><circle cx="120" cy="495" r="1.5"/><circle cx="130" cy="495" r="1.5"/><circle cx="140" cy="495" r="1.5"/><circle cx="150" cy="495" r="1.5"/><circle cx="160" cy="495" r="1.5"/><circle cx="170" cy="495" r="1.5"/><circle cx="180" cy="495" r="1.5"/><circle cx="190" cy="495" r="1.5"/><circle cx="200" cy="495" r="1.5"/><circle cx="210" cy="495" r="1.5"/><circle cx="220" cy="495" r="1.5"/><circle cx="230" cy="495" r="1.5"/><circle cx="240" cy="495" r="1.5"/><circle cx="250" cy="495" r="1.5"/><circle cx="260" cy="495" r="1.5"/><circle cx="270" cy="495" r="1.5"/><circle cx="280" cy="495" r="1.5"/><circle cx="290" cy="495" r="1.5"/><circle cx="300" cy="495" r="1.5"/>
   </g>
-  <text x="175" y="530" text-anchor="middle" font-size="10" fill="#333">Every interval has both rationals and irrationals — upper/lower sums never converge</text>
+  <text x="175" y="530" text-anchor="middle" font-size="10" fill="#d4d4d4">Every interval has both rationals and irrationals — upper/lower sums never converge</text>
 
   <!-- Right: Lebesgue works -->
   <text x="525" y="410" text-anchor="middle" font-size="13" fill="#339933">Lebesgue: = 0</text>
-  <line x1="390" y1="500" x2="670" y2="500" stroke="#333" stroke-width="1.5"/>
-  <line x1="390" y1="500" x2="390" y2="420" stroke="#333" stroke-width="1.5"/>
-  <text x="385" y="445" text-anchor="end" font-size="10" fill="#333">1</text>
-  <text x="385" y="500" text-anchor="end" font-size="10" fill="#333">0</text>
+  <line x1="390" y1="500" x2="670" y2="500" stroke="#d4d4d4" stroke-width="1.5"/>
+  <line x1="390" y1="500" x2="390" y2="420" stroke="#d4d4d4" stroke-width="1.5"/>
+  <text x="385" y="445" text-anchor="end" font-size="10" fill="#d4d4d4">1</text>
+  <text x="385" y="500" text-anchor="end" font-size="10" fill="#d4d4d4">0</text>
   <!-- Level set at y=1: rationals, measure 0 -->
   <rect x="395" y="432" width="265" height="16" fill="#339933" fill-opacity="0.1" stroke="#339933" stroke-width="1" stroke-dasharray="3,2"/>
-  <text x="530" y="444" text-anchor="middle" font-size="10" fill="#339933">μ({f = 1}) = λ(Q ∩ [0,1]) = 0</text>
+  <text x="530" y="444" text-anchor="middle" font-size="10" fill="#339933">μ({f = 1}) = λ(ℚ ∩ [0,1]) = 0</text>
   <!-- Level set at y=0: irrationals, measure 1 -->
   <rect x="395" y="488" width="265" height="16" fill="#339933" fill-opacity="0.3" stroke="#339933" stroke-width="1"/>
-  <text x="530" y="500" text-anchor="middle" font-size="10" fill="#339933">μ({f = 0}) = λ(Q^c ∩ [0,1]) = 1</text>
-  <text x="525" y="530" text-anchor="middle" font-size="10" fill="#333">∫ 1_Q dλ = 1 · λ(Q) + 0 · λ(Q^c) = 1 · 0 + 0 · 1 = 0</text>
+  <text x="530" y="500" text-anchor="middle" font-size="10" fill="#339933">μ({f = 0}) = λ(ℚᶜ ∩ [0,1]) = 1</text>
+  <text x="525" y="530" text-anchor="middle" font-size="10" fill="#d4d4d4">∫ 1_ℚ dλ = 1 · λ(ℚ) + 0 · λ(ℚᶜ) = 1 · 0 + 0 · 1 = 0</text>
 </svg>
 
 ### Formal Construction

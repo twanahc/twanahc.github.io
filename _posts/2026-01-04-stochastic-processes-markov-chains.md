@@ -82,13 +82,13 @@ In two dimensions, at each step the walker moves to one of the four adjacent gri
 
 Polya proved in 1921 that the 2D random walk is also **recurrent** --- it returns to the origin with probability 1. But in 3D and higher, the walk is **transient** --- there is a positive probability (about 34% in 3D) that the walker never returns to the origin. This is sometimes paraphrased as "a drunk man will find his way home, but a drunk bird may not."
 
-<svg viewBox="0 0 700 350" xmlns="http://www.w3.org/2000/svg" style="background: white; max-width: 700px; display: block; margin: 2em auto;">
-  <text x="350" y="25" text-anchor="middle" font-size="14" font-weight="bold" fill="#333">Random Walk: 1D Diffusive Spreading</text>
+<svg viewBox="0 0 700 350" xmlns="http://www.w3.org/2000/svg" style="max-width: 700px; display: block; margin: 2em auto;">
+  <text x="350" y="25" text-anchor="middle" font-size="14" font-weight="bold" fill="#e8e8e8">Random Walk: 1D Diffusive Spreading</text>
   <!-- Axes -->
-  <line x1="60" y1="175" x2="670" y2="175" stroke="#999" stroke-width="1"/>
-  <line x1="60" y1="30" x2="60" y2="320" stroke="#999" stroke-width="1"/>
-  <text x="370" y="340" text-anchor="middle" font-size="12" fill="#666">Time step t</text>
-  <text x="20" y="175" text-anchor="middle" font-size="12" fill="#666" transform="rotate(-90, 20, 175)">Position X(t)</text>
+  <line x1="60" y1="175" x2="670" y2="175" stroke="#444" stroke-width="1"/>
+  <line x1="60" y1="30" x2="60" y2="320" stroke="#444" stroke-width="1"/>
+  <text x="370" y="340" text-anchor="middle" font-size="12" fill="#999">Time step t</text>
+  <text x="20" y="175" text-anchor="middle" font-size="12" fill="#999" transform="rotate(-90, 20, 175)">Position X(t)</text>
   <!-- Standard deviation envelope: ±sqrt(t) -->
   <path d="M60,175 Q200,145 365,120 Q530,100 670,85" stroke="#2563eb" stroke-width="1.5" fill="none" stroke-dasharray="6,4"/>
   <path d="M60,175 Q200,205 365,230 Q530,250 670,265" stroke="#2563eb" stroke-width="1.5" fill="none" stroke-dasharray="6,4"/>
@@ -100,9 +100,9 @@ Polya proved in 1921 that the 2D random walk is also **recurrent** --- it return
   <polyline points="60,175 80,185 100,195 120,185 140,195 160,205 180,215 200,205 220,215 240,225 260,215 280,205 300,215 320,225 340,215 360,225 380,235 400,225 420,215 440,225 460,235 480,225 500,215 520,225 540,235 560,225 580,215 600,225 620,215 640,225 660,220 670,225" stroke="#16a34a" stroke-width="1.5" fill="none" opacity="0.7"/>
   <!-- Legend -->
   <line x1="200" y1="310" x2="230" y2="310" stroke="#2563eb" stroke-width="1.5" stroke-dasharray="6,4"/>
-  <text x="235" y="314" font-size="10" fill="#333">±σ = ±√t envelope</text>
+  <text x="235" y="314" font-size="10" fill="#d4d4d4">±σ = ±√t envelope</text>
   <line x1="400" y1="310" x2="430" y2="310" stroke="#dc2626" stroke-width="1.5"/>
-  <text x="435" y="314" font-size="10" fill="#333">Sample paths</text>
+  <text x="435" y="314" font-size="10" fill="#d4d4d4">Sample paths</text>
 </svg>
 
 ---

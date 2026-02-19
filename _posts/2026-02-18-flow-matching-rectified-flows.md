@@ -49,7 +49,7 @@ The score function $\nabla_x \log p_t(x)$ is approximated by a neural network tr
 
 In practice, DDPM uses $T = 1000$ steps. Faster samplers like DDIM reduce this to 50--100 steps by converting the SDE to a probability flow ODE (removing the noise term $d\bar{W}_t$), but the paths are still curved because the velocity field inherited from the diffusion process is not straight. The ODE solver must take many small steps to track these curves accurately.
 
-<svg viewBox="0 0 700 300" xmlns="http://www.w3.org/2000/svg" style="background: white; max-width: 700px; display: block; margin: 2em auto;">
+<svg viewBox="0 0 700 300" xmlns="http://www.w3.org/2000/svg" style="max-width: 700px; display: block; margin: 2em auto;">
   <defs>
     <marker id="arrowR" markerWidth="10" markerHeight="7" refX="10" refY="3.5" orient="auto">
       <polygon points="0 0, 10 3.5, 0 7" fill="#E53935"/>
@@ -58,32 +58,32 @@ In practice, DDPM uses $T = 1000$ steps. Faster samplers like DDIM reduce this t
       <polygon points="0 0, 10 3.5, 0 7" fill="#1E88E5"/>
     </marker>
   </defs>
-  <text x="350" y="25" text-anchor="middle" font-size="14" font-weight="bold" fill="#333">Diffusion vs. Flow Matching: Path Geometry</text>
+  <text x="350" y="25" text-anchor="middle" font-size="14" font-weight="bold" fill="#d4d4d4">Diffusion vs. Flow Matching: Path Geometry</text>
 
   <!-- Left: Diffusion (curved, stochastic) -->
   <text x="175" y="55" text-anchor="middle" font-size="12" font-weight="bold" fill="#E53935">Diffusion (SDE/ODE)</text>
   <circle cx="60" cy="150" r="6" fill="#E53935" opacity="0.6"/>
-  <text x="60" y="180" text-anchor="middle" font-size="10" fill="#666">Noise</text>
+  <text x="60" y="180" text-anchor="middle" font-size="10" fill="#999">Noise</text>
   <circle cx="290" cy="150" r="6" fill="#E53935"/>
-  <text x="290" y="180" text-anchor="middle" font-size="10" fill="#666">Data</text>
+  <text x="290" y="180" text-anchor="middle" font-size="10" fill="#999">Data</text>
   <!-- Curved path -->
   <path d="M 66,150 C 100,100 130,200 160,120 C 190,40 220,180 250,130 C 265,100 280,140 284,150" fill="none" stroke="#E53935" stroke-width="2" stroke-dasharray="5,3" marker-end="url(#arrowR)"/>
-  <text x="175" y="220" text-anchor="middle" font-size="10" fill="#999">Curved paths, many steps needed</text>
-  <text x="175" y="235" text-anchor="middle" font-size="10" fill="#999">~50-1000 NFE</text>
+  <text x="175" y="220" text-anchor="middle" font-size="10" fill="#666">Curved paths, many steps needed</text>
+  <text x="175" y="235" text-anchor="middle" font-size="10" fill="#666">~50-1000 NFE</text>
 
   <!-- Right: Flow Matching (straight, deterministic) -->
   <text x="525" y="55" text-anchor="middle" font-size="12" font-weight="bold" fill="#1E88E5">Flow Matching (ODE)</text>
   <circle cx="410" cy="150" r="6" fill="#1E88E5" opacity="0.6"/>
-  <text x="410" y="180" text-anchor="middle" font-size="10" fill="#666">Noise</text>
+  <text x="410" y="180" text-anchor="middle" font-size="10" fill="#999">Noise</text>
   <circle cx="640" cy="150" r="6" fill="#1E88E5"/>
-  <text x="640" y="180" text-anchor="middle" font-size="10" fill="#666">Data</text>
+  <text x="640" y="180" text-anchor="middle" font-size="10" fill="#999">Data</text>
   <!-- Straight path -->
   <line x1="416" y1="150" x2="634" y2="150" stroke="#1E88E5" stroke-width="2.5" marker-end="url(#arrowB)"/>
-  <text x="525" y="220" text-anchor="middle" font-size="10" fill="#999">Straight paths, few steps suffice</text>
-  <text x="525" y="235" text-anchor="middle" font-size="10" fill="#999">~1-8 NFE</text>
+  <text x="525" y="220" text-anchor="middle" font-size="10" fill="#666">Straight paths, few steps suffice</text>
+  <text x="525" y="235" text-anchor="middle" font-size="10" fill="#666">~1-8 NFE</text>
 
   <!-- Divider -->
-  <line x1="350" y1="45" x2="350" y2="270" stroke="#ddd" stroke-width="1" stroke-dasharray="4,4"/>
+  <line x1="350" y1="45" x2="350" y2="270" stroke="#444" stroke-width="1" stroke-dasharray="4,4"/>
 </svg>
 
 The fundamental question is: can we design a generative process that transports noise to data along *straight* paths? If the paths are straight, even a crude ODE solver (a single Euler step) can follow them exactly. This would mean one-step generation with no quality loss.
@@ -294,49 +294,49 @@ $$\mathcal{L} = \|v_\theta(x_t, t) - (x_1 - x_0)\|^2$$
 
 No ODE solver. No score function. No divergence computation. Just a simple regression loss. The training loop looks almost identical to diffusion model training --- sample noise, sample data, compute an interpolation, regress a network --- but the target is a velocity (displacement) rather than a noise prediction.
 
-<svg viewBox="0 0 700 280" xmlns="http://www.w3.org/2000/svg" style="background: white; max-width: 700px; display: block; margin: 2em auto;">
-  <text x="350" y="25" text-anchor="middle" font-size="14" font-weight="bold" fill="#333">Flow Matching Training Pipeline</text>
+<svg viewBox="0 0 700 280" xmlns="http://www.w3.org/2000/svg" style="max-width: 700px; display: block; margin: 2em auto;">
+  <text x="350" y="25" text-anchor="middle" font-size="14" font-weight="bold" fill="#d4d4d4">Flow Matching Training Pipeline</text>
 
   <!-- Step boxes -->
   <rect x="20" y="50" width="130" height="60" rx="8" fill="#E3F2FD" stroke="#1E88E5" stroke-width="1.5"/>
   <text x="85" y="75" text-anchor="middle" font-size="11" fill="#1565C0" font-weight="bold">Sample</text>
-  <text x="85" y="95" text-anchor="middle" font-size="10" fill="#333">x₀ ~ N(0,I)</text>
-  <text x="85" y="105" text-anchor="middle" font-size="10" fill="#333">x₁ ~ p_data</text>
+  <text x="85" y="95" text-anchor="middle" font-size="10" fill="#d4d4d4">x₀ ~ N(0,I)</text>
+  <text x="85" y="105" text-anchor="middle" font-size="10" fill="#d4d4d4">x₁ ~ p_data</text>
 
   <rect x="175" y="50" width="130" height="60" rx="8" fill="#E8F5E9" stroke="#43A047" stroke-width="1.5"/>
   <text x="240" y="75" text-anchor="middle" font-size="11" fill="#2E7D32" font-weight="bold">Interpolate</text>
-  <text x="240" y="95" text-anchor="middle" font-size="10" fill="#333">t ~ U[0,1]</text>
-  <text x="240" y="105" text-anchor="middle" font-size="10" fill="#333">xₜ = (1-t)x₀ + tx₁</text>
+  <text x="240" y="95" text-anchor="middle" font-size="10" fill="#d4d4d4">t ~ U[0,1]</text>
+  <text x="240" y="105" text-anchor="middle" font-size="10" fill="#d4d4d4">xₜ = (1-t)x₀ + tx₁</text>
 
   <rect x="330" y="50" width="130" height="60" rx="8" fill="#FFF3E0" stroke="#FB8C00" stroke-width="1.5"/>
   <text x="395" y="75" text-anchor="middle" font-size="11" fill="#E65100" font-weight="bold">Target</text>
-  <text x="395" y="95" text-anchor="middle" font-size="10" fill="#333">uₜ = x₁ - x₀</text>
-  <text x="395" y="105" text-anchor="middle" font-size="10" fill="#333">(constant velocity)</text>
+  <text x="395" y="95" text-anchor="middle" font-size="10" fill="#d4d4d4">uₜ = x₁ - x₀</text>
+  <text x="395" y="105" text-anchor="middle" font-size="10" fill="#d4d4d4">(constant velocity)</text>
 
   <rect x="485" y="50" width="190" height="60" rx="8" fill="#FCE4EC" stroke="#E53935" stroke-width="1.5"/>
   <text x="580" y="75" text-anchor="middle" font-size="11" fill="#C62828" font-weight="bold">Loss</text>
-  <text x="580" y="95" text-anchor="middle" font-size="10" fill="#333">L = ||v_θ(xₜ, t) - uₜ||²</text>
-  <text x="580" y="105" text-anchor="middle" font-size="10" fill="#333">Simple MSE regression</text>
+  <text x="580" y="95" text-anchor="middle" font-size="10" fill="#d4d4d4">L = ||v_θ(xₜ, t) - uₜ||²</text>
+  <text x="580" y="105" text-anchor="middle" font-size="10" fill="#d4d4d4">Simple MSE regression</text>
 
   <!-- Arrows -->
-  <line x1="150" y1="80" x2="175" y2="80" stroke="#666" stroke-width="1.5" marker-end="url(#arrowG)"/>
-  <line x1="305" y1="80" x2="330" y2="80" stroke="#666" stroke-width="1.5" marker-end="url(#arrowG)"/>
-  <line x1="460" y1="80" x2="485" y2="80" stroke="#666" stroke-width="1.5" marker-end="url(#arrowG)"/>
+  <line x1="150" y1="80" x2="175" y2="80" stroke="#999" stroke-width="1.5" marker-end="url(#arrowG)"/>
+  <line x1="305" y1="80" x2="330" y2="80" stroke="#999" stroke-width="1.5" marker-end="url(#arrowG)"/>
+  <line x1="460" y1="80" x2="485" y2="80" stroke="#999" stroke-width="1.5" marker-end="url(#arrowG)"/>
 
   <defs>
     <marker id="arrowG" markerWidth="8" markerHeight="6" refX="8" refY="3" orient="auto">
-      <polygon points="0 0, 8 3, 0 6" fill="#666"/>
+      <polygon points="0 0, 8 3, 0 6" fill="#999"/>
     </marker>
   </defs>
 
   <!-- Comparison note -->
-  <rect x="80" y="140" width="540" height="120" rx="8" fill="#FAFAFA" stroke="#ddd" stroke-width="1"/>
-  <text x="350" y="165" text-anchor="middle" font-size="12" font-weight="bold" fill="#333">Compare: Diffusion Training vs. Flow Matching Training</text>
+  <rect x="80" y="140" width="540" height="120" rx="8" fill="#1e1e1e" stroke="#444" stroke-width="1"/>
+  <text x="350" y="165" text-anchor="middle" font-size="12" font-weight="bold" fill="#d4d4d4">Compare: Diffusion Training vs. Flow Matching Training</text>
   <text x="100" y="190" font-size="11" fill="#E53935" font-weight="bold">Diffusion:</text>
-  <text x="185" y="190" font-size="11" fill="#555">xₜ = √ᾱₜ x₀ + √(1-ᾱₜ) ε,   target = ε,   loss = ||ε_θ(xₜ,t) - ε||²</text>
+  <text x="185" y="190" font-size="11" fill="#999">xₜ = √ᾱₜ x₀ + √(1-ᾱₜ) ε,   target = ε,   loss = ||ε_θ(xₜ,t) - ε||²</text>
   <text x="100" y="215" font-size="11" fill="#1E88E5" font-weight="bold">Flow Matching:</text>
-  <text x="215" y="215" font-size="11" fill="#555">xₜ = (1-t) x₀ + t x₁,   target = x₁-x₀,   loss = ||v_θ(xₜ,t) - (x₁-x₀)||²</text>
-  <text x="350" y="245" text-anchor="middle" font-size="10" fill="#999">Both are simple MSE regression. The difference is the interpolation schedule and the target.</text>
+  <text x="215" y="215" font-size="11" fill="#999">xₜ = (1-t) x₀ + t x₁,   target = x₁-x₀,   loss = ||v_θ(xₜ,t) - (x₁-x₀)||²</text>
+  <text x="350" y="245" text-anchor="middle" font-size="10" fill="#666">Both are simple MSE regression. The difference is the interpolation schedule and the target.</text>
 </svg>
 
 ---
@@ -369,12 +369,12 @@ When $x_0$ and $x_1$ are independent (as in the initial training), there is a lo
 
 After reflowing, $x_0$ and $\hat{x}_1$ are coupled by the flow itself. Paths that previously crossed now tend to be parallel (because $\hat{x}_1$ is the destination that the flow already assigns to $x_0$). With less crossing, there is less velocity averaging, less compromise, and the paths are straighter.
 
-<svg viewBox="0 0 700 350" xmlns="http://www.w3.org/2000/svg" style="background: white; max-width: 700px; display: block; margin: 2em auto;">
-  <text x="350" y="25" text-anchor="middle" font-size="14" font-weight="bold" fill="#333">Rectified Flow: Path Straightening via Reflow</text>
+<svg viewBox="0 0 700 350" xmlns="http://www.w3.org/2000/svg" style="max-width: 700px; display: block; margin: 2em auto;">
+  <text x="350" y="25" text-anchor="middle" font-size="14" font-weight="bold" fill="#d4d4d4">Rectified Flow: Path Straightening via Reflow</text>
 
   <!-- Left panel: Initial (crossing paths) -->
   <text x="175" y="55" text-anchor="middle" font-size="12" font-weight="bold" fill="#E53935">Before Reflow</text>
-  <text x="175" y="70" text-anchor="middle" font-size="10" fill="#999">Independent coupling (x₀, x₁)</text>
+  <text x="175" y="70" text-anchor="middle" font-size="10" fill="#666">Independent coupling (x₀, x₁)</text>
 
   <!-- Noise points (left side) -->
   <circle cx="40" cy="120" r="4" fill="#E53935" opacity="0.5"/>
@@ -395,19 +395,19 @@ After reflowing, $x_0$ and $\hat{x}_1$ are coupled by the flow itself. Paths tha
   <path d="M 44,300 C 120,290 200,250 306,240" fill="none" stroke="#FB8C00" stroke-width="1.5" opacity="0.7"/>
 
   <!-- Crossing indicator -->
-  <circle cx="155" cy="195" r="12" fill="none" stroke="#333" stroke-width="1" stroke-dasharray="3,2"/>
-  <text x="155" y="198" text-anchor="middle" font-size="8" fill="#333">cross</text>
+  <circle cx="155" cy="195" r="12" fill="none" stroke="#d4d4d4" stroke-width="1" stroke-dasharray="3,2"/>
+  <text x="155" y="198" text-anchor="middle" font-size="8" fill="#d4d4d4">cross</text>
 
   <!-- Labels -->
-  <text x="40" y="330" text-anchor="middle" font-size="10" fill="#666">x₀</text>
-  <text x="310" y="330" text-anchor="middle" font-size="10" fill="#666">x₁</text>
+  <text x="40" y="330" text-anchor="middle" font-size="10" fill="#999">x₀</text>
+  <text x="310" y="330" text-anchor="middle" font-size="10" fill="#999">x₁</text>
 
   <!-- Divider -->
-  <line x1="350" y1="45" x2="350" y2="320" stroke="#ddd" stroke-width="1" stroke-dasharray="4,4"/>
+  <line x1="350" y1="45" x2="350" y2="320" stroke="#444" stroke-width="1" stroke-dasharray="4,4"/>
 
   <!-- Right panel: After reflow (parallel paths) -->
   <text x="525" y="55" text-anchor="middle" font-size="12" font-weight="bold" fill="#1E88E5">After Reflow</text>
-  <text x="525" y="70" text-anchor="middle" font-size="10" fill="#999">Coupled (x₀, x̂₁) from learned flow</text>
+  <text x="525" y="70" text-anchor="middle" font-size="10" fill="#666">Coupled (x₀, x̂₁) from learned flow</text>
 
   <!-- Noise points -->
   <circle cx="390" cy="120" r="4" fill="#E53935" opacity="0.5"/>
@@ -428,8 +428,8 @@ After reflowing, $x_0$ and $\hat{x}_1$ are coupled by the flow itself. Paths tha
   <line x1="394" y1="300" x2="656" y2="305" stroke="#FB8C00" stroke-width="1.8" opacity="0.8"/>
 
   <!-- Labels -->
-  <text x="390" y="330" text-anchor="middle" font-size="10" fill="#666">x₀</text>
-  <text x="660" y="330" text-anchor="middle" font-size="10" fill="#666">x̂₁</text>
+  <text x="390" y="330" text-anchor="middle" font-size="10" fill="#999">x₀</text>
+  <text x="660" y="330" text-anchor="middle" font-size="10" fill="#999">x̂₁</text>
 </svg>
 
 ### Why Straighter Paths Need Fewer Steps

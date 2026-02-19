@@ -187,14 +187,15 @@ Each patch can attend to every other patch in the same frame. This enables:
 - **Spatial coherence**: Edges align, textures are consistent, objects have correct proportions
 - **Compositional understanding**: The model can reason about spatial relationships between objects
 
-<svg viewBox="0 0 700 500" xmlns="http://www.w3.org/2000/svg" style="background: white; max-width: 700px; display: block; margin: 2em auto;">
-  <text x="350" y="25" text-anchor="middle" font-family="Arial, sans-serif" font-size="16" font-weight="bold" fill="#333">Spatial vs Temporal Attention Patterns</text>
+<svg viewBox="0 0 700 500" xmlns="http://www.w3.org/2000/svg" style="max-width: 700px; display: block; margin: 2em auto;">
+  <text x="350" y="25" text-anchor="middle" font-family="Arial, sans-serif" font-size="16" font-weight="bold" fill="#d4d4d4">Spatial vs Temporal Attention Patterns</text>
   <!-- Left: Spatial attention -->
   <text x="190" y="55" text-anchor="middle" font-family="Arial, sans-serif" font-size="14" font-weight="bold" fill="#4fc3f7">Spatial Attention</text>
   <text x="190" y="72" text-anchor="middle" font-family="Arial, sans-serif" font-size="11" fill="#999">Within each frame independently</text>
+
   <!-- Frame grid - Frame 1 -->
   <rect x="60" y="85" width="120" height="90" fill="none" stroke="#4fc3f7" stroke-width="2" rx="3"/>
-  <text x="120" y="80" text-anchor="middle" font-family="Arial, sans-serif" font-size="10" fill="#666">Frame 1</text>
+  <text x="120" y="80" text-anchor="middle" font-family="Arial, sans-serif" font-size="10" fill="#999">Frame 1</text>
   <!-- 4x3 grid of tokens -->
   <rect x="65" y="90" width="25" height="25" fill="#4fc3f7" fill-opacity="0.3" stroke="#4fc3f7" stroke-width="0.5"/>
   <rect x="95" y="90" width="25" height="25" fill="#4fc3f7" fill-opacity="0.15" stroke="#4fc3f7" stroke-width="0.5"/>
@@ -224,19 +225,19 @@ Each patch can attend to every other patch in the same frame. This enables:
   <line x1="108" y1="133" x2="168" y2="163" stroke="#4fc3f7" stroke-width="1" opacity="0.2"/>
   <!-- Frame 2 (independent, no cross-frame connections) -->
   <rect x="210" y="85" width="120" height="90" fill="none" stroke="#4fc3f7" stroke-width="2" rx="3"/>
-  <text x="270" y="80" text-anchor="middle" font-family="Arial, sans-serif" font-size="10" fill="#666">Frame 2</text>
-  <rect x="215" y="90" width="25" height="25" fill="#e0e0e0" stroke="#ccc" stroke-width="0.5"/>
-  <rect x="245" y="90" width="25" height="25" fill="#e0e0e0" stroke="#ccc" stroke-width="0.5"/>
-  <rect x="275" y="90" width="25" height="25" fill="#e0e0e0" stroke="#ccc" stroke-width="0.5"/>
-  <rect x="305" y="90" width="25" height="25" fill="#e0e0e0" stroke="#ccc" stroke-width="0.5"/>
-  <rect x="215" y="120" width="25" height="25" fill="#e0e0e0" stroke="#ccc" stroke-width="0.5"/>
-  <rect x="245" y="120" width="25" height="25" fill="#e0e0e0" stroke="#ccc" stroke-width="0.5"/>
-  <rect x="275" y="120" width="25" height="25" fill="#e0e0e0" stroke="#ccc" stroke-width="0.5"/>
-  <rect x="305" y="120" width="25" height="25" fill="#e0e0e0" stroke="#ccc" stroke-width="0.5"/>
-  <rect x="215" y="150" width="25" height="25" fill="#e0e0e0" stroke="#ccc" stroke-width="0.5"/>
-  <rect x="245" y="150" width="25" height="25" fill="#e0e0e0" stroke="#ccc" stroke-width="0.5"/>
-  <rect x="275" y="150" width="25" height="25" fill="#e0e0e0" stroke="#ccc" stroke-width="0.5"/>
-  <rect x="305" y="150" width="25" height="25" fill="#e0e0e0" stroke="#ccc" stroke-width="0.5"/>
+  <text x="270" y="80" text-anchor="middle" font-family="Arial, sans-serif" font-size="10" fill="#999">Frame 2</text>
+  <rect x="215" y="90" width="25" height="25" fill="#2a2a2a" stroke="#444" stroke-width="0.5"/>
+  <rect x="245" y="90" width="25" height="25" fill="#2a2a2a" stroke="#444" stroke-width="0.5"/>
+  <rect x="275" y="90" width="25" height="25" fill="#2a2a2a" stroke="#444" stroke-width="0.5"/>
+  <rect x="305" y="90" width="25" height="25" fill="#2a2a2a" stroke="#444" stroke-width="0.5"/>
+  <rect x="215" y="120" width="25" height="25" fill="#2a2a2a" stroke="#444" stroke-width="0.5"/>
+  <rect x="245" y="120" width="25" height="25" fill="#2a2a2a" stroke="#444" stroke-width="0.5"/>
+  <rect x="275" y="120" width="25" height="25" fill="#2a2a2a" stroke="#444" stroke-width="0.5"/>
+  <rect x="305" y="120" width="25" height="25" fill="#2a2a2a" stroke="#444" stroke-width="0.5"/>
+  <rect x="215" y="150" width="25" height="25" fill="#2a2a2a" stroke="#444" stroke-width="0.5"/>
+  <rect x="245" y="150" width="25" height="25" fill="#2a2a2a" stroke="#444" stroke-width="0.5"/>
+  <rect x="275" y="150" width="25" height="25" fill="#2a2a2a" stroke="#444" stroke-width="0.5"/>
+  <rect x="305" y="150" width="25" height="25" fill="#2a2a2a" stroke="#444" stroke-width="0.5"/>
   <text x="270" y="195" text-anchor="middle" font-family="Arial, sans-serif" font-size="10" fill="#999">(processed separately)</text>
   <!-- Complexity -->
   <text x="190" y="220" text-anchor="middle" font-family="monospace" font-size="12" fill="#4fc3f7">O(N_s^2) per frame</text>
@@ -244,35 +245,35 @@ Each patch can attend to every other patch in the same frame. This enables:
   <text x="530" y="55" text-anchor="middle" font-family="Arial, sans-serif" font-size="14" font-weight="bold" fill="#ef5350">Temporal Attention</text>
   <text x="530" y="72" text-anchor="middle" font-family="Arial, sans-serif" font-size="11" fill="#999">Same position across frames</text>
   <!-- 4 frames stacked vertically -->
-  <rect x="420" y="85" width="120" height="35" fill="none" stroke="#ccc" stroke-width="1" rx="2"/>
-  <text x="410" y="107" text-anchor="end" font-family="Arial, sans-serif" font-size="10" fill="#666">t=1</text>
-  <rect x="420" y="130" width="120" height="35" fill="none" stroke="#ccc" stroke-width="1" rx="2"/>
-  <text x="410" y="152" text-anchor="end" font-family="Arial, sans-serif" font-size="10" fill="#666">t=2</text>
-  <rect x="420" y="175" width="120" height="35" fill="none" stroke="#ccc" stroke-width="1" rx="2"/>
-  <text x="410" y="197" text-anchor="end" font-family="Arial, sans-serif" font-size="10" fill="#666">t=3</text>
-  <rect x="420" y="220" width="120" height="35" fill="none" stroke="#ccc" stroke-width="1" rx="2"/>
-  <text x="410" y="242" text-anchor="end" font-family="Arial, sans-serif" font-size="10" fill="#666">t=4</text>
+  <rect x="420" y="85" width="120" height="35" fill="none" stroke="#444" stroke-width="1" rx="2"/>
+  <text x="410" y="107" text-anchor="end" font-family="Arial, sans-serif" font-size="10" fill="#999">t=1</text>
+  <rect x="420" y="130" width="120" height="35" fill="none" stroke="#444" stroke-width="1" rx="2"/>
+  <text x="410" y="152" text-anchor="end" font-family="Arial, sans-serif" font-size="10" fill="#999">t=2</text>
+  <rect x="420" y="175" width="120" height="35" fill="none" stroke="#444" stroke-width="1" rx="2"/>
+  <text x="410" y="197" text-anchor="end" font-family="Arial, sans-serif" font-size="10" fill="#999">t=3</text>
+  <rect x="420" y="220" width="120" height="35" fill="none" stroke="#444" stroke-width="1" rx="2"/>
+  <text x="410" y="242" text-anchor="end" font-family="Arial, sans-serif" font-size="10" fill="#999">t=4</text>
   <!-- Tokens in each frame - highlight the same spatial position -->
   <!-- Frame 1 tokens -->
-  <rect x="425" y="90" width="22" height="25" fill="#e0e0e0" stroke="#ccc" stroke-width="0.5"/>
+  <rect x="425" y="90" width="22" height="25" fill="#2a2a2a" stroke="#444" stroke-width="0.5"/>
   <rect x="452" y="90" width="22" height="25" fill="#ef5350" fill-opacity="0.3" stroke="#ef5350" stroke-width="1.5"/>
-  <rect x="479" y="90" width="22" height="25" fill="#e0e0e0" stroke="#ccc" stroke-width="0.5"/>
-  <rect x="506" y="90" width="22" height="25" fill="#e0e0e0" stroke="#ccc" stroke-width="0.5"/>
+  <rect x="479" y="90" width="22" height="25" fill="#2a2a2a" stroke="#444" stroke-width="0.5"/>
+  <rect x="506" y="90" width="22" height="25" fill="#2a2a2a" stroke="#444" stroke-width="0.5"/>
   <!-- Frame 2 tokens -->
-  <rect x="425" y="135" width="22" height="25" fill="#e0e0e0" stroke="#ccc" stroke-width="0.5"/>
+  <rect x="425" y="135" width="22" height="25" fill="#2a2a2a" stroke="#444" stroke-width="0.5"/>
   <rect x="452" y="135" width="22" height="25" fill="#ef5350" fill-opacity="0.6" stroke="#ef5350" stroke-width="1.5"/>
-  <rect x="479" y="135" width="22" height="25" fill="#e0e0e0" stroke="#ccc" stroke-width="0.5"/>
-  <rect x="506" y="135" width="22" height="25" fill="#e0e0e0" stroke="#ccc" stroke-width="0.5"/>
+  <rect x="479" y="135" width="22" height="25" fill="#2a2a2a" stroke="#444" stroke-width="0.5"/>
+  <rect x="506" y="135" width="22" height="25" fill="#2a2a2a" stroke="#444" stroke-width="0.5"/>
   <!-- Frame 3 tokens -->
-  <rect x="425" y="180" width="22" height="25" fill="#e0e0e0" stroke="#ccc" stroke-width="0.5"/>
+  <rect x="425" y="180" width="22" height="25" fill="#2a2a2a" stroke="#444" stroke-width="0.5"/>
   <rect x="452" y="180" width="22" height="25" fill="#ef5350" fill-opacity="0.8" stroke="#ef5350" stroke-width="1.5"/>
-  <rect x="479" y="180" width="22" height="25" fill="#e0e0e0" stroke="#ccc" stroke-width="0.5"/>
-  <rect x="506" y="180" width="22" height="25" fill="#e0e0e0" stroke="#ccc" stroke-width="0.5"/>
+  <rect x="479" y="180" width="22" height="25" fill="#2a2a2a" stroke="#444" stroke-width="0.5"/>
+  <rect x="506" y="180" width="22" height="25" fill="#2a2a2a" stroke="#444" stroke-width="0.5"/>
   <!-- Frame 4 tokens -->
-  <rect x="425" y="225" width="22" height="25" fill="#e0e0e0" stroke="#ccc" stroke-width="0.5"/>
+  <rect x="425" y="225" width="22" height="25" fill="#2a2a2a" stroke="#444" stroke-width="0.5"/>
   <rect x="452" y="225" width="22" height="25" fill="#ef5350" fill-opacity="1.0" stroke="#ef5350" stroke-width="1.5"/>
-  <rect x="479" y="225" width="22" height="25" fill="#e0e0e0" stroke="#ccc" stroke-width="0.5"/>
-  <rect x="506" y="225" width="22" height="25" fill="#e0e0e0" stroke="#ccc" stroke-width="0.5"/>
+  <rect x="479" y="225" width="22" height="25" fill="#2a2a2a" stroke="#444" stroke-width="0.5"/>
+  <rect x="506" y="225" width="22" height="25" fill="#2a2a2a" stroke="#444" stroke-width="0.5"/>
   <!-- Temporal connections (vertical) -->
   <line x1="463" y1="115" x2="463" y2="135" stroke="#ef5350" stroke-width="2"/>
   <line x1="463" y1="160" x2="463" y2="180" stroke="#ef5350" stroke-width="2"/>
@@ -287,11 +288,11 @@ Each patch can attend to every other patch in the same frame. This enables:
   <!-- Complexity -->
   <text x="530" y="280" text-anchor="middle" font-family="monospace" font-size="12" fill="#ef5350">O(T^2) per position</text>
   <!-- Bottom: Combined -->
-  <rect x="60" y="310" width="600" height="170" rx="8" fill="#f8f8f8" stroke="#ddd" stroke-width="1"/>
-  <text x="360" y="340" text-anchor="middle" font-family="Arial, sans-serif" font-size="14" font-weight="bold" fill="#333">Combined Spatiotemporal (Factored)</text>
-  <text x="360" y="365" text-anchor="middle" font-family="monospace" font-size="13" fill="#333">Total: O(N_s^2 * T + N_s * T^2)</text>
-  <text x="360" y="395" text-anchor="middle" font-family="Arial, sans-serif" font-size="12" fill="#666">Alternating spatial and temporal layers instead of full 3D attention</text>
-  <text x="360" y="425" text-anchor="middle" font-family="monospace" font-size="12" fill="#ef5350">Full 3D would be: O((N_s * T)^2) -- prohibitively expensive</text>
+  <rect x="60" y="310" width="600" height="170" rx="8" fill="#1e1e1e" stroke="#444" stroke-width="1"/>
+  <text x="360" y="340" text-anchor="middle" font-family="Arial, sans-serif" font-size="14" font-weight="bold" fill="#d4d4d4">Combined Spatiotemporal (Factored)</text>
+  <text x="360" y="365" text-anchor="middle" font-family="monospace" font-size="13" fill="#d4d4d4">Total: O(N_s² * T + N_s * T²)</text>
+  <text x="360" y="395" text-anchor="middle" font-family="Arial, sans-serif" font-size="12" fill="#999">Alternating spatial and temporal layers instead of full 3D attention</text>
+  <text x="360" y="425" text-anchor="middle" font-family="monospace" font-size="12" fill="#ef5350">Full 3D would be: O((N_s * T)²) -- prohibitively expensive</text>
   <!-- Comparison numbers -->
   <text x="180" y="460" text-anchor="middle" font-family="Arial, sans-serif" font-size="11" fill="#8bc34a">Factored: ~2.5 TFLOPs</text>
   <text x="480" y="460" text-anchor="middle" font-family="Arial, sans-serif" font-size="11" fill="#ef5350">Full 3D: ~2,400 TFLOPs</text>

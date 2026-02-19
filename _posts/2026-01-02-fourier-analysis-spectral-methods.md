@@ -54,16 +54,16 @@ This means the waveform of any musical instrument, no matter how complex it look
 
 Now extend this idea: it is not just musical instruments. **Any** periodic function --- square waves, sawtooth waves, triangle waves, arbitrary wiggly periodic shapes --- can be decomposed into sines and cosines. And as we will see later, even non-periodic functions have a frequency decomposition, just with a continuous spectrum instead of discrete harmonics.
 
-<svg viewBox="0 0 700 350" xmlns="http://www.w3.org/2000/svg" style="background: white; max-width: 700px; display: block; margin: 2em auto;">
-  <text x="350" y="25" text-anchor="middle" font-size="14" font-weight="bold" fill="#333">Building a Square Wave from Sines</text>
+<svg viewBox="0 0 700 350" xmlns="http://www.w3.org/2000/svg" style="max-width: 700px; display: block; margin: 2em auto;">
+  <text x="350" y="25" text-anchor="middle" font-size="14" font-weight="bold" fill="#e8e8e8">Building a Square Wave from Sines</text>
   <!-- Axes -->
-  <line x1="50" y1="80" x2="650" y2="80" stroke="#ccc" stroke-width="1"/>
-  <line x1="50" y1="180" x2="650" y2="180" stroke="#ccc" stroke-width="1"/>
-  <line x1="50" y1="280" x2="650" y2="280" stroke="#ccc" stroke-width="1"/>
+  <line x1="50" y1="80" x2="650" y2="80" stroke="#444" stroke-width="1"/>
+  <line x1="50" y1="180" x2="650" y2="180" stroke="#444" stroke-width="1"/>
+  <line x1="50" y1="280" x2="650" y2="280" stroke="#444" stroke-width="1"/>
   <!-- Labels -->
-  <text x="40" y="85" text-anchor="end" font-size="11" fill="#666">sin(t)</text>
-  <text x="40" y="185" text-anchor="end" font-size="11" fill="#666">+ sin(3t)/3</text>
-  <text x="40" y="285" text-anchor="end" font-size="11" fill="#666">+ sin(5t)/5 + ...</text>
+  <text x="40" y="85" text-anchor="end" font-size="11" fill="#999">sin(t)</text>
+  <text x="40" y="185" text-anchor="end" font-size="11" fill="#999">+ sin(3t)/3</text>
+  <text x="40" y="285" text-anchor="end" font-size="11" fill="#999">+ sin(5t)/5 + ...</text>
   <!-- Fundamental sine -->
   <path d="M50,80 Q200,40 350,80 Q500,120 650,80" stroke="#2563eb" stroke-width="2.5" fill="none"/>
   <!-- Sum of 1st and 3rd harmonic (approximation) -->
@@ -73,11 +73,11 @@ Now extend this idea: it is not just musical instruments. **Any** periodic funct
   <path d="M50,280 Q90,248 130,252 Q160,254 170,280 Q180,306 210,310 Q250,312 290,280 Q310,252 350,250 Q390,252 410,280 Q420,306 450,310 Q490,312 530,280 Q550,252 590,250 Q630,252 650,258" stroke="#16a34a" stroke-width="2.5" fill="none"/>
   <!-- Legend -->
   <rect x="200" y="320" width="15" height="3" fill="#2563eb"/>
-  <text x="220" y="325" font-size="10" fill="#333">Fundamental</text>
+  <text x="220" y="325" font-size="10" fill="#d4d4d4">Fundamental</text>
   <rect x="310" y="320" width="15" height="3" fill="#dc2626"/>
-  <text x="330" y="325" font-size="10" fill="#333">2 terms</text>
+  <text x="330" y="325" font-size="10" fill="#d4d4d4">2 terms</text>
   <rect x="400" y="320" width="15" height="3" fill="#16a34a"/>
-  <text x="420" y="325" font-size="10" fill="#333">Many terms (approaching square)</text>
+  <text x="420" y="325" font-size="10" fill="#d4d4d4">Many terms (approaching square)</text>
 </svg>
 
 ---

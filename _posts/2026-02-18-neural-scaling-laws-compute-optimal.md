@@ -49,19 +49,19 @@ $$L(x) = a \cdot x^{-\alpha} + L_\infty$$
 
 The quantity $L(x) - L_\infty$ is the **reducible loss**: the part that better modeling can actually shrink. It is this reducible component that follows the power law.
 
-<svg viewBox="0 0 700 380" xmlns="http://www.w3.org/2000/svg" style="background: white; max-width: 700px; display: block; margin: 2em auto;">
+<svg viewBox="0 0 700 380" xmlns="http://www.w3.org/2000/svg" style="max-width: 700px; display: block; margin: 2em auto;">
   <defs>
     <marker id="arrowhead" markerWidth="10" markerHeight="7" refX="10" refY="3.5" orient="auto">
-      <polygon points="0 0, 10 3.5, 0 7" fill="#333"/>
+      <polygon points="0 0, 10 3.5, 0 7" fill="#d4d4d4"/>
     </marker>
   </defs>
   <!-- Title -->
-  <text x="350" y="25" text-anchor="middle" font-family="Arial, sans-serif" font-size="15" font-weight="bold" fill="#333">Power Law with Irreducible Loss</text>
+  <text x="350" y="25" text-anchor="middle" font-family="Arial, sans-serif" font-size="15" font-weight="bold" fill="#d4d4d4">Power Law with Irreducible Loss</text>
   <!-- Axes -->
-  <line x1="80" y1="320" x2="650" y2="320" stroke="#333" stroke-width="2" marker-end="url(#arrowhead)"/>
-  <line x1="80" y1="320" x2="80" y2="40" stroke="#333" stroke-width="2" marker-end="url(#arrowhead)"/>
-  <text x="380" y="360" text-anchor="middle" font-family="Arial, sans-serif" font-size="13" fill="#333">log(x) — e.g. log(Parameters) or log(Data)</text>
-  <text x="25" y="180" text-anchor="middle" font-family="Arial, sans-serif" font-size="13" fill="#333" transform="rotate(-90, 25, 180)">Loss L(x)</text>
+  <line x1="80" y1="320" x2="650" y2="320" stroke="#d4d4d4" stroke-width="2" marker-end="url(#arrowhead)"/>
+  <line x1="80" y1="320" x2="80" y2="40" stroke="#d4d4d4" stroke-width="2" marker-end="url(#arrowhead)"/>
+  <text x="380" y="360" text-anchor="middle" font-family="Arial, sans-serif" font-size="13" fill="#d4d4d4">log(x) — e.g. log(Parameters) or log(Data)</text>
+  <text x="25" y="180" text-anchor="middle" font-family="Arial, sans-serif" font-size="13" fill="#d4d4d4" transform="rotate(-90, 25, 180)">Loss L(x)</text>
   <!-- Irreducible loss line -->
   <line x1="80" y1="270" x2="640" y2="270" stroke="#e57373" stroke-width="2" stroke-dasharray="8,4"/>
   <text x="645" y="266" font-family="Arial, sans-serif" font-size="12" fill="#e57373" text-anchor="start">L&#x221E;</text>
@@ -76,9 +76,9 @@ The quantity $L(x) - L_\infty$ is the **reducible loss**: the part that better m
   <!-- Curve label -->
   <text x="300" y="145" font-family="Arial, sans-serif" font-size="12" fill="#4fc3f7" font-weight="bold">L(x) = a x^(-&#x3B1;) + L&#x221E;</text>
   <!-- Slope annotation -->
-  <line x1="130" y1="110" x2="230" y2="110" stroke="#999" stroke-width="1" stroke-dasharray="3,3"/>
-  <line x1="230" y1="110" x2="230" y2="175" stroke="#999" stroke-width="1" stroke-dasharray="3,3"/>
-  <text x="245" y="148" font-family="Arial, sans-serif" font-size="11" fill="#999">slope = -&#x3B1;</text>
+  <line x1="130" y1="110" x2="230" y2="110" stroke="#666" stroke-width="1" stroke-dasharray="3,3"/>
+  <line x1="230" y1="110" x2="230" y2="175" stroke="#666" stroke-width="1" stroke-dasharray="3,3"/>
+  <text x="245" y="148" font-family="Arial, sans-serif" font-size="11" fill="#666">slope = -&#x3B1;</text>
 </svg>
 
 ---
@@ -179,42 +179,42 @@ This has a clean interpretation. The loss decomposes into three additive terms:
 
 The key structural insight: these three sources of loss are **additive and independent**. Making the model bigger only helps the first term. Adding more data only helps the second term. Neither helps the third.
 
-<svg viewBox="0 0 700 350" xmlns="http://www.w3.org/2000/svg" style="background: white; max-width: 700px; display: block; margin: 2em auto;">
-  <text x="350" y="25" text-anchor="middle" font-family="Arial, sans-serif" font-size="15" font-weight="bold" fill="#333">Decomposition of Loss</text>
+<svg viewBox="0 0 700 350" xmlns="http://www.w3.org/2000/svg" style="max-width: 700px; display: block; margin: 2em auto;">
+  <text x="350" y="25" text-anchor="middle" font-family="Arial, sans-serif" font-size="15" font-weight="bold" fill="#d4d4d4">Decomposition of Loss</text>
   <!-- Three boxes -->
-  <rect x="30" y="50" width="190" height="260" rx="10" fill="#e3f2fd" stroke="#4fc3f7" stroke-width="2"/>
-  <rect x="250" y="50" width="190" height="260" rx="10" fill="#fce4ec" stroke="#e57373" stroke-width="2"/>
-  <rect x="470" y="50" width="190" height="260" rx="10" fill="#f3e5f5" stroke="#ab47bc" stroke-width="2"/>
+  <rect x="30" y="50" width="190" height="260" rx="10" fill="#0c2d4a" stroke="#4fc3f7" stroke-width="2"/>
+  <rect x="250" y="50" width="190" height="260" rx="10" fill="#3d1520" stroke="#e57373" stroke-width="2"/>
+  <rect x="470" y="50" width="190" height="260" rx="10" fill="#2d1a47" stroke="#ab47bc" stroke-width="2"/>
   <!-- Plus signs -->
-  <text x="235" y="185" text-anchor="middle" font-family="Arial, sans-serif" font-size="28" font-weight="bold" fill="#333">+</text>
-  <text x="455" y="185" text-anchor="middle" font-family="Arial, sans-serif" font-size="28" font-weight="bold" fill="#333">+</text>
+  <text x="235" y="185" text-anchor="middle" font-family="Arial, sans-serif" font-size="28" font-weight="bold" fill="#d4d4d4">+</text>
+  <text x="455" y="185" text-anchor="middle" font-family="Arial, sans-serif" font-size="28" font-weight="bold" fill="#d4d4d4">+</text>
   <!-- Box 1: Approximation -->
   <text x="125" y="80" text-anchor="middle" font-family="Arial, sans-serif" font-size="14" font-weight="bold" fill="#1976d2">Approximation</text>
   <text x="125" y="130" text-anchor="middle" font-family="Arial, sans-serif" font-size="22" fill="#1976d2">A / N^&#x3B1;</text>
-  <text x="125" y="170" text-anchor="middle" font-family="Arial, sans-serif" font-size="12" fill="#555">Model too small to</text>
-  <text x="125" y="186" text-anchor="middle" font-family="Arial, sans-serif" font-size="12" fill="#555">represent the true</text>
-  <text x="125" y="202" text-anchor="middle" font-family="Arial, sans-serif" font-size="12" fill="#555">distribution</text>
+  <text x="125" y="170" text-anchor="middle" font-family="Arial, sans-serif" font-size="12" fill="#999">Model too small to</text>
+  <text x="125" y="186" text-anchor="middle" font-family="Arial, sans-serif" font-size="12" fill="#999">represent the true</text>
+  <text x="125" y="202" text-anchor="middle" font-family="Arial, sans-serif" font-size="12" fill="#999">distribution</text>
   <text x="125" y="240" text-anchor="middle" font-family="Arial, sans-serif" font-size="12" fill="#1976d2" font-weight="bold">Fix: more parameters</text>
-  <text x="125" y="265" text-anchor="middle" font-family="Arial, sans-serif" font-size="11" fill="#555">&#x3B1; &#x2248; 0.34</text>
-  <text x="125" y="285" text-anchor="middle" font-family="Arial, sans-serif" font-size="11" fill="#555">Diminishes as N grows</text>
+  <text x="125" y="265" text-anchor="middle" font-family="Arial, sans-serif" font-size="11" fill="#999">&#x3B1; &#x2248; 0.34</text>
+  <text x="125" y="285" text-anchor="middle" font-family="Arial, sans-serif" font-size="11" fill="#999">Diminishes as N grows</text>
   <!-- Box 2: Estimation -->
   <text x="345" y="80" text-anchor="middle" font-family="Arial, sans-serif" font-size="14" font-weight="bold" fill="#c62828">Estimation</text>
   <text x="345" y="130" text-anchor="middle" font-family="Arial, sans-serif" font-size="22" fill="#c62828">B / D^&#x3B2;</text>
-  <text x="345" y="170" text-anchor="middle" font-family="Arial, sans-serif" font-size="12" fill="#555">Not enough data to</text>
-  <text x="345" y="186" text-anchor="middle" font-family="Arial, sans-serif" font-size="12" fill="#555">learn the parameters</text>
-  <text x="345" y="202" text-anchor="middle" font-family="Arial, sans-serif" font-size="12" fill="#555">the model has</text>
+  <text x="345" y="170" text-anchor="middle" font-family="Arial, sans-serif" font-size="12" fill="#999">Not enough data to</text>
+  <text x="345" y="186" text-anchor="middle" font-family="Arial, sans-serif" font-size="12" fill="#999">learn the parameters</text>
+  <text x="345" y="202" text-anchor="middle" font-family="Arial, sans-serif" font-size="12" fill="#999">the model has</text>
   <text x="345" y="240" text-anchor="middle" font-family="Arial, sans-serif" font-size="12" fill="#c62828" font-weight="bold">Fix: more data</text>
-  <text x="345" y="265" text-anchor="middle" font-family="Arial, sans-serif" font-size="11" fill="#555">&#x3B2; &#x2248; 0.28</text>
-  <text x="345" y="285" text-anchor="middle" font-family="Arial, sans-serif" font-size="11" fill="#555">Diminishes as D grows</text>
+  <text x="345" y="265" text-anchor="middle" font-family="Arial, sans-serif" font-size="11" fill="#999">&#x3B2; &#x2248; 0.28</text>
+  <text x="345" y="285" text-anchor="middle" font-family="Arial, sans-serif" font-size="11" fill="#999">Diminishes as D grows</text>
   <!-- Box 3: Irreducible -->
   <text x="565" y="80" text-anchor="middle" font-family="Arial, sans-serif" font-size="14" font-weight="bold" fill="#7b1fa2">Irreducible</text>
   <text x="565" y="130" text-anchor="middle" font-family="Arial, sans-serif" font-size="22" fill="#7b1fa2">L&#x221E;</text>
-  <text x="565" y="170" text-anchor="middle" font-family="Arial, sans-serif" font-size="12" fill="#555">Inherent entropy of</text>
-  <text x="565" y="186" text-anchor="middle" font-family="Arial, sans-serif" font-size="12" fill="#555">the data itself</text>
-  <text x="565" y="202" text-anchor="middle" font-family="Arial, sans-serif" font-size="12" fill="#555">(randomness in language)</text>
+  <text x="565" y="170" text-anchor="middle" font-family="Arial, sans-serif" font-size="12" fill="#999">Inherent entropy of</text>
+  <text x="565" y="186" text-anchor="middle" font-family="Arial, sans-serif" font-size="12" fill="#999">the data itself</text>
+  <text x="565" y="202" text-anchor="middle" font-family="Arial, sans-serif" font-size="12" fill="#999">(randomness in language)</text>
   <text x="565" y="240" text-anchor="middle" font-family="Arial, sans-serif" font-size="12" fill="#7b1fa2" font-weight="bold">No fix possible</text>
-  <text x="565" y="265" text-anchor="middle" font-family="Arial, sans-serif" font-size="11" fill="#555">&#x2248; 1.69 nats</text>
-  <text x="565" y="285" text-anchor="middle" font-family="Arial, sans-serif" font-size="11" fill="#555">Constant floor</text>
+  <text x="565" y="265" text-anchor="middle" font-family="Arial, sans-serif" font-size="11" fill="#999">&#x2248; 1.69 nats</text>
+  <text x="565" y="285" text-anchor="middle" font-family="Arial, sans-serif" font-size="11" fill="#999">Constant floor</text>
 </svg>
 
 ### Where Kaplan Went Wrong

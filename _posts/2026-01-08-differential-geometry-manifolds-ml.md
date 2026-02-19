@@ -83,12 +83,12 @@ The standard atlas for $S^2$ uses **stereographic projection** from two charts:
 
 Together, they cover all of $S^2$.
 
-<svg viewBox="0 0 700 380" xmlns="http://www.w3.org/2000/svg" style="background: white; max-width: 700px; display: block; margin: 2em auto;">
-  <text x="350" y="25" text-anchor="middle" font-size="15" font-weight="bold" fill="#333">Stereographic Projection: A Chart on S^2</text>
+<svg viewBox="0 0 700 380" xmlns="http://www.w3.org/2000/svg" style="max-width: 700px; display: block; margin: 2em auto;">
+  <text x="350" y="25" text-anchor="middle" font-size="15" font-weight="bold" fill="#d4d4d4">Stereographic Projection: A Chart on S²</text>
 
   <!-- Sphere -->
-  <ellipse cx="250" cy="200" rx="120" ry="120" fill="none" stroke="#333" stroke-width="2"/>
-  <ellipse cx="250" cy="200" rx="120" ry="30" fill="none" stroke="#333" stroke-width="1" stroke-dasharray="5,5"/>
+  <ellipse cx="250" cy="200" rx="120" ry="120" fill="none" stroke="#d4d4d4" stroke-width="2"/>
+  <ellipse cx="250" cy="200" rx="120" ry="30" fill="none" stroke="#d4d4d4" stroke-width="1" stroke-dasharray="5,5"/>
 
   <!-- North pole -->
   <circle cx="250" cy="80" r="5" fill="#cc3333"/>
@@ -106,8 +106,8 @@ Together, they cover all of $S^2$.
   <line x1="250" y1="80" x2="500" y2="360" stroke="#cc3333" stroke-width="1.5" stroke-dasharray="6,3"/>
 
   <!-- Projection plane -->
-  <line x1="100" y1="360" x2="560" y2="360" stroke="#333" stroke-width="2"/>
-  <text x="570" y="365" font-size="12" fill="#333">ℝ^2</text>
+  <line x1="100" y1="360" x2="560" y2="360" stroke="#d4d4d4" stroke-width="2"/>
+  <text x="570" y="365" font-size="12" fill="#d4d4d4">ℝ²</text>
 
   <!-- Projected point -->
   <circle cx="500" cy="360" r="5" fill="#339933"/>
@@ -118,22 +118,22 @@ Together, they cover all of $S^2$.
   <text x="420" y="226" font-size="11" fill="#cc3333">from N through p</text>
 
   <!-- Right side: coordinate explanation -->
-  <rect x="560" y="60" width="130" height="120" rx="8" fill="#f5f5f5" stroke="#ccc" stroke-width="1"/>
-  <text x="625" y="82" text-anchor="middle" font-size="12" font-weight="bold" fill="#333">Chart (U, φ)</text>
-  <text x="625" y="102" text-anchor="middle" font-size="11" fill="#333">U = S² \ {N}</text>
-  <text x="625" y="122" text-anchor="middle" font-size="11" fill="#333">φ: U → ℝ²</text>
-  <text x="625" y="142" text-anchor="middle" font-size="11" fill="#333">φ(p) = (x, y)</text>
-  <text x="625" y="162" text-anchor="middle" font-size="11" fill="#666">Covers all of</text>
-  <text x="625" y="177" text-anchor="middle" font-size="11" fill="#666">S² except N</text>
+  <rect x="560" y="60" width="130" height="120" rx="8" fill="#1e1e1e" stroke="#444" stroke-width="1"/>
+  <text x="625" y="82" text-anchor="middle" font-size="12" font-weight="bold" fill="#d4d4d4">Chart (U, φ)</text>
+  <text x="625" y="102" text-anchor="middle" font-size="11" fill="#d4d4d4">U = S² \ {N}</text>
+  <text x="625" y="122" text-anchor="middle" font-size="11" fill="#d4d4d4">φ: U → ℝ²</text>
+  <text x="625" y="142" text-anchor="middle" font-size="11" fill="#d4d4d4">φ(p) = (x, y)</text>
+  <text x="625" y="162" text-anchor="middle" font-size="11" fill="#999">Covers all of</text>
+  <text x="625" y="177" text-anchor="middle" font-size="11" fill="#999">S² except N</text>
 
   <!-- Second chart note -->
-  <rect x="560" y="200" width="130" height="80" rx="8" fill="#f5f5f5" stroke="#ccc" stroke-width="1"/>
+  <rect x="560" y="200" width="130" height="80" rx="8" fill="#1e1e1e" stroke="#444" stroke-width="1"/>
   <text x="625" y="222" text-anchor="middle" font-size="11" fill="#336699">Second chart:</text>
   <text x="625" y="242" text-anchor="middle" font-size="11" fill="#336699">project from S</text>
   <text x="625" y="262" text-anchor="middle" font-size="11" fill="#336699">covers S² \ {S}</text>
 
-  <text x="625" y="310" text-anchor="middle" font-size="11" fill="#333">Together: full</text>
-  <text x="625" y="326" text-anchor="middle" font-size="11" fill="#333">atlas for S²</text>
+  <text x="625" y="310" text-anchor="middle" font-size="11" fill="#d4d4d4">Together: full</text>
+  <text x="625" y="326" text-anchor="middle" font-size="11" fill="#d4d4d4">atlas for S²</text>
 </svg>
 
 ---
@@ -166,8 +166,8 @@ $$\left\{\frac{\partial}{\partial x^1}\bigg|_p, \frac{\partial}{\partial x^2}\bi
 
 Any tangent vector $v \in T_pM$ can be written as $v = v^i \frac{\partial}{\partial x^i}\bigg|_p$ (using Einstein summation convention: repeated indices are summed).
 
-<svg viewBox="0 0 700 380" xmlns="http://www.w3.org/2000/svg" style="background: white; max-width: 700px; display: block; margin: 2em auto;">
-  <text x="350" y="25" text-anchor="middle" font-size="15" font-weight="bold" fill="#333">Tangent Plane to S² at Point p</text>
+<svg viewBox="0 0 700 380" xmlns="http://www.w3.org/2000/svg" style="max-width: 700px; display: block; margin: 2em auto;">
+  <text x="350" y="25" text-anchor="middle" font-size="15" font-weight="bold" fill="#d4d4d4">Tangent Plane to S² at Point p</text>
 
   <defs>
     <marker id="arrowTangent" markerWidth="10" markerHeight="7" refX="10" refY="3.5" orient="auto">
@@ -179,16 +179,16 @@ Any tangent vector $v \in T_pM$ can be written as $v = v^i \frac{\partial}{\part
   </defs>
 
   <!-- Sphere -->
-  <ellipse cx="280" cy="220" rx="150" ry="150" fill="#ddeeff" fill-opacity="0.3" stroke="#333" stroke-width="2"/>
-  <ellipse cx="280" cy="220" rx="150" ry="40" fill="none" stroke="#333" stroke-width="1" stroke-dasharray="5,5"/>
+  <ellipse cx="280" cy="220" rx="150" ry="150" fill="#1a2a40" fill-opacity="0.3" stroke="#d4d4d4" stroke-width="2"/>
+  <ellipse cx="280" cy="220" rx="150" ry="40" fill="none" stroke="#d4d4d4" stroke-width="1" stroke-dasharray="5,5"/>
 
   <!-- Point p (on upper part of sphere) -->
   <circle cx="340" cy="120" r="6" fill="#339933"/>
   <text x="352" y="115" font-size="13" fill="#339933" font-weight="bold">p</text>
 
   <!-- Tangent plane (parallelogram) -->
-  <polygon points="240,60 420,80 460,180 280,160" fill="#ffddbb" fill-opacity="0.4" stroke="#cc7733" stroke-width="1.5"/>
-  <text x="450" y="75" font-size="12" fill="#cc7733" font-weight="bold">T_p M</text>
+  <polygon points="240,60 420,80 460,180 280,160" fill="#cc7733" fill-opacity="0.15" stroke="#cc7733" stroke-width="1.5"/>
+  <text x="450" y="75" font-size="12" fill="#cc7733" font-weight="bold">TₚM</text>
 
   <!-- Tangent vectors -->
   <line x1="340" y1="120" x2="410" y2="110" stroke="#cc3333" stroke-width="2.5" marker-end="url(#arrowTangent)"/>
@@ -202,12 +202,12 @@ Any tangent vector $v \in T_pM$ can be written as $v = v^i \frac{\partial}{\part
   <text x="205" y="168" font-size="11" fill="#339933">γ(t)</text>
 
   <!-- Annotation -->
-  <rect x="490" y="120" width="190" height="100" rx="8" fill="#f5f5f5" stroke="#ccc" stroke-width="1"/>
-  <text x="585" y="142" text-anchor="middle" font-size="11" fill="#333">T_p M is the plane</text>
-  <text x="585" y="158" text-anchor="middle" font-size="11" fill="#333">tangent to M at p.</text>
-  <text x="585" y="180" text-anchor="middle" font-size="11" fill="#333">dim(T_p M) = dim(M)</text>
-  <text x="585" y="202" text-anchor="middle" font-size="11" fill="#333">Vectors live IN T_p M,</text>
-  <text x="585" y="218" text-anchor="middle" font-size="11" fill="#333">not in M itself.</text>
+  <rect x="490" y="120" width="190" height="100" rx="8" fill="#1e1e1e" stroke="#444" stroke-width="1"/>
+  <text x="585" y="142" text-anchor="middle" font-size="11" fill="#d4d4d4">TₚM is the plane</text>
+  <text x="585" y="158" text-anchor="middle" font-size="11" fill="#d4d4d4">tangent to M at p.</text>
+  <text x="585" y="180" text-anchor="middle" font-size="11" fill="#d4d4d4">dim(TₚM) = dim(M)</text>
+  <text x="585" y="202" text-anchor="middle" font-size="11" fill="#d4d4d4">Vectors live IN TₚM,</text>
+  <text x="585" y="218" text-anchor="middle" font-size="11" fill="#d4d4d4">not in M itself.</text>
 </svg>
 
 ---
@@ -445,8 +445,8 @@ The operator $D/dt$ is the **covariant derivative** along the curve. It adjusts 
 
 The key property of parallel transport on a curved manifold: **the result depends on the path.** If you parallel transport a vector from $A$ to $B$ along two different paths, you may get different results. The difference is exactly measured by the Riemann curvature tensor.
 
-<svg viewBox="0 0 700 350" xmlns="http://www.w3.org/2000/svg" style="background: white; max-width: 700px; display: block; margin: 2em auto;">
-  <text x="350" y="25" text-anchor="middle" font-size="15" font-weight="bold" fill="#333">Parallel Transport on S²: Path Dependence</text>
+<svg viewBox="0 0 700 350" xmlns="http://www.w3.org/2000/svg" style="max-width: 700px; display: block; margin: 2em auto;">
+  <text x="350" y="25" text-anchor="middle" font-size="15" font-weight="bold" fill="#d4d4d4">Parallel Transport on S²: Path Dependence</text>
 
   <defs>
     <marker id="arrowRed" markerWidth="8" markerHeight="6" refX="8" refY="3" orient="auto">
@@ -458,8 +458,8 @@ The key property of parallel transport on a curved manifold: **the result depend
   </defs>
 
   <!-- Sphere outline -->
-  <ellipse cx="280" cy="200" rx="160" ry="160" fill="#ddeeff" fill-opacity="0.2" stroke="#333" stroke-width="2"/>
-  <ellipse cx="280" cy="200" rx="160" ry="45" fill="none" stroke="#333" stroke-width="1" stroke-dasharray="4,4"/>
+  <ellipse cx="280" cy="200" rx="160" ry="160" fill="#1a2a40" fill-opacity="0.2" stroke="#d4d4d4" stroke-width="2"/>
+  <ellipse cx="280" cy="200" rx="160" ry="45" fill="none" stroke="#d4d4d4" stroke-width="1" stroke-dasharray="4,4"/>
 
   <!-- Triangle path on sphere: North Pole -> Equator(0) -> Equator(90) -> North Pole -->
   <!-- Path A -> B (along meridian) -->
@@ -475,12 +475,12 @@ The key property of parallel transport on a curved manifold: **the result depend
   <text x="195" y="110" font-size="11" fill="#4488cc">meridian φ=90°</text>
 
   <!-- Points -->
-  <circle cx="280" cy="45" r="6" fill="#333"/>
-  <text x="290" y="38" font-size="12" fill="#333" font-weight="bold">N (start)</text>
-  <circle cx="375" cy="195" r="5" fill="#333"/>
-  <text x="385" y="193" font-size="11" fill="#333">B</text>
-  <circle cx="185" cy="195" r="5" fill="#333"/>
-  <text x="160" y="193" font-size="11" fill="#333">C</text>
+  <circle cx="280" cy="45" r="6" fill="#d4d4d4"/>
+  <text x="290" y="38" font-size="12" fill="#d4d4d4" font-weight="bold">N (start)</text>
+  <circle cx="375" cy="195" r="5" fill="#d4d4d4"/>
+  <text x="385" y="193" font-size="11" fill="#d4d4d4">B</text>
+  <circle cx="185" cy="195" r="5" fill="#d4d4d4"/>
+  <text x="160" y="193" font-size="11" fill="#d4d4d4">C</text>
 
   <!-- Initial vector at N pointing "east" -->
   <line x1="280" y1="45" x2="320" y2="45" stroke="#cc3333" stroke-width="3" marker-end="url(#arrowRed)"/>
@@ -495,12 +495,12 @@ The key property of parallel transport on a curved manifold: **the result depend
   <text x="305" y="62" font-size="11" fill="#cc7733">90°</text>
 
   <!-- Explanation -->
-  <rect x="460" y="60" width="220" height="140" rx="8" fill="#f5f5f5" stroke="#ccc" stroke-width="1"/>
-  <text x="570" y="82" text-anchor="middle" font-size="12" font-weight="bold" fill="#333">Path dependence</text>
-  <text x="570" y="102" text-anchor="middle" font-size="11" fill="#333">Transport v around a</text>
-  <text x="570" y="118" text-anchor="middle" font-size="11" fill="#333">triangle with 3 right angles.</text>
-  <text x="570" y="142" text-anchor="middle" font-size="11" fill="#333">After returning to start,</text>
-  <text x="570" y="158" text-anchor="middle" font-size="11" fill="#333">v has rotated by 90°!</text>
+  <rect x="460" y="60" width="220" height="140" rx="8" fill="#1e1e1e" stroke="#444" stroke-width="1"/>
+  <text x="570" y="82" text-anchor="middle" font-size="12" font-weight="bold" fill="#d4d4d4">Path dependence</text>
+  <text x="570" y="102" text-anchor="middle" font-size="11" fill="#d4d4d4">Transport v around a</text>
+  <text x="570" y="118" text-anchor="middle" font-size="11" fill="#d4d4d4">triangle with 3 right angles.</text>
+  <text x="570" y="142" text-anchor="middle" font-size="11" fill="#d4d4d4">After returning to start,</text>
+  <text x="570" y="158" text-anchor="middle" font-size="11" fill="#d4d4d4">v has rotated by 90°!</text>
   <text x="570" y="182" text-anchor="middle" font-size="11" fill="#cc3333">Rotation angle = area/R²</text>
   <text x="570" y="198" text-anchor="middle" font-size="11" fill="#cc3333">= enclosed solid angle</text>
 </svg>

@@ -44,8 +44,8 @@ A few important definitions:
 - **Local minimum**: $\theta^*$ such that $f(\theta^*) \leq f(\theta)$ for all $\theta$ in some neighborhood of $\theta^*$. A valley that may not be the deepest.
 - **Saddle point**: A point where the gradient is zero but the point is neither a local maximum nor a local minimum. Nearby, the function curves up in some directions and down in others. Think of a mountain pass.
 
-<svg viewBox="0 0 700 300" xmlns="http://www.w3.org/2000/svg" style="background: white; max-width: 700px; display: block; margin: 2em auto;">
-  <text x="350" y="20" text-anchor="middle" font-size="14" font-weight="bold" fill="#333">Loss Landscape Features</text>
+<svg viewBox="0 0 700 300" xmlns="http://www.w3.org/2000/svg" style="max-width: 700px; display: block; margin: 2em auto;">
+  <text x="350" y="20" text-anchor="middle" font-size="14" font-weight="bold" fill="#e8e8e8">Loss Landscape Features</text>
   <!-- Curve representing loss landscape -->
   <path d="M30,200 Q80,60 150,170 Q200,240 250,180 Q280,140 320,160 Q370,190 400,100 Q430,30 460,100 Q500,190 540,180 Q580,170 620,150 Q660,135 680,140" stroke="#2563eb" stroke-width="2.5" fill="none"/>
   <!-- Global min marker -->
@@ -60,9 +60,9 @@ A few important definitions:
   <circle cx="320" cy="160" r="4" fill="#9333ea"/>
   <text x="320" y="145" text-anchor="middle" font-size="10" fill="#9333ea">Saddle point</text>
   <!-- Axes -->
-  <line x1="30" y1="260" x2="680" y2="260" stroke="#999" stroke-width="1"/>
-  <text x="350" y="285" text-anchor="middle" font-size="12" fill="#666">Parameter space θ</text>
-  <text x="15" y="150" text-anchor="middle" font-size="12" fill="#666" transform="rotate(-90, 15, 150)">Loss f(θ)</text>
+  <line x1="30" y1="260" x2="680" y2="260" stroke="#444" stroke-width="1"/>
+  <text x="350" y="285" text-anchor="middle" font-size="12" fill="#999">Parameter space θ</text>
+  <text x="15" y="150" text-anchor="middle" font-size="12" fill="#999" transform="rotate(-90, 15, 150)">Loss f(θ)</text>
 </svg>
 
 ---

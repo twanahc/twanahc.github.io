@@ -100,40 +100,40 @@ The minimum number of terms $R$ needed in this sum is the **matrix rank**. This 
 
 More generally, if $S$ is a tensor of type $(p_1, q_1)$ and $T$ is a tensor of type $(p_2, q_2)$, then $S \otimes T$ is a tensor of type $(p_1 + p_2, q_1 + q_2)$. The tensor product of vector spaces $V \otimes W$ is a new vector space whose dimension is $\dim(V) \times \dim(W)$.
 
-<svg viewBox="0 0 700 300" xmlns="http://www.w3.org/2000/svg" style="background: white; max-width: 700px; display: block; margin: 2em auto;">
-  <text x="350" y="25" text-anchor="middle" font-size="14" font-weight="bold" fill="#333">Tensor Product: From Vectors to Matrices (Outer Product)</text>
+<svg viewBox="0 0 700 300" xmlns="http://www.w3.org/2000/svg" style="max-width: 700px; display: block; margin: 2em auto;">
+  <text x="350" y="25" text-anchor="middle" font-size="14" font-weight="bold" fill="#d4d4d4">Tensor Product: From Vectors to Matrices (Outer Product)</text>
   <!-- Vector u -->
   <rect x="50" y="60" width="40" height="120" fill="none" stroke="#2196F3" stroke-width="2"/>
   <text x="70" y="55" text-anchor="middle" font-size="12" fill="#2196F3" font-weight="bold">u</text>
-  <text x="70" y="85" text-anchor="middle" font-size="11" fill="#333">u¹</text>
-  <text x="70" y="115" text-anchor="middle" font-size="11" fill="#333">u²</text>
-  <text x="70" y="145" text-anchor="middle" font-size="11" fill="#333">u³</text>
+  <text x="70" y="85" text-anchor="middle" font-size="11" fill="#d4d4d4">u¹</text>
+  <text x="70" y="115" text-anchor="middle" font-size="11" fill="#d4d4d4">u²</text>
+  <text x="70" y="145" text-anchor="middle" font-size="11" fill="#d4d4d4">u³</text>
   <!-- multiply sign -->
-  <text x="130" y="125" text-anchor="middle" font-size="20" fill="#333">⊗</text>
+  <text x="130" y="125" text-anchor="middle" font-size="20" fill="#d4d4d4">⊗</text>
   <!-- Vector w transpose -->
   <rect x="170" y="100" width="120" height="40" fill="none" stroke="#F44336" stroke-width="2"/>
   <text x="230" y="95" text-anchor="middle" font-size="12" fill="#F44336" font-weight="bold">w</text>
-  <text x="200" y="125" text-anchor="middle" font-size="11" fill="#333">w¹</text>
-  <text x="230" y="125" text-anchor="middle" font-size="11" fill="#333">w²</text>
-  <text x="260" y="125" text-anchor="middle" font-size="11" fill="#333">w³</text>
+  <text x="200" y="125" text-anchor="middle" font-size="11" fill="#d4d4d4">w¹</text>
+  <text x="230" y="125" text-anchor="middle" font-size="11" fill="#d4d4d4">w²</text>
+  <text x="260" y="125" text-anchor="middle" font-size="11" fill="#d4d4d4">w³</text>
   <!-- equals -->
-  <text x="330" y="125" text-anchor="middle" font-size="20" fill="#333">=</text>
+  <text x="330" y="125" text-anchor="middle" font-size="20" fill="#d4d4d4">=</text>
   <!-- Result matrix -->
   <rect x="370" y="60" width="120" height="120" fill="none" stroke="#9C27B0" stroke-width="2"/>
   <text x="430" y="55" text-anchor="middle" font-size="12" fill="#9C27B0" font-weight="bold">u ⊗ w</text>
-  <text x="400" y="90" text-anchor="middle" font-size="10" fill="#333">u¹w¹</text>
-  <text x="430" y="90" text-anchor="middle" font-size="10" fill="#333">u¹w²</text>
-  <text x="460" y="90" text-anchor="middle" font-size="10" fill="#333">u¹w³</text>
-  <text x="400" y="120" text-anchor="middle" font-size="10" fill="#333">u²w¹</text>
-  <text x="430" y="120" text-anchor="middle" font-size="10" fill="#333">u²w²</text>
-  <text x="460" y="120" text-anchor="middle" font-size="10" fill="#333">u²w³</text>
-  <text x="400" y="150" text-anchor="middle" font-size="10" fill="#333">u³w¹</text>
-  <text x="430" y="150" text-anchor="middle" font-size="10" fill="#333">u³w²</text>
-  <text x="460" y="150" text-anchor="middle" font-size="10" fill="#333">u³w³</text>
+  <text x="400" y="90" text-anchor="middle" font-size="10" fill="#d4d4d4">u¹w¹</text>
+  <text x="430" y="90" text-anchor="middle" font-size="10" fill="#d4d4d4">u¹w²</text>
+  <text x="460" y="90" text-anchor="middle" font-size="10" fill="#d4d4d4">u¹w³</text>
+  <text x="400" y="120" text-anchor="middle" font-size="10" fill="#d4d4d4">u²w¹</text>
+  <text x="430" y="120" text-anchor="middle" font-size="10" fill="#d4d4d4">u²w²</text>
+  <text x="460" y="120" text-anchor="middle" font-size="10" fill="#d4d4d4">u²w³</text>
+  <text x="400" y="150" text-anchor="middle" font-size="10" fill="#d4d4d4">u³w¹</text>
+  <text x="430" y="150" text-anchor="middle" font-size="10" fill="#d4d4d4">u³w²</text>
+  <text x="460" y="150" text-anchor="middle" font-size="10" fill="#d4d4d4">u³w³</text>
   <!-- Note -->
-  <text x="350" y="220" text-anchor="middle" font-size="12" fill="#666">The outer product u ⊗ w produces a rank-1 matrix.</text>
-  <text x="350" y="240" text-anchor="middle" font-size="12" fill="#666">Every matrix is a sum of rank-1 outer products (this is the SVD).</text>
-  <text x="350" y="260" text-anchor="middle" font-size="12" fill="#666">Tensor decompositions generalize this idea to higher dimensions.</text>
+  <text x="350" y="220" text-anchor="middle" font-size="12" fill="#999">The outer product u ⊗ w produces a rank-1 matrix.</text>
+  <text x="350" y="240" text-anchor="middle" font-size="12" fill="#999">Every matrix is a sum of rank-1 outer products (this is the SVD).</text>
+  <text x="350" y="260" text-anchor="middle" font-size="12" fill="#999">Tensor decompositions generalize this idea to higher dimensions.</text>
 </svg>
 
 ---
