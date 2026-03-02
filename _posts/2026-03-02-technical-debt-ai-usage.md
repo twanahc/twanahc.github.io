@@ -83,3 +83,25 @@ Each quadrant carries different risk profiles and different remediation costs. T
 Here is the question that matters for the rest of this post: AI code generation tools interact with each of these four quadrants differently. They make some quadrants cheaper, some more dangerous, and they shift the default distribution of where new debt lands. Understanding which quadrant your AI-generated code falls into is the difference between leveraging the tools and being buried by them.
 
 ---
+
+## The Mathematics of Debt Accumulation
+
+The financial metaphor is not just an analogy --- it can be formalized. The dynamics of technical debt follow patterns that anyone who has worked with coupled differential equations will recognize immediately, and making the structure explicit clarifies *why* debt is so dangerous even when each individual shortcut seems harmless.
+
+Start with the core observation. Your team's development velocity --- features shipped per unit time --- degrades as debt accumulates. But the degradation is not linear. The first few shortcuts barely register. Your codebase is clean, the shortcuts are isolated, and engineers route around them without thinking. The 50th shortcut starts to bite. The 100th makes everything take three times longer, because now every change touches something fragile, every debugging session requires archaeology, and every new feature interacts with load-bearing workarounds nobody fully understands. This is compounding. The natural model is exponential decay:
+
+$$V(t) = V_0 \cdot e^{-\alpha D(t)}$$
+
+Here \\(V_0\\) is the initial development velocity --- how fast your team ships when the codebase is clean. \\(D(t)\\) is the accumulated debt at time \\(t\\), measured in whatever units make sense for your context (complexity points, hours-to-refactor, incident count --- the specific unit matters less than tracking it consistently). The parameter \\(\alpha\\) is the debt sensitivity coefficient: it captures how aggressively debt translates into slowdown for *your* particular codebase and team. A well-modularized system with clean interfaces has low \\(\alpha\\). A monolith with everything coupled to everything has high \\(\alpha\\).
+
+Where does the debt itself come from? Every line of code your team writes has some probability of creating debt, and every hour spent refactoring pays some of it down. Write this as an ODE:
+
+$$\frac{dD}{dt} = \beta \cdot R(t) - \gamma \cdot P(t)$$
+
+The terms: \\(R(t)\\) is the rate of new code production, \\(P(t)\\) is the paydown effort --- time spent refactoring, rewriting, cleaning up. \\(\beta\\) is the debt creation rate per unit of code, ranging from 0 (every line is perfectly designed) to 1 (every line is pure debt). \\(\gamma\\) is the paydown efficiency --- how much debt you eliminate per unit of refactoring effort. When \\(\beta R(t) > \gamma P(t)\\), debt grows. When the inequality flips, debt shrinks. Most teams never flip the inequality. They never even try.
+
+Now look at what happens when you couple these two equations. Higher \\(D(t)\\) reduces \\(V(t)\\). Reduced velocity creates schedule pressure. Schedule pressure causes the team to ship faster with less care --- \\(R(t)\\) goes up while \\(\beta\\) increases and \\(P(t)\\) drops to zero because "we don't have time for refactoring right now." All three changes push \\(D(t)\\) higher, which further reduces \\(V(t)\\), which intensifies the pressure. This is the debt spiral. It is a positive feedback loop, and like all positive feedback loops, it is stable right up until it is catastrophic.
+
+A caveat before we move on. This is not a predictive model. You cannot measure \\(\alpha\\) or \\(\beta\\) with any precision in a real codebase, and if someone tells you they can, they are selling something. The value of formalizing the dynamics is not prediction --- it is making the qualitative structure visible. The feedback loop exists whether you write down the equations or not. Writing them down makes it harder to pretend that skipping refactoring is free, and harder to ignore the exponential hiding in what feels like a series of small, reasonable compromises.
+
+---
