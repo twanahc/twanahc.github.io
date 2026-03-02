@@ -167,3 +167,106 @@ AI handles the happy path with genuine competence. The primary flow works, the c
 The style of the code communicates confidence. The logic does not earn it. These bugs are the hardest to find because nothing about the code signals uncertainty --- it all reads the same whether it is correct or subtly broken.
 
 ---
+
+## The Detection Problem
+
+Traditional technical debt announces itself. Long functions, inconsistent naming, TODO comments, deeply nested conditionals, copy-pasted blocks with minor variations --- these are visual signals that experienced developers pattern-match on instantly. You open a file, you see the mess, you know where the debt lives. This is syntactic debt. It is ugly and it is obvious.
+
+AI-generated debt is different. It is *pretty*. The functions are short. The names are descriptive. The code is formatted consistently, structured into clean modules, and commented where appropriate. It passes every linter, satisfies every style guide, and reads like it was written by a competent senior engineer on a good day. The problem is that none of those signals tell you whether the code actually does the right thing for your system.
+
+Code review, as practiced at most organizations, is a surface-quality activity. Reviewers are human. They have thirty minutes and eight files to get through before standup. They pattern-match on the signals they can evaluate quickly: Is the naming clear? Is the structure reasonable? Are there obvious bugs? Does this follow our conventions? AI-generated code scores near-perfect on every one of those dimensions. It was trained on millions of reviewed, merged pull requests. It knows exactly what "good code" looks like to a reviewer spending five minutes per file.
+
+The signals that actually matter --- Does this abstraction fit our domain? Will this error handling help us debug at 3 AM? Does this interact correctly with the seventeen other services it has never seen? --- are semantic. They require the reviewer to hold the entire system in their head, understand the business context, and reason about operational behavior under failure. No amount of clean formatting helps with that. And reviewers, faced with code that *looks* right, are far less likely to invest the cognitive effort required to determine whether it *is* right.
+
+Here is what the gap looks like in practice:
+
+<svg viewBox="0 0 640 480" xmlns="http://www.w3.org/2000/svg" style="max-width: 700px; display: block; margin: 2em auto;">
+  <!-- Background -->
+  <rect width="640" height="480" rx="8" fill="#1a1a2e"/>
+
+  <!-- Title -->
+  <text x="320" y="32" text-anchor="middle" fill="#e8e8e8" font-family="Georgia, serif" font-size="16" font-weight="bold">AI-Generated Code: Surface vs Semantic Quality</text>
+
+  <!-- Surface Metrics Group -->
+  <text x="320" y="64" text-anchor="middle" fill="#4ade80" font-family="Georgia, serif" font-size="13" font-weight="bold">Surface Metrics</text>
+
+  <!-- Bar: Formatting 95% -->
+  <text x="168" y="90" text-anchor="end" fill="#e8e8e8" font-family="Georgia, serif" font-size="11">Formatting</text>
+  <rect x="174" y="78" width="380" height="16" rx="3" fill="#2a2a4a"/>
+  <rect x="174" y="78" width="361" height="16" rx="3" fill="#16a34a"/>
+  <text x="540" y="90" text-anchor="start" fill="#e8e8e8" font-family="Georgia, serif" font-size="11" font-weight="bold">95%</text>
+
+  <!-- Bar: Lint Score 92% -->
+  <text x="168" y="114" text-anchor="end" fill="#e8e8e8" font-family="Georgia, serif" font-size="11">Lint Score</text>
+  <rect x="174" y="102" width="380" height="16" rx="3" fill="#2a2a4a"/>
+  <rect x="174" y="102" width="350" height="16" rx="3" fill="#16a34a"/>
+  <text x="540" y="114" text-anchor="start" fill="#e8e8e8" font-family="Georgia, serif" font-size="11" font-weight="bold">92%</text>
+
+  <!-- Bar: Naming Conventions 90% -->
+  <text x="168" y="138" text-anchor="end" fill="#e8e8e8" font-family="Georgia, serif" font-size="11">Naming Conventions</text>
+  <rect x="174" y="126" width="380" height="16" rx="3" fill="#2a2a4a"/>
+  <rect x="174" y="126" width="342" height="16" rx="3" fill="#16a34a"/>
+  <text x="540" y="138" text-anchor="start" fill="#e8e8e8" font-family="Georgia, serif" font-size="11" font-weight="bold">90%</text>
+
+  <!-- Bar: Code Structure 88% -->
+  <text x="168" y="162" text-anchor="end" fill="#e8e8e8" font-family="Georgia, serif" font-size="11">Code Structure</text>
+  <rect x="174" y="150" width="380" height="16" rx="3" fill="#2a2a4a"/>
+  <rect x="174" y="150" width="334" height="16" rx="3" fill="#16a34a"/>
+  <text x="540" y="162" text-anchor="start" fill="#e8e8e8" font-family="Georgia, serif" font-size="11" font-weight="bold">88%</text>
+
+  <!-- Bar: Cyclomatic Complexity 85% -->
+  <text x="168" y="186" text-anchor="end" fill="#e8e8e8" font-family="Georgia, serif" font-size="11">Cyclomatic Complexity</text>
+  <rect x="174" y="174" width="380" height="16" rx="3" fill="#2a2a4a"/>
+  <rect x="174" y="174" width="323" height="16" rx="3" fill="#16a34a"/>
+  <text x="540" y="186" text-anchor="start" fill="#e8e8e8" font-family="Georgia, serif" font-size="11" font-weight="bold">85%</text>
+
+  <!-- Divider -->
+  <line x1="40" y1="210" x2="600" y2="210" stroke="#444" stroke-width="1" stroke-dasharray="6,4"/>
+
+  <!-- Semantic Metrics Group -->
+  <text x="320" y="236" text-anchor="middle" fill="#f87171" font-family="Georgia, serif" font-size="13" font-weight="bold">Semantic Metrics</text>
+
+  <!-- Bar: Edge-Case Correctness 40% -->
+  <text x="168" y="262" text-anchor="end" fill="#e8e8e8" font-family="Georgia, serif" font-size="11">Edge-Case Correctness</text>
+  <rect x="174" y="250" width="380" height="16" rx="3" fill="#2a2a4a"/>
+  <rect x="174" y="250" width="152" height="16" rx="3" fill="#dc2626"/>
+  <text x="540" y="262" text-anchor="start" fill="#e8e8e8" font-family="Georgia, serif" font-size="11" font-weight="bold">40%</text>
+
+  <!-- Bar: Domain Alignment 35% -->
+  <text x="168" y="286" text-anchor="end" fill="#e8e8e8" font-family="Georgia, serif" font-size="11">Domain Alignment</text>
+  <rect x="174" y="274" width="380" height="16" rx="3" fill="#2a2a4a"/>
+  <rect x="174" y="274" width="133" height="16" rx="3" fill="#dc2626"/>
+  <text x="540" y="286" text-anchor="start" fill="#e8e8e8" font-family="Georgia, serif" font-size="11" font-weight="bold">35%</text>
+
+  <!-- Bar: Abstraction Accuracy 30% -->
+  <text x="168" y="310" text-anchor="end" fill="#e8e8e8" font-family="Georgia, serif" font-size="11">Abstraction Accuracy</text>
+  <rect x="174" y="298" width="380" height="16" rx="3" fill="#2a2a4a"/>
+  <rect x="174" y="298" width="114" height="16" rx="3" fill="#dc2626"/>
+  <text x="540" y="310" text-anchor="start" fill="#e8e8e8" font-family="Georgia, serif" font-size="11" font-weight="bold">30%</text>
+
+  <!-- Bar: Operational Fitness 25% -->
+  <text x="168" y="334" text-anchor="end" fill="#e8e8e8" font-family="Georgia, serif" font-size="11">Operational Fitness</text>
+  <rect x="174" y="322" width="380" height="16" rx="3" fill="#2a2a4a"/>
+  <rect x="174" y="322" width="95" height="16" rx="3" fill="#dc2626"/>
+  <text x="540" y="334" text-anchor="start" fill="#e8e8e8" font-family="Georgia, serif" font-size="11" font-weight="bold">25%</text>
+
+  <!-- Bar: Failure-Mode Coverage 20% -->
+  <text x="168" y="358" text-anchor="end" fill="#e8e8e8" font-family="Georgia, serif" font-size="11">Failure-Mode Coverage</text>
+  <rect x="174" y="346" width="380" height="16" rx="3" fill="#2a2a4a"/>
+  <rect x="174" y="346" width="76" height="16" rx="3" fill="#dc2626"/>
+  <text x="540" y="358" text-anchor="start" fill="#e8e8e8" font-family="Georgia, serif" font-size="11" font-weight="bold">20%</text>
+
+  <!-- Legend -->
+  <rect x="190" y="392" width="12" height="12" rx="2" fill="#16a34a"/>
+  <text x="208" y="403" fill="#e8e8e8" font-family="Georgia, serif" font-size="11">AI excels here — reviewers see "good code"</text>
+  <rect x="190" y="414" width="12" height="12" rx="2" fill="#dc2626"/>
+  <text x="208" y="425" fill="#e8e8e8" font-family="Georgia, serif" font-size="11">AI fails here — reviewers rarely check</text>
+</svg>
+
+The green bars are what code review catches. The red bars are what production catches.
+
+This is why the six patterns from the previous section are so dangerous. Every one of them scores well on surface metrics and poorly on semantic ones. Plausible-but-wrong abstractions look like textbook design. Cargo-cult error handling looks like defensive programming. Dependency hoarding looks like leveraging the ecosystem. Implicit coupling hides behind clean individual files. Missing observability is invisible by definition --- you cannot see the absence of instrumentation in a diff. Confident edge-case bugs read identically to correct code.
+
+The implication is uncomfortable but important: code review processes designed for human-written code are insufficient for AI-generated code. When a human writes bad code, it usually looks bad. When AI writes bad code, it looks great. You need to review for fundamentally different things --- domain fit, operational behavior, system-level coherence, failure modes --- and those reviews take longer and require deeper context than the surface-level scan that catches most human-introduced debt. The tooling and processes for doing this well are the subject of the next section.
+
+---
