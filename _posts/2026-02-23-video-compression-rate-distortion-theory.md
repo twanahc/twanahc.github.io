@@ -5,7 +5,7 @@ date: 2026-02-23
 category: math
 ---
 
-Every video generation model operates in compressed space. Stable Video Diffusion compresses video by 8× spatially and 4× temporally before denoising. Sora uses a spatiotemporal patchifier that reduces a 1080p video to a small grid of latent tokens. The reason is simple arithmetic: a 5-second 1080p video at 24fps is \(5 \times 24 \times 1920 \times 1080 \times 3 \approx 746\) million values. No diffusion model can operate on that directly.
+Every video generation model operates in compressed space. Stable Video Diffusion compresses video by 8× spatially and 4× temporally before denoising. Sora uses a spatiotemporal patchifier that reduces a 1080p video to a small grid of latent tokens. The reason is simple arithmetic: a 5-second 1080p video at 24fps is \\(5 \times 24 \times 1920 \times 1080 \times 3 \approx 746\\) million values. No diffusion model can operate on that directly.
 
 This makes video compression not just a practical necessity but a theoretical foundation of video generation. The quality of the compression --- how much information is preserved at a given bit budget --- determines the ceiling for generation quality. A latent space that discards too much detail produces blurry output no matter how good the diffusion model is.
 
@@ -31,7 +31,7 @@ This post develops the theory of video compression from first principles. We sta
 
 ## Why Compression Matters for Video Generation
 
-Consider the computational cost of running diffusion on raw pixels. A video of \(F\) frames at resolution \(H \times W\) with 3 color channels has \(3FHW\) values. For each denoising step, a neural network processes all of these. Self-attention, the workhorse of modern architectures, scales as \(O(N^2)\) where \(N\) is the number of tokens.
+Consider the computational cost of running diffusion on raw pixels. A video of \\(F\\) frames at resolution \\(H \times W\\) with 3 color channels has \\(3FHW\\) values. For each denoising step, a neural network processes all of these. Self-attention, the workhorse of modern architectures, scales as \\(O(N^2)\\) where \\(N\\) is the number of tokens.
 
 The numbers are stark:
 
@@ -51,30 +51,30 @@ A 1024× compression ratio means the latent space represents the video with 1/10
 
 ### Setup
 
-Let \(X\) be a source random variable with distribution \(p(x)\) (e.g., pixel values). A **lossy compression scheme** consists of:
-- An **encoder** that maps a sequence of source symbols \(x^n = (x_1, \ldots, x_n)\) to a compressed representation using \(nR\) bits total (rate \(R\) bits per symbol)
-- A **decoder** that produces a reconstruction \(\hat{x}^n\) from the compressed representation
+Let \\(X\\) be a source random variable with distribution \\(p(x)\\) (e.g., pixel values). A **lossy compression scheme** consists of:
+- An **encoder** that maps a sequence of source symbols \\(x^n = (x_1, \ldots, x_n)\\) to a compressed representation using \\(nR\\) bits total (rate \\(R\\) bits per symbol)
+- A **decoder** that produces a reconstruction \\(\hat{x}^n\\) from the compressed representation
 
-The **distortion** is measured by a per-symbol distortion function \(d(x, \hat{x})\), averaged over the sequence:
+The **distortion** is measured by a per-symbol distortion function \\(d(x, \hat{x})\\), averaged over the sequence:
 
 $$D = \frac{1}{n} \sum_{i=1}^n \mathbb{E}[d(X_i, \hat{X}_i)]$$
 
-Common choices: **squared error** \(d(x, \hat{x}) = (x - \hat{x})^2\) (MSE) and **absolute error** \(d(x, \hat{x}) = |x - \hat{x}|\).
+Common choices: **squared error** \\(d(x, \hat{x}) = (x - \hat{x})^2\\) (MSE) and **absolute error** \\(d(x, \hat{x}) = |x - \hat{x}|\\).
 
 ### The Rate-Distortion Function
 
-The **rate-distortion function** \(R(D)\) is the minimum rate required to achieve distortion at most \(D\):
+The **rate-distortion function** \\(R(D)\\) is the minimum rate required to achieve distortion at most \\(D\\):
 
 $$R(D) = \min_{p(\hat{x}|x): \, \mathbb{E}[d(X,\hat{X})] \leq D} I(X; \hat{X})$$
 
-where \(I(X; \hat{X})\) is the **mutual information** between the source and reconstruction. The minimization is over all conditional distributions \(p(\hat{x}|x)\) (all possible encodings) that achieve the target distortion.
+where \\(I(X; \hat{X})\\) is the **mutual information** between the source and reconstruction. The minimization is over all conditional distributions \\(p(\hat{x}|x)\\) (all possible encodings) that achieve the target distortion.
 
-Properties of \(R(D)\):
-- \(R(D)\) is a convex, non-increasing function of \(D\)
-- \(R(0) = H(X)\) for discrete sources (perfect reconstruction requires full entropy)
-- \(R(D_{\max}) = 0\) where \(D_{\max}\) is the distortion achieved by ignoring the source entirely
+Properties of \\(R(D)\\):
+- \\(R(D)\\) is a convex, non-increasing function of \\(D\\)
+- \\(R(0) = H(X)\\) for discrete sources (perfect reconstruction requires full entropy)
+- \\(R(D_{\max}) = 0\\) where \\(D_{\max}\\) is the distortion achieved by ignoring the source entirely
 
-Shannon's theorem says: any compression scheme achieving distortion \(D\) requires rate at least \(R(D)\), and there exist schemes that achieve \(R(D) + \epsilon\) for any \(\epsilon > 0\) (in the limit of long block lengths).
+Shannon's theorem says: any compression scheme achieving distortion \\(D\\) requires rate at least \\(R(D)\\), and there exist schemes that achieve \\(R(D) + \epsilon\\) for any \\(\epsilon > 0\\) (in the limit of long block lengths).
 
 <svg viewBox="0 0 700 350" xmlns="http://www.w3.org/2000/svg" style="max-width: 700px; display: block; margin: 2em auto;">
   <defs>
@@ -116,29 +116,29 @@ Shannon's theorem says: any compression scheme achieving distortion \(D\) requir
 
 ## The Rate-Distortion Function for Gaussian Sources
 
-For a Gaussian source \(X \sim \mathcal{N}(0, \sigma^2)\) with MSE distortion, the rate-distortion function has a beautiful closed form.
+For a Gaussian source \\(X \sim \mathcal{N}(0, \sigma^2)\\) with MSE distortion, the rate-distortion function has a beautiful closed form.
 
 ### Derivation
 
-We seek the conditional distribution \(p(\hat{x}|x)\) that minimizes \(I(X; \hat{X})\) subject to \(\mathbb{E}[(X - \hat{X})^2] \leq D\).
+We seek the conditional distribution \\(p(\hat{x}|x)\\) that minimizes \\(I(X; \hat{X})\\) subject to \\(\mathbb{E}[(X - \hat{X})^2] \leq D\\).
 
-The key insight: the optimal reconstruction is \(\hat{X} = X + Z\) where \(Z\) is independent Gaussian noise. More precisely, the optimal "test channel" is:
+The key insight: the optimal reconstruction is \\(\hat{X} = X + Z\\) where \\(Z\\) is independent Gaussian noise. More precisely, the optimal "test channel" is:
 
 $$\hat{X} = X + Z, \quad Z \sim \mathcal{N}(0, D), \quad Z \perp X$$
 
-Wait --- that adds noise, making things worse! The trick is that we are optimizing over the full joint distribution. The optimal scheme actually sends a coarsened version of \(X\):
+Wait --- that adds noise, making things worse! The trick is that we are optimizing over the full joint distribution. The optimal scheme actually sends a coarsened version of \\(X\\):
 
 $$\hat{X} = X - N = X - \text{(quantization noise)}$$
 
-where the quantization noise \(N\) has variance \(D\). The mutual information is:
+where the quantization noise \\(N\\) has variance \\(D\\). The mutual information is:
 
 $$I(X; \hat{X}) = h(X) - h(X | \hat{X})$$
 
-Since \(X\) is Gaussian with variance \(\sigma^2\):
+Since \\(X\\) is Gaussian with variance \\(\sigma^2\\):
 
 $$h(X) = \frac{1}{2}\log(2\pi e \sigma^2)$$
 
-Given \(\hat{X}\), the reconstruction error \(X - \hat{X}\) has variance \(D\), and by the optimality of the Gaussian, \(X | \hat{X}\) is Gaussian with variance \(D\):
+Given \\(\hat{X}\\), the reconstruction error \\(X - \hat{X}\\) has variance \\(D\\), and by the optimality of the Gaussian, \\(X | \hat{X}\\) is Gaussian with variance \\(D\\):
 
 $$h(X | \hat{X}) = \frac{1}{2}\log(2\pi e D)$$
 
@@ -146,9 +146,9 @@ Therefore:
 
 $$R(D) = \frac{1}{2}\log\frac{\sigma^2}{D} \quad \text{bits (using log base 2)}$$
 
-This is valid for \(0 \leq D \leq \sigma^2\). At \(D = 0\) (perfect reconstruction), \(R = \infty\) --- you need infinite bits to represent a continuous variable exactly. At \(D = \sigma^2\), \(R = 0\) --- the best zero-rate reconstruction is just the mean (zero).
+This is valid for \\(0 \leq D \leq \sigma^2\\). At \\(D = 0\\) (perfect reconstruction), \\(R = \infty\\) --- you need infinite bits to represent a continuous variable exactly. At \\(D = \sigma^2\\), \\(R = 0\\) --- the best zero-rate reconstruction is just the mean (zero).
 
-Equivalently, solving for \(D\) as a function of \(R\):
+Equivalently, solving for \\(D\\) as a function of \\(R\\):
 
 $$D(R) = \sigma^2 \cdot 2^{-2R}$$
 
@@ -156,11 +156,11 @@ Every additional bit per symbol halves the MSE. This is a fundamental law of los
 
 ### The Water-Filling Interpretation
 
-For a vector Gaussian source with independent components \(X_i \sim \mathcal{N}(0, \sigma_i^2)\), the optimal rate allocation is given by **reverse water-filling**: allocate rate to component \(i\) as:
+For a vector Gaussian source with independent components \\(X_i \sim \mathcal{N}(0, \sigma_i^2)\\), the optimal rate allocation is given by **reverse water-filling**: allocate rate to component \\(i\\) as:
 
 $$R_i = \max\left(0, \frac{1}{2}\log\frac{\sigma_i^2}{\theta}\right)$$
 
-where \(\theta\) is chosen so that \(\sum R_i = R_{\text{total}}\). Components with variance below the "water level" \(\theta\) get zero rate (they are reconstructed as zero). High-variance components get more bits.
+where \\(\theta\\) is chosen so that \\(\sum R_i = R_{\text{total}}\\). Components with variance below the "water level" \\(\theta\\) get zero rate (they are reconstructed as zero). High-variance components get more bits.
 
 This is exactly what transform coding does: transform to a basis where components are decorrelated, then allocate bits proportional to log-variance.
 
@@ -172,23 +172,23 @@ Natural images have strong spatial correlations --- neighboring pixels are simil
 
 ### The Discrete Cosine Transform
 
-The **DCT** of a 1D signal \(x[n]\) for \(n = 0, 1, \ldots, N-1\) is:
+The **DCT** of a 1D signal \\(x[n]\\) for \\(n = 0, 1, \ldots, N-1\\) is:
 
 $$X[k] = \sqrt{\frac{2}{N}} \, c_k \sum_{n=0}^{N-1} x[n] \cos\!\left(\frac{\pi(2n+1)k}{2N}\right)$$
 
-where \(c_0 = 1/\sqrt{2}\) and \(c_k = 1\) for \(k > 0\). The DCT basis functions are cosines at integer multiples of a base frequency, with even symmetry.
+where \\(c_0 = 1/\sqrt{2}\\) and \\(c_k = 1\\) for \\(k > 0\\). The DCT basis functions are cosines at integer multiples of a base frequency, with even symmetry.
 
 ### Why the DCT?
 
-The DCT is nearly optimal for natural images because of the **Karhunen-Loeve theorem**: the optimal transform (in the MSE sense) for a stationary random process is the eigenbasis of its covariance matrix. For a first-order Markov process \(x[n] = \rho \, x[n-1] + w[n]\) (a reasonable model for rows of natural images, with \(\rho \approx 0.95\)), the eigenbasis approaches the DCT as the block size grows.
+The DCT is nearly optimal for natural images because of the **Karhunen-Loeve theorem**: the optimal transform (in the MSE sense) for a stationary random process is the eigenbasis of its covariance matrix. For a first-order Markov process \\(x[n] = \rho \, x[n-1] + w[n]\\) (a reasonable model for rows of natural images, with \\(\rho \approx 0.95\\)), the eigenbasis approaches the DCT as the block size grows.
 
-The 2D DCT (used in JPEG) is the tensor product of 1D DCTs applied to \(8 \times 8\) blocks:
+The 2D DCT (used in JPEG) is the tensor product of 1D DCTs applied to \\(8 \times 8\\) blocks:
 
 $$X[k_1, k_2] = \sum_{n_1=0}^{7} \sum_{n_2=0}^{7} x[n_1, n_2] \cdot B_{k_1}[n_1] \cdot B_{k_2}[n_2]$$
 
-where \(B_k[n]\) are the 1D DCT basis functions.
+where \\(B_k[n]\\) are the 1D DCT basis functions.
 
-The **energy compaction** property means that for natural images, most of the energy is in the low-frequency DCT coefficients (top-left corner of the \(8 \times 8\) block). The high-frequency coefficients are small and can be quantized coarsely or discarded.
+The **energy compaction** property means that for natural images, most of the energy is in the low-frequency DCT coefficients (top-left corner of the \\(8 \times 8\\) block). The high-frequency coefficients are small and can be quantized coarsely or discarded.
 
 ---
 
@@ -198,31 +198,31 @@ After transforming, the DCT coefficients are **quantized** --- mapped from conti
 
 ### Scalar Quantization
 
-A scalar quantizer maps a continuous value \(x\) to the nearest point in a finite set \(\{q_1, \ldots, q_K\}\) (reconstruction levels). The set \(\{q_i\}\) and the decision boundaries between them are the quantizer's design parameters.
+A scalar quantizer maps a continuous value \\(x\\) to the nearest point in a finite set \\(\{q_1, \ldots, q_K\}\\) (reconstruction levels). The set \\(\{q_i\}\\) and the decision boundaries between them are the quantizer's design parameters.
 
 ### Lloyd-Max Optimal Quantizer
 
-Given a source distribution \(p(x)\) and a target number of levels \(K\), the **Lloyd-Max algorithm** finds the optimal quantizer by alternating:
+Given a source distribution \\(p(x)\\) and a target number of levels \\(K\\), the **Lloyd-Max algorithm** finds the optimal quantizer by alternating:
 
-1. **Nearest-neighbor assignment:** Given reconstruction levels \(\{q_i\}\), the optimal decision boundaries are the midpoints: \(b_i = (q_i + q_{i+1})/2\).
+1. **Nearest-neighbor assignment:** Given reconstruction levels \\(\{q_i\}\\), the optimal decision boundaries are the midpoints: \\(b_i = (q_i + q_{i+1})/2\\).
 
-2. **Centroid condition:** Given decision regions \([b_{i-1}, b_i)\), the optimal reconstruction level is the conditional mean:
+2. **Centroid condition:** Given decision regions \\([b_{i-1}, b_i)\\), the optimal reconstruction level is the conditional mean:
 
 $$q_i = \frac{\int_{b_{i-1}}^{b_i} x \, p(x) \, dx}{\int_{b_{i-1}}^{b_i} p(x) \, dx} = \mathbb{E}[X | b_{i-1} \leq X < b_i]$$
 
 This is the quantization analogue of K-means clustering. The algorithm converges to a local optimum.
 
-For a Gaussian source with \(K\) levels, the MSE of the optimal quantizer scales as:
+For a Gaussian source with \\(K\\) levels, the MSE of the optimal quantizer scales as:
 
 $$D \approx \frac{\sqrt{3} \pi}{2} \sigma^2 \cdot 2^{-2R}$$
 
-where \(R = \log_2 K\) bits. The factor \(\frac{\sqrt{3}\pi}{2} \approx 2.72\) is the **quantization penalty** --- the gap between actual quantization and the rate-distortion bound. This gap motivates vector quantization.
+where \\(R = \log_2 K\\) bits. The factor \\(\frac{\sqrt{3}\pi}{2} \approx 2.72\\) is the **quantization penalty** --- the gap between actual quantization and the rate-distortion bound. This gap motivates vector quantization.
 
 ### Vector Quantization
 
-**Vector quantization (VQ)** quantizes vectors jointly instead of element-by-element. A codebook of \(K\) codewords \(\{\mathbf{q}_1, \ldots, \mathbf{q}_K\}\) in \(\mathbb{R}^d\) partitions the space into \(K\) **Voronoi cells**. Each input vector is mapped to the nearest codeword.
+**Vector quantization (VQ)** quantizes vectors jointly instead of element-by-element. A codebook of \\(K\\) codewords \\(\{\mathbf{q}_1, \ldots, \mathbf{q}_K\}\\) in \\(\mathbb{R}^d\\) partitions the space into \\(K\\) **Voronoi cells**. Each input vector is mapped to the nearest codeword.
 
-VQ can close the gap to the rate-distortion bound as the vector dimension \(d \to \infty\) (Shannon's lossy source coding theorem). In practice, VQ with \(d = 8\)--\(16\) already provides significant gains over scalar quantization. The VQ-VAE (covered later) learns the codebook end-to-end as part of a neural network.
+VQ can close the gap to the rate-distortion bound as the vector dimension \\(d \to \infty\\) (Shannon's lossy source coding theorem). In practice, VQ with \\(d = 8\\)--\\(16\\) already provides significant gains over scalar quantization. The VQ-VAE (covered later) learns the codebook end-to-end as part of a neural network.
 
 ---
 
@@ -242,11 +242,11 @@ A typical GOP structure: `I B B P B B P B B P B B I ...`
 
 ### Motion Estimation
 
-For each \(16 \times 16\) (or variable-size) block in the current frame, search the reference frame for the best match. The displacement is the **motion vector** \(\mathbf{v} = (v_x, v_y)\). The search minimizes the **sum of absolute differences (SAD)**:
+For each \\(16 \times 16\\) (or variable-size) block in the current frame, search the reference frame for the best match. The displacement is the **motion vector** \\(\mathbf{v} = (v_x, v_y)\\). The search minimizes the **sum of absolute differences (SAD)**:
 
 $$\text{SAD}(\mathbf{v}) = \sum_{(i,j) \in \text{block}} |I_{\text{current}}(i, j) - I_{\text{ref}}(i + v_x, j + v_y)|$$
 
-The residual is then: \(R(i, j) = I_{\text{current}}(i, j) - I_{\text{ref}}(i + v_x, j + v_y)\). Because the motion-compensated prediction is good, the residual has much less energy than the original block. DCT + quantize + entropy code the residual, transmitting far fewer bits than an I-frame.
+The residual is then: \\(R(i, j) = I_{\text{current}}(i, j) - I_{\text{ref}}(i + v_x, j + v_y)\\). Because the motion-compensated prediction is good, the residual has much less energy than the original block. DCT + quantize + entropy code the residual, transmitting far fewer bits than an I-frame.
 
 Sub-pixel motion estimation (half-pixel, quarter-pixel) interpolates the reference frame and searches at fractional positions, capturing motion more precisely.
 
@@ -313,23 +313,23 @@ Neural compression replaces the hand-crafted DCT + quantization + entropy coding
 
 ### The Architecture (Balle et al., 2018)
 
-An **encoder** \(f_a(\mathbf{x})\) maps an image \(\mathbf{x}\) to a latent representation \(\mathbf{y} = f_a(\mathbf{x})\). The latents are **quantized**: \(\hat{\mathbf{y}} = \lfloor \mathbf{y} \rceil\) (round to nearest integer). A **decoder** \(f_s(\hat{\mathbf{y}})\) reconstructs the image: \(\hat{\mathbf{x}} = f_s(\hat{\mathbf{y}})\).
+An **encoder** \\(f_a(\mathbf{x})\\) maps an image \\(\mathbf{x}\\) to a latent representation \\(\mathbf{y} = f_a(\mathbf{x})\\). The latents are **quantized**: \\(\hat{\mathbf{y}} = \lfloor \mathbf{y} \rceil\\) (round to nearest integer). A **decoder** \\(f_s(\hat{\mathbf{y}})\\) reconstructs the image: \\(\hat{\mathbf{x}} = f_s(\hat{\mathbf{y}})\\).
 
 The training loss is the **rate-distortion Lagrangian**:
 
 $$\mathcal{L} = \underbrace{-\log p_{\hat{\mathbf{y}}}(\hat{\mathbf{y}})}_{\text{rate (bits)}} + \lambda \underbrace{d(\mathbf{x}, \hat{\mathbf{x}})}_{\text{distortion}}$$
 
-The rate term is the negative log-likelihood of the quantized latents under a learned **entropy model** \(p_{\hat{\mathbf{y}}}\). Minimizing this term encourages the encoder to produce latents that are easy to compress (predictable, low-entropy).
+The rate term is the negative log-likelihood of the quantized latents under a learned **entropy model** \\(p_{\hat{\mathbf{y}}}\\). Minimizing this term encourages the encoder to produce latents that are easy to compress (predictable, low-entropy).
 
-The distortion term can be MSE, MS-SSIM, or a perceptual loss. The Lagrange multiplier \(\lambda\) sweeps the rate-distortion tradeoff: large \(\lambda\) favors low distortion (high quality, high rate), small \(\lambda\) favors low rate (low quality, small file).
+The distortion term can be MSE, MS-SSIM, or a perceptual loss. The Lagrange multiplier \\(\lambda\\) sweeps the rate-distortion tradeoff: large \\(\lambda\\) favors low distortion (high quality, high rate), small \\(\lambda\\) favors low rate (low quality, small file).
 
 ### The Hyperprior
 
-A **hyperprior** (Balle et al., 2018) captures dependencies between latent elements. An additional small encoder \(h_a(\mathbf{y})\) extracts **hyper-latents** \(\mathbf{z}\) that parameterize the entropy model for \(\mathbf{y}\):
+A **hyperprior** (Balle et al., 2018) captures dependencies between latent elements. An additional small encoder \\(h_a(\mathbf{y})\\) extracts **hyper-latents** \\(\mathbf{z}\\) that parameterize the entropy model for \\(\mathbf{y}\\):
 
 $$p_{\hat{\mathbf{y}}}(\hat{\mathbf{y}} | \hat{\mathbf{z}}) = \prod_i \left(\mathcal{N}(\mu_i(\hat{\mathbf{z}}), \sigma_i^2(\hat{\mathbf{z}})) * \mathcal{U}(-\frac{1}{2}, \frac{1}{2})\right)(\hat{y}_i)$$
 
-Each latent element has its own predicted mean \(\mu_i\) and variance \(\sigma_i^2\) from the hyperprior, yielding a more accurate entropy model and lower bit rates.
+Each latent element has its own predicted mean \\(\mu_i\\) and variance \\(\sigma_i^2\\) from the hyperprior, yielding a more accurate entropy model and lower bit rates.
 
 The result: learned compression matches or exceeds traditional codecs (JPEG, BPG/HEVC-intra) at the same bit rate, with fewer visual artifacts.
 
@@ -341,11 +341,11 @@ Video diffusion models do not learn compression for file size reduction. They le
 
 ### Architecture
 
-The encoder takes raw video \(\mathbf{x} \in \mathbb{R}^{F \times H \times W \times 3}\) and produces latents \(\mathbf{z} \in \mathbb{R}^{F' \times H' \times W' \times C}\), where:
+The encoder takes raw video \\(\mathbf{x} \in \mathbb{R}^{F \times H \times W \times 3}\\) and produces latents \\(\mathbf{z} \in \mathbb{R}^{F' \times H' \times W' \times C}\\), where:
 
-- Spatial downsampling: \(H' = H/f_s\), \(W' = W/f_s\) with \(f_s = 8\) typically
-- Temporal downsampling: \(F' = F/f_t\) with \(f_t = 4\) typically
-- Channel expansion: \(C = 4\) or \(16\) (more channels preserve more information per spatial location)
+- Spatial downsampling: \\(H' = H/f_s\\), \\(W' = W/f_s\\) with \\(f_s = 8\\) typically
+- Temporal downsampling: \\(F' = F/f_t\\) with \\(f_t = 4\\) typically
+- Channel expansion: \\(C = 4\\) or \\(16\\) (more channels preserve more information per spatial location)
 
 The encoder uses 3D convolutions (or factored 2D spatial + 1D temporal convolutions) with strided downsampling. The decoder mirrors this with transposed convolutions or sub-pixel upsampling.
 
@@ -374,7 +374,7 @@ An alternative to continuous latent spaces is **discrete tokenization** via VQ-V
 
 ### Vector Quantization in the Latent Space
 
-Instead of a continuous \(\mathbf{z}\), the encoder output is quantized to the nearest entry in a learned codebook \(\mathcal{C} = \{\mathbf{e}_1, \ldots, \mathbf{e}_K\}\):
+Instead of a continuous \\(\mathbf{z}\\), the encoder output is quantized to the nearest entry in a learned codebook \\(\mathcal{C} = \{\mathbf{e}_1, \ldots, \mathbf{e}_K\}\\):
 
 $$\mathbf{z}_q = \mathbf{e}_k \quad \text{where} \quad k = \arg\min_j \|\mathbf{z}_e - \mathbf{e}_j\|_2$$
 
@@ -384,11 +384,11 @@ The argmin is not differentiable, so gradients are passed through using the **st
 
 $$\mathcal{L}_{\text{VQ}} = \underbrace{\|\mathbf{x} - \hat{\mathbf{x}}\|_2^2}_{\text{reconstruction}} + \underbrace{\|\text{sg}[\mathbf{z}_e] - \mathbf{e}_k\|_2^2}_{\text{codebook}} + \beta \underbrace{\|\mathbf{z}_e - \text{sg}[\mathbf{e}_k]\|_2^2}_{\text{commitment}}$$
 
-where \(\text{sg}[\cdot]\) is the stop-gradient operator. The codebook loss moves the codebook vectors toward the encoder outputs. The commitment loss (with \(\beta \approx 0.25\)) prevents the encoder from oscillating by penalizing encoder outputs that are far from their assigned codeword.
+where \\(\text{sg}[\cdot]\\) is the stop-gradient operator. The codebook loss moves the codebook vectors toward the encoder outputs. The commitment loss (with \\(\beta \approx 0.25\\)) prevents the encoder from oscillating by penalizing encoder outputs that are far from their assigned codeword.
 
 ### Finite Scalar Quantization (FSQ)
 
-A recent simplification (Mentzer et al., 2023) replaces vector quantization with per-dimension scalar quantization: round each dimension of the latent to one of \(L\) fixed levels (e.g., \(L = 5\)). With a \(d\)-dimensional latent, the effective codebook size is \(L^d\) without needing to manage codebook vectors, avoiding collapse entirely.
+A recent simplification (Mentzer et al., 2023) replaces vector quantization with per-dimension scalar quantization: round each dimension of the latent to one of \\(L\\) fixed levels (e.g., \\(L = 5\\)). With a \\(d\\)-dimensional latent, the effective codebook size is \\(L^d\\) without needing to manage codebook vectors, avoiding collapse entirely.
 
 ---
 

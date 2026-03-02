@@ -29,49 +29,49 @@ This post builds all three from the mathematical foundations. We define the sign
 
 ## The Signal-to-Noise Ratio Framework
 
-Every diffusion model defines a **noising process** that adds Gaussian noise to data. At time \(t\), the noisy sample is:
+Every diffusion model defines a **noising process** that adds Gaussian noise to data. At time \\(t\\), the noisy sample is:
 
 $$\mathbf{x}_t = \alpha_t \, \mathbf{x}_0 + \sigma_t \, \boldsymbol{\epsilon}, \quad \boldsymbol{\epsilon} \sim \mathcal{N}(0, I)$$
 
-where \(\alpha_t\) is the signal coefficient and \(\sigma_t\) is the noise coefficient. Different schedules define different functions \(\alpha_t\) and \(\sigma_t\).
+where \\(\alpha_t\\) is the signal coefficient and \\(\sigma_t\\) is the noise coefficient. Different schedules define different functions \\(\alpha_t\\) and \\(\sigma_t\\).
 
-The **signal-to-noise ratio (SNR)** at time \(t\) is:
+The **signal-to-noise ratio (SNR)** at time \\(t\\) is:
 
 $$\text{SNR}(t) = \frac{\alpha_t^2}{\sigma_t^2}$$
 
-This single quantity captures everything about the noise level. At \(t = 0\) (clean data), \(\text{SNR} = \infty\). At \(t = T\) (pure noise), \(\text{SNR} \approx 0\). The denoising process traverses from low SNR to high SNR.
+This single quantity captures everything about the noise level. At \\(t = 0\\) (clean data), \\(\text{SNR} = \infty\\). At \\(t = T\\) (pure noise), \\(\text{SNR} \approx 0\\). The denoising process traverses from low SNR to high SNR.
 
-The **log-SNR** \(\lambda_t = \log \text{SNR}(t) = \log(\alpha_t^2 / \sigma_t^2)\) is the natural parameterization for analysis. It maps the entire noising process to a monotonically decreasing function from \(+\infty\) to \(-\infty\).
+The **log-SNR** \\(\lambda_t = \log \text{SNR}(t) = \log(\alpha_t^2 / \sigma_t^2)\\) is the natural parameterization for analysis. It maps the entire noising process to a monotonically decreasing function from \\(+\infty\\) to \\(-\infty\\).
 
-A key theorem (Kingma et al., 2021): **the diffusion training objective, weighted appropriately, depends on the noise schedule only through the SNR schedule.** Two schedules with the same SNR(t) function produce the same trained model, even if their \(\alpha_t\) and \(\sigma_t\) differ individually. This is because the model learns to predict the clean signal given a noisy input at a particular SNR, regardless of how that SNR was achieved.
+A key theorem (Kingma et al., 2021): **the diffusion training objective, weighted appropriately, depends on the noise schedule only through the SNR schedule.** Two schedules with the same SNR(t) function produce the same trained model, even if their \\(\alpha_t\\) and \\(\sigma_t\\) differ individually. This is because the model learns to predict the clean signal given a noisy input at a particular SNR, regardless of how that SNR was achieved.
 
 ---
 
 ## VP, VE, and Sub-VP Schedules
 
-The three classical noise schedule families correspond to different choices of \(\alpha_t\) and \(\sigma_t\):
+The three classical noise schedule families correspond to different choices of \\(\alpha_t\\) and \\(\sigma_t\\):
 
 ### Variance-Preserving (VP)
 
-Used by DDPM. The constraint is \(\alpha_t^2 + \sigma_t^2 = 1\), so the noisy sample always has unit variance (assuming the data has unit variance). The DDPM schedule defines:
+Used by DDPM. The constraint is \\(\alpha_t^2 + \sigma_t^2 = 1\\), so the noisy sample always has unit variance (assuming the data has unit variance). The DDPM schedule defines:
 
 $$\alpha_t^2 = \bar{\alpha}_t = \prod_{s=1}^{t} (1 - \beta_s)$$
 
-where \(\beta_t\) is a linearly increasing sequence from \(\beta_1 = 10^{-4}\) to \(\beta_T = 0.02\). Then \(\sigma_t^2 = 1 - \bar{\alpha}_t\).
+where \\(\beta_t\\) is a linearly increasing sequence from \\(\beta_1 = 10^{-4}\\) to \\(\beta_T = 0.02\\). Then \\(\sigma_t^2 = 1 - \bar{\alpha}_t\\).
 
-The SNR decreases from \(\bar{\alpha}_1 / (1 - \bar{\alpha}_1) \approx 10^4\) to \(\bar{\alpha}_T / (1 - \bar{\alpha}_T) \approx 0.006\).
+The SNR decreases from \\(\bar{\alpha}_1 / (1 - \bar{\alpha}_1) \approx 10^4\\) to \\(\bar{\alpha}_T / (1 - \bar{\alpha}_T) \approx 0.006\\).
 
 ### Variance-Exploding (VE)
 
-Used by SMLD (Song & Ermon, 2019). Here \(\alpha_t = 1\) (signal is unchanged) and noise of increasing variance is added:
+Used by SMLD (Song & Ermon, 2019). Here \\(\alpha_t = 1\\) (signal is unchanged) and noise of increasing variance is added:
 
 $$\mathbf{x}_t = \mathbf{x}_0 + \sigma_t \boldsymbol{\epsilon}$$
 
-where \(\sigma_t\) increases geometrically from \(\sigma_{\min} \approx 0.01\) to \(\sigma_{\max} \approx 100\). The variance of \(\mathbf{x}_t\) grows without bound (hence "exploding"). SNR \(= 1/\sigma_t^2\).
+where \\(\sigma_t\\) increases geometrically from \\(\sigma_{\min} \approx 0.01\\) to \\(\sigma_{\max} \approx 100\\). The variance of \\(\mathbf{x}_t\\) grows without bound (hence "exploding"). SNR \\(= 1/\sigma_t^2\\).
 
 ### Sub-VP
 
-A variant where \(\alpha_t^2 + \sigma_t^2 < 1\) (the variance decreases slightly). This avoids the endpoint problem where VP schedules have \(\sigma_T^2 \approx 1\) but not exactly 1, creating a mismatch between the diffusion endpoint and the prior \(\mathcal{N}(0, I)\).
+A variant where \\(\alpha_t^2 + \sigma_t^2 < 1\\) (the variance decreases slightly). This avoids the endpoint problem where VP schedules have \\(\sigma_T^2 \approx 1\\) but not exactly 1, creating a mismatch between the diffusion endpoint and the prior \\(\mathcal{N}(0, I)\\).
 
 <svg viewBox="0 0 700 300" xmlns="http://www.w3.org/2000/svg" style="max-width: 700px; display: block; margin: 2em auto;">
   <defs>
@@ -112,21 +112,21 @@ A variant where \(\alpha_t^2 + \sigma_t^2 < 1\) (the variance decreases slightly
 
 ## Continuous-Time Noise Schedules
 
-The discrete-time schedules above can be unified in a continuous-time framework. Define the noise schedule as a continuous function \(\text{SNR}(t)\) for \(t \in [0, 1]\), with \(\text{SNR}(0) = \text{SNR}_{\max}\) and \(\text{SNR}(1) = \text{SNR}_{\min}\).
+The discrete-time schedules above can be unified in a continuous-time framework. Define the noise schedule as a continuous function \\(\text{SNR}(t)\\) for \\(t \in [0, 1]\\), with \\(\text{SNR}(0) = \text{SNR}_{\max}\\) and \\(\text{SNR}(1) = \text{SNR}_{\min}\\).
 
 ### The EDM Parameterization (Karras et al., 2022)
 
-EDM defines the noise schedule directly in terms of \(\sigma(t)\):
+EDM defines the noise schedule directly in terms of \\(\sigma(t)\\):
 
 $$\sigma(t) = \left(\sigma_{\min}^{1/\rho} + t \cdot (\sigma_{\max}^{1/\rho} - \sigma_{\min}^{1/\rho})\right)^\rho$$
 
-with \(\rho = 7\), \(\sigma_{\min} = 0.002\), \(\sigma_{\max} = 80\). The parameter \(\rho\) controls how time is distributed across noise levels. With \(\rho = 7\), more timesteps are allocated to intermediate noise levels (where the denoising is most challenging) rather than the extreme ends.
+with \\(\rho = 7\\), \\(\sigma_{\min} = 0.002\\), \\(\sigma_{\max} = 80\\). The parameter \\(\rho\\) controls how time is distributed across noise levels. With \\(\rho = 7\\), more timesteps are allocated to intermediate noise levels (where the denoising is most challenging) rather than the extreme ends.
 
-EDM also sets \(\alpha_t = 1\) (VE-like) and focuses the entire design on the sigma schedule. The corresponding SNR is \(1/\sigma(t)^2\).
+EDM also sets \\(\alpha_t = 1\\) (VE-like) and focuses the entire design on the sigma schedule. The corresponding SNR is \\(1/\sigma(t)^2\\).
 
 ### Optimal Time Discretization
 
-When sampling with \(N\) steps, the timesteps \(t_1 > t_2 > \cdots > t_N\) should be chosen to equalize the "difficulty" of each step. Karras et al. show that spacing the \(\sigma\) values equally in \(\sigma^{1/\rho}\) (which corresponds to equal steps in the EDM parameterization) is near-optimal. This places more steps at medium noise levels and fewer at the extremes.
+When sampling with \\(N\\) steps, the timesteps \\(t_1 > t_2 > \cdots > t_N\\) should be chosen to equalize the "difficulty" of each step. Karras et al. show that spacing the \\(\sigma\\) values equally in \\(\sigma^{1/\rho}\\) (which corresponds to equal steps in the EDM parameterization) is near-optimal. This places more steps at medium noise levels and fewer at the extremes.
 
 ---
 
@@ -140,27 +140,27 @@ DDPM defines a Markovian forward process:
 
 $$q(\mathbf{x}_t | \mathbf{x}_{t-1}) = \mathcal{N}(\sqrt{1-\beta_t} \, \mathbf{x}_{t-1}, \beta_t I)$$
 
-DDIM observes that the marginals \(q(\mathbf{x}_t | \mathbf{x}_0)\) are:
+DDIM observes that the marginals \\(q(\mathbf{x}_t | \mathbf{x}_0)\\) are:
 
 $$q(\mathbf{x}_t | \mathbf{x}_0) = \mathcal{N}(\sqrt{\bar{\alpha}_t} \, \mathbf{x}_0, (1 - \bar{\alpha}_t) I)$$
 
-There are **many** different forward processes that produce these same marginals. DDIM constructs a **non-Markovian** forward process parameterized by \(\eta \geq 0\):
+There are **many** different forward processes that produce these same marginals. DDIM constructs a **non-Markovian** forward process parameterized by \\(\eta \geq 0\\):
 
 $$q_\eta(\mathbf{x}_{t-1} | \mathbf{x}_t, \mathbf{x}_0) = \mathcal{N}\!\left(\sqrt{\bar{\alpha}_{t-1}} \, \mathbf{x}_0 + \sqrt{1 - \bar{\alpha}_{t-1} - \eta^2 \beta_t} \cdot \frac{\mathbf{x}_t - \sqrt{\bar{\alpha}_t} \mathbf{x}_0}{\sqrt{1 - \bar{\alpha}_t}}, \, \eta^2 \beta_t I\right)$$
 
 Let us unpack this. The mean of the reverse step is a weighted combination of:
-1. The predicted clean image \(\mathbf{x}_0\) (scaled by \(\sqrt{\bar{\alpha}_{t-1}}\))
-2. The "direction pointing to \(\mathbf{x}_t\)" --- the noise component rescaled from noise level \(t\) to noise level \(t-1\)
+1. The predicted clean image \\(\mathbf{x}_0\\) (scaled by \\(\sqrt{\bar{\alpha}_{t-1}}\\))
+2. The "direction pointing to \\(\mathbf{x}_t\\)" --- the noise component rescaled from noise level \\(t\\) to noise level \\(t-1\\)
 
-The variance is \(\eta^2 \beta_t\).
+The variance is \\(\eta^2 \beta_t\\).
 
-**When \(\eta = 1\):** This reduces to DDPM (full stochasticity).
+**When \\(\eta = 1\\):** This reduces to DDPM (full stochasticity).
 
-**When \(\eta = 0\):** The variance is zero --- the process is **deterministic**. Given \(\mathbf{x}_t\) and the model's prediction of \(\boldsymbol{\epsilon}_\theta(\mathbf{x}_t, t)\), the DDIM update is:
+**When \\(\eta = 0\\):** The variance is zero --- the process is **deterministic**. Given \\(\mathbf{x}_t\\) and the model's prediction of \\(\boldsymbol{\epsilon}_\theta(\mathbf{x}_t, t)\\), the DDIM update is:
 
 $$\mathbf{x}_{t-1} = \sqrt{\bar{\alpha}_{t-1}} \underbrace{\left(\frac{\mathbf{x}_t - \sqrt{1-\bar{\alpha}_t} \, \boldsymbol{\epsilon}_\theta(\mathbf{x}_t, t)}{\sqrt{\bar{\alpha}_t}}\right)}_{\text{predicted } \mathbf{x}_0} + \sqrt{1 - \bar{\alpha}_{t-1}} \cdot \boldsymbol{\epsilon}_\theta(\mathbf{x}_t, t)$$
 
-This is a deterministic map from \(\mathbf{x}_t\) to \(\mathbf{x}_{t-1}\). The same initial noise always produces the same output. And because it is deterministic, you can skip steps --- go directly from \(\mathbf{x}_{1000}\) to \(\mathbf{x}_{950}\) to \(\mathbf{x}_{900}\) etc., using any subsequence of timesteps.
+This is a deterministic map from \\(\mathbf{x}_t\\) to \\(\mathbf{x}_{t-1}\\). The same initial noise always produces the same output. And because it is deterministic, you can skip steps --- go directly from \\(\mathbf{x}_{1000}\\) to \\(\mathbf{x}_{950}\\) to \\(\mathbf{x}_{900}\\) etc., using any subsequence of timesteps.
 
 ### Why DDIM Can Skip Steps
 
@@ -174,7 +174,7 @@ DDIM is a first-order ODE solver (Euler method). **DPM-Solver** (Lu et al., 2022
 
 ### The Probability Flow ODE
 
-Any diffusion process with score function \(\nabla_{\mathbf{x}} \log p_t(\mathbf{x})\) has an equivalent deterministic ODE (the probability flow ODE):
+Any diffusion process with score function \\(\nabla_{\mathbf{x}} \log p_t(\mathbf{x})\\) has an equivalent deterministic ODE (the probability flow ODE):
 
 $$\frac{d\mathbf{x}}{dt} = f(\mathbf{x}, t) - \frac{1}{2}g(t)^2 \nabla_{\mathbf{x}} \log p_t(\mathbf{x})$$
 
@@ -182,23 +182,23 @@ For the VP schedule, this simplifies to:
 
 $$\frac{d\mathbf{x}}{d\lambda} = \frac{\sigma_\lambda}{2} \left(\mathbf{x} - \hat{\mathbf{x}}_0(\mathbf{x}, \lambda)\right)$$
 
-where \(\lambda = \log(\alpha/\sigma)\) is the log-SNR and \(\hat{\mathbf{x}}_0\) is the denoised prediction.
+where \\(\lambda = \log(\alpha/\sigma)\\) is the log-SNR and \\(\hat{\mathbf{x}}_0\\) is the denoised prediction.
 
 ### Exponential Integrator
 
-DPM-Solver writes the ODE in a form where the linear part can be integrated exactly. The key change of variables: let \(\hat{\boldsymbol{\epsilon}}_\theta\) be the noise prediction. Then the exact solution from time \(s\) to time \(t\) (in log-SNR parameterization) is:
+DPM-Solver writes the ODE in a form where the linear part can be integrated exactly. The key change of variables: let \\(\hat{\boldsymbol{\epsilon}}_\theta\\) be the noise prediction. Then the exact solution from time \\(s\\) to time \\(t\\) (in log-SNR parameterization) is:
 
 $$\mathbf{x}_t = \frac{\alpha_t}{\alpha_s} \mathbf{x}_s - \sigma_t \int_{\lambda_s}^{\lambda_t} e^{-\lambda} \hat{\boldsymbol{\epsilon}}_\theta(\mathbf{x}_\lambda, \lambda) \, d\lambda$$
 
-DPM-Solver approximates the integral by Taylor-expanding \(\hat{\boldsymbol{\epsilon}}_\theta\) around \(\lambda_s\):
+DPM-Solver approximates the integral by Taylor-expanding \\(\hat{\boldsymbol{\epsilon}}_\theta\\) around \\(\lambda_s\\):
 
 **First order (DPM-Solver-1, equivalent to DDIM):**
 
 $$\mathbf{x}_t \approx \frac{\alpha_t}{\alpha_s} \mathbf{x}_s - \sigma_t (e^{h} - 1) \hat{\boldsymbol{\epsilon}}_\theta(\mathbf{x}_s, \lambda_s)$$
 
-where \(h = \lambda_t - \lambda_s\).
+where \\(h = \lambda_t - \lambda_s\\).
 
-**Second order (DPM-Solver-2):** Evaluate \(\hat{\boldsymbol{\epsilon}}_\theta\) at a midpoint to get a better approximation:
+**Second order (DPM-Solver-2):** Evaluate \\(\hat{\boldsymbol{\epsilon}}_\theta\\) at a midpoint to get a better approximation:
 
 $$\mathbf{x}_t \approx \frac{\alpha_t}{\alpha_s} \mathbf{x}_s - \sigma_t (e^h - 1) \hat{\boldsymbol{\epsilon}}_\theta(\mathbf{x}_s, \lambda_s) - \frac{\sigma_t}{2h}(e^h - 1 - h)(\hat{\boldsymbol{\epsilon}}_\theta(\mathbf{x}_m, \lambda_m) - \hat{\boldsymbol{\epsilon}}_\theta(\mathbf{x}_s, \lambda_s))$$
 
@@ -216,7 +216,7 @@ ODE-based samplers (DDIM, DPM-Solver) are deterministic: the same noise input al
 - **Error correction:** Added noise can "wash out" accumulated errors from imperfect denoising, improving robustness.
 - **Quality at low steps:** At very few steps (1--4), stochastic samplers often produce artifacts because the noise injection is too large relative to the signal evolution.
 
-**The \(\eta\) parameter** (from DDIM) and **churn** (from EDM) interpolate between deterministic and stochastic. For video, deterministic sampling is generally preferred because stochastic noise injection at each step can break temporal consistency.
+**The \\(\eta\\) parameter** (from DDIM) and **churn** (from EDM) interpolate between deterministic and stochastic. For video, deterministic sampling is generally preferred because stochastic noise injection at each step can break temporal consistency.
 
 ---
 
@@ -226,16 +226,16 @@ ODE-based samplers (DDIM, DPM-Solver) are deterministic: the same noise input al
 
 ### The Algorithm
 
-1. Start with a teacher model \(\boldsymbol{\epsilon}_\text{teacher}\) that generates in \(N\) steps.
-2. Train a student \(\boldsymbol{\epsilon}_\text{student}\) that takes one step to match the teacher's two steps:
+1. Start with a teacher model \\(\boldsymbol{\epsilon}_\text{teacher}\\) that generates in \\(N\\) steps.
+2. Train a student \\(\boldsymbol{\epsilon}_\text{student}\\) that takes one step to match the teacher's two steps:
 
 $$\mathcal{L} = \mathbb{E}\!\left[\left\| \boldsymbol{\epsilon}_\text{student}(\mathbf{x}_{t}, t \to t-2) - \hat{\boldsymbol{\epsilon}}_{\text{target}} \right\|^2 \right]$$
 
-where \(\hat{\boldsymbol{\epsilon}}_{\text{target}}\) is computed by running the teacher for two steps from \(\mathbf{x}_t\).
+where \\(\hat{\boldsymbol{\epsilon}}_{\text{target}}\\) is computed by running the teacher for two steps from \\(\mathbf{x}_t\\).
 
-3. The student now generates in \(N/2\) steps. Use the student as the new teacher and repeat.
+3. The student now generates in \\(N/2\\) steps. Use the student as the new teacher and repeat.
 
-After \(k\) rounds, the model generates in \(N / 2^k\) steps. Starting from \(N = 1024\):
+After \\(k\\) rounds, the model generates in \\(N / 2^k\\) steps. Starting from \\(N = 1024\\):
 - Round 1: 512 steps
 - Round 2: 256 steps
 - ...
@@ -249,7 +249,7 @@ Progressive distillation works best with the **v-prediction** parameterization:
 
 $$\mathbf{v}_t = \alpha_t \boldsymbol{\epsilon} - \sigma_t \mathbf{x}_0$$
 
-which is a rotation of the \((\mathbf{x}_0, \boldsymbol{\epsilon})\) pair. The v-prediction is numerically better behaved than \(\epsilon\)-prediction at high and low noise levels, which matters when distillation pushes the model to make large jumps in noise space.
+which is a rotation of the \\((\mathbf{x}_0, \boldsymbol{\epsilon})\\) pair. The v-prediction is numerically better behaved than \\(\epsilon\\)-prediction at high and low noise levels, which matters when distillation pushes the model to make large jumps in noise space.
 
 ---
 
@@ -259,7 +259,7 @@ which is a rotation of the \((\mathbf{x}_0, \boldsymbol{\epsilon})\) pair. The v
 
 ### The Key Idea
 
-Consider the probability flow ODE trajectory starting from any noisy point \(\mathbf{x}_t\). All points on this trajectory map to the same clean output \(\mathbf{x}_0\) when the ODE is solved to completion. A **consistency function** \(f_\theta(\mathbf{x}_t, t)\) maps any point on the trajectory directly to the endpoint:
+Consider the probability flow ODE trajectory starting from any noisy point \\(\mathbf{x}_t\\). All points on this trajectory map to the same clean output \\(\mathbf{x}_0\\) when the ODE is solved to completion. A **consistency function** \\(f_\theta(\mathbf{x}_t, t)\\) maps any point on the trajectory directly to the endpoint:
 
 $$f_\theta(\mathbf{x}_t, t) = \mathbf{x}_0 \quad \text{for all } t \text{ along the same ODE trajectory}$$
 
@@ -269,11 +269,11 @@ $$f_\theta(\mathbf{x}_t, t) = f_\theta(\mathbf{x}_{t'}, t') \quad \text{for all 
 
 ### Boundary Condition
 
-At \(t = \epsilon\) (near-clean data), the consistency function must be the identity:
+At \\(t = \epsilon\\) (near-clean data), the consistency function must be the identity:
 
 $$f_\theta(\mathbf{x}_\epsilon, \epsilon) = \mathbf{x}_\epsilon$$
 
-This is enforced architecturally: parameterize \(f_\theta(\mathbf{x}_t, t) = c_\text{skip}(t) \mathbf{x}_t + c_\text{out}(t) F_\theta(\mathbf{x}_t, t)\) where \(c_\text{skip}(\epsilon) = 1\) and \(c_\text{out}(\epsilon) = 0\).
+This is enforced architecturally: parameterize \\(f_\theta(\mathbf{x}_t, t) = c_\text{skip}(t) \mathbf{x}_t + c_\text{out}(t) F_\theta(\mathbf{x}_t, t)\\) where \\(c_\text{skip}(\epsilon) = 1\\) and \\(c_\text{out}(\epsilon) = 0\\).
 
 ### Training
 
@@ -281,13 +281,13 @@ This is enforced architecturally: parameterize \(f_\theta(\mathbf{x}_t, t) = c_\
 
 $$\mathcal{L} = \mathbb{E}\!\left[\| f_\theta(\mathbf{x}_{t_{n+1}}, t_{n+1}) - f_{\theta^-}(\hat{\mathbf{x}}_{t_n}, t_n) \|^2 \right]$$
 
-where \(\hat{\mathbf{x}}_{t_n}\) is obtained by one ODE step from \(\mathbf{x}_{t_{n+1}}\) using the teacher, and \(\theta^-\) is an EMA of \(\theta\).
+where \\(\hat{\mathbf{x}}_{t_n}\\) is obtained by one ODE step from \\(\mathbf{x}_{t_{n+1}}\\) using the teacher, and \\(\theta^-\\) is an EMA of \\(\theta\\).
 
 **Consistency training:** Train from scratch without a teacher, using the data itself to define the ODE trajectories. This avoids needing a pretrained model but is harder to train.
 
 ### Sampling
 
-A trained consistency model generates in **one step**: sample \(\mathbf{x}_T \sim \mathcal{N}(0, I)\) and compute \(f_\theta(\mathbf{x}_T, T)\). For better quality, use 2--4 steps with a "denoise-then-noise-then-denoise" strategy.
+A trained consistency model generates in **one step**: sample \\(\mathbf{x}_T \sim \mathcal{N}(0, I)\\) and compute \\(f_\theta(\mathbf{x}_T, T)\\). For better quality, use 2--4 steps with a "denoise-then-noise-then-denoise" strategy.
 
 <svg viewBox="0 0 700 280" xmlns="http://www.w3.org/2000/svg" style="max-width: 700px; display: block; margin: 2em auto;">
   <text x="350" y="25" text-anchor="middle" font-size="14" font-weight="bold" fill="#d4d4d4">Consistency Model: All Points Map to x₀</text>
@@ -327,9 +327,9 @@ The latest distillation methods use a **discriminator** to match distributions i
 
 ### SDXL-Turbo / ADD (Adversarial Diffusion Distillation)
 
-Train a student generator \(G_\theta\) with two losses:
+Train a student generator \\(G_\theta\\) with two losses:
 1. **Diffusion loss:** The student's output, when noised to an intermediate level, should fool the teacher's denoiser (the student's generation should look like a plausible intermediate state of the teacher's denoising process).
-2. **Adversarial loss:** A discriminator \(D_\phi\) is trained to distinguish real images from the student's 1--4 step outputs.
+2. **Adversarial loss:** A discriminator \\(D_\phi\\) is trained to distinguish real images from the student's 1--4 step outputs.
 
 $$\mathcal{L}_\text{student} = \lambda_\text{diff} \mathcal{L}_\text{diffusion} + \lambda_\text{adv} \mathcal{L}_\text{adversarial}$$
 
@@ -337,7 +337,7 @@ The adversarial loss is crucial: it ensures the student's outputs lie on the man
 
 ### Distribution Matching Distillation (DMD2)
 
-Instead of training a discriminator from scratch, use the pretrained diffusion model itself as the discriminator. The key insight: the score function \(\nabla_\mathbf{x} \log p(\mathbf{x})\) can distinguish real from fake images (real images have high log-likelihood; fake images do not). The loss pushes the student's generated distribution toward the teacher's.
+Instead of training a discriminator from scratch, use the pretrained diffusion model itself as the discriminator. The key insight: the score function \\(\nabla_\mathbf{x} \log p(\mathbf{x})\\) can distinguish real from fake images (real images have high log-likelihood; fake images do not). The loss pushes the student's generated distribution toward the teacher's.
 
 ### LADD (Latent Adversarial Diffusion Distillation)
 

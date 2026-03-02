@@ -31,7 +31,7 @@ This is not a bug in the training procedure. It is a mathematical inevitability:
 
 ## Why Pixel Loss Produces Blur
 
-Consider a conditional generation problem: given input \(\mathbf{c}\), generate output \(\mathbf{x}\). There may be many valid outputs for a given input (the mapping is one-to-many). For example, given a low-resolution image, many high-resolution images are consistent with it.
+Consider a conditional generation problem: given input \\(\mathbf{c}\\), generate output \\(\mathbf{x}\\). There may be many valid outputs for a given input (the mapping is one-to-many). For example, given a low-resolution image, many high-resolution images are consistent with it.
 
 ### The MSE-Optimal Prediction
 
@@ -39,21 +39,21 @@ A model trained with MSE loss minimizes:
 
 $$\mathcal{L}_{\text{MSE}} = \mathbb{E}_{\mathbf{x}, \mathbf{c}}\!\left[\|\hat{\mathbf{x}}(\mathbf{c}) - \mathbf{x}\|^2\right]$$
 
-The solution that minimizes this over all possible functions \(\hat{\mathbf{x}}(\cdot)\) is the **conditional mean**:
+The solution that minimizes this over all possible functions \\(\hat{\mathbf{x}}(\cdot)\\) is the **conditional mean**:
 
 $$\hat{\mathbf{x}}^*(\mathbf{c}) = \mathbb{E}[\mathbf{x} | \mathbf{c}]$$
 
-**Proof.** For any fixed \(\mathbf{c}\), we want to find the \(\hat{\mathbf{x}}\) that minimizes \(\mathbb{E}[\|\hat{\mathbf{x}} - \mathbf{x}\|^2 | \mathbf{c}]\). Expand:
+**Proof.** For any fixed \\(\mathbf{c}\\), we want to find the \\(\hat{\mathbf{x}}\\) that minimizes \\(\mathbb{E}[\|\hat{\mathbf{x}} - \mathbf{x}\|^2 | \mathbf{c}]\\). Expand:
 
 $$\mathbb{E}[\|\hat{\mathbf{x}} - \mathbf{x}\|^2 | \mathbf{c}] = \|\hat{\mathbf{x}}\|^2 - 2\hat{\mathbf{x}}^T \mathbb{E}[\mathbf{x}|\mathbf{c}] + \mathbb{E}[\|\mathbf{x}\|^2 | \mathbf{c}]$$
 
-Taking the derivative with respect to \(\hat{\mathbf{x}}\) and setting to zero:
+Taking the derivative with respect to \\(\hat{\mathbf{x}}\\) and setting to zero:
 
 $$2\hat{\mathbf{x}} - 2\mathbb{E}[\mathbf{x}|\mathbf{c}] = 0 \implies \hat{\mathbf{x}}^* = \mathbb{E}[\mathbf{x} | \mathbf{c}]$$
 
 ### Why the Mean Is Blurry
 
-If the conditional distribution \(p(\mathbf{x} | \mathbf{c})\) is multimodal --- several distinct sharp images are plausible given \(\mathbf{c}\) --- then the mean averages over these modes. Each mode has sharp edges at slightly different positions. The average smears these edges out.
+If the conditional distribution \\(p(\mathbf{x} | \mathbf{c})\\) is multimodal --- several distinct sharp images are plausible given \\(\mathbf{c}\\) --- then the mean averages over these modes. Each mode has sharp edges at slightly different positions. The average smears these edges out.
 
 For video, this is even worse. Given the first 10 frames, many plausible continuations exist (the person could turn left or right, the ball could bounce or roll). The conditional mean averages over all futures, producing a ghostly, blurry mess.
 
@@ -103,7 +103,7 @@ Similarly, L1 loss yields the conditional **median**, which is slightly better (
 
 **SSIM** (Wang et al., 2004) was the first widely-used metric that goes beyond pixel-level comparison by measuring structural similarity.
 
-For two image patches \(\mathbf{x}\) and \(\mathbf{y}\), SSIM computes three components:
+For two image patches \\(\mathbf{x}\\) and \\(\mathbf{y}\\), SSIM computes three components:
 
 **Luminance comparison:**
 $$l(\mathbf{x}, \mathbf{y}) = \frac{2\mu_x \mu_y + C_1}{\mu_x^2 + \mu_y^2 + C_1}$$
@@ -114,13 +114,13 @@ $$c(\mathbf{x}, \mathbf{y}) = \frac{2\sigma_x \sigma_y + C_2}{\sigma_x^2 + \sigm
 **Structure comparison:**
 $$s(\mathbf{x}, \mathbf{y}) = \frac{\sigma_{xy} + C_3}{\sigma_x \sigma_y + C_3}$$
 
-where \(\mu_x, \mu_y\) are means, \(\sigma_x, \sigma_y\) are standard deviations, \(\sigma_{xy}\) is the covariance, and \(C_1, C_2, C_3\) are small stabilization constants.
+where \\(\mu_x, \mu_y\\) are means, \\(\sigma_x, \sigma_y\\) are standard deviations, \\(\sigma_{xy}\\) is the covariance, and \\(C_1, C_2, C_3\\) are small stabilization constants.
 
 The full SSIM is their product:
 
 $$\text{SSIM}(\mathbf{x}, \mathbf{y}) = l \cdot c \cdot s = \frac{(2\mu_x\mu_y + C_1)(2\sigma_{xy} + C_2)}{(\mu_x^2 + \mu_y^2 + C_1)(\sigma_x^2 + \sigma_y^2 + C_2)}$$
 
-SSIM ranges from -1 to 1 (1 = identical). As a loss, we use \(\mathcal{L}_{\text{D-SSIM}} = (1 - \text{SSIM})/2\).
+SSIM ranges from -1 to 1 (1 = identical). As a loss, we use \\(\mathcal{L}_{\text{D-SSIM}} = (1 - \text{SSIM})/2\\).
 
 **MS-SSIM** extends this to multiple scales by computing SSIM at different resolutions (via downsampling) and combining them, capturing both fine details and coarse structure.
 
@@ -137,7 +137,7 @@ A CNN trained on ImageNet (e.g., VGG-16) learns a hierarchy of representations:
 - **Middle layers** (conv3, conv4): parts, patterns, spatial structure
 - **Late layers** (conv5): objects, scenes, semantic content
 
-Let \(\phi_l(\mathbf{x})\) denote the feature map of image \(\mathbf{x}\) at layer \(l\). These features are high-dimensional tensors (channels × height × width) that encode image content at a particular level of abstraction.
+Let \\(\phi_l(\mathbf{x})\\) denote the feature map of image \\(\mathbf{x}\\) at layer \\(l\\). These features are high-dimensional tensors (channels × height × width) that encode image content at a particular level of abstraction.
 
 The key property: two images that are **perceptually similar** (similar content, structure, and appearance) have **similar feature representations**, even if their pixel values differ significantly. A slightly shifted image, a differently lit image, or a slightly different crop of the same scene will have different pixels but nearly identical mid-level features.
 
@@ -149,7 +149,7 @@ The key property: two images that are **perceptually similar** (similar content,
 
 $$\mathcal{L}_{\text{perceptual}} = \sum_l w_l \|\phi_l(\hat{\mathbf{x}}) - \phi_l(\mathbf{x})\|_2^2$$
 
-where \(\phi_l\) is the feature extractor at layer \(l\) of a pretrained VGG network, and \(w_l\) are per-layer weights.
+where \\(\phi_l\\) is the feature extractor at layer \\(l\\) of a pretrained VGG network, and \\(w_l\\) are per-layer weights.
 
 Typical layer choices for VGG-19: relu1_1, relu2_1, relu3_1, relu4_1, relu5_1. Each layer contributes a different level of perceptual comparison.
 
@@ -171,11 +171,11 @@ The perceptual loss was originally developed for style transfer and super-resolu
 
 ### The Gram Matrix
 
-For a feature map \(\phi_l(\mathbf{x}) \in \mathbb{R}^{C_l \times H_l \times W_l}\), reshape it to \(F \in \mathbb{R}^{C_l \times (H_l W_l)}\) (each row is a channel's spatial activation). The **Gram matrix** is:
+For a feature map \\(\phi_l(\mathbf{x}) \in \mathbb{R}^{C_l \times H_l \times W_l}\\), reshape it to \\(F \in \mathbb{R}^{C_l \times (H_l W_l)}\\) (each row is a channel's spatial activation). The **Gram matrix** is:
 
 $$G_l = \frac{1}{C_l H_l W_l} F F^T \in \mathbb{R}^{C_l \times C_l}$$
 
-The entry \(G_l[i, j]\) is the inner product (correlation) between channels \(i\) and \(j\). This captures **which features co-occur spatially**: if channels for "horizontal edges" and "blue color" are correlated, the Gram matrix records this, indicating a texture with blue horizontal edges.
+The entry \\(G_l[i, j]\\) is the inner product (correlation) between channels \\(i\\) and \\(j\\). This captures **which features co-occur spatially**: if channels for "horizontal edges" and "blue color" are correlated, the Gram matrix records this, indicating a texture with blue horizontal edges.
 
 ### Why Gram Matrices Capture Style
 
@@ -183,7 +183,7 @@ The Gram matrix computes the **second-order statistics** of the feature distribu
 
 $$G_l[i, j] = \frac{1}{N_l}\sum_{k=1}^{N_l} \phi_l^{(i)}(x_k) \cdot \phi_l^{(j)}(x_k)$$
 
-where \(N_l = H_l W_l\) and \(\phi_l^{(i)}\) is the \(i\)-th channel.
+where \\(N_l = H_l W_l\\) and \\(\phi_l^{(i)}\\) is the \\(i\\)-th channel.
 
 This discards spatial arrangement (where features are) but preserves texture patterns (which features co-occur). A field of grass and a close-up of a carpet might have different spatial layouts but similar Gram matrices if they share the same texture statistics.
 
@@ -191,7 +191,7 @@ This discards spatial arrangement (where features are) but preserves texture pat
 
 $$\mathcal{L}_{\text{style}} = \sum_l w_l \|G_l(\hat{\mathbf{x}}) - G_l(\mathbf{x}_{\text{style}})\|_F^2$$
 
-where \(\|\cdot\|_F\) is the Frobenius norm.
+where \\(\|\cdot\|_F\\) is the Frobenius norm.
 
 **Neural style transfer** (Gatys et al., 2015) combines content loss (perceptual loss matching a content image) with style loss (Gram matrix matching a style image) to synthesize an image with the content of one image and the style of another.
 
@@ -203,14 +203,14 @@ where \(\|\cdot\|_F\) is the Frobenius norm.
 
 ### Architecture
 
-Given two images \(\mathbf{x}, \hat{\mathbf{x}}\):
+Given two images \\(\mathbf{x}, \hat{\mathbf{x}}\\):
 
 1. Extract features from a pretrained backbone (AlexNet, VGG, or SqueezeNet) at multiple layers
 2. Normalize features channel-wise (unit variance per channel)
-3. Compute squared differences: \(d_l = (\hat{\phi}_l(\mathbf{x}) - \hat{\phi}_l(\hat{\mathbf{x}}))^2\)
-4. Apply **learned linear weights** \(w_l \in \mathbb{R}^{C_l}\) per channel: \(\text{LPIPS} = \sum_l \sum_c w_l^{(c)} \cdot \text{mean}(d_l^{(c)})\)
+3. Compute squared differences: \\(d_l = (\hat{\phi}_l(\mathbf{x}) - \hat{\phi}_l(\hat{\mathbf{x}}))^2\\)
+4. Apply **learned linear weights** \\(w_l \in \mathbb{R}^{C_l}\\) per channel: \\(\text{LPIPS} = \sum_l \sum_c w_l^{(c)} \cdot \text{mean}(d_l^{(c)})\\)
 
-The key innovation: the channel weights \(w_l\) are trained on a dataset of **human perceptual judgments** (2AFC --- two-alternative forced choice: given a reference, which of two distortions is more similar?).
+The key innovation: the channel weights \\(w_l\\) are trained on a dataset of **human perceptual judgments** (2AFC --- two-alternative forced choice: given a reference, which of two distortions is more similar?).
 
 ### Why Learned Weights Matter
 
@@ -226,7 +226,7 @@ A **discriminator** in a GAN can be viewed as a learned perceptual metric. The a
 
 ### The PatchGAN
 
-Instead of a single real/fake classification per image, a **PatchGAN** discriminator outputs a grid of real/fake predictions, each covering a receptive field of \(70 \times 70\) pixels (typically). This enforces realism at the texture level.
+Instead of a single real/fake classification per image, a **PatchGAN** discriminator outputs a grid of real/fake predictions, each covering a receptive field of \\(70 \times 70\\) pixels (typically). This enforces realism at the texture level.
 
 The adversarial loss:
 
@@ -246,7 +246,7 @@ For video, discriminators can operate at multiple scales (image-level and video-
 
 $$D(G) \geq D_{\min}(d(p_G, p_X))$$
 
-where \(D(G)\) is the expected distortion (e.g., MSE), \(d(p_G, p_X)\) is a divergence between the generated and real distributions (perceptual quality), and \(D_{\min}\) is a monotonically decreasing function.
+where \\(D(G)\\) is the expected distortion (e.g., MSE), \\(d(p_G, p_X)\\) is a divergence between the generated and real distributions (perceptual quality), and \\(D_{\min}\\) is a monotonically decreasing function.
 
 **In plain language:** you cannot simultaneously minimize distortion (MSE, PSNR) and maximize perceptual quality (make the distribution of outputs match the distribution of real data). Reducing one increases the other.
 
@@ -267,11 +267,11 @@ Spatial perceptual losses applied per-frame do not enforce temporal consistency.
 
 ### Warping Loss
 
-Given optical flow \(\mathbf{u}_{t \to t+1}\) between consecutive frames, the warping loss penalizes temporal inconsistency:
+Given optical flow \\(\mathbf{u}_{t \to t+1}\\) between consecutive frames, the warping loss penalizes temporal inconsistency:
 
 $$\mathcal{L}_{\text{warp}} = \sum_t \|\mathbf{x}_{t+1} - \text{warp}(\mathbf{x}_t, \mathbf{u}_{t \to t+1})\|_1 \cdot (1 - O_t)$$
 
-where \(O_t\) is an occlusion mask (regions visible in one frame but not the other are excluded). This loss says: if you warp frame \(t\) to frame \(t+1\) using the flow, the result should match frame \(t+1\) in non-occluded regions.
+where \\(O_t\\) is an occlusion mask (regions visible in one frame but not the other are excluded). This loss says: if you warp frame \\(t\\) to frame \\(t+1\\) using the flow, the result should match frame \\(t+1\\) in non-occluded regions.
 
 ### Temporal Feature Loss
 
@@ -287,7 +287,7 @@ Use a video-pretrained backbone (e.g., I3D, VideoMAE) to extract spatiotemporal 
 
 $$\mathcal{L}_{\text{3D-perc}} = \|\Phi_{\text{3D}}(\hat{\mathbf{v}}) - \Phi_{\text{3D}}(\mathbf{v})\|_2^2$$
 
-where \(\Phi_{\text{3D}}\) is the 3D feature extractor and \(\mathbf{v}\) is the video.
+where \\(\Phi_{\text{3D}}\\) is the 3D feature extractor and \\(\mathbf{v}\\) is the video.
 
 ---
 
@@ -306,7 +306,7 @@ $$\mathcal{L}_{\text{total}} = \lambda_1 \|\hat{\mathbf{x}} - \mathbf{x}\|_1 + \
 | KL divergence | Smooth latent space | Overfitting |
 | Warping | Temporal consistency | Independent frame processing |
 
-The weights \(\lambda_i\) determine where on the perception-distortion Pareto frontier the model operates. These are typically tuned empirically --- there is no known closed-form optimal weighting.
+The weights \\(\lambda_i\\) determine where on the perception-distortion Pareto frontier the model operates. These are typically tuned empirically --- there is no known closed-form optimal weighting.
 
 ---
 

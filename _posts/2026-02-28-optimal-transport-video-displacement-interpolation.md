@@ -32,9 +32,9 @@ This post builds optimal transport from the Monge problem (1781) through the Kan
 
 ### Monge's Formulation (1781)
 
-Gaspard Monge asked: given a pile of sand (source distribution \(\mu\)) and a hole to fill (target distribution \(\nu\)), what is the cheapest way to move the sand? The cost of moving a grain from position \(\mathbf{x}\) to position \(\mathbf{y}\) is \(c(\mathbf{x}, \mathbf{y})\) (typically the squared Euclidean distance \(c(\mathbf{x}, \mathbf{y}) = \|\mathbf{x} - \mathbf{y}\|^2\)).
+Gaspard Monge asked: given a pile of sand (source distribution \\(\mu\\)) and a hole to fill (target distribution \\(\nu\\)), what is the cheapest way to move the sand? The cost of moving a grain from position \\(\mathbf{x}\\) to position \\(\mathbf{y}\\) is \\(c(\mathbf{x}, \mathbf{y})\\) (typically the squared Euclidean distance \\(c(\mathbf{x}, \mathbf{y}) = \|\mathbf{x} - \mathbf{y}\|^2\\)).
 
-A **transport map** \(T: \mathbb{R}^d \to \mathbb{R}^d\) pushes each point \(\mathbf{x}\) to \(T(\mathbf{x})\). The constraint is that the pushed-forward distribution \(T_\# \mu\) must equal \(\nu\):
+A **transport map** \\(T: \mathbb{R}^d \to \mathbb{R}^d\\) pushes each point \\(\mathbf{x}\\) to \\(T(\mathbf{x})\\). The constraint is that the pushed-forward distribution \\(T_\# \mu\\) must equal \\(\nu\\):
 
 $$T_\# \mu = \nu \quad \Leftrightarrow \quad \nu(B) = \mu(T^{-1}(B)) \text{ for all measurable sets } B$$
 
@@ -44,7 +44,7 @@ $$\inf_{T: T_\# \mu = \nu} \int c(\mathbf{x}, T(\mathbf{x})) \, d\mu(\mathbf{x})
 
 ### Why Monge Fails
 
-Monge's formulation requires a **deterministic map**: each grain of sand goes to exactly one destination. This is problematic when \(\mu\) is a point mass and \(\nu\) is spread out --- you cannot split a point mass using a map. More precisely, if \(\mu = \delta_{\mathbf{x}_0}\) (all mass at one point) and \(\nu\) has support on multiple points, no transport map \(T\) satisfies \(T_\# \mu = \nu\).
+Monge's formulation requires a **deterministic map**: each grain of sand goes to exactly one destination. This is problematic when \\(\mu\\) is a point mass and \\(\nu\\) is spread out --- you cannot split a point mass using a map. More precisely, if \\(\mu = \delta_{\mathbf{x}_0}\\) (all mass at one point) and \\(\nu\\) has support on multiple points, no transport map \\(T\\) satisfies \\(T_\# \mu = \nu\\).
 
 ---
 
@@ -52,29 +52,29 @@ Monge's formulation requires a **deterministic map**: each grain of sand goes to
 
 ### Kantorovich Relaxation
 
-Leonid Kantorovich (1942) relaxed Monge's problem by allowing mass to **split**. Instead of a deterministic map, use a **transport plan** (or coupling) \(\pi \in \Gamma(\mu, \nu)\) --- a joint distribution on \(\mathbb{R}^d \times \mathbb{R}^d\) with marginals \(\mu\) and \(\nu\):
+Leonid Kantorovich (1942) relaxed Monge's problem by allowing mass to **split**. Instead of a deterministic map, use a **transport plan** (or coupling) \\(\pi \in \Gamma(\mu, \nu)\\) --- a joint distribution on \\(\mathbb{R}^d \times \mathbb{R}^d\\) with marginals \\(\mu\\) and \\(\nu\\):
 
 $$\Gamma(\mu, \nu) = \{\pi \in \mathcal{P}(\mathbb{R}^d \times \mathbb{R}^d) : \pi(\cdot, \mathbb{R}^d) = \mu, \, \pi(\mathbb{R}^d, \cdot) = \nu\}$$
 
-The value \(\pi(\mathbf{x}, \mathbf{y})\) represents how much mass is moved from \(\mathbf{x}\) to \(\mathbf{y}\).
+The value \\(\pi(\mathbf{x}, \mathbf{y})\\) represents how much mass is moved from \\(\mathbf{x}\\) to \\(\mathbf{y}\\).
 
 **Kantorovich's problem:**
 
 $$W_p^p(\mu, \nu) = \inf_{\pi \in \Gamma(\mu, \nu)} \int \|\mathbf{x} - \mathbf{y}\|^p \, d\pi(\mathbf{x}, \mathbf{y})$$
 
-The **\(p\)-Wasserstein distance** is:
+The **\\(p\\)-Wasserstein distance** is:
 
 $$W_p(\mu, \nu) = \left(\inf_{\pi \in \Gamma(\mu, \nu)} \int \|\mathbf{x} - \mathbf{y}\|^p \, d\pi(\mathbf{x}, \mathbf{y})\right)^{1/p}$$
 
-**\(W_1\)** is the **Earth Mover's Distance**: the minimum total distance that mass must travel.
+**\\(W_1\\)** is the **Earth Mover's Distance**: the minimum total distance that mass must travel.
 
-**\(W_2\)** (quadratic cost) is the most mathematically rich. It has a unique optimal transport plan (under mild conditions), a beautiful geometric structure, and direct connections to fluid mechanics.
+**\\(W_2\\)** (quadratic cost) is the most mathematically rich. It has a unique optimal transport plan (under mild conditions), a beautiful geometric structure, and direct connections to fluid mechanics.
 
 ### Properties
 
-- \(W_p\) is a metric on the space of probability distributions with finite \(p\)-th moments
-- \(W_p\) metrizes weak convergence plus convergence of \(p\)-th moments
-- \(W_p\) is sensitive to the **geometry** of the underlying space (unlike KL divergence, which depends only on density ratios)
+- \\(W_p\\) is a metric on the space of probability distributions with finite \\(p\\)-th moments
+- \\(W_p\\) metrizes weak convergence plus convergence of \\(p\\)-th moments
+- \\(W_p\\) is sensitive to the **geometry** of the underlying space (unlike KL divergence, which depends only on density ratios)
 
 <svg viewBox="0 0 700 280" xmlns="http://www.w3.org/2000/svg" style="max-width: 700px; display: block; margin: 2em auto;">
   <text x="350" y="25" text-anchor="middle" font-size="14" font-weight="bold" fill="#d4d4d4">Monge Map vs Kantorovich Coupling</text>
@@ -113,25 +113,25 @@ $$W_p(\mu, \nu) = \left(\inf_{\pi \in \Gamma(\mu, \nu)} \int \|\mathbf{x} - \mat
 
 ## The Brenier Theorem
 
-For the quadratic cost \(c(\mathbf{x}, \mathbf{y}) = \|\mathbf{x} - \mathbf{y}\|^2\), there is a unique optimal transport map (under mild conditions), and it has a beautiful structure.
+For the quadratic cost \\(c(\mathbf{x}, \mathbf{y}) = \|\mathbf{x} - \mathbf{y}\|^2\\), there is a unique optimal transport map (under mild conditions), and it has a beautiful structure.
 
-**Theorem (Brenier, 1991).** If \(\mu\) is absolutely continuous (no point masses), then the optimal transport map from \(\mu\) to \(\nu\) with quadratic cost is the gradient of a convex function:
+**Theorem (Brenier, 1991).** If \\(\mu\\) is absolutely continuous (no point masses), then the optimal transport map from \\(\mu\\) to \\(\nu\\) with quadratic cost is the gradient of a convex function:
 
 $$T(\mathbf{x}) = \nabla \phi(\mathbf{x})$$
 
-where \(\phi: \mathbb{R}^d \to \mathbb{R}\) is a convex function (called the **Brenier potential** or **Kantorovich potential**).
+where \\(\phi: \mathbb{R}^d \to \mathbb{R}\\) is a convex function (called the **Brenier potential** or **Kantorovich potential**).
 
 **Implications:**
 
 1. The optimal map pushes each point in the gradient direction of a convex potential. Since the gradient of a convex function is a monotone map (it does not "cross" transport paths), the optimal transport avoids path crossings.
 
-2. The convex function \(\phi\) satisfies the **Monge-Ampere equation**:
+2. The convex function \\(\phi\\) satisfies the **Monge-Ampere equation**:
 
 $$\det(\nabla^2 \phi(\mathbf{x})) = \frac{d\mu}{d\nu}(\nabla \phi(\mathbf{x}))$$
 
 This PDE relates the curvature of the potential to the density ratio.
 
-3. For the special case of two Gaussians \(\mu = \mathcal{N}(\mathbf{m}_0, \Sigma_0)\) and \(\nu = \mathcal{N}(\mathbf{m}_1, \Sigma_1)\), the optimal map is affine:
+3. For the special case of two Gaussians \\(\mu = \mathcal{N}(\mathbf{m}_0, \Sigma_0)\\) and \\(\nu = \mathcal{N}(\mathbf{m}_1, \Sigma_1)\\), the optimal map is affine:
 
 $$T(\mathbf{x}) = \mathbf{m}_1 + \Sigma_0^{-1/2}(\Sigma_0^{1/2} \Sigma_1 \Sigma_0^{1/2})^{1/2} \Sigma_0^{-1/2}(\mathbf{x} - \mathbf{m}_0)$$
 
@@ -143,19 +143,19 @@ $$W_2^2(\mu, \nu) = \|\mathbf{m}_0 - \mathbf{m}_1\|^2 + \text{tr}\!\left(\Sigma_
 
 ## Displacement Interpolation
 
-Given distributions \(\mu_0\) and \(\mu_1\) and an optimal transport map \(T\), the **displacement interpolation** (McCann, 1997) at time \(t \in [0, 1]\) is:
+Given distributions \\(\mu_0\\) and \\(\mu_1\\) and an optimal transport map \\(T\\), the **displacement interpolation** (McCann, 1997) at time \\(t \in [0, 1]\\) is:
 
 $$\mu_t = ((1-t)\text{Id} + tT)_\# \mu_0$$
 
-Each point \(\mathbf{x}\) in \(\mu_0\) moves linearly toward its destination \(T(\mathbf{x})\) in \(\mu_1\):
+Each point \\(\mathbf{x}\\) in \\(\mu_0\\) moves linearly toward its destination \\(T(\mathbf{x})\\) in \\(\mu_1\\):
 
 $$\mathbf{x}_t = (1-t)\mathbf{x} + t \cdot T(\mathbf{x})$$
 
-The distribution \(\mu_t\) is the distribution of \(\mathbf{x}_t\).
+The distribution \\(\mu_t\\) is the distribution of \\(\mathbf{x}_t\\).
 
 ### Why Displacement Interpolation Is Special
 
-Displacement interpolation is the **geodesic** in the Wasserstein-2 space. It is the shortest path between \(\mu_0\) and \(\mu_1\) in the space of probability distributions, measured by the Wasserstein-2 distance:
+Displacement interpolation is the **geodesic** in the Wasserstein-2 space. It is the shortest path between \\(\mu_0\\) and \\(\mu_1\\) in the space of probability distributions, measured by the Wasserstein-2 distance:
 
 $$W_2(\mu_0, \mu_t) = t \cdot W_2(\mu_0, \mu_1), \quad W_2(\mu_t, \mu_1) = (1-t) \cdot W_2(\mu_0, \mu_1)$$
 
@@ -165,9 +165,9 @@ The **linear (mixture) interpolation** between densities is:
 
 $$\rho_t^{\text{linear}} = (1-t) \rho_0 + t \rho_1$$
 
-This is a **cross-fade**: at each point in space, the density is a weighted average of the two distributions. For two separated Gaussian blobs, linear interpolation creates a bimodal distribution at \(t = 0.5\) --- the mass exists at both locations simultaneously, like a ghost.
+This is a **cross-fade**: at each point in space, the density is a weighted average of the two distributions. For two separated Gaussian blobs, linear interpolation creates a bimodal distribution at \\(t = 0.5\\) --- the mass exists at both locations simultaneously, like a ghost.
 
-**Displacement interpolation** instead moves the mass physically from one location to the other. At \(t = 0.5\), the blob is halfway between the two positions --- a single, coherent blob, not a ghostly superposition.
+**Displacement interpolation** instead moves the mass physically from one location to the other. At \\(t = 0.5\\), the blob is halfway between the two positions --- a single, coherent blob, not a ghostly superposition.
 
 For video: cross-fading between frames produces ghosting artifacts (transparent overlapping images). Displacement interpolation produces actual motion --- the content physically moves from the first frame's position to the second frame's position.
 
@@ -207,13 +207,13 @@ For video: cross-fading between frames produces ghosting artifacts (transparent 
 
 ## The Benamou-Brenier Formula
 
-The **Benamou-Brenier formula** (2000) provides a dynamic formulation of optimal transport. Instead of finding a static transport plan, find a **velocity field** \(\mathbf{v}(\mathbf{x}, t)\) that moves the mass from \(\mu_0\) to \(\mu_1\) along the cheapest path.
+The **Benamou-Brenier formula** (2000) provides a dynamic formulation of optimal transport. Instead of finding a static transport plan, find a **velocity field** \\(\mathbf{v}(\mathbf{x}, t)\\) that moves the mass from \\(\mu_0\\) to \\(\mu_1\\) along the cheapest path.
 
-The density \(\rho(\mathbf{x}, t)\) must satisfy the **continuity equation** (conservation of mass):
+The density \\(\rho(\mathbf{x}, t)\\) must satisfy the **continuity equation** (conservation of mass):
 
 $$\frac{\partial \rho}{\partial t} + \nabla \cdot (\rho \mathbf{v}) = 0$$
 
-with boundary conditions \(\rho(\cdot, 0) = \mu_0\) and \(\rho(\cdot, 1) = \mu_1\).
+with boundary conditions \\(\rho(\cdot, 0) = \mu_0\\) and \\(\rho(\cdot, 1) = \mu_1\\).
 
 The Benamou-Brenier formula says:
 
@@ -221,17 +221,17 @@ $$W_2^2(\mu_0, \mu_1) = \inf_{(\rho, \mathbf{v})} \int_0^1 \int_{\mathbb{R}^d} \
 
 The cost being minimized is the total **kinetic energy** of the transport. The optimal velocity field has constant speed along each particle's path (straight lines at constant velocity), which is precisely the displacement interpolation.
 
-This is the fluid mechanics interpretation: \(W_2^2\) is the minimum kinetic energy required to morph one density into another while conserving mass.
+This is the fluid mechanics interpretation: \\(W_2^2\\) is the minimum kinetic energy required to morph one density into another while conserving mass.
 
 ---
 
 ## Displacement Interpolation as Frame Interpolation
 
-The connection to video is direct. Consider two video frames as distributions of "visual content" in pixel space. Frame interpolation asks: what should the intermediate frame at time \(t\) look like?
+The connection to video is direct. Consider two video frames as distributions of "visual content" in pixel space. Frame interpolation asks: what should the intermediate frame at time \\(t\\) look like?
 
-**Cross-fade** (linear interpolation of pixel values): \(I_t = (1-t) I_0 + t I_1\). This produces ghosting --- both frames visible simultaneously, semi-transparent.
+**Cross-fade** (linear interpolation of pixel values): \\(I_t = (1-t) I_0 + t I_1\\). This produces ghosting --- both frames visible simultaneously, semi-transparent.
 
-**Displacement interpolation** (OT-based): move the content from its position in \(I_0\) to its position in \(I_1\) along straight paths. At time \(t\), each pixel is at the linearly interpolated position. This produces natural-looking motion without ghosting.
+**Displacement interpolation** (OT-based): move the content from its position in \\(I_0\\) to its position in \\(I_1\\) along straight paths. At time \\(t\\), each pixel is at the linearly interpolated position. This produces natural-looking motion without ghosting.
 
 In practice, this requires knowing the optical flow (the transport map between frames). Methods like FILM and RIFE estimate bidirectional flow and use it for frame interpolation, which is conceptually an approximation to displacement interpolation.
 
@@ -239,19 +239,19 @@ In practice, this requires knowing the optical flow (the transport map between f
 
 ## Entropic Optimal Transport and Sinkhorn
 
-Computing exact optimal transport is expensive: \(O(n^3 \log n)\) for discrete distributions with \(n\) support points (via linear programming). **Entropic regularization** makes it dramatically faster.
+Computing exact optimal transport is expensive: \\(O(n^3 \log n)\\) for discrete distributions with \\(n\\) support points (via linear programming). **Entropic regularization** makes it dramatically faster.
 
 Add an entropy term to the Kantorovich problem:
 
 $$W_\epsilon(\mu, \nu) = \inf_{\pi \in \Gamma(\mu, \nu)} \int c(\mathbf{x}, \mathbf{y}) \, d\pi(\mathbf{x}, \mathbf{y}) - \epsilon H(\pi)$$
 
-where \(H(\pi) = -\int \pi \log \pi\) is the entropy of the coupling. The parameter \(\epsilon > 0\) controls the regularization strength. As \(\epsilon \to 0\), we recover the exact OT solution.
+where \\(H(\pi) = -\int \pi \log \pi\\) is the entropy of the coupling. The parameter \\(\epsilon > 0\\) controls the regularization strength. As \\(\epsilon \to 0\\), we recover the exact OT solution.
 
 The entropy penalty encourages the coupling to be "spread out" (less deterministic). The regularized problem has a unique solution of the form:
 
 $$\pi^*_{ij} = a_i K_{ij} b_j$$
 
-where \(K_{ij} = \exp(-c_{ij}/\epsilon)\) is the Gibbs kernel and \(a_i, b_j\) are scaling factors determined by the marginal constraints.
+where \\(K_{ij} = \exp(-c_{ij}/\epsilon)\\) is the Gibbs kernel and \\(a_i, b_j\\) are scaling factors determined by the marginal constraints.
 
 ### The Sinkhorn Algorithm
 
@@ -259,9 +259,9 @@ The scaling factors are found by alternating:
 
 $$a_i \leftarrow \frac{\mu_i}{\sum_j K_{ij} b_j}, \quad b_j \leftarrow \frac{\nu_j}{\sum_i a_i K_{ij}}$$
 
-This is **Sinkhorn iteration** (also called the IPFP algorithm). Each iteration enforces one marginal constraint. After \(L\) iterations, the coupling approximately satisfies both marginals.
+This is **Sinkhorn iteration** (also called the IPFP algorithm). Each iteration enforces one marginal constraint. After \\(L\\) iterations, the coupling approximately satisfies both marginals.
 
-**Complexity:** Each iteration is a matrix-vector product \(O(n^2)\), and \(O(1/\epsilon)\) iterations typically suffice. Total: \(O(n^2/\epsilon)\), which is dramatically faster than the \(O(n^3)\) exact solver for moderate \(\epsilon\).
+**Complexity:** Each iteration is a matrix-vector product \\(O(n^2)\\), and \\(O(1/\epsilon)\\) iterations typically suffice. Total: \\(O(n^2/\epsilon)\\), which is dramatically faster than the \\(O(n^3)\\) exact solver for moderate \\(\epsilon\\).
 
 ---
 
@@ -269,11 +269,11 @@ This is **Sinkhorn iteration** (also called the IPFP algorithm). Each iteration 
 
 The connection between optimal transport and flow matching is the central reason OT matters for modern video generation.
 
-In the [flow matching post](/2026/02/18/flow-matching-rectified-flows.html), we derived that flow matching trains a velocity field to transport noise \(\mathbf{x}_0 \sim \mathcal{N}(0, I)\) to data \(\mathbf{x}_1 \sim p_{\text{data}}\) along straight paths:
+In the [flow matching post](/2026/02/18/flow-matching-rectified-flows.html), we derived that flow matching trains a velocity field to transport noise \\(\mathbf{x}_0 \sim \mathcal{N}(0, I)\\) to data \\(\mathbf{x}_1 \sim p_{\text{data}}\\) along straight paths:
 
 $$\mathbf{x}_t = (1-t)\mathbf{x}_0 + t \mathbf{x}_1$$
 
-This is exactly the **displacement interpolation** between a point mass at \(\mathbf{x}_0\) and a point mass at \(\mathbf{x}_1\). The velocity field is:
+This is exactly the **displacement interpolation** between a point mass at \\(\mathbf{x}_0\\) and a point mass at \\(\mathbf{x}_1\\). The velocity field is:
 
 $$\mathbf{v}_t(\mathbf{x}_t) = \mathbf{x}_1 - \mathbf{x}_0$$
 
@@ -285,7 +285,7 @@ $$\mathcal{L}_{\text{CFM}} = \mathbb{E}_{t, \mathbf{x}_0, \mathbf{x}_1}\!\left[\
 
 trains the model to predict the OT velocity field. This is why flow matching produces straighter generation paths than diffusion (which follows curved SDE trajectories): it is explicitly trained to follow the OT geodesic.
 
-The **OT conditional path** is the cheapest (minimum kinetic energy) way to transport each noise-data pair. By the Benamou-Brenier formula, this minimizes \(\int \|\mathbf{v}\|^2 dt\) per pair, which is achieved by constant-velocity straight lines.
+The **OT conditional path** is the cheapest (minimum kinetic energy) way to transport each noise-data pair. By the Benamou-Brenier formula, this minimizes \\(\int \|\mathbf{v}\|^2 dt\\) per pair, which is achieved by constant-velocity straight lines.
 
 ---
 
@@ -299,11 +299,11 @@ The Kantorovich-Rubinstein duality provides a computable form:
 
 $$W_1(\mu, \nu) = \sup_{\|f\|_L \leq 1} \left[\mathbb{E}_{\mathbf{x} \sim \mu}[f(\mathbf{x})] - \mathbb{E}_{\mathbf{y} \sim \nu}[f(\mathbf{y})]\right]$$
 
-where the supremum is over all 1-Lipschitz functions \(f\). The **critic** (discriminator) approximates this optimal \(f\).
+where the supremum is over all 1-Lipschitz functions \\(f\\). The **critic** (discriminator) approximates this optimal \\(f\\).
 
-**Why \(W_1\) is better than KL/JS for GANs:**
+**Why \\(W_1\\) is better than KL/JS for GANs:**
 
-KL and JS divergences are infinite (or saturated) when the supports of \(p_{\text{data}}\) and \(p_G\) do not overlap --- which is common early in training when the generator is poor. \(W_1\) provides meaningful gradients even for non-overlapping distributions, because it measures the physical distance between them.
+KL and JS divergences are infinite (or saturated) when the supports of \\(p_{\text{data}}\\) and \\(p_G\\) do not overlap --- which is common early in training when the generator is poor. \\(W_1\\) provides meaningful gradients even for non-overlapping distributions, because it measures the physical distance between them.
 
 The Lipschitz constraint is enforced via weight clipping (original WGAN), gradient penalty (WGAN-GP), or spectral normalization.
 

@@ -35,12 +35,12 @@ The mathematical foundation of NeRF is the **volume rendering equation**, which 
 
 ### The Differential Equation
 
-Consider a ray \(\mathbf{r}(t) = \mathbf{o} + t\mathbf{d}\) originating at a camera center \(\mathbf{o}\) and traveling in direction \(\mathbf{d}\). As the ray passes through the medium, light is:
+Consider a ray \\(\mathbf{r}(t) = \mathbf{o} + t\mathbf{d}\\) originating at a camera center \\(\mathbf{o}\\) and traveling in direction \\(\mathbf{d}\\). As the ray passes through the medium, light is:
 
-- **Absorbed** at a rate proportional to the density \(\sigma(t)\) at each point
-- **Emitted** with color \(\mathbf{c}(t)\) at each point (in NeRF, the "emission" is the learned radiance)
+- **Absorbed** at a rate proportional to the density \\(\sigma(t)\\) at each point
+- **Emitted** with color \\(\mathbf{c}(t)\\) at each point (in NeRF, the "emission" is the learned radiance)
 
-The **Beer-Lambert law** describes absorption. If light of intensity \(L_0\) enters a medium of density \(\sigma\) over an infinitesimal distance \(dt\), the fraction absorbed is:
+The **Beer-Lambert law** describes absorption. If light of intensity \\(L_0\\) enters a medium of density \\(\sigma\\) over an infinitesimal distance \\(dt\\), the fraction absorbed is:
 
 $$dL = -\sigma(t) \, L(t) \, dt$$
 
@@ -48,24 +48,24 @@ This is a first-order ODE. The solution is exponential decay:
 
 $$L(t) = L_0 \exp\!\left(-\int_0^t \sigma(s) \, ds\right)$$
 
-The exponential factor is the **transmittance** --- the probability that a photon travels from 0 to \(t\) without being absorbed:
+The exponential factor is the **transmittance** --- the probability that a photon travels from 0 to \\(t\\) without being absorbed:
 
 $$T(t) = \exp\!\left(-\int_0^t \sigma(s) \, ds\right)$$
 
 Properties of transmittance:
-- \(T(0) = 1\) (nothing absorbed at the start)
-- \(T(t)\) is monotonically decreasing
-- \(T(t) \to 0\) as \(t \to \infty\) if \(\sigma > 0\) everywhere (all light eventually absorbed)
+- \\(T(0) = 1\\) (nothing absorbed at the start)
+- \\(T(t)\\) is monotonically decreasing
+- \\(T(t) \to 0\\) as \\(t \to \infty\\) if \\(\sigma > 0\\) everywhere (all light eventually absorbed)
 
 ### The Full Rendering Integral
 
-Including emission, the radiance accumulated along the ray from near plane \(t_n\) to far plane \(t_f\) is:
+Including emission, the radiance accumulated along the ray from near plane \\(t_n\\) to far plane \\(t_f\\) is:
 
 $$C(\mathbf{r}) = \int_{t_n}^{t_f} T(t) \, \sigma(\mathbf{r}(t)) \, \mathbf{c}(\mathbf{r}(t), \mathbf{d}) \, dt$$
 
 This integral has a beautiful physical interpretation:
-- At each point \(t\) along the ray, the medium emits light of color \(\mathbf{c}(t)\) with intensity proportional to the density \(\sigma(t)\)
-- This emitted light is attenuated by the transmittance \(T(t)\) --- the fraction of light that survives the journey from point \(t\) back to the camera
+- At each point \\(t\\) along the ray, the medium emits light of color \\(\mathbf{c}(t)\\) with intensity proportional to the density \\(\sigma(t)\\)
+- This emitted light is attenuated by the transmittance \\(T(t)\\) --- the fraction of light that survives the journey from point \\(t\\) back to the camera
 - The final color is the sum of all these attenuated emissions along the ray
 
 <svg viewBox="0 0 700 300" xmlns="http://www.w3.org/2000/svg" style="max-width: 700px; display: block; margin: 2em auto;">
@@ -111,11 +111,11 @@ This integral has a beautiful physical interpretation:
 
 ## Discretizing the Integral: Alpha Compositing
 
-The continuous integral cannot be evaluated analytically (since \(\sigma\) and \(\mathbf{c}\) come from a neural network), so we approximate it numerically.
+The continuous integral cannot be evaluated analytically (since \\(\sigma\\) and \\(\mathbf{c}\\) come from a neural network), so we approximate it numerically.
 
 ### Stratified Sampling
 
-Divide the ray interval \([t_n, t_f]\) into \(N\) bins and sample one point uniformly within each bin:
+Divide the ray interval \\([t_n, t_f]\\) into \\(N\\) bins and sample one point uniformly within each bin:
 
 $$t_i \sim \mathcal{U}\!\left[t_n + \frac{i-1}{N}(t_f - t_n), \, t_n + \frac{i}{N}(t_f - t_n)\right]$$
 
@@ -123,7 +123,7 @@ The jittering within each bin is crucial --- it turns a deterministic quadrature
 
 ### The Discrete Formula
 
-With sample points \(t_1 < t_2 < \cdots < t_N\) and spacings \(\delta_i = t_{i+1} - t_i\), the integral is approximated by:
+With sample points \\(t_1 < t_2 < \cdots < t_N\\) and spacings \\(\delta_i = t_{i+1} - t_i\\), the integral is approximated by:
 
 $$\hat{C}(\mathbf{r}) = \sum_{i=1}^{N} T_i \, \alpha_i \, \mathbf{c}_i$$
 
@@ -135,31 +135,31 @@ $$\alpha_i = 1 - \exp(-\sigma_i \, \delta_i)$$
 
 ### Derivation
 
-This formula comes from approximating the continuous transmittance as piecewise constant within each interval. If \(\sigma(t) = \sigma_i\) for \(t \in [t_i, t_{i+1}]\), then:
+This formula comes from approximating the continuous transmittance as piecewise constant within each interval. If \\(\sigma(t) = \sigma_i\\) for \\(t \in [t_i, t_{i+1}]\\), then:
 
 $$T(t_{i+1}) = T(t_i) \exp(-\sigma_i \delta_i) = T(t_i)(1 - \alpha_i)$$
 
-The contribution of interval \(i\) to the integral is approximately:
+The contribution of interval \\(i\\) to the integral is approximately:
 
 $$\int_{t_i}^{t_{i+1}} T(t) \sigma(t) \mathbf{c}(t) \, dt \approx T(t_i) \mathbf{c}_i \int_{t_i}^{t_{i+1}} \sigma_i \exp(-\sigma_i (t - t_i)) \, dt = T(t_i) \mathbf{c}_i \left[1 - \exp(-\sigma_i \delta_i)\right] = T_i \alpha_i \mathbf{c}_i$$
 
 This is exactly the **front-to-back alpha compositing** formula from computer graphics. The connection is not a coincidence --- alpha compositing was originally derived as an approximation to volume rendering.
 
-Note that \(\alpha_i = 1 - \exp(-\sigma_i \delta_i)\) maps the density-times-distance product to an opacity in \([0, 1)\):
-- \(\sigma_i \delta_i = 0 \implies \alpha_i = 0\) (transparent)
-- \(\sigma_i \delta_i \to \infty \implies \alpha_i \to 1\) (opaque)
+Note that \\(\alpha_i = 1 - \exp(-\sigma_i \delta_i)\\) maps the density-times-distance product to an opacity in \\([0, 1)\\):
+- \\(\sigma_i \delta_i = 0 \implies \alpha_i = 0\\) (transparent)
+- \\(\sigma_i \delta_i \to \infty \implies \alpha_i \to 1\\) (opaque)
 
 ---
 
 ## Neural Radiance Fields: The MLP
 
-NeRF represents the scene as a multilayer perceptron (MLP) \(F_\theta\) that maps a 3D position \(\mathbf{x} = (x, y, z)\) and viewing direction \(\mathbf{d} = (\theta, \phi)\) to a density \(\sigma\) and RGB color \(\mathbf{c}\):
+NeRF represents the scene as a multilayer perceptron (MLP) \\(F_\theta\\) that maps a 3D position \\(\mathbf{x} = (x, y, z)\\) and viewing direction \\(\mathbf{d} = (\theta, \phi)\\) to a density \\(\sigma\\) and RGB color \\(\mathbf{c}\\):
 
 $$F_\theta: (\mathbf{x}, \mathbf{d}) \to (\sigma, \mathbf{c})$$
 
-A critical design choice: **density is independent of viewing direction, but color is not.** The density function \(\sigma(\mathbf{x})\) encodes the scene geometry (where is there stuff?), which does not change with viewpoint. The color function \(\mathbf{c}(\mathbf{x}, \mathbf{d})\) encodes appearance, which can be view-dependent (specular highlights, reflections).
+A critical design choice: **density is independent of viewing direction, but color is not.** The density function \\(\sigma(\mathbf{x})\\) encodes the scene geometry (where is there stuff?), which does not change with viewpoint. The color function \\(\mathbf{c}(\mathbf{x}, \mathbf{d})\\) encodes appearance, which can be view-dependent (specular highlights, reflections).
 
-In practice, the MLP first processes position \(\mathbf{x}\) through 8 layers (256 units each) to produce \(\sigma\) and a feature vector, then concatenates the viewing direction and passes through 1 additional layer to produce color. The density branch is deeper because geometry requires understanding global structure, while color is a local, view-dependent modulation.
+In practice, the MLP first processes position \\(\mathbf{x}\\) through 8 layers (256 units each) to produce \\(\sigma\\) and a feature vector, then concatenates the viewing direction and passes through 1 additional layer to produce color. The density branch is deeper because geometry requires understanding global structure, while color is a local, view-dependent modulation.
 
 <svg viewBox="0 0 700 200" xmlns="http://www.w3.org/2000/svg" style="max-width: 700px; display: block; margin: 2em auto;">
   <text x="350" y="20" text-anchor="middle" font-size="13" font-weight="bold" fill="#d4d4d4">NeRF MLP Architecture</text>
@@ -207,29 +207,29 @@ In practice, the MLP first processes position \(\mathbf{x}\) through 8 layers (2
 
 ## Positional Encoding and Spectral Bias
 
-A plain MLP \(F_\theta(\mathbf{x})\) with smooth activations (ReLU, etc.) has a **spectral bias**: it learns low-frequency functions first and struggles to represent high-frequency detail. This is a problem for NeRF, where scenes contain sharp edges, fine textures, and intricate geometry.
+A plain MLP \\(F_\theta(\mathbf{x})\\) with smooth activations (ReLU, etc.) has a **spectral bias**: it learns low-frequency functions first and struggles to represent high-frequency detail. This is a problem for NeRF, where scenes contain sharp edges, fine textures, and intricate geometry.
 
 The reason is well-understood from the theory of the **Neural Tangent Kernel (NTK)**. An MLP's NTK kernel has a spectrum that decays rapidly with frequency, meaning the network's effective learning rate for high-frequency components is much lower than for low-frequency ones. Training converges first on the coarse structure and only slowly (if ever) fits the fine details.
 
-**Positional encoding** (Fourier feature mapping) is the solution. Instead of feeding raw coordinates \(\mathbf{x}\) to the MLP, we map them through sinusoidal functions at geometrically spaced frequencies:
+**Positional encoding** (Fourier feature mapping) is the solution. Instead of feeding raw coordinates \\(\mathbf{x}\\) to the MLP, we map them through sinusoidal functions at geometrically spaced frequencies:
 
 $$\gamma(\mathbf{x}) = \left(\sin(2^0 \pi \mathbf{x}), \cos(2^0 \pi \mathbf{x}), \sin(2^1 \pi \mathbf{x}), \cos(2^1 \pi \mathbf{x}), \ldots, \sin(2^{L-1} \pi \mathbf{x}), \cos(2^{L-1} \pi \mathbf{x})\right)$$
 
-For a 3D input and \(L = 10\) frequency bands, this maps \(\mathbb{R}^3 \to \mathbb{R}^{60}\).
+For a 3D input and \\(L = 10\\) frequency bands, this maps \\(\mathbb{R}^3 \to \mathbb{R}^{60}\\).
 
-**Why this works:** The key theorem (Tancik et al., 2020) shows that the NTK of a network with Fourier features has a **tunable bandwidth**. By choosing the frequencies in \(\gamma\), you directly control which spatial frequencies the network can learn efficiently. The geometric spacing \(2^0, 2^1, \ldots, 2^{L-1}\) covers frequencies from scene scale down to fine detail.
+**Why this works:** The key theorem (Tancik et al., 2020) shows that the NTK of a network with Fourier features has a **tunable bandwidth**. By choosing the frequencies in \\(\gamma\\), you directly control which spatial frequencies the network can learn efficiently. The geometric spacing \\(2^0, 2^1, \ldots, 2^{L-1}\\) covers frequencies from scene scale down to fine detail.
 
-For viewing direction, a smaller encoding is used (\(L = 4\), giving 24 dimensions), since view-dependent effects are typically low-frequency (broad specular lobes).
+For viewing direction, a smaller encoding is used (\\(L = 4\\), giving 24 dimensions), since view-dependent effects are typically low-frequency (broad specular lobes).
 
 ---
 
 ## Hierarchical Volume Sampling
 
-Evaluating the MLP at \(N\) points per ray is expensive. Worse, most sample points fall in empty space or behind occluding surfaces, contributing nothing to the final color. **Hierarchical sampling** allocates samples where they matter.
+Evaluating the MLP at \\(N\\) points per ray is expensive. Worse, most sample points fall in empty space or behind occluding surfaces, contributing nothing to the final color. **Hierarchical sampling** allocates samples where they matter.
 
 ### Coarse Network
 
-First, evaluate a "coarse" network at \(N_c = 64\) stratified sample points along each ray. This produces a rough density profile. The discrete weights:
+First, evaluate a "coarse" network at \\(N_c = 64\\) stratified sample points along each ray. This produces a rough density profile. The discrete weights:
 
 $$w_i = T_i \alpha_i$$
 
@@ -241,14 +241,14 @@ These weights define a piecewise-constant probability distribution along the ray
 
 ### Fine Network: Importance Sampling
 
-Sample \(N_f = 128\) additional points from this distribution using **inverse CDF sampling**:
+Sample \\(N_f = 128\\) additional points from this distribution using **inverse CDF sampling**:
 
-1. Compute the cumulative distribution: \(F_i = \sum_{j=1}^{i} \hat{w}_j\)
-2. Draw uniform samples \(u_k \sim \mathcal{U}[0, 1]\)
-3. For each \(u_k\), find the bin \(i\) such that \(F_{i-1} \leq u_k < F_i\)
-4. Sample uniformly within that bin: \(t_k = t_i + (u_k - F_{i-1}) / \hat{w}_i \cdot \delta_i\)
+1. Compute the cumulative distribution: \\(F_i = \sum_{j=1}^{i} \hat{w}_j\\)
+2. Draw uniform samples \\(u_k \sim \mathcal{U}[0, 1]\\)
+3. For each \\(u_k\\), find the bin \\(i\\) such that \\(F_{i-1} \leq u_k < F_i\\)
+4. Sample uniformly within that bin: \\(t_k = t_i + (u_k - F_{i-1}) / \hat{w}_i \cdot \delta_i\\)
 
-This concentrates samples near surfaces (where \(\sigma\) is large) and away from empty space. The fine network is evaluated at all \(N_c + N_f\) points (coarse + fine) and produces the final rendering.
+This concentrates samples near surfaces (where \\(\sigma\\) is large) and away from empty space. The fine network is evaluated at all \\(N_c + N_f\\) points (coarse + fine) and produces the final rendering.
 
 <svg viewBox="0 0 700 250" xmlns="http://www.w3.org/2000/svg" style="max-width: 700px; display: block; margin: 2em auto;">
   <text x="350" y="25" text-anchor="middle" font-size="13" font-weight="bold" fill="#d4d4d4">Hierarchical Sampling</text>
@@ -304,22 +304,22 @@ The training loss is simply the mean squared error between rendered pixel colors
 
 $$\mathcal{L} = \sum_{\mathbf{r} \in \mathcal{R}} \left\| \hat{C}_c(\mathbf{r}) - C^*(\mathbf{r}) \right\|_2^2 + \left\| \hat{C}_f(\mathbf{r}) - C^*(\mathbf{r}) \right\|_2^2$$
 
-where \(\mathcal{R}\) is a batch of rays, \(\hat{C}_c\) and \(\hat{C}_f\) are the coarse and fine rendered colors, and \(C^*\) is the ground-truth pixel color.
+where \\(\mathcal{R}\\) is a batch of rays, \\(\hat{C}_c\\) and \\(\hat{C}_f\\) are the coarse and fine rendered colors, and \\(C^*\\) is the ground-truth pixel color.
 
 That is it. No 3D supervision, no depth maps, no segmentation masks. Just photometric error. The 3D structure emerges because it is the only way to consistently explain the 2D observations from multiple viewpoints.
 
 ### Camera Poses
 
 NeRF requires known camera poses (position and orientation for each training image). These are typically obtained via **Structure from Motion** (SfM) using COLMAP. Each camera has:
-- An extrinsic matrix \([R | \mathbf{t}] \in \mathbb{R}^{3 \times 4}\) (rotation and translation)
-- An intrinsic matrix with focal length \(f\) and principal point
+- An extrinsic matrix \\([R | \mathbf{t}] \in \mathbb{R}^{3 \times 4}\\) (rotation and translation)
+- An intrinsic matrix with focal length \\(f\\) and principal point
 
-Rays are cast from the camera center through each pixel: \(\mathbf{r}(t) = \mathbf{o} + t \cdot \mathbf{d}\), where \(\mathbf{o}\) is the camera position and \(\mathbf{d}\) is the pixel's direction in world coordinates.
+Rays are cast from the camera center through each pixel: \\(\mathbf{r}(t) = \mathbf{o} + t \cdot \mathbf{d}\\), where \\(\mathbf{o}\\) is the camera position and \\(\mathbf{d}\\) is the pixel's direction in world coordinates.
 
 ### Training Details
 
 - Batch size: 4096 rays per iteration (not full images --- random rays from random views)
-- Optimizer: Adam with learning rate \(5 \times 10^{-4}\), decaying exponentially
+- Optimizer: Adam with learning rate \\(5 \times 10^{-4}\\), decaying exponentially
 - Training: ~100K--300K iterations (hours on a single GPU)
 - The network has ~1.2M parameters (tiny by modern standards)
 
@@ -331,20 +331,20 @@ NeRF is slow. Training takes hours; rendering takes seconds per frame. **Instant
 
 ### The Idea
 
-Instead of encoding position with sinusoidal functions, store **learnable feature vectors** on a multi-resolution grid. For a query point \(\mathbf{x}\):
+Instead of encoding position with sinusoidal functions, store **learnable feature vectors** on a multi-resolution grid. For a query point \\(\mathbf{x}\\):
 
-1. Define \(L\) resolution levels, with grid spacing geometrically increasing from fine to coarse
-2. At each level, find the grid cell containing \(\mathbf{x}\) and look up the feature vectors at its corners
+1. Define \\(L\\) resolution levels, with grid spacing geometrically increasing from fine to coarse
+2. At each level, find the grid cell containing \\(\mathbf{x}\\) and look up the feature vectors at its corners
 3. Trilinearly interpolate the corner features to get a per-level feature
 4. Concatenate features from all levels and pass through a small MLP (2 layers, 64 units)
 
 ### Hash Encoding
 
-At fine resolutions, a full dense grid would be enormous. The trick: use a **hash table** of fixed size \(T\) (e.g., \(2^{19}\)) at each level. Grid vertices are mapped to hash table entries via a spatial hash function:
+At fine resolutions, a full dense grid would be enormous. The trick: use a **hash table** of fixed size \\(T\\) (e.g., \\(2^{19}\\)) at each level. Grid vertices are mapped to hash table entries via a spatial hash function:
 
 $$h(\mathbf{x}_{\text{grid}}) = \left(\bigoplus_{d=1}^{3} x_d \cdot \pi_d \right) \mod T$$
 
-where \(\bigoplus\) is XOR and \(\pi_d\) are large prime numbers.
+where \\(\bigoplus\\) is XOR and \\(\pi_d\\) are large prime numbers.
 
 Collisions are inevitable at fine resolutions (many grid points share a hash entry), but this is handled gracefully: the gradients from different collision partners average out, and the small MLP learns to disambiguate. The theory shows that fine-scale details that collide are typically spatially distant and do not interfere perceptually.
 
@@ -358,17 +358,17 @@ For video, the scene changes over time. Several approaches extend NeRF to the te
 
 ### D-NeRF: Deformation Fields
 
-Add a time-conditioned deformation network \(\mathcal{D}_\theta(\mathbf{x}, t) \to \Delta \mathbf{x}\) that warps points from the observation time \(t\) to a canonical frame:
+Add a time-conditioned deformation network \\(\mathcal{D}_\theta(\mathbf{x}, t) \to \Delta \mathbf{x}\\) that warps points from the observation time \\(t\\) to a canonical frame:
 
 $$\mathbf{x}_{\text{canonical}} = \mathbf{x} + \mathcal{D}_\theta(\mathbf{x}, t)$$
 
-Then evaluate the static NeRF at the deformed position: \(F_\theta(\mathbf{x}_{\text{canonical}}, \mathbf{d}) \to (\sigma, \mathbf{c})\).
+Then evaluate the static NeRF at the deformed position: \\(F_\theta(\mathbf{x}_{\text{canonical}}, \mathbf{d}) \to (\sigma, \mathbf{c})\\).
 
 This separates geometry (canonical NeRF) from motion (deformation field). The canonical NeRF captures the scene's structure, and the deformation field captures how it moves over time.
 
 ### HyperNeRF: Higher-Dimensional Lifting
 
-Some deformations are topological (a person opening their mouth creates new surfaces). HyperNeRF handles this by lifting the ambient space to higher dimensions: map \((\mathbf{x}, t)\) to a higher-dimensional "hyper-space" \((\mathbf{x}, \mathbf{w}(t))\) where the topology change becomes a smooth deformation. The additional dimensions \(\mathbf{w}(t)\) provide enough room for the surface to continuously deform without tearing.
+Some deformations are topological (a person opening their mouth creates new surfaces). HyperNeRF handles this by lifting the ambient space to higher dimensions: map \\((\mathbf{x}, t)\\) to a higher-dimensional "hyper-space" \\((\mathbf{x}, \mathbf{w}(t))\\) where the topology change becomes a smooth deformation. The additional dimensions \\(\mathbf{w}(t)\\) provide enough room for the surface to continuously deform without tearing.
 
 ---
 
@@ -376,11 +376,11 @@ Some deformations are topological (a person opening their mouth creates new surf
 
 Full 4D representations (3D space + time) are expensive. Factored approaches decompose the 4D volume into lower-dimensional components:
 
-**K-Planes** (Fridovich-Keil et al., 2023): Represent the 4D field as a product of six 2D plane features (one for each pair of axes: xy, xz, xt, yz, yt, zt). For a query point \((x, y, z, t)\), look up features from each plane and combine them:
+**K-Planes** (Fridovich-Keil et al., 2023): Represent the 4D field as a product of six 2D plane features (one for each pair of axes: xy, xz, xt, yz, yt, zt). For a query point \\((x, y, z, t)\\), look up features from each plane and combine them:
 
 $$f(x,y,z,t) = \prod_{k=1}^{6} P_k(\text{project}_{k}(x,y,z,t))$$
 
-Each plane \(P_k\) is a 2D grid of feature vectors, interpolated bilinearly. This reduces storage from \(O(N^4)\) to \(O(N^2)\) and supports efficient optimization.
+Each plane \\(P_k\\) is a 2D grid of feature vectors, interpolated bilinearly. This reduces storage from \\(O(N^4)\\) to \\(O(N^2)\\) and supports efficient optimization.
 
 **HexPlane** and **TensoRF** use similar factorizations but with different combination operations (concatenation, summation, or Hadamard product).
 

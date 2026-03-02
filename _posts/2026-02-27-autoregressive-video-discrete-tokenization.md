@@ -5,7 +5,7 @@ date: 2026-02-27
 category: math
 ---
 
-Language models generate text one token at a time, left to right, by modeling the joint distribution as a product of conditionals: \(p(x_1, x_2, \ldots, x_n) = \prod_{i=1}^n p(x_i | x_{<i})\). This is exact --- no approximation, no variational bound, just the chain rule of probability. The question is: can we do the same for video?
+Language models generate text one token at a time, left to right, by modeling the joint distribution as a product of conditionals: \\(p(x_1, x_2, \ldots, x_n) = \prod_{i=1}^n p(x_i | x_{<i})\\). This is exact --- no approximation, no variational bound, just the chain rule of probability. The question is: can we do the same for video?
 
 The answer is yes, with a catch. Video is continuous (pixel values are real numbers), but autoregressive models work naturally with discrete tokens. The bridge is **vector quantization**: learn a codebook that maps continuous visual patches to discrete tokens, then model the token sequence autoregressively. This is the VQ-VAE → VQ-GAN → autoregressive generation pipeline, and it represents a fundamentally different approach to video generation than diffusion.
 
@@ -35,13 +35,13 @@ The chain rule of probability factorizes any joint distribution into a product o
 
 $$p(\mathbf{x}) = p(x_1, x_2, \ldots, x_n) = p(x_1) \prod_{i=2}^{n} p(x_i | x_1, \ldots, x_{i-1})$$
 
-This is not an approximation --- it is an identity, valid for any distribution. The power of autoregressive models is that they parameterize each conditional \(p(x_i | x_{<i})\) with a neural network (typically a Transformer) and train by maximizing the log-likelihood:
+This is not an approximation --- it is an identity, valid for any distribution. The power of autoregressive models is that they parameterize each conditional \\(p(x_i | x_{<i})\\) with a neural network (typically a Transformer) and train by maximizing the log-likelihood:
 
 $$\mathcal{L} = -\sum_{i=1}^{n} \log p_\theta(x_i | x_{<i})$$
 
-This is the **negative log-likelihood (NLL)** or cross-entropy loss. For discrete tokens with vocabulary size \(V\), each conditional is a softmax over \(V\) classes. The model outputs logits, the softmax converts to probabilities, and the loss is the negative log of the probability assigned to the correct token.
+This is the **negative log-likelihood (NLL)** or cross-entropy loss. For discrete tokens with vocabulary size \\(V\\), each conditional is a softmax over \\(V\\) classes. The model outputs logits, the softmax converts to probabilities, and the loss is the negative log of the probability assigned to the correct token.
 
-**Teacher forcing:** During training, the model receives the ground-truth tokens \(x_{<i}\) as input (not its own predictions). This is exact maximum likelihood estimation and avoids exposure bias.
+**Teacher forcing:** During training, the model receives the ground-truth tokens \\(x_{<i}\\) as input (not its own predictions). This is exact maximum likelihood estimation and avoids exposure bias.
 
 **Generation:** At inference, the model generates one token at a time, feeding its own predictions back as input. This is inherently sequential --- each token depends on all previous tokens.
 
@@ -49,15 +49,15 @@ This is the **negative log-likelihood (NLL)** or cross-entropy loss. For discret
 
 ## Vector Quantization: Discretizing Continuous Spaces
 
-To apply autoregressive models to images and video, we need to convert continuous pixel values to discrete tokens. **Vector quantization (VQ)** does this by maintaining a **codebook** \(\mathcal{C} = \{\mathbf{e}_1, \ldots, \mathbf{e}_K\} \subset \mathbb{R}^d\) of \(K\) prototype vectors (codewords) in a \(d\)-dimensional space.
+To apply autoregressive models to images and video, we need to convert continuous pixel values to discrete tokens. **Vector quantization (VQ)** does this by maintaining a **codebook** \\(\mathcal{C} = \{\mathbf{e}_1, \ldots, \mathbf{e}_K\} \subset \mathbb{R}^d\\) of \\(K\\) prototype vectors (codewords) in a \\(d\\)-dimensional space.
 
-Given a continuous vector \(\mathbf{z} \in \mathbb{R}^d\), the quantization operation maps it to the nearest codeword:
+Given a continuous vector \\(\mathbf{z} \in \mathbb{R}^d\\), the quantization operation maps it to the nearest codeword:
 
 $$q(\mathbf{z}) = \mathbf{e}_k \quad \text{where} \quad k = \arg\min_j \|\mathbf{z} - \mathbf{e}_j\|_2$$
 
-This partitions \(\mathbb{R}^d\) into \(K\) **Voronoi cells**, one per codeword. Each cell contains all points closer to that codeword than to any other.
+This partitions \\(\mathbb{R}^d\\) into \\(K\\) **Voronoi cells**, one per codeword. Each cell contains all points closer to that codeword than to any other.
 
-The quantization is lossy: \(q(\mathbf{z}) \neq \mathbf{z}\) in general. The quantization error is \(\|\mathbf{z} - q(\mathbf{z})\|_2\). More codewords (larger \(K\)) and higher dimensions (larger \(d\)) reduce the error, at the cost of a larger codebook.
+The quantization is lossy: \\(q(\mathbf{z}) \neq \mathbf{z}\\) in general. The quantization error is \\(\|\mathbf{z} - q(\mathbf{z})\|_2\\). More codewords (larger \\(K\\)) and higher dimensions (larger \\(d\\)) reduce the error, at the cost of a larger codebook.
 
 <svg viewBox="0 0 700 280" xmlns="http://www.w3.org/2000/svg" style="max-width: 700px; display: block; margin: 2em auto;">
   <text x="350" y="25" text-anchor="middle" font-size="14" font-weight="bold" fill="#d4d4d4">Vector Quantization: Voronoi Cells and Codebook</text>
@@ -107,9 +107,9 @@ The quantization is lossy: \(q(\mathbf{z}) \neq \mathbf{z}\) in general. The qua
 
 ### Architecture
 
-1. **Encoder** \(f_e\): Maps input \(\mathbf{x}\) to continuous latent representations \(\mathbf{z}_e = f_e(\mathbf{x}) \in \mathbb{R}^{H' \times W' \times d}\)
-2. **Quantization**: Each spatial position's \(d\)-dimensional vector is quantized to the nearest codebook entry
-3. **Decoder** \(f_d\): Maps the quantized latents \(\mathbf{z}_q\) back to pixel space: \(\hat{\mathbf{x}} = f_d(\mathbf{z}_q)\)
+1. **Encoder** \\(f_e\\): Maps input \\(\mathbf{x}\\) to continuous latent representations \\(\mathbf{z}_e = f_e(\mathbf{x}) \in \mathbb{R}^{H' \times W' \times d}\\)
+2. **Quantization**: Each spatial position's \\(d\\)-dimensional vector is quantized to the nearest codebook entry
+3. **Decoder** \\(f_d\\): Maps the quantized latents \\(\mathbf{z}_q\\) back to pixel space: \\(\hat{\mathbf{x}} = f_d(\mathbf{z}_q)\\)
 
 ### The VQ-VAE Objective
 
@@ -117,31 +117,31 @@ The loss function has three terms:
 
 $$\mathcal{L} = \underbrace{\|\mathbf{x} - f_d(\mathbf{z}_q)\|_2^2}_{\text{reconstruction}} + \underbrace{\|\text{sg}[\mathbf{z}_e] - \mathbf{e}_k\|_2^2}_{\text{codebook}} + \beta \underbrace{\|\mathbf{z}_e - \text{sg}[\mathbf{e}_k]\|_2^2}_{\text{commitment}}$$
 
-where \(\text{sg}[\cdot]\) is the **stop-gradient** operator (treats the argument as a constant during backpropagation).
+where \\(\text{sg}[\cdot]\\) is the **stop-gradient** operator (treats the argument as a constant during backpropagation).
 
-**Reconstruction loss:** Standard \(L^2\) reconstruction. The decoder must reconstruct the input from the quantized latents.
+**Reconstruction loss:** Standard \\(L^2\\) reconstruction. The decoder must reconstruct the input from the quantized latents.
 
-**Codebook loss:** Moves each codeword \(\mathbf{e}_k\) toward the encoder outputs that are assigned to it. This is essentially K-means on the encoder outputs. The stop-gradient on \(\mathbf{z}_e\) means only the codebook updates (the encoder does not receive gradients from this term).
+**Codebook loss:** Moves each codeword \\(\mathbf{e}_k\\) toward the encoder outputs that are assigned to it. This is essentially K-means on the encoder outputs. The stop-gradient on \\(\mathbf{z}_e\\) means only the codebook updates (the encoder does not receive gradients from this term).
 
-**Commitment loss:** Prevents the encoder outputs from drifting too far from the codebook. The stop-gradient on \(\mathbf{e}_k\) means only the encoder updates. The coefficient \(\beta \approx 0.25\) controls the strength.
+**Commitment loss:** Prevents the encoder outputs from drifting too far from the codebook. The stop-gradient on \\(\mathbf{e}_k\\) means only the encoder updates. The coefficient \\(\beta \approx 0.25\\) controls the strength.
 
 ### The Straight-Through Estimator
 
-The quantization operation \(q(\mathbf{z})\) = argmin is **not differentiable** (it is a piecewise-constant function with zero gradient almost everywhere). How do gradients flow from the decoder loss to the encoder?
+The quantization operation \\(q(\mathbf{z})\\) = argmin is **not differentiable** (it is a piecewise-constant function with zero gradient almost everywhere). How do gradients flow from the decoder loss to the encoder?
 
-The **straight-through estimator (STE)**: during the forward pass, use the quantized values \(\mathbf{z}_q\). During the backward pass, copy the gradients from \(\mathbf{z}_q\) directly to \(\mathbf{z}_e\), as if the quantization had not happened:
+The **straight-through estimator (STE)**: during the forward pass, use the quantized values \\(\mathbf{z}_q\\). During the backward pass, copy the gradients from \\(\mathbf{z}_q\\) directly to \\(\mathbf{z}_e\\), as if the quantization had not happened:
 
 $$\frac{\partial \mathcal{L}}{\partial \mathbf{z}_e} \approx \frac{\partial \mathcal{L}}{\partial \mathbf{z}_q}$$
 
 In code: `z_q = z_e + (z_q - z_e).detach()`. The forward pass uses `z_q`, but the gradient flows through `z_e`.
 
-This works because the commitment loss keeps \(\mathbf{z}_e\) close to \(\mathbf{z}_q\), so the gradient at \(\mathbf{z}_q\) is a reasonable approximation of the gradient at \(\mathbf{z}_e\).
+This works because the commitment loss keeps \\(\mathbf{z}_e\\) close to \\(\mathbf{z}_q\\), so the gradient at \\(\mathbf{z}_q\\) is a reasonable approximation of the gradient at \\(\mathbf{z}_e\\).
 
 ### Why the KL Term Vanishes
 
-In a standard VAE, the loss includes a KL divergence term \(D_{\text{KL}}(q(\mathbf{z}|\mathbf{x}) \| p(\mathbf{z}))\). In VQ-VAE:
-- The posterior \(q(\mathbf{z}|\mathbf{x})\) is a delta function on the nearest codebook entry (deterministic quantization)
-- The prior \(p(\mathbf{z})\) is uniform over codebook entries
+In a standard VAE, the loss includes a KL divergence term \\(D_{\text{KL}}(q(\mathbf{z}|\mathbf{x}) \| p(\mathbf{z}))\\). In VQ-VAE:
+- The posterior \\(q(\mathbf{z}|\mathbf{x})\\) is a delta function on the nearest codebook entry (deterministic quantization)
+- The prior \\(p(\mathbf{z})\\) is uniform over codebook entries
 
 The KL divergence is:
 
@@ -153,7 +153,7 @@ It is constant and drops out of the optimization. This is a feature: VQ-VAE avoi
 
 ## VQ-GAN: Adversarial Training for Sharp Reconstruction
 
-VQ-VAE with an \(L^2\) reconstruction loss produces blurry reconstructions (same issue as always). **VQ-GAN** (Esser et al., 2021) adds perceptual and adversarial losses:
+VQ-VAE with an \\(L^2\\) reconstruction loss produces blurry reconstructions (same issue as always). **VQ-GAN** (Esser et al., 2021) adds perceptual and adversarial losses:
 
 $$\mathcal{L}_{\text{VQ-GAN}} = \underbrace{\|\mathbf{x} - \hat{\mathbf{x}}\|_1}_{\text{L1}} + \underbrace{\lambda_p \mathcal{L}_{\text{perc}}}_{\text{perceptual}} + \underbrace{\lambda_a \mathcal{L}_{\text{GAN}}}_{\text{adversarial}} + \underbrace{\mathcal{L}_{\text{VQ}}}_{\text{codebook + commitment}}$$
 
@@ -173,17 +173,17 @@ A persistent problem: during training, many codebook entries go unused. The enco
 
 The codebook update (K-means-like) only moves codewords that are actively assigned to encoder outputs. If a codeword is far from any encoder output, it never gets assigned, never gets updated, and drifts further away. Positive feedback loop.
 
-Mathematically, if codeword \(\mathbf{e}_j\) is never the nearest neighbor for any encoder output, then \(\partial \mathcal{L}_{\text{codebook}} / \partial \mathbf{e}_j = 0\) --- zero gradient, no update.
+Mathematically, if codeword \\(\mathbf{e}_j\\) is never the nearest neighbor for any encoder output, then \\(\partial \mathcal{L}_{\text{codebook}} / \partial \mathbf{e}_j = 0\\) --- zero gradient, no update.
 
 ### Solutions
 
-**Codebook reset:** Periodically replace unused codewords with randomly selected encoder outputs. If a codeword has not been used in the last \(N\) batches, replace it with a random \(\mathbf{z}_e\) from the current batch.
+**Codebook reset:** Periodically replace unused codewords with randomly selected encoder outputs. If a codeword has not been used in the last \\(N\\) batches, replace it with a random \\(\mathbf{z}_e\\) from the current batch.
 
 **EMA codebook updates:** Instead of gradient descent on the codebook loss, update codewords using an exponential moving average of the encoder outputs assigned to them:
 
 $$\mathbf{e}_k \leftarrow \gamma \mathbf{e}_k + (1 - \gamma) \bar{\mathbf{z}}_k$$
 
-where \(\bar{\mathbf{z}}_k\) is the mean of encoder outputs assigned to codeword \(k\) in the current batch, and \(\gamma \approx 0.99\). This is more stable than gradient-based updates.
+where \\(\bar{\mathbf{z}}_k\\) is the mean of encoder outputs assigned to codeword \\(k\\) in the current batch, and \\(\gamma \approx 0.99\\). This is more stable than gradient-based updates.
 
 **K-means initialization:** Initialize the codebook using K-means on the first batch of encoder outputs, ensuring the codewords start near the actual data distribution.
 
@@ -191,15 +191,15 @@ where \(\bar{\mathbf{z}}_k\) is the mean of encoder outputs assigned to codeword
 
 ## Finite Scalar Quantization
 
-**FSQ** (Mentzer et al., 2023) sidesteps the codebook entirely. Instead of vector quantization (nearest-neighbor in a learned codebook), independently quantize each dimension of the latent to one of \(L\) fixed levels.
+**FSQ** (Mentzer et al., 2023) sidesteps the codebook entirely. Instead of vector quantization (nearest-neighbor in a learned codebook), independently quantize each dimension of the latent to one of \\(L\\) fixed levels.
 
-For a \(d\)-dimensional latent with \(L\) levels per dimension, the effective codebook size is \(L^d\). For example, \(d = 8\) and \(L = 5\) gives \(5^8 = 390{,}625\) effective codewords --- without learning a single codebook vector.
+For a \\(d\\)-dimensional latent with \\(L\\) levels per dimension, the effective codebook size is \\(L^d\\). For example, \\(d = 8\\) and \\(L = 5\\) gives \\(5^8 = 390{,}625\\) effective codewords --- without learning a single codebook vector.
 
 ### How It Works
 
-1. The encoder outputs \(\mathbf{z}_e \in \mathbb{R}^d\)
-2. Apply \(\tanh\) to bound each dimension to \([-1, 1]\)
-3. Quantize each dimension independently: \(\hat{z}_i = \text{round}(z_i \cdot (L-1)/2) / ((L-1)/2)\)
+1. The encoder outputs \\(\mathbf{z}_e \in \mathbb{R}^d\\)
+2. Apply \\(\tanh\\) to bound each dimension to \\([-1, 1]\\)
+3. Quantize each dimension independently: \\(\hat{z}_i = \text{round}(z_i \cdot (L-1)/2) / ((L-1)/2)\\)
 4. Use the straight-through estimator for gradients
 
 **Advantages:**
@@ -208,7 +208,7 @@ For a \(d\)-dimensional latent with \(L\) levels per dimension, the effective co
 - Simpler implementation
 - Comparable reconstruction quality to VQ-VAE/VQ-GAN
 
-**Lookup-Free Quantization (LFQ)** is a similar idea where each dimension is quantized to \(\{-1, +1\}\), giving a binary codebook of size \(2^d\).
+**Lookup-Free Quantization (LFQ)** is a similar idea where each dimension is quantized to \\(\{-1, +1\}\\), giving a binary codebook of size \\(2^d\\).
 
 ---
 
@@ -216,13 +216,13 @@ For a \(d\)-dimensional latent with \(L\) levels per dimension, the effective co
 
 A single round of VQ may not capture all the detail. **Residual Quantization (RQ)** applies VQ iteratively to the quantization residual:
 
-1. First round: \(\hat{\mathbf{z}}^{(1)} = q_1(\mathbf{z}_e)\), residual \(\mathbf{r}^{(1)} = \mathbf{z}_e - \hat{\mathbf{z}}^{(1)}\)
-2. Second round: \(\hat{\mathbf{z}}^{(2)} = q_2(\mathbf{r}^{(1)})\), residual \(\mathbf{r}^{(2)} = \mathbf{r}^{(1)} - \hat{\mathbf{z}}^{(2)}\)
-3. Repeat for \(D\) rounds
+1. First round: \\(\hat{\mathbf{z}}^{(1)} = q_1(\mathbf{z}_e)\\), residual \\(\mathbf{r}^{(1)} = \mathbf{z}_e - \hat{\mathbf{z}}^{(1)}\\)
+2. Second round: \\(\hat{\mathbf{z}}^{(2)} = q_2(\mathbf{r}^{(1)})\\), residual \\(\mathbf{r}^{(2)} = \mathbf{r}^{(1)} - \hat{\mathbf{z}}^{(2)}\\)
+3. Repeat for \\(D\\) rounds
 
-The final quantized representation is \(\hat{\mathbf{z}} = \sum_{d=1}^D \hat{\mathbf{z}}^{(d)}\).
+The final quantized representation is \\(\hat{\mathbf{z}} = \sum_{d=1}^D \hat{\mathbf{z}}^{(d)}\\).
 
-Each spatial position now maps to \(D\) codebook indices instead of 1. With \(D = 8\) rounds and codebook size \(K = 1024\), the effective vocabulary for autoregressive modeling is \(1024^8\) --- too large for a flat softmax. Instead, the tokens at each depth are predicted sequentially or in parallel with a depth-conditional model.
+Each spatial position now maps to \\(D\\) codebook indices instead of 1. With \\(D = 8\\) rounds and codebook size \\(K = 1024\\), the effective vocabulary for autoregressive modeling is \\(1024^8\\) --- too large for a flat softmax. Instead, the tokens at each depth are predicted sequentially or in parallel with a depth-conditional model.
 
 **RQ-VAE** and **RQ-Transformer** use this approach for high-fidelity image and video generation.
 
@@ -230,22 +230,22 @@ Each spatial position now maps to \(D\) codebook indices instead of 1. With \(D 
 
 ## Tokenizing Video
 
-Extending image tokenization to video adds a temporal dimension. A video tokenizer maps \(\mathbf{x} \in \mathbb{R}^{F \times H \times W \times 3}\) to a grid of discrete tokens \(\mathbf{t} \in \{1, \ldots, K\}^{F' \times H' \times W'}\).
+Extending image tokenization to video adds a temporal dimension. A video tokenizer maps \\(\mathbf{x} \in \mathbb{R}^{F \times H \times W \times 3}\\) to a grid of discrete tokens \\(\mathbf{t} \in \{1, \ldots, K\}^{F' \times H' \times W'}\\).
 
 ### 3D Causal Tokenizers
 
 **Causal** means the encoder only looks at past and present frames (not future frames), enabling streaming generation. The encoder uses causal 3D convolutions (masked to prevent looking ahead in time).
 
 Compression ratios:
-- Spatial: \(f_s = 8\) or \(16\) (reducing 256×256 to 32×32 or 16×16)
-- Temporal: \(f_t = 4\) or \(8\) (reducing 16 frames to 4 or 2 tokens in time)
+- Spatial: \\(f_s = 8\\) or \\(16\\) (reducing 256×256 to 32×32 or 16×16)
+- Temporal: \\(f_t = 4\\) or \\(8\\) (reducing 16 frames to 4 or 2 tokens in time)
 
-A 16-frame, 256×256 video becomes \(4 \times 32 \times 32 = 4{,}096\) tokens (at \(f_t = 4, f_s = 8\)).
+A 16-frame, 256×256 video becomes \\(4 \times 32 \times 32 = 4{,}096\\) tokens (at \\(f_t = 4, f_s = 8\\)).
 
 ### MAGVIT-v2
 
 Google's MAGVIT-v2 uses a sophisticated tokenizer with:
-- **Lookup-Free Quantization** with \(2^{18} = 262{,}144\) effective vocabulary
+- **Lookup-Free Quantization** with \\(2^{18} = 262{,}144\\) effective vocabulary
 - Causal 3D encoder/decoder
 - Joint image-video training (images are 1-frame videos)
 - State-of-the-art reconstruction quality on video
@@ -264,11 +264,11 @@ The ordering is typically **raster scan**: left-to-right, top-to-bottom, frame-b
 
 ### The Sequence Length Problem
 
-A 5-second, 24fps, 256×256 video with 8× spatial and 4× temporal compression: \(30 \times 32 \times 32 = 30{,}720\) tokens. This is 10× longer than a typical language model context. Attention scales as \(O(N^2)\), making full self-attention impractical.
+A 5-second, 24fps, 256×256 video with 8× spatial and 4× temporal compression: \\(30 \times 32 \times 32 = 30{,}720\\) tokens. This is 10× longer than a typical language model context. Attention scales as \\(O(N^2)\\), making full self-attention impractical.
 
 **Solutions:**
 
-- **Sliding window attention:** Only attend to the most recent \(W\) tokens (local context). Long-range dependencies are captured through stacking layers.
+- **Sliding window attention:** Only attend to the most recent \\(W\\) tokens (local context). Long-range dependencies are captured through stacking layers.
 - **Causal masking with block-parallel generation:** Generate one spatial frame at a time, attending to all previous frames but generating all tokens within the current frame in parallel (using a masked image model approach).
 - **Hierarchical generation:** First generate a coarse token grid (low temporal/spatial resolution), then fill in details with a second-stage model.
 

@@ -1099,7 +1099,7 @@ The solution is **exponential backoff with jitter**.
 
 **Jitter** adds randomness to the backoff delay. Without jitter, if 50 workers all start their first retry at exactly 1 second, you still get a burst of 50 at the 1-second mark. Jitter randomizes the delay so the 50 retries are spread across a window instead of arriving simultaneously.
 
-The math is straightforward. For retry attempt \(n\) (starting at 0), the delay is:
+The math is straightforward. For retry attempt \\(n\\) (starting at 0), the delay is:
 
 $$
 \text{delay}(n) = \min\left(\text{baseDelay} \times 2^n + \text{random}(0, \text{jitter}), \;\text{maxDelay}\right)
@@ -1341,7 +1341,7 @@ The key insight is that a 429 response is infinitely better than a timeout. The 
 
 ### 6.4 Idempotency
 
-**Idempotency** means that performing the same operation multiple times produces the same result as performing it once. Mathematically, a function \(f\) is idempotent if \(f(f(x)) = f(x)\).
+**Idempotency** means that performing the same operation multiple times produces the same result as performing it once. Mathematically, a function \\(f\\) is idempotent if \\(f(f(x)) = f(x)\\).
 
 Why does this matter? Because retries exist. When a network timeout occurs, the client does not know whether the server received and processed the request or not. The request might have been processed successfully, but the response was lost in transit. The client retries. If the operation is not idempotent, the user gets charged twice, or two videos are generated, or two database rows are created.
 

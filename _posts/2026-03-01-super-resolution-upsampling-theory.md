@@ -36,23 +36,23 @@ The **Nyquist-Shannon sampling theorem** is the foundational result of signal pr
 
 ### Statement
 
-Let \(x(t)\) be a continuous signal that is **bandlimited** to frequency \(B\): its Fourier transform \(\hat{x}(f) = 0\) for all \(|f| > B\). Then \(x(t)\) is completely determined by its samples at rate \(f_s \geq 2B\):
+Let \\(x(t)\\) be a continuous signal that is **bandlimited** to frequency \\(B\\): its Fourier transform \\(\hat{x}(f) = 0\\) for all \\(|f| > B\\). Then \\(x(t)\\) is completely determined by its samples at rate \\(f_s \geq 2B\\):
 
 $$x(t) = \sum_{n=-\infty}^{\infty} x[n] \, \text{sinc}\!\left(\frac{t - nT_s}{T_s}\right)$$
 
-where \(T_s = 1/f_s\) is the sampling period and \(\text{sinc}(u) = \sin(\pi u) / (\pi u)\).
+where \\(T_s = 1/f_s\\) is the sampling period and \\(\text{sinc}(u) = \sin(\pi u) / (\pi u)\\).
 
-The **Nyquist rate** \(f_s = 2B\) is the minimum sampling rate for perfect reconstruction. Below this rate, the signal cannot be recovered --- information is irreversibly lost.
+The **Nyquist rate** \\(f_s = 2B\\) is the minimum sampling rate for perfect reconstruction. Below this rate, the signal cannot be recovered --- information is irreversibly lost.
 
 ### Proof Sketch (via Fourier Transform)
 
-Sampling a continuous signal \(x(t)\) at intervals \(T_s\) produces a discrete signal \(x[n] = x(nT_s)\). In the frequency domain, sampling corresponds to **periodization** of the spectrum:
+Sampling a continuous signal \\(x(t)\\) at intervals \\(T_s\\) produces a discrete signal \\(x[n] = x(nT_s)\\). In the frequency domain, sampling corresponds to **periodization** of the spectrum:
 
 $$\hat{x}_s(f) = \frac{1}{T_s} \sum_{k=-\infty}^{\infty} \hat{x}(f - k f_s)$$
 
-The spectrum is replicated at integer multiples of \(f_s\). If \(f_s \geq 2B\), the replicas do not overlap, and we can recover \(\hat{x}(f)\) by applying an ideal low-pass filter at frequency \(B\). In the time domain, this filter is the sinc function, giving the reconstruction formula above.
+The spectrum is replicated at integer multiples of \\(f_s\\). If \\(f_s \geq 2B\\), the replicas do not overlap, and we can recover \\(\hat{x}(f)\\) by applying an ideal low-pass filter at frequency \\(B\\). In the time domain, this filter is the sinc function, giving the reconstruction formula above.
 
-If \(f_s < 2B\), the replicas overlap --- this is **aliasing**, and the original spectrum cannot be recovered.
+If \\(f_s < 2B\\), the replicas overlap --- this is **aliasing**, and the original spectrum cannot be recovered.
 
 <svg viewBox="0 0 700 280" xmlns="http://www.w3.org/2000/svg" style="max-width: 700px; display: block; margin: 2em auto;">
   <defs>
@@ -109,7 +109,7 @@ In practice, a Gaussian blur is the standard anti-aliasing filter:
 
 $$I_{\text{filtered}} = I * G_\sigma$$
 
-where \(G_\sigma\) is a Gaussian kernel with \(\sigma \approx 0.5 \cdot (\text{downsample factor})\). Then subsample by keeping every \(k\)-th pixel.
+where \\(G_\sigma\\) is a Gaussian kernel with \\(\sigma \approx 0.5 \cdot (\text{downsample factor})\\). Then subsample by keeping every \\(k\\)-th pixel.
 
 **The information-theoretic point:** after anti-aliasing and downsampling, the high-frequency content is **gone**. It cannot be recovered from the downsampled image. Super-resolution must **hallucinate** the missing high frequencies using prior knowledge about what natural images look like.
 
@@ -117,7 +117,7 @@ where \(G_\sigma\) is a Gaussian kernel with \(\sigma \approx 0.5 \cdot (\text{d
 
 ## Classical Upsampling Methods
 
-Given a low-resolution image \(\mathbf{y}\) at resolution \(H/k \times W/k\), produce a high-resolution image \(\hat{\mathbf{x}}\) at resolution \(H \times W\). Classical methods interpolate between known pixel values:
+Given a low-resolution image \\(\mathbf{y}\\) at resolution \\(H/k \times W/k\\), produce a high-resolution image \\(\hat{\mathbf{x}}\\) at resolution \\(H \times W\\). Classical methods interpolate between known pixel values:
 
 **Nearest neighbor:** Each output pixel takes the value of the nearest input pixel. Produces blocky, pixelated output. Zero frequency-domain smoothing --- preserves all existing frequencies but adds no new information.
 
@@ -138,31 +138,31 @@ The forward model for image degradation is:
 $$\mathbf{y} = D H \mathbf{x} + \mathbf{n}$$
 
 where:
-- \(\mathbf{x} \in \mathbb{R}^{kH \times kW}\) is the unknown high-resolution image
-- \(H\) is a blur operator (anti-aliasing filter)
-- \(D\) is a downsampling operator (keep every \(k\)-th pixel)
-- \(\mathbf{n}\) is observation noise
-- \(\mathbf{y} \in \mathbb{R}^{H \times W}\) is the observed low-resolution image
+- \\(\mathbf{x} \in \mathbb{R}^{kH \times kW}\\) is the unknown high-resolution image
+- \\(H\\) is a blur operator (anti-aliasing filter)
+- \\(D\\) is a downsampling operator (keep every \\(k\\)-th pixel)
+- \\(\mathbf{n}\\) is observation noise
+- \\(\mathbf{y} \in \mathbb{R}^{H \times W}\\) is the observed low-resolution image
 
-This system is **ill-posed**: the operator \(DH\) maps a high-dimensional space to a low-dimensional space. Its null space is huge --- all the high-frequency components that were filtered out by \(H\) and lost by \(D\). Infinitely many \(\mathbf{x}\) values produce the same \(\mathbf{y}\).
+This system is **ill-posed**: the operator \\(DH\\) maps a high-dimensional space to a low-dimensional space. Its null space is huge --- all the high-frequency components that were filtered out by \\(H\\) and lost by \\(D\\). Infinitely many \\(\mathbf{x}\\) values produce the same \\(\mathbf{y}\\).
 
-For \(k = 4\) (4× super-resolution), each output pixel must be inferred from 1/16th of the information. The other 15/16ths must come from the **prior** --- our knowledge of what natural images look like.
+For \\(k = 4\\) (4× super-resolution), each output pixel must be inferred from 1/16th of the information. The other 15/16ths must come from the **prior** --- our knowledge of what natural images look like.
 
 ---
 
 ## Regularization and MAP Estimation
 
-To make the inverse problem well-posed, add a **regularizer** \(R(\mathbf{x})\) that encodes prior knowledge. The **MAP (maximum a posteriori)** estimate is:
+To make the inverse problem well-posed, add a **regularizer** \\(R(\mathbf{x})\\) that encodes prior knowledge. The **MAP (maximum a posteriori)** estimate is:
 
 $$\hat{\mathbf{x}} = \arg\min_\mathbf{x} \left[\underbrace{\|\mathbf{y} - DH\mathbf{x}\|_2^2}_{\text{data fidelity}} + \lambda \underbrace{R(\mathbf{x})}_{\text{regularizer}}\right]$$
 
 The data fidelity term ensures the solution is consistent with the observation. The regularizer encodes what "natural" high-resolution images look like.
 
-**Tikhonov regularization:** \(R(\mathbf{x}) = \|\mathbf{x}\|_2^2\). Penalizes large values, encouraging smoothness. Too simple for natural images.
+**Tikhonov regularization:** \\(R(\mathbf{x}) = \|\mathbf{x}\|_2^2\\). Penalizes large values, encouraging smoothness. Too simple for natural images.
 
-**Total Variation (TV):** \(R(\mathbf{x}) = \|\nabla \mathbf{x}\|_1 = \sum_{i,j} |x_{i+1,j} - x_{i,j}| + |x_{i,j+1} - x_{i,j}|\). Penalizes the total gradient, encouraging piecewise-constant images. Produces sharp edges but cartoon-like textures.
+**Total Variation (TV):** \\(R(\mathbf{x}) = \|\nabla \mathbf{x}\|_1 = \sum_{i,j} |x_{i+1,j} - x_{i,j}| + |x_{i,j+1} - x_{i,j}|\\). Penalizes the total gradient, encouraging piecewise-constant images. Produces sharp edges but cartoon-like textures.
 
-**Sparse prior:** \(R(\mathbf{x}) = \|\Psi \mathbf{x}\|_1\) where \(\Psi\) is a sparsifying transform (wavelet, DCT). Natural images are sparse in these domains.
+**Sparse prior:** \\(R(\mathbf{x}) = \|\Psi \mathbf{x}\|_1\\) where \\(\Psi\\) is a sparsifying transform (wavelet, DCT). Natural images are sparse in these domains.
 
 **Neural prior (deep image prior):** The regularization comes from the architecture of a neural network. Even an untrained CNN, when optimized to fit the observation, produces natural-looking images because its architecture biases toward smoothness at multiple scales.
 
@@ -178,16 +178,16 @@ Instead of:
 
 Sub-pixel convolution:
 1. Processes at low resolution (cheap)
-2. Outputs \(k^2 C\) channels instead of \(C\) channels
-3. Rearranges (shuffles) these channels into a \(k \times k\) spatial grid, producing the high-resolution output
+2. Outputs \\(k^2 C\\) channels instead of \\(C\\) channels
+3. Rearranges (shuffles) these channels into a \\(k \times k\\) spatial grid, producing the high-resolution output
 
-Mathematically, the pixel shuffle operation \(\mathcal{S}_k: \mathbb{R}^{H \times W \times k^2 C} \to \mathbb{R}^{kH \times kW \times C}\) is:
+Mathematically, the pixel shuffle operation \\(\mathcal{S}_k: \mathbb{R}^{H \times W \times k^2 C} \to \mathbb{R}^{kH \times kW \times C}\\) is:
 
 $$\mathcal{S}_k(\mathbf{Z})_{kh+i, kw+j, c} = \mathbf{Z}_{h, w, c \cdot k^2 + i \cdot k + j}$$
 
-for \(i, j \in \{0, \ldots, k-1\}\). This is a deterministic rearrangement, not a learned operation. The learning happens in the convolution layers that produce the channel-expanded output.
+for \\(i, j \in \{0, \ldots, k-1\}\\). This is a deterministic rearrangement, not a learned operation. The learning happens in the convolution layers that produce the channel-expanded output.
 
-**Advantage:** All computation happens at the low resolution. A \(4\times\) SR model processes features at 1/16th the pixel count compared to a model that upsamples first. This is 16× cheaper.
+**Advantage:** All computation happens at the low resolution. A \\(4\times\\) SR model processes features at 1/16th the pixel count compared to a model that upsamples first. This is 16× cheaper.
 
 **Disadvantage:** The initial versions produced **checkerboard artifacts** because adjacent output pixels come from different convolution filters (different channel indices), creating systematic patterns. This is mitigated by careful initialization and by using sub-pixel convolution in the last layer only.
 
@@ -205,7 +205,7 @@ The residual learning formulation:
 
 $$\hat{\mathbf{x}} = \text{bicubic}(\mathbf{y}) + F_\theta(\mathbf{y})$$
 
-The network \(F_\theta\) only needs to predict the high-frequency detail (edges, textures) that bicubic interpolation misses. This is easier to learn than the full high-resolution image.
+The network \\(F_\theta\\) only needs to predict the high-frequency detail (edges, textures) that bicubic interpolation misses. This is easier to learn than the full high-resolution image.
 
 ---
 
@@ -225,17 +225,17 @@ $$\mathcal{L}_G = \lambda_{\text{pixel}} \|\hat{\mathbf{x}} - \mathbf{x}\|_1 + \
 
 ## The Perception-Distortion Tradeoff
 
-**Theorem (Blau & Michaeli, 2018).** Let \(G\) be an estimator of \(\mathbf{x}\) from \(\mathbf{y}\). Define:
-- **Distortion:** \(\Delta = \mathbb{E}[d(\mathbf{x}, G(\mathbf{y}))]\) (e.g., MSE)
-- **Perceptual quality:** \(d(p_G, p_X)\) where \(p_G\) is the distribution of \(G(\mathbf{y})\) and \(p_X\) is the real distribution
+**Theorem (Blau & Michaeli, 2018).** Let \\(G\\) be an estimator of \\(\mathbf{x}\\) from \\(\mathbf{y}\\). Define:
+- **Distortion:** \\(\Delta = \mathbb{E}[d(\mathbf{x}, G(\mathbf{y}))]\\) (e.g., MSE)
+- **Perceptual quality:** \\(d(p_G, p_X)\\) where \\(p_G\\) is the distribution of \\(G(\mathbf{y})\\) and \\(p_X\\) is the real distribution
 
 Then for any estimator:
 
 $$\Delta \geq \Delta^*(d(p_G, p_X))$$
 
-where \(\Delta^*\) is a monotonically decreasing function. You cannot simultaneously minimize distortion and make the output distribution match the real distribution.
+where \\(\Delta^*\\) is a monotonically decreasing function. You cannot simultaneously minimize distortion and make the output distribution match the real distribution.
 
-**Proof intuition:** The distortion-optimal estimator is the conditional mean \(\mathbb{E}[\mathbf{x}|\mathbf{y}]\), which is blurry (has a different distribution from real images). To make \(p_G = p_X\), you must add variability (randomness), which increases MSE. The tradeoff is fundamental --- it holds for any estimator, learned or not.
+**Proof intuition:** The distortion-optimal estimator is the conditional mean \\(\mathbb{E}[\mathbf{x}|\mathbf{y}]\\), which is blurry (has a different distribution from real images). To make \\(p_G = p_X\\), you must add variability (randomness), which increases MSE. The tradeoff is fundamental --- it holds for any estimator, learned or not.
 
 **For video SR:** There is an additional temporal dimension to this tradeoff. Per-frame perceptual quality (sharpness) can conflict with temporal consistency (low flicker). A model that hallucinated different plausible high-frequency details for consecutive frames would score well on per-frame metrics but produce unwatchable flickering video.
 
@@ -243,19 +243,19 @@ where \(\Delta^*\) is a monotonically decreasing function. You cannot simultaneo
 
 ## Diffusion-Based Super-Resolution
 
-Diffusion models approach SR as **conditional generation**: given a low-resolution image \(\mathbf{y}\), sample from \(p(\mathbf{x} | \mathbf{y})\) --- the posterior distribution over high-resolution images consistent with \(\mathbf{y}\).
+Diffusion models approach SR as **conditional generation**: given a low-resolution image \\(\mathbf{y}\\), sample from \\(p(\mathbf{x} | \mathbf{y})\\) --- the posterior distribution over high-resolution images consistent with \\(\mathbf{y}\\).
 
 ### Conditioning Mechanisms
 
-**Concatenation:** Upsample \(\mathbf{y}\) to the target resolution (bicubic) and concatenate with the noisy image as additional input channels to the denoising network.
+**Concatenation:** Upsample \\(\mathbf{y}\\) to the target resolution (bicubic) and concatenate with the noisy image as additional input channels to the denoising network.
 
-**Cross-attention:** Encode \(\mathbf{y}\) with a separate encoder and inject it via cross-attention into the denoising U-Net/DiT.
+**Cross-attention:** Encode \\(\mathbf{y}\\) with a separate encoder and inject it via cross-attention into the denoising U-Net/DiT.
 
-**SDEdit:** Start from a partially noised version of the upsampled \(\mathbf{y}\) (add noise to time \(t_0 < T\), not full noise) and denoise. The partial noise preserves the low-frequency content from \(\mathbf{y}\) while the denoising adds high-frequency detail.
+**SDEdit:** Start from a partially noised version of the upsampled \\(\mathbf{y}\\) (add noise to time \\(t_0 < T\\), not full noise) and denoise. The partial noise preserves the low-frequency content from \\(\mathbf{y}\\) while the denoising adds high-frequency detail.
 
 ### Why Diffusion SR Is Different
 
-Unlike deterministic SR (EDSR, ESRGAN), diffusion SR is **stochastic**: each run produces a different plausible high-resolution image. This is a feature, not a bug --- it means the model samples from the posterior \(p(\mathbf{x}|\mathbf{y})\) rather than computing the posterior mean (which would be blurry).
+Unlike deterministic SR (EDSR, ESRGAN), diffusion SR is **stochastic**: each run produces a different plausible high-resolution image. This is a feature, not a bug --- it means the model samples from the posterior \\(p(\mathbf{x}|\mathbf{y})\\) rather than computing the posterior mean (which would be blurry).
 
 Multiple samples from the same low-resolution input will have the same large-scale structure (same content, composition, colors) but different fine details (slightly different texture patterns, edge sharpness, noise structure). This is exactly the mathematical consequence of the ill-posedness: many high-res images are consistent with the same low-res input.
 

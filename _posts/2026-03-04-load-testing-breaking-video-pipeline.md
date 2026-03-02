@@ -700,13 +700,13 @@ L = \lambda W
 $$
 
 Where:
-- \(L\) is the average number of items in the system (concurrent requests being processed)
-- \(\lambda\) is the average arrival rate (requests per second)
-- \(W\) is the average time each item spends in the system (response time)
+- \\(L\\) is the average number of items in the system (concurrent requests being processed)
+- \\(\lambda\\) is the average arrival rate (requests per second)
+- \\(W\\) is the average time each item spends in the system (response time)
 
 This is not an approximation. It is an exact identity that holds for any stable queueing system in steady state, regardless of the arrival distribution or service time distribution. John Little proved this in 1961, and it applies to everything from grocery store checkout lines to API servers.
 
-Let us apply it to our situation. At 50 VUs with 1-second think time, each VU sends roughly 1 request per second, so \(\lambda \approx 50\) req/s. If average response time \(W = 82\text{ms} = 0.082\text{s}\), then:
+Let us apply it to our situation. At 50 VUs with 1-second think time, each VU sends roughly 1 request per second, so \\(\lambda \approx 50\\) req/s. If average response time \\(W = 82\text{ms} = 0.082\text{s}\\), then:
 
 $$
 L = 50 \times 0.082 = 4.1
@@ -714,13 +714,13 @@ $$
 
 So on average, 4.1 requests are being processed concurrently. Our database connection pool of 50 can handle that easily.
 
-At 200 VUs, even with longer response times reducing the actual request rate to about 31 req/s, and average response time \(W = 2.8\text{s}\):
+At 200 VUs, even with longer response times reducing the actual request rate to about 31 req/s, and average response time \\(W = 2.8\text{s}\\):
 
 $$
 L = 31 \times 2.8 = 86.8
 $$
 
-Now 87 requests are being processed concurrently, but our connection pool only has 50 connections. The excess requests queue up, wait for a connection, and that waiting time adds to \(W\), which increases \(L\), which causes more queuing. This is a positive feedback loop --- the system spirals into failure.
+Now 87 requests are being processed concurrently, but our connection pool only has 50 connections. The excess requests queue up, wait for a connection, and that waiting time adds to \\(W\\), which increases \\(L\\), which causes more queuing. This is a positive feedback loop --- the system spirals into failure.
 
 ---
 
@@ -762,7 +762,7 @@ If `pg_stat_activity` shows all connections as `active` and your pool size match
 
 **What is happening**: Without an index, PostgreSQL performs a **sequential scan** --- it reads every single row in the table to find matches. With 1,000 rows, this takes a few milliseconds and you never notice. With 100,000 rows and 50 concurrent queries doing sequential scans, you have 50 processes each reading the entire table, fighting for disk I/O and CPU.
 
-An **index** is a separate data structure (usually a B-tree) that maps column values to row locations. Looking up a row by an indexed column is \(O(\log n)\) instead of \(O(n)\). For 100,000 rows, that is roughly 17 comparisons instead of 100,000.
+An **index** is a separate data structure (usually a B-tree) that maps column values to row locations. Looking up a row by an indexed column is \\(O(\log n)\\) instead of \\(O(n)\\). For 100,000 rows, that is roughly 17 comparisons instead of 100,000.
 
 **How to diagnose**:
 
@@ -1087,7 +1087,7 @@ $$
 \text{pool\_size} = \text{CPU\_cores} \times 2 + \text{disk\_spindles}
 $$
 
-For an SSD-backed database on a 4-core instance, that gives \(4 \times 2 + 1 = 9\). In practice, you should benchmark, but 10 to 20 connections per application instance is a reasonable starting point. If you have 4 application instances, that is 40 to 80 total database connections, leaving headroom below PostgreSQL's default `max_connections = 100`.
+For an SSD-backed database on a 4-core instance, that gives \\(4 \times 2 + 1 = 9\\). In practice, you should benchmark, but 10 to 20 connections per application instance is a reasonable starting point. If you have 4 application instances, that is 40 to 80 total database connections, leaving headroom below PostgreSQL's default `max_connections = 100`.
 
 ```typescript
 // Connection pool configuration
@@ -1564,11 +1564,11 @@ S(n) = \frac{1}{(1 - p) + \frac{p}{n}}
 $$
 
 Where:
-- \(S(n)\) is the theoretical speedup of the system when you parallelize the portion \(p\) of it across \(n\) processors (or threads, or instances)
-- \(p\) is the fraction of the workload that can be parallelized
-- \(1 - p\) is the fraction that is inherently sequential
+- \\(S(n)\\) is the theoretical speedup of the system when you parallelize the portion \\(p\\) of it across \\(n\\) processors (or threads, or instances)
+- \\(p\\) is the fraction of the workload that can be parallelized
+- \\(1 - p\\) is the fraction that is inherently sequential
 
-Suppose 80% of your request processing time is spent waiting for the database (parallelizable, since you can add read replicas), and 20% is sequential application logic. Even with infinite database performance (\(n \to \infty\)):
+Suppose 80% of your request processing time is spent waiting for the database (parallelizable, since you can add read replicas), and 20% is sequential application logic. Even with infinite database performance (\\(n \to \infty\\)):
 
 $$
 S(\infty) = \frac{1}{(1 - 0.8) + 0} = \frac{1}{0.2} = 5

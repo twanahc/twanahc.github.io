@@ -31,11 +31,11 @@ This post builds the theory of optical flow from scratch. We start with the brig
 
 ## What Is Optical Flow?
 
-Consider two consecutive video frames, \(I(x, y, t)\) and \(I(x, y, t + \Delta t)\), where \(I\) is the image intensity (brightness) at spatial position \((x, y)\) and time \(t\). Some pixels in the first frame have "moved" to new positions in the second frame --- a person walks, a car drives, the camera pans.
+Consider two consecutive video frames, \\(I(x, y, t)\\) and \\(I(x, y, t + \Delta t)\\), where \\(I\\) is the image intensity (brightness) at spatial position \\((x, y)\\) and time \\(t\\). Some pixels in the first frame have "moved" to new positions in the second frame --- a person walks, a car drives, the camera pans.
 
-**Optical flow** is a 2D vector field \(\mathbf{u}(x, y) = (u(x, y), v(x, y))\) that assigns to every pixel \((x, y)\) in the first frame a displacement vector telling you where that pixel moved to in the second frame. The component \(u\) is the horizontal displacement and \(v\) is the vertical displacement.
+**Optical flow** is a 2D vector field \\(\mathbf{u}(x, y) = (u(x, y), v(x, y))\\) that assigns to every pixel \\((x, y)\\) in the first frame a displacement vector telling you where that pixel moved to in the second frame. The component \\(u\\) is the horizontal displacement and \\(v\\) is the vertical displacement.
 
-More precisely, if a point at position \((x, y)\) in frame \(t\) corresponds to position \((x + u, y + v)\) in frame \(t + \Delta t\), then \((u, v)\) is the optical flow at that point.
+More precisely, if a point at position \\((x, y)\\) in frame \\(t\\) corresponds to position \\((x + u, y + v)\\) in frame \\(t + \Delta t\\), then \\((u, v)\\) is the optical flow at that point.
 
 <svg viewBox="0 0 700 280" xmlns="http://www.w3.org/2000/svg" style="max-width: 700px; display: block; margin: 2em auto;">
   <defs>
@@ -73,45 +73,45 @@ There is a subtle but important distinction: optical flow is not the same as the
 
 ## The Brightness Constancy Assumption
 
-The foundation of all classical optical flow methods is a single assumption: **a pixel's brightness does not change as it moves**. If a pixel at \((x, y)\) in frame \(t\) has intensity \(I(x, y, t)\), and it moves to \((x + u, y + v)\) in frame \(t + \Delta t\), then:
+The foundation of all classical optical flow methods is a single assumption: **a pixel's brightness does not change as it moves**. If a pixel at \\((x, y)\\) in frame \\(t\\) has intensity \\(I(x, y, t)\\), and it moves to \\((x + u, y + v)\\) in frame \\(t + \Delta t\\), then:
 
 $$I(x + u, y + v, t + \Delta t) = I(x, y, t)$$
 
 This is the **brightness constancy equation**. It says that the intensity is conserved along the motion trajectory. This is reasonable when illumination is constant and surfaces are Lambertian (diffuse reflectors), but it breaks down under shadows, specular reflections, transparency, and occlusion.
 
-Now we linearize. Taylor-expand the left side around \((x, y, t)\):
+Now we linearize. Taylor-expand the left side around \\((x, y, t)\\):
 
 $$I(x + u, y + v, t + \Delta t) \approx I(x, y, t) + \frac{\partial I}{\partial x} u + \frac{\partial I}{\partial y} v + \frac{\partial I}{\partial t} \Delta t$$
 
-Setting this equal to \(I(x, y, t)\) and dividing by \(\Delta t\):
+Setting this equal to \\(I(x, y, t)\\) and dividing by \\(\Delta t\\):
 
 $$\frac{\partial I}{\partial x} \frac{u}{\Delta t} + \frac{\partial I}{\partial y} \frac{v}{\Delta t} + \frac{\partial I}{\partial t} = 0$$
 
-Define the flow velocities \(u' = u / \Delta t\) and \(v' = v / \Delta t\) (but by convention we drop the primes and just call them \(u, v\), understanding they are velocities per frame). Introduce the shorthand \(I_x = \partial I / \partial x\), \(I_y = \partial I / \partial y\), \(I_t = \partial I / \partial t\). The result is the **optical flow constraint equation**:
+Define the flow velocities \\(u' = u / \Delta t\\) and \\(v' = v / \Delta t\\) (but by convention we drop the primes and just call them \\(u, v\\), understanding they are velocities per frame). Introduce the shorthand \\(I_x = \partial I / \partial x\\), \\(I_y = \partial I / \partial y\\), \\(I_t = \partial I / \partial t\\). The result is the **optical flow constraint equation**:
 
 $$I_x u + I_y v + I_t = 0$$
 
-Or in vector form, with \(\nabla I = (I_x, I_y)\) being the spatial image gradient:
+Or in vector form, with \\(\nabla I = (I_x, I_y)\\) being the spatial image gradient:
 
 $$\nabla I \cdot \mathbf{u} + I_t = 0$$
 
-This is a single linear equation in two unknowns \((u, v)\). One equation, two unknowns. The system is **underdetermined** --- there are infinitely many flow vectors \((u, v)\) consistent with the constraint at any single pixel. This is the **aperture problem**.
+This is a single linear equation in two unknowns \\((u, v)\\). One equation, two unknowns. The system is **underdetermined** --- there are infinitely many flow vectors \\((u, v)\\) consistent with the constraint at any single pixel. This is the **aperture problem**.
 
 ---
 
 ## The Aperture Problem
 
-The optical flow constraint equation tells us the component of the flow in the direction of the image gradient \(\nabla I\), but tells us nothing about the component perpendicular to it.
+The optical flow constraint equation tells us the component of the flow in the direction of the image gradient \\(\nabla I\\), but tells us nothing about the component perpendicular to it.
 
 To see why, rewrite the constraint:
 
 $$\nabla I \cdot \mathbf{u} = -I_t$$
 
-The left side is the dot product of the flow with the gradient direction. This means we can only recover the **normal flow** --- the component of \(\mathbf{u}\) in the direction of \(\nabla I\):
+The left side is the dot product of the flow with the gradient direction. This means we can only recover the **normal flow** --- the component of \\(\mathbf{u}\\) in the direction of \\(\nabla I\\):
 
 $$u_n = \frac{-I_t}{|\nabla I|}$$
 
-The component of \(\mathbf{u}\) tangent to the image edge (perpendicular to \(\nabla I\)) is completely unconstrained.
+The component of \\(\mathbf{u}\\) tangent to the image edge (perpendicular to \\(\nabla I\\)) is completely unconstrained.
 
 <svg viewBox="0 0 700 300" xmlns="http://www.w3.org/2000/svg" style="max-width: 700px; display: block; margin: 2em auto;">
   <defs>
@@ -164,9 +164,9 @@ To recover the full flow, we need additional constraints. The two classical appr
 
 ## The Lucas-Kanade Method
 
-The Lucas-Kanade (LK) method (1981) resolves the aperture problem by assuming that the flow \((u, v)\) is constant within a small spatial neighborhood \(\Omega\) of each pixel. If the flow is the same for all pixels in a patch, we get one equation per pixel but only two unknowns, giving us an overdetermined system.
+The Lucas-Kanade (LK) method (1981) resolves the aperture problem by assuming that the flow \\((u, v)\\) is constant within a small spatial neighborhood \\(\Omega\\) of each pixel. If the flow is the same for all pixels in a patch, we get one equation per pixel but only two unknowns, giving us an overdetermined system.
 
-For a window of \(N\) pixels, the brightness constancy equation at each pixel \((x_i, y_i)\) gives:
+For a window of \\(N\\) pixels, the brightness constancy equation at each pixel \\((x_i, y_i)\\) gives:
 
 $$I_x(x_i, y_i) \, u + I_y(x_i, y_i) \, v = -I_t(x_i, y_i) \quad \text{for } i = 1, \ldots, N$$
 
@@ -178,33 +178,33 @@ where:
 
 $$A = \begin{pmatrix} I_x(x_1, y_1) & I_y(x_1, y_1) \\ I_x(x_2, y_2) & I_y(x_2, y_2) \\ \vdots & \vdots \\ I_x(x_N, y_N) & I_y(x_N, y_N) \end{pmatrix}, \quad \mathbf{u} = \begin{pmatrix} u \\ v \end{pmatrix}, \quad \mathbf{b} = \begin{pmatrix} -I_t(x_1, y_1) \\ -I_t(x_2, y_2) \\ \vdots \\ -I_t(x_N, y_N) \end{pmatrix}$$
 
-This is an overdetermined system (\(N \gg 2\)), so we solve it in the least-squares sense by solving the **normal equations**:
+This is an overdetermined system (\\(N \gg 2\\)), so we solve it in the least-squares sense by solving the **normal equations**:
 
 $$A^T A \, \mathbf{u} = A^T \mathbf{b}$$
 
-The matrix \(A^T A\) is the **structure tensor** (also called the second moment matrix):
+The matrix \\(A^T A\\) is the **structure tensor** (also called the second moment matrix):
 
 $$M = A^T A = \begin{pmatrix} \sum I_x^2 & \sum I_x I_y \\ \sum I_x I_y & \sum I_y^2 \end{pmatrix}$$
 
-where all sums run over the window \(\Omega\). The solution is:
+where all sums run over the window \\(\Omega\\). The solution is:
 
 $$\mathbf{u} = M^{-1} A^T \mathbf{b} = \begin{pmatrix} \sum I_x^2 & \sum I_x I_y \\ \sum I_x I_y & \sum I_y^2 \end{pmatrix}^{-1} \begin{pmatrix} -\sum I_x I_t \\ -\sum I_y I_t \end{pmatrix}$$
 
 ### When Does This Work?
 
-The solution exists and is well-conditioned when \(M\) is invertible, which requires both eigenvalues \(\lambda_1, \lambda_2\) to be large. The eigenvalue structure of \(M\) reveals the local image geometry:
+The solution exists and is well-conditioned when \\(M\\) is invertible, which requires both eigenvalues \\(\lambda_1, \lambda_2\\) to be large. The eigenvalue structure of \\(M\\) reveals the local image geometry:
 
-- **Both eigenvalues small** (\(\lambda_1 \approx \lambda_2 \approx 0\)): Flat region --- no gradient, no flow information. The system is degenerate.
-- **One eigenvalue large, one small** (\(\lambda_1 \gg \lambda_2 \approx 0\)): An edge --- the gradient has one dominant direction. We can recover normal flow but not tangential flow. This is the aperture problem again.
-- **Both eigenvalues large** (\(\lambda_1, \lambda_2 \gg 0\)): A corner or textured region --- gradients in multiple directions. The system is well-determined and the flow estimate is reliable.
+- **Both eigenvalues small** (\\(\lambda_1 \approx \lambda_2 \approx 0\\)): Flat region --- no gradient, no flow information. The system is degenerate.
+- **One eigenvalue large, one small** (\\(\lambda_1 \gg \lambda_2 \approx 0\\)): An edge --- the gradient has one dominant direction. We can recover normal flow but not tangential flow. This is the aperture problem again.
+- **Both eigenvalues large** (\\(\lambda_1, \lambda_2 \gg 0\\)): A corner or textured region --- gradients in multiple directions. The system is well-determined and the flow estimate is reliable.
 
-This eigenvalue analysis is precisely the **Harris corner detector**. Corners are good features for flow estimation; edges and flat regions are not. The quantity \(\min(\lambda_1, \lambda_2)\) (the Shi-Tomasi criterion) tells you how reliable the LK flow estimate is at each point.
+This eigenvalue analysis is precisely the **Harris corner detector**. Corners are good features for flow estimation; edges and flat regions are not. The quantity \\(\min(\lambda_1, \lambda_2)\\) (the Shi-Tomasi criterion) tells you how reliable the LK flow estimate is at each point.
 
 In practice, the window is often weighted by a Gaussian to give more influence to the center pixel:
 
 $$M = \sum_{(x_i, y_i) \in \Omega} w_i \begin{pmatrix} I_x^2 & I_x I_y \\ I_x I_y & I_y^2 \end{pmatrix}_{(x_i, y_i)}$$
 
-where \(w_i = \exp\left(-\frac{(x_i - x_0)^2 + (y_i - y_0)^2}{2\sigma^2}\right)\).
+where \\(w_i = \exp\left(-\frac{(x_i - x_0)^2 + (y_i - y_0)^2}{2\sigma^2}\right)\\).
 
 ---
 
@@ -216,7 +216,7 @@ This is formulated as a **variational problem**. Define the energy functional:
 
 $$E(u, v) = \iint \left[ \underbrace{(I_x u + I_y v + I_t)^2}_{\text{data term}} + \alpha^2 \underbrace{\left(|\nabla u|^2 + |\nabla v|^2\right)}_{\text{smoothness term}} \right] dx \, dy$$
 
-The **data term** penalizes violations of brightness constancy. The **smoothness term** penalizes spatial variation in the flow field, encouraging neighboring pixels to have similar flow vectors. The parameter \(\alpha^2 > 0\) controls the tradeoff: larger \(\alpha\) produces smoother flow (at the cost of accuracy at motion boundaries).
+The **data term** penalizes violations of brightness constancy. The **smoothness term** penalizes spatial variation in the flow field, encouraging neighboring pixels to have similar flow vectors. The parameter \\(\alpha^2 > 0\\) controls the tradeoff: larger \\(\alpha\\) produces smoother flow (at the cost of accuracy at motion boundaries).
 
 The gradient terms are:
 
@@ -226,7 +226,7 @@ where subscripts denote partial derivatives of the flow components.
 
 ### Euler-Lagrange Equations
 
-To minimize this functional, we apply the calculus of variations. The integrand is of the form \(\mathcal{L}(u, v, u_x, u_y, v_x, v_y)\), and the Euler-Lagrange equations for \(u\) and \(v\) are:
+To minimize this functional, we apply the calculus of variations. The integrand is of the form \\(\mathcal{L}(u, v, u_x, u_y, v_x, v_y)\\), and the Euler-Lagrange equations for \\(u\\) and \\(v\\) are:
 
 $$\frac{\partial \mathcal{L}}{\partial u} - \frac{\partial}{\partial x}\frac{\partial \mathcal{L}}{\partial u_x} - \frac{\partial}{\partial y}\frac{\partial \mathcal{L}}{\partial u_y} = 0$$
 
@@ -236,7 +236,7 @@ Let us compute each term. The integrand is:
 
 $$\mathcal{L} = (I_x u + I_y v + I_t)^2 + \alpha^2(u_x^2 + u_y^2 + v_x^2 + v_y^2)$$
 
-For the \(u\) equation:
+For the \\(u\\) equation:
 
 $$\frac{\partial \mathcal{L}}{\partial u} = 2 I_x (I_x u + I_y v + I_t)$$
 
@@ -244,19 +244,19 @@ $$\frac{\partial \mathcal{L}}{\partial u_x} = 2\alpha^2 u_x \implies \frac{\part
 
 $$\frac{\partial \mathcal{L}}{\partial u_y} = 2\alpha^2 u_y \implies \frac{\partial}{\partial y}\frac{\partial \mathcal{L}}{\partial u_y} = 2\alpha^2 u_{yy}$$
 
-The Euler-Lagrange equation for \(u\) becomes:
+The Euler-Lagrange equation for \\(u\\) becomes:
 
 $$I_x(I_x u + I_y v + I_t) - \alpha^2 \nabla^2 u = 0$$
 
-where \(\nabla^2 u = u_{xx} + u_{yy}\) is the Laplacian. Similarly for \(v\):
+where \\(\nabla^2 u = u_{xx} + u_{yy}\\) is the Laplacian. Similarly for \\(v\\):
 
 $$I_y(I_x u + I_y v + I_t) - \alpha^2 \nabla^2 v = 0$$
 
-These are two coupled partial differential equations for the flow field \((u, v)\). They can be solved iteratively using a Gauss-Seidel or Jacobi scheme. A standard approach approximates the Laplacian using the difference between the local average and the center value:
+These are two coupled partial differential equations for the flow field \\((u, v)\\). They can be solved iteratively using a Gauss-Seidel or Jacobi scheme. A standard approach approximates the Laplacian using the difference between the local average and the center value:
 
 $$\nabla^2 u \approx \bar{u} - u$$
 
-where \(\bar{u}\) is the average of \(u\) over the 4-neighborhood (or 8-neighborhood) of the pixel. Substituting and solving for \(u\) and \(v\):
+where \\(\bar{u}\\) is the average of \\(u\\) over the 4-neighborhood (or 8-neighborhood) of the pixel. Substituting and solving for \\(u\\) and \\(v\\):
 
 $$u^{k+1} = \bar{u}^k - \frac{I_x(I_x \bar{u}^k + I_y \bar{v}^k + I_t)}{\alpha^2 + I_x^2 + I_y^2}$$
 
@@ -309,7 +309,7 @@ Both classical methods assume **small displacements** --- the Taylor expansion i
 
 The solution is a **coarse-to-fine** approach using an **image pyramid**:
 
-1. Build a Gaussian pyramid for both frames: downsample each image by factor 2 repeatedly, creating \(L\) levels. At the coarsest level, images are tiny (e.g., 16×12 pixels).
+1. Build a Gaussian pyramid for both frames: downsample each image by factor 2 repeatedly, creating \\(L\\) levels. At the coarsest level, images are tiny (e.g., 16×12 pixels).
 
 2. At the coarsest level, displacements are small (because the image is small), so the linearization is valid. Estimate the flow at this level using LK or HS.
 
@@ -321,35 +321,35 @@ The solution is a **coarse-to-fine** approach using an **image pyramid**:
 
 This hierarchical approach can handle displacements of hundreds of pixels. It is standard in all classical flow methods and remains the conceptual backbone even for deep methods (which process features at multiple scales via encoder-decoder architectures).
 
-The warping step at level \(l\) is:
+The warping step at level \\(l\\) is:
 
 $$I_1^{\text{warped}}(x, y) = I_1(x + u^{l+1}(x,y), \, y + v^{l+1}(x,y))$$
 
-where \((u^{l+1}, v^{l+1})\) is the flow estimate from the coarser level, upsampled to the current resolution.
+where \\((u^{l+1}, v^{l+1})\\) is the flow estimate from the coarser level, upsampled to the current resolution.
 
 ---
 
 ## The General Variational Framework
 
-Horn-Schunck is the simplest variational optical flow method, but it has a well-known weakness: the quadratic smoothness term \(|\nabla u|^2\) penalizes flow discontinuities everywhere, including at **motion boundaries** (where the flow genuinely changes sharply --- the edge between a moving foreground and a stationary background).
+Horn-Schunck is the simplest variational optical flow method, but it has a well-known weakness: the quadratic smoothness term \\(|\nabla u|^2\\) penalizes flow discontinuities everywhere, including at **motion boundaries** (where the flow genuinely changes sharply --- the edge between a moving foreground and a stationary background).
 
 The modern variational framework generalizes the energy to:
 
 $$E(u, v) = \iint \left[ \Psi_D\!\left((I_x u + I_y v + I_t)^2\right) + \alpha \, \Psi_S\!\left(|\nabla u|^2 + |\nabla v|^2\right) \right] dx \, dy$$
 
-where \(\Psi_D\) and \(\Psi_S\) are **penalty functions** (also called robust estimators) that control how violations of the data constraint and smoothness constraint are penalized.
+where \\(\Psi_D\\) and \\(\Psi_S\\) are **penalty functions** (also called robust estimators) that control how violations of the data constraint and smoothness constraint are penalized.
 
-**Horn-Schunck** uses \(\Psi(s) = s\) (quadratic penalty). The problem: outliers and motion boundaries get penalized quadratically, causing over-smoothing.
+**Horn-Schunck** uses \\(\Psi(s) = s\\) (quadratic penalty). The problem: outliers and motion boundaries get penalized quadratically, causing over-smoothing.
 
 **Robust alternatives:**
 
-- **Charbonnier penalty:** \(\Psi(s) = \sqrt{s + \epsilon^2}\) (a smooth approximation to \(L^1\)). This penalizes large deviations less than quadratic, allowing the flow to have sharp boundaries.
+- **Charbonnier penalty:** \\(\Psi(s) = \sqrt{s + \epsilon^2}\\) (a smooth approximation to \\(L^1\\)). This penalizes large deviations less than quadratic, allowing the flow to have sharp boundaries.
 
-- **Lorentzian:** \(\Psi(s) = \log(1 + s / (2\sigma^2))\). Even more robust to outliers.
+- **Lorentzian:** \\(\Psi(s) = \log(1 + s / (2\sigma^2))\\). Even more robust to outliers.
 
-- **Total Variation (TV):** \(\Psi_S(|\nabla u|^2) = |\nabla u|\). This promotes piecewise-constant flow, which is appropriate when objects move rigidly.
+- **Total Variation (TV):** \\(\Psi_S(|\nabla u|^2) = |\nabla u|\\). This promotes piecewise-constant flow, which is appropriate when objects move rigidly.
 
-The TV-L1 optical flow method (Zach, Pock, Bischof, 2007) uses an \(L^1\) data term with TV regularization:
+The TV-L1 optical flow method (Zach, Pock, Bischof, 2007) uses an \\(L^1\\) data term with TV regularization:
 
 $$E = \iint \left[ |I_x u + I_y v + I_t| + \alpha (|\nabla u| + |\nabla v|) \right] dx \, dy$$
 
@@ -368,23 +368,23 @@ The first end-to-end deep flow method. Two variants:
 - **FlowNetS** ("simple"): Concatenate two frames along the channel dimension, pass through a CNN encoder-decoder. The network implicitly computes correspondences.
 - **FlowNetC** ("correlation"): Compute features separately for each image, then compute a **correlation volume** (the dot product of feature vectors at all spatial positions), which explicitly encodes matching costs.
 
-The correlation volume at position \((x, y)\) for displacement \((d_x, d_y)\) is:
+The correlation volume at position \\((x, y)\\) for displacement \\((d_x, d_y)\\) is:
 
 $$C(x, y, d_x, d_y) = \sum_c f_1^c(x, y) \cdot f_2^c(x + d_x, y + d_y)$$
 
-where \(f_1, f_2\) are feature maps and \(c\) indexes channels.
+where \\(f_1, f_2\\) are feature maps and \\(c\\) indexes channels.
 
 ### RAFT (2020)
 
 Recurrent All-Pairs Field Transforms. The state-of-the-art architecture before the transformer era. Key ideas:
 
-1. **All-pairs correlation volume.** Compute the full 4D correlation volume between all pairs of feature vectors (not just local displacements). This is \(H \times W \times H \times W\), which is expensive but comprehensive.
+1. **All-pairs correlation volume.** Compute the full 4D correlation volume between all pairs of feature vectors (not just local displacements). This is \\(H \times W \times H \times W\\), which is expensive but comprehensive.
 
 2. **Correlation pyramid.** Pool the correlation volume at multiple scales to capture both small and large displacements.
 
-3. **Iterative refinement.** Start with an initial flow estimate (e.g., zero). At each iteration, look up the correlation volume at the current flow-warped positions, concatenate with context features, and pass through a **GRU** (gated recurrent unit) to produce a flow update \(\Delta \mathbf{u}\).
+3. **Iterative refinement.** Start with an initial flow estimate (e.g., zero). At each iteration, look up the correlation volume at the current flow-warped positions, concatenate with context features, and pass through a **GRU** (gated recurrent unit) to produce a flow update \\(\Delta \mathbf{u}\\).
 
-4. **Repeat for \(K\) iterations** (typically 12--32), progressively refining the flow.
+4. **Repeat for \\(K\\) iterations** (typically 12--32), progressively refining the flow.
 
 This iterative approach is analogous to the iterative optimization in variational methods, but the update rule is learned rather than derived from an energy functional. RAFT achieves dramatically better accuracy than classical methods, especially at motion boundaries and in occluded regions.
 
@@ -400,15 +400,15 @@ Once you have an optical flow field, you can use it to **warp** one frame toward
 
 ### Backward Warping
 
-Given a flow field \(\mathbf{u} = (u, v)\) from frame \(I_0\) to frame \(I_1\), the **backward warp** produces a reconstructed frame:
+Given a flow field \\(\mathbf{u} = (u, v)\\) from frame \\(I_0\\) to frame \\(I_1\\), the **backward warp** produces a reconstructed frame:
 
 $$\hat{I}_1(x, y) = I_0(x + u(x,y), \, y + v(x,y))$$
 
-Since \((x + u, y + v)\) generally falls between pixel grid points, we use **bilinear interpolation**:
+Since \\((x + u, y + v)\\) generally falls between pixel grid points, we use **bilinear interpolation**:
 
 $$I_0(x', y') = (1-\alpha)(1-\beta) \, I_0(\lfloor x' \rfloor, \lfloor y' \rfloor) + \alpha(1-\beta) \, I_0(\lceil x' \rceil, \lfloor y' \rfloor) + (1-\alpha)\beta \, I_0(\lfloor x' \rfloor, \lceil y' \rceil) + \alpha \beta \, I_0(\lceil x' \rceil, \lceil y' \rceil)$$
 
-where \(\alpha = x' - \lfloor x' \rfloor\) and \(\beta = y' - \lfloor y' \rfloor\).
+where \\(\alpha = x' - \lfloor x' \rfloor\\) and \\(\beta = y' - \lfloor y' \rfloor\\).
 
 Backward warping is **differentiable** with respect to both the flow and the source image (via the spatial transformer network formulation of Jaderberg et al. 2015), which is why it can be used as a layer in trainable networks.
 
@@ -416,7 +416,7 @@ Backward warping is **differentiable** with respect to both the flow and the sou
 
 Warping breaks at **occlusions** --- regions visible in one frame but not the other. When an object moves, it reveals previously hidden background. No amount of warping can synthesize content that was never visible.
 
-Occlusion maps can be estimated from flow consistency: compute forward flow \(\mathbf{u}_{0 \to 1}\) and backward flow \(\mathbf{u}_{1 \to 0}\), and check if they are consistent:
+Occlusion maps can be estimated from flow consistency: compute forward flow \\(\mathbf{u}_{0 \to 1}\\) and backward flow \\(\mathbf{u}_{1 \to 0}\\), and check if they are consistent:
 
 $$\text{occluded}(x, y) = |\mathbf{u}_{0 \to 1}(x, y) + \mathbf{u}_{1 \to 0}(x + u, y + v)| > \tau$$
 
@@ -424,12 +424,12 @@ If the forward and backward flows don't cancel, the point is likely occluded.
 
 ### Frame Interpolation
 
-To interpolate a frame at time \(t \in (0, 1)\) between frames \(I_0\) (at \(t=0\)) and \(I_1\) (at \(t=1\)):
+To interpolate a frame at time \\(t \in (0, 1)\\) between frames \\(I_0\\) (at \\(t=0\\)) and \\(I_1\\) (at \\(t=1\\)):
 
-1. Estimate flows \(\mathbf{u}_{0 \to 1}\) and \(\mathbf{u}_{1 \to 0}\).
-2. Approximate intermediate flows: \(\mathbf{u}_{0 \to t} \approx t \cdot \mathbf{u}_{0 \to 1}\), \(\mathbf{u}_{1 \to t} \approx (1-t) \cdot \mathbf{u}_{1 \to 0}\).
-3. Warp both frames to time \(t\): \(\hat{I}_t^0 = \text{warp}(I_0, \mathbf{u}_{0 \to t})\), \(\hat{I}_t^1 = \text{warp}(I_1, \mathbf{u}_{1 \to t})\).
-4. Blend (with occlusion-aware weighting): \(\hat{I}_t = (1-t) \hat{I}_t^0 + t \hat{I}_t^1\).
+1. Estimate flows \\(\mathbf{u}_{0 \to 1}\\) and \\(\mathbf{u}_{1 \to 0}\\).
+2. Approximate intermediate flows: \\(\mathbf{u}_{0 \to t} \approx t \cdot \mathbf{u}_{0 \to 1}\\), \\(\mathbf{u}_{1 \to t} \approx (1-t) \cdot \mathbf{u}_{1 \to 0}\\).
+3. Warp both frames to time \\(t\\): \\(\hat{I}_t^0 = \text{warp}(I_0, \mathbf{u}_{0 \to t})\\), \\(\hat{I}_t^1 = \text{warp}(I_1, \mathbf{u}_{1 \to t})\\).
+4. Blend (with occlusion-aware weighting): \\(\hat{I}_t = (1-t) \hat{I}_t^0 + t \hat{I}_t^1\\).
 
 This is the basis of methods like FILM and RIFE for video frame interpolation.
 
@@ -439,7 +439,7 @@ This is the basis of methods like FILM and RIFE for video frame interpolation.
 
 Modern video generation models (Stable Video Diffusion, Sora, Kling, Runway Gen-3) do not explicitly compute optical flow. They operate in latent space and generate all frames jointly. But the concept of optical flow is deeply embedded in how these models work:
 
-**Implicit motion learning.** The temporal attention layers in video DiT models learn to correlate features across frames. The attention weights implicitly encode correspondences --- which token in frame \(t\) corresponds to which token in frame \(t+1\). This is a soft, learned version of optical flow operating in feature space.
+**Implicit motion learning.** The temporal attention layers in video DiT models learn to correlate features across frames. The attention weights implicitly encode correspondences --- which token in frame \\(t\\) corresponds to which token in frame \\(t+1\\). This is a soft, learned version of optical flow operating in feature space.
 
 **Flow-conditioned generation.** Some architectures accept explicit flow maps as conditioning. You provide the model with a desired motion field, and it generates video that follows that motion. This allows user control over camera movement and object trajectories.
 
@@ -449,7 +449,7 @@ Modern video generation models (Stable Video Diffusion, Sora, Kling, Runway Gen-
 
 $$\mathcal{L}_{\text{temporal}} = \sum_t \| I_{t+1} - \text{warp}(I_t, \mathbf{u}_{t \to t+1}) \|_1 \cdot (1 - O_t)$$
 
-where \(O_t\) is an occlusion mask. This loss penalizes temporal inconsistency in non-occluded regions.
+where \\(O_t\\) is an occlusion mask. This loss penalizes temporal inconsistency in non-occluded regions.
 
 **Flow in latent space.** An intriguing recent direction: estimate optical flow not in pixel space but in the latent space of the video autoencoder. Since the latent space is 8× downsampled spatially and may be downsampled temporally, "latent flow" captures motion at a semantic level rather than pixel level.
 

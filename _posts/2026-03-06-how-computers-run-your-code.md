@@ -9,7 +9,7 @@ category: infra
 
 *This is Part 5 of the series on taking vibe-coded AI projects to production. Parts 1--4 covered [performance engineering](/2026/03/02/vibe-code-to-production-performance-engineering.html), [containerization](/2026/03/03/containerizing-deploying-ai-video-platform.html), [load testing](/2026/03/04/load-testing-breaking-video-pipeline.html), and [observability](/2026/03/05/observability-failure-modes-production-ai.html). This begins a new Foundations sub-series --- the systems knowledge behind those practices.*
 
-You have an image processing step in your AI video pipeline. Each generated frame is a 1920×1080 array of pixels. You need to normalize every pixel value, so you write a simple nested loop. The algorithm is \(O(n)\) where \(n\) is the number of pixels --- about 2 million per frame. Straightforward.
+You have an image processing step in your AI video pipeline. Each generated frame is a 1920×1080 array of pixels. You need to normalize every pixel value, so you write a simple nested loop. The algorithm is \\(O(n)\\) where \\(n\\) is the number of pixels --- about 2 million per frame. Straightforward.
 
 Then you notice something strange. When you iterate row-by-row, the loop takes 1.2 seconds. When you iterate column-by-column --- same pixels, same operation, same number of iterations --- it takes 12 seconds. Ten times slower. Your algorithm has not changed. Your Big-O complexity has not changed. The number of operations is identical to the last addition.
 
@@ -131,7 +131,7 @@ $$\text{Cache misses} \approx 10{,}000{,}000$$
 
 $$\text{Time from cache misses} = 10{,}000{,}000 \times 100\text{ ns} = 1{,}000\text{ ms}$$
 
-Same data. Same operation. Same Big-O complexity: \(O(n)\). But the random access version is **8x slower**, entirely because of cache misses.
+Same data. Same operation. Same Big-O complexity: \\(O(n)\\). But the random access version is **8x slower**, entirely because of cache misses.
 
 <svg viewBox="0 0 860 350" xmlns="http://www.w3.org/2000/svg" style="max-width:100%;height:auto;background:#fff;font-family:Arial,Helvetica,sans-serif">
   <text x="430" y="25" text-anchor="middle" font-size="16" font-weight="bold" fill="#333">Cache Line Loading: Sequential vs Random Access</text>
@@ -305,7 +305,7 @@ For an array of `float64` (8 bytes each) with 64-byte cache lines (8 elements pe
 
 $$\text{Miss rate} = \frac{1}{64 / 8} = \frac{1}{8} = 12.5\%$$
 
-**Stride-N access** (column-major iteration on an N-column matrix): if \(N \geq 8\), every access is a miss.
+**Stride-N access** (column-major iteration on an N-column matrix): if \\(N \geq 8\\), every access is a miss.
 
 $$\text{Miss rate} = \frac{1}{\min(1, \lfloor 64 / (8 \times N) \rfloor + 1)} \approx 100\% \text{ for } N \geq 8$$
 
@@ -313,7 +313,7 @@ $$\text{Miss rate} = \frac{1}{\min(1, \lfloor 64 / (8 \times N) \rfloor + 1)} \a
 
 $$\text{Miss rate} = \min\left(1,\ \frac{K \times \text{element\_size}}{64}\right)$$
 
-This is the formula that Big-O cannot capture. Two \(O(n)\) algorithms with different strides can have radically different performance because one produces 12.5% cache misses and the other produces 100%.
+This is the formula that Big-O cannot capture. Two \\(O(n)\\) algorithms with different strides can have radically different performance because one produces 12.5% cache misses and the other produces 100%.
 
 ---
 
@@ -394,13 +394,13 @@ This is also why ML frameworks prefer to process data in sorted batches of simil
 
 ## 5. Why HashMap Is O(1) But Slow
 
-Every data structures course teaches that hash tables provide \(O(1)\) average-case lookup. This is true in the asymptotic sense. But when you compare the actual wall-clock time of a hash table lookup to a linear scan of a small sorted array, the linear scan often wins --- sometimes dramatically.
+Every data structures course teaches that hash tables provide \\(O(1)\\) average-case lookup. This is true in the asymptotic sense. But when you compare the actual wall-clock time of a hash table lookup to a linear scan of a small sorted array, the linear scan often wins --- sometimes dramatically.
 
 ### What O(1) Actually Means
 
-Big-O notation describes how the number of operations scales with input size. \(O(1)\) means the number of operations does not grow as the data structure gets larger. For a hash table, this is true: you compute a hash (one operation), find a bucket (one operation), and retrieve the value (one or a few operations for collision resolution). The count of operations is constant regardless of whether the table has 10 entries or 10 million.
+Big-O notation describes how the number of operations scales with input size. \\(O(1)\\) means the number of operations does not grow as the data structure gets larger. For a hash table, this is true: you compute a hash (one operation), find a bucket (one operation), and retrieve the value (one or a few operations for collision resolution). The count of operations is constant regardless of whether the table has 10 entries or 10 million.
 
-But \(O(1)\) says nothing about **how long each operation takes**. And each of those constant-number operations involves a memory access that may or may not hit the cache.
+But \\(O(1)\\) says nothing about **how long each operation takes**. And each of those constant-number operations involves a memory access that may or may not hit the cache.
 
 ### The Memory Access Pattern Problem
 
@@ -434,8 +434,8 @@ The crossover point --- where hash tables become faster than sorted arrays with 
 | Data Size | Winner | Why |
 |-----------|--------|-----|
 | < 16 elements | Linear scan | Everything fits in 1--2 cache lines |
-| 16--64 elements | Binary search on sorted array | \(O(\log n)\) with sequential-ish access |
-| > 64 elements | Hash table | \(O(1)\) amortizes the cache miss cost |
+| 16--64 elements | Binary search on sorted array | \\(O(\log n)\\) with sequential-ish access |
+| > 64 elements | Hash table | \\(O(1)\\) amortizes the cache miss cost |
 
 This is why many high-performance systems use flat, sorted arrays for small lookup tables instead of hash maps. The asymptotic complexity does not matter at small scale --- cache behavior does.
 
@@ -674,6 +674,6 @@ Parts 1--4 tell you **what to do** in production. Parts 5--7 explain **why it wo
 
 The column-major loop from the opening was not wrong. It computed the correct answer. It had the correct Big-O complexity. It would pass every unit test. But it was fighting the hardware, and the hardware won by a factor of 7.
 
-Production performance is not just about algorithms. It is about understanding the machine your code runs on --- the cache hierarchy, the memory layout, the branch predictor, the gap between \(O(1)\) in theory and 100 nanoseconds in practice. The most impactful performance optimizations are often not algorithmic improvements. They are access pattern improvements: iterating in the right order, keeping data contiguous, respecting the cache.
+Production performance is not just about algorithms. It is about understanding the machine your code runs on --- the cache hierarchy, the memory layout, the branch predictor, the gap between \\(O(1)\\) in theory and 100 nanoseconds in practice. The most impactful performance optimizations are often not algorithmic improvements. They are access pattern improvements: iterating in the right order, keeping data contiguous, respecting the cache.
 
 Big-O tells you how algorithms scale. The memory hierarchy tells you how fast they actually run. You need both.

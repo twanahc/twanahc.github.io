@@ -1128,7 +1128,7 @@ app.post('/api/upload-reference', async (req, res) => {
 
 `sharp` is actually one of the better libraries because it offloads to native code via libvips. But many image processing operations still consume significant CPU time. During those ~180ms of CPU-bound work, the event loop is **completely blocked**. No other request can be processed. No WebSocket messages can be sent. No health check can be responded to.
 
-At 50 concurrent uploads, you have 50 requests each needing ~180ms of CPU time. With one thread, they execute sequentially. The 50th request waits \(50 \times 180\text{ms} = 9\text{ seconds}\) before it even starts processing.
+At 50 concurrent uploads, you have 50 requests each needing ~180ms of CPU time. With one thread, they execute sequentially. The 50th request waits \\(50 \times 180\text{ms} = 9\text{ seconds}\\) before it even starts processing.
 
 Here is what this looks like to your users:
 

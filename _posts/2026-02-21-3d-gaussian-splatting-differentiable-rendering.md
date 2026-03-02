@@ -38,9 +38,9 @@ To render a 3D scene from a novel camera viewpoint, you need a 3D representation
 
 **Triangle meshes.** Explicit surfaces defined by vertices, edges, and faces. Fast to render (hardware-accelerated rasterization), but hard to optimize --- moving vertices requires careful handling of topology, and gradients through rasterization are discontinuous.
 
-**Voxel grids.** Divide 3D space into a regular grid, store density and color per voxel. Simple and differentiable, but memory scales as \(O(N^3)\) --- a \(512^3\) grid requires 134 million voxels, most of which are empty.
+**Voxel grids.** Divide 3D space into a regular grid, store density and color per voxel. Simple and differentiable, but memory scales as \\(O(N^3)\\) --- a \\(512^3\\) grid requires 134 million voxels, most of which are empty.
 
-**Implicit functions (NeRF).** Represent the scene as a neural network \(F_\theta(x, y, z, \theta, \phi) \to (\sigma, \mathbf{c})\) mapping 3D coordinates and viewing direction to density and color. Compact and flexible, but rendering requires marching rays through the volume with hundreds of network evaluations per ray. Slow.
+**Implicit functions (NeRF).** Represent the scene as a neural network \\(F_\theta(x, y, z, \theta, \phi) \to (\sigma, \mathbf{c})\\) mapping 3D coordinates and viewing direction to density and color. Compact and flexible, but rendering requires marching rays through the volume with hundreds of network evaluations per ray. Slow.
 
 **Point clouds / Gaussian splats.** Represent the scene as a collection of points, each carrying attributes. Memory is proportional to the scene complexity, not the volume. Rendering is done by **splatting** (projecting points onto the image plane), which is fast and parallelizable.
 
@@ -50,27 +50,27 @@ To render a 3D scene from a novel camera viewpoint, you need a 3D representation
 
 ## 3D Gaussian Primitives
 
-Each Gaussian primitive \(i\) in the scene is parameterized by:
+Each Gaussian primitive \\(i\\) in the scene is parameterized by:
 
-**Position** \(\boldsymbol{\mu}_i \in \mathbb{R}^3\): the center of the Gaussian in world coordinates.
+**Position** \\(\boldsymbol{\mu}_i \in \mathbb{R}^3\\): the center of the Gaussian in world coordinates.
 
-**Covariance** \(\Sigma_i \in \mathbb{R}^{3 \times 3}\): a symmetric positive-definite matrix defining the shape and orientation of the Gaussian. The Gaussian's density in 3D is:
+**Covariance** \\(\Sigma_i \in \mathbb{R}^{3 \times 3}\\): a symmetric positive-definite matrix defining the shape and orientation of the Gaussian. The Gaussian's density in 3D is:
 
 $$G(\mathbf{x}) = \exp\!\left(-\frac{1}{2}(\mathbf{x} - \boldsymbol{\mu})^T \Sigma^{-1} (\mathbf{x} - \boldsymbol{\mu})\right)$$
 
-The covariance matrix \(\Sigma\) encodes an **ellipsoid**. Its eigendecomposition \(\Sigma = R \Lambda R^T\) reveals:
-- The eigenvectors (columns of \(R\)) give the **orientation** of the ellipsoid's principal axes
-- The eigenvalues \(\lambda_1, \lambda_2, \lambda_3\) in \(\Lambda\) give the **squared semi-axis lengths** (variances along each axis)
+The covariance matrix \\(\Sigma\\) encodes an **ellipsoid**. Its eigendecomposition \\(\Sigma = R \Lambda R^T\\) reveals:
+- The eigenvectors (columns of \\(R\\)) give the **orientation** of the ellipsoid's principal axes
+- The eigenvalues \\(\lambda_1, \lambda_2, \lambda_3\\) in \\(\Lambda\\) give the **squared semi-axis lengths** (variances along each axis)
 
-To ensure \(\Sigma\) stays positive definite during gradient-based optimization, it is parameterized as:
+To ensure \\(\Sigma\\) stays positive definite during gradient-based optimization, it is parameterized as:
 
 $$\Sigma = R S S^T R^T$$
 
-where \(R\) is a rotation matrix (stored as a unit quaternion \(\mathbf{q} \in \mathbb{R}^4\)) and \(S = \text{diag}(s_1, s_2, s_3)\) is a diagonal scaling matrix with \(s_i > 0\). This guarantees positive definiteness by construction.
+where \\(R\\) is a rotation matrix (stored as a unit quaternion \\(\mathbf{q} \in \mathbb{R}^4\\)) and \\(S = \text{diag}(s_1, s_2, s_3)\\) is a diagonal scaling matrix with \\(s_i > 0\\). This guarantees positive definiteness by construction.
 
-**Opacity** \(\alpha_i \in (0, 1)\): how opaque the Gaussian is at its center. Parameterized via a sigmoid to keep it in range.
+**Opacity** \\(\alpha_i \in (0, 1)\\): how opaque the Gaussian is at its center. Parameterized via a sigmoid to keep it in range.
 
-**Color** \(\mathbf{c}_i\): represented via spherical harmonic coefficients (explained below) to capture view-dependent appearance.
+**Color** \\(\mathbf{c}_i\\): represented via spherical harmonic coefficients (explained below) to capture view-dependent appearance.
 
 <svg viewBox="0 0 700 280" xmlns="http://www.w3.org/2000/svg" style="max-width: 700px; display: block; margin: 2em auto;">
   <text x="350" y="25" text-anchor="middle" font-size="14" font-weight="bold" fill="#d4d4d4">3D Gaussian Primitive: Parameterization</text>
@@ -113,7 +113,7 @@ To render, we need to project each 3D Gaussian onto the 2D image plane. The key 
 
 ### The Projection Pipeline
 
-Let \(\boldsymbol{\mu}\) be the Gaussian's center in world coordinates and \(\Sigma\) its 3D covariance. The camera has a view matrix \(W\) (world-to-camera transform) and projection matrix \(P\).
+Let \\(\boldsymbol{\mu}\\) be the Gaussian's center in world coordinates and \\(\Sigma\\) its 3D covariance. The camera has a view matrix \\(W\\) (world-to-camera transform) and projection matrix \\(P\\).
 
 **Step 1: Transform to camera space.** The Gaussian center in camera coordinates is:
 
@@ -125,25 +125,25 @@ $$\Sigma' = W \Sigma W^T$$
 
 (covariance matrices transform by conjugation, not by simple multiplication, because they are quadratic forms).
 
-**Step 2: Project to image plane.** Perspective projection is nonlinear: \((x, y, z) \mapsto (fx/z, fy/z)\) where \(f\) is the focal length. A Gaussian passed through a nonlinear function is not exactly Gaussian, but we can approximate by linearizing.
+**Step 2: Project to image plane.** Perspective projection is nonlinear: \\((x, y, z) \mapsto (fx/z, fy/z)\\) where \\(f\\) is the focal length. A Gaussian passed through a nonlinear function is not exactly Gaussian, but we can approximate by linearizing.
 
-The Jacobian of the perspective projection at the Gaussian center \(\boldsymbol{\mu}' = (\mu_x', \mu_y', \mu_z')\) is:
+The Jacobian of the perspective projection at the Gaussian center \\(\boldsymbol{\mu}' = (\mu_x', \mu_y', \mu_z')\\) is:
 
 $$J = \begin{pmatrix} f / \mu_z' & 0 & -f \mu_x' / (\mu_z')^2 \\ 0 & f / \mu_z' & -f \mu_y' / (\mu_z')^2 \end{pmatrix}$$
 
-This is a \(2 \times 3\) matrix (projecting from 3D to 2D).
+This is a \\(2 \times 3\\) matrix (projecting from 3D to 2D).
 
 **Step 3: Compute the 2D covariance.** Using the first-order approximation (local affine), the projected 2D covariance is:
 
 $$\Sigma_{2D} = J \Sigma' J^T = J W \Sigma W^T J^T$$
 
-This \(2 \times 2\) symmetric positive-definite matrix defines an ellipse on the image plane --- the "footprint" of the projected Gaussian. Its eigenvalues give the semi-axis lengths of the ellipse, and its eigenvectors give the orientation.
+This \\(2 \times 2\\) symmetric positive-definite matrix defines an ellipse on the image plane --- the "footprint" of the projected Gaussian. Its eigenvalues give the semi-axis lengths of the ellipse, and its eigenvectors give the orientation.
 
-The projected 2D Gaussian at pixel position \(\mathbf{p}\) is:
+The projected 2D Gaussian at pixel position \\(\mathbf{p}\\) is:
 
 $$G_{2D}(\mathbf{p}) = \exp\!\left(-\frac{1}{2}(\mathbf{p} - \boldsymbol{\mu}_{2D})^T \Sigma_{2D}^{-1} (\mathbf{p} - \boldsymbol{\mu}_{2D})\right)$$
 
-where \(\boldsymbol{\mu}_{2D}\) is the projected center.
+where \\(\boldsymbol{\mu}_{2D}\\) is the projected center.
 
 <svg viewBox="0 0 700 300" xmlns="http://www.w3.org/2000/svg" style="max-width: 700px; display: block; margin: 2em auto;">
   <defs>
@@ -188,9 +188,9 @@ The volume rendering equation for a ray passing through a participating medium i
 
 $$C = \int_0^\infty T(t) \, \sigma(t) \, \mathbf{c}(t) \, dt$$
 
-where \(T(t) = \exp\!\left(-\int_0^t \sigma(s) \, ds\right)\) is the **transmittance** (probability of the ray reaching distance \(t\) without being absorbed) and \(\sigma(t)\) is the density at distance \(t\).
+where \\(T(t) = \exp\!\left(-\int_0^t \sigma(s) \, ds\right)\\) is the **transmittance** (probability of the ray reaching distance \\(t\\) without being absorbed) and \\(\sigma(t)\\) is the density at distance \\(t\\).
 
-For a discrete set of \(N\) Gaussians sorted by depth (front-to-back), this integral discretizes to:
+For a discrete set of \\(N\\) Gaussians sorted by depth (front-to-back), this integral discretizes to:
 
 $$C = \sum_{i=1}^{N} T_i \, \alpha_i \, \mathbf{c}_i$$
 
@@ -198,17 +198,17 @@ where:
 
 $$\alpha_i = o_i \cdot G_{2D}^{(i)}(\mathbf{p})$$
 
-is the effective opacity of Gaussian \(i\) at pixel \(\mathbf{p}\) (base opacity \(o_i\) times the Gaussian's value at that pixel), and the transmittance is:
+is the effective opacity of Gaussian \\(i\\) at pixel \\(\mathbf{p}\\) (base opacity \\(o_i\\) times the Gaussian's value at that pixel), and the transmittance is:
 
 $$T_i = \prod_{j=1}^{i-1} (1 - \alpha_j)$$
 
 This is the standard **over** operator from computer graphics: each Gaussian contributes its color weighted by its opacity, attenuated by all the Gaussians in front of it.
 
-The transmittance \(T_i\) decreases monotonically as we accumulate Gaussians, and once it drops below a threshold (e.g., \(T_i < 0.001\)), we can stop --- the remaining Gaussians contribute negligibly. This early termination is crucial for performance.
+The transmittance \\(T_i\\) decreases monotonically as we accumulate Gaussians, and once it drops below a threshold (e.g., \\(T_i < 0.001\\)), we can stop --- the remaining Gaussians contribute negligibly. This early termination is crucial for performance.
 
 ### Why Sorting Matters
 
-The formula above requires processing Gaussians in depth order. 3D Gaussian Splatting uses **tile-based rendering**: divide the image into \(16 \times 16\) pixel tiles, assign each Gaussian to the tiles it overlaps, sort Gaussians per tile by depth, then composite within each tile in parallel. This is extremely GPU-friendly.
+The formula above requires processing Gaussians in depth order. 3D Gaussian Splatting uses **tile-based rendering**: divide the image into \\(16 \times 16\\) pixel tiles, assign each Gaussian to the tiles it overlaps, sort Gaussians per tile by depth, then composite within each tile in parallel. This is extremely GPU-friendly.
 
 ---
 
@@ -218,7 +218,7 @@ Real-world surfaces exhibit view-dependent appearance: specular highlights, refl
 
 ### What Are Spherical Harmonics?
 
-Spherical harmonics \(Y_l^m(\theta, \phi)\) are an orthonormal basis for functions on the sphere, analogous to Fourier series for functions on a circle. They are indexed by **degree** \(l \geq 0\) and **order** \(-l \leq m \leq l\).
+Spherical harmonics \\(Y_l^m(\theta, \phi)\\) are an orthonormal basis for functions on the sphere, analogous to Fourier series for functions on a circle. They are indexed by **degree** \\(l \geq 0\\) and **order** \\(-l \leq m \leq l\\).
 
 The first few (real) spherical harmonics:
 
@@ -228,18 +228,18 @@ $$Y_0^0 = \frac{1}{2\sqrt{\pi}}$$
 **Band 1** (linear, 3 functions):
 $$Y_1^{-1} = \sqrt{\frac{3}{4\pi}} y, \quad Y_1^0 = \sqrt{\frac{3}{4\pi}} z, \quad Y_1^1 = \sqrt{\frac{3}{4\pi}} x$$
 
-where \((x, y, z)\) is the unit viewing direction vector.
+where \\((x, y, z)\\) is the unit viewing direction vector.
 
 **Band 2** (quadratic, 5 functions):
 $$Y_2^{-2} = \sqrt{\frac{15}{4\pi}} xy, \quad Y_2^{-1} = \sqrt{\frac{15}{4\pi}} yz, \quad Y_2^0 = \sqrt{\frac{5}{16\pi}}(3z^2 - 1), \quad \ldots$$
 
-Each degree \(l\) has \(2l + 1\) basis functions. Through degree \(l_{\max}\), there are \((l_{\max} + 1)^2\) total coefficients. 3D Gaussian Splatting typically uses degree 3, giving \(16\) coefficients per color channel, or \(48\) total for RGB.
+Each degree \\(l\\) has \\(2l + 1\\) basis functions. Through degree \\(l_{\max}\\), there are \\((l_{\max} + 1)^2\\) total coefficients. 3D Gaussian Splatting typically uses degree 3, giving \\(16\\) coefficients per color channel, or \\(48\\) total for RGB.
 
-The color for a given viewing direction \(\mathbf{d}\) is:
+The color for a given viewing direction \\(\mathbf{d}\\) is:
 
 $$\mathbf{c}(\mathbf{d}) = \sum_{l=0}^{l_{\max}} \sum_{m=-l}^{l} \mathbf{k}_l^m \, Y_l^m(\mathbf{d})$$
 
-where \(\mathbf{k}_l^m \in \mathbb{R}^3\) are the per-Gaussian, per-channel SH coefficients.
+where \\(\mathbf{k}_l^m \in \mathbb{R}^3\\) are the per-Gaussian, per-channel SH coefficients.
 
 Band 0 captures the average color (diffuse). Band 1 adds directional shading. Bands 2+ add specular-like effects. This provides a compact, differentiable representation of view-dependent appearance.
 
@@ -249,20 +249,20 @@ Band 0 captures the average color (diffuse). Band 1 adds directional shading. Ba
 
 Putting it all together, here is the complete pipeline for rendering a single image:
 
-1. **For each Gaussian:** Transform center to camera coordinates, compute 2D projected covariance \(\Sigma_{2D} = J W \Sigma W^T J^T\), compute 2D center \(\boldsymbol{\mu}_{2D}\).
+1. **For each Gaussian:** Transform center to camera coordinates, compute 2D projected covariance \\(\Sigma_{2D} = J W \Sigma W^T J^T\\), compute 2D center \\(\boldsymbol{\mu}_{2D}\\).
 
-2. **Tile assignment:** Determine which \(16 \times 16\) pixel tiles each projected Gaussian overlaps (using the 2D ellipse's bounding box).
+2. **Tile assignment:** Determine which \\(16 \times 16\\) pixel tiles each projected Gaussian overlaps (using the 2D ellipse's bounding box).
 
-3. **Sort by depth:** Within each tile, sort assigned Gaussians by their camera-space depth \(\mu_z'\).
+3. **Sort by depth:** Within each tile, sort assigned Gaussians by their camera-space depth \\(\mu_z'\\).
 
-4. **Composite per pixel:** For each pixel \(\mathbf{p}\) in a tile, iterate through sorted Gaussians front-to-back:
-   - Evaluate the 2D Gaussian: \(G_{2D}^{(i)}(\mathbf{p})\)
-   - Compute effective opacity: \(\alpha_i = o_i \cdot G_{2D}^{(i)}(\mathbf{p})\)
-   - Evaluate view-dependent color: \(\mathbf{c}_i = \text{SH}(\mathbf{d}_i)\)
-   - Accumulate: \(C \mathrel{+}= T \cdot \alpha_i \cdot \mathbf{c}_i\), then \(T \mathrel{*}= (1 - \alpha_i)\)
-   - Early termination: stop if \(T < \epsilon\)
+4. **Composite per pixel:** For each pixel \\(\mathbf{p}\\) in a tile, iterate through sorted Gaussians front-to-back:
+   - Evaluate the 2D Gaussian: \\(G_{2D}^{(i)}(\mathbf{p})\\)
+   - Compute effective opacity: \\(\alpha_i = o_i \cdot G_{2D}^{(i)}(\mathbf{p})\\)
+   - Evaluate view-dependent color: \\(\mathbf{c}_i = \text{SH}(\mathbf{d}_i)\\)
+   - Accumulate: \\(C \mathrel{+}= T \cdot \alpha_i \cdot \mathbf{c}_i\\), then \\(T \mathrel{*}= (1 - \alpha_i)\\)
+   - Early termination: stop if \\(T < \epsilon\\)
 
-5. **Output pixel color** \(C\).
+5. **Output pixel color** \\(C\\).
 
 This entire pipeline runs on GPU. The tile-based approach avoids global sorting (only local per-tile sorting) and enables massive parallelism.
 
@@ -307,7 +307,7 @@ This entire pipeline runs on GPU. The tile-based approach avoids global sorting 
 
 ## Differentiable Rendering and Optimization
 
-The key innovation is that the entire rendering pipeline is **differentiable**. Given a rendered image \(\hat{I}\) and a ground-truth photograph \(I^*\), we can compute a loss \(\mathcal{L}(\hat{I}, I^*)\) and backpropagate gradients all the way to the Gaussian parameters.
+The key innovation is that the entire rendering pipeline is **differentiable**. Given a rendered image \\(\hat{I}\\) and a ground-truth photograph \\(I^*\\), we can compute a loss \\(\mathcal{L}(\hat{I}, I^*)\\) and backpropagate gradients all the way to the Gaussian parameters.
 
 ### Gradient Flow
 
@@ -317,18 +317,18 @@ $$\frac{\partial \mathcal{L}}{\partial \boldsymbol{\mu}} = \frac{\partial \mathc
 
 Each factor is computed in closed form:
 
-- \(\partial C / \partial \alpha_i\): from the alpha compositing formula
-- \(\partial \alpha_i / \partial G_{2D}\): simply \(o_i\) (the base opacity)
-- \(\partial G_{2D} / \partial \boldsymbol{\mu}_{2D}\): gradient of a Gaussian (which is the Gaussian times the Mahalanobis direction)
-- \(\partial \boldsymbol{\mu}_{2D} / \partial \boldsymbol{\mu}\): the Jacobian of projection
+- \\(\partial C / \partial \alpha_i\\): from the alpha compositing formula
+- \\(\partial \alpha_i / \partial G_{2D}\\): simply \\(o_i\\) (the base opacity)
+- \\(\partial G_{2D} / \partial \boldsymbol{\mu}_{2D}\\): gradient of a Gaussian (which is the Gaussian times the Mahalanobis direction)
+- \\(\partial \boldsymbol{\mu}_{2D} / \partial \boldsymbol{\mu}\\): the Jacobian of projection
 
-Similarly, gradients flow to the covariance parameters (via \(\Sigma_{2D}\)), the opacity, and the SH coefficients.
+Similarly, gradients flow to the covariance parameters (via \\(\Sigma_{2D}\\)), the opacity, and the SH coefficients.
 
-The gradient through alpha compositing is particularly elegant. For the accumulated color at pixel \(\mathbf{p}\):
+The gradient through alpha compositing is particularly elegant. For the accumulated color at pixel \\(\mathbf{p}\\):
 
 $$\frac{\partial C}{\partial \alpha_i} = T_i \left(\mathbf{c}_i - \frac{1}{1 - \alpha_i} \sum_{j=i+1}^{N} T_j \alpha_j \mathbf{c}_j \right)$$
 
-The term in parentheses compares Gaussian \(i\)'s color to the weighted average of everything behind it. If Gaussian \(i\) has the "wrong" color, the gradient pushes its opacity down.
+The term in parentheses compares Gaussian \\(i\\)'s color to the weighted average of everything behind it. If Gaussian \\(i\\) has the "wrong" color, the gradient pushes its opacity down.
 
 ---
 
@@ -336,12 +336,12 @@ The term in parentheses compares Gaussian \(i\)'s color to the weighted average 
 
 Starting from an initial set of Gaussians (typically from Structure-from-Motion point clouds), the scene needs more Gaussians in detailed regions and fewer in empty space. 3D Gaussian Splatting uses **adaptive density control** during training:
 
-**Densification.** Every \(N\) iterations (e.g., 100), check each Gaussian's accumulated position gradient magnitude \(\|\partial \mathcal{L} / \partial \boldsymbol{\mu}_{2D}\|\). Large gradients indicate the Gaussian is trying to move a lot --- it is either too big (covering a region with fine detail) or in the wrong place.
+**Densification.** Every \\(N\\) iterations (e.g., 100), check each Gaussian's accumulated position gradient magnitude \\(\|\partial \mathcal{L} / \partial \boldsymbol{\mu}_{2D}\|\\). Large gradients indicate the Gaussian is trying to move a lot --- it is either too big (covering a region with fine detail) or in the wrong place.
 
 - If the Gaussian is **large** (its scale exceeds a threshold) and has large gradients: **split** it into two smaller Gaussians, each with half the scale.
 - If the Gaussian is **small** and has large gradients: **clone** it, creating a copy shifted in the gradient direction. This fills in under-represented regions.
 
-**Pruning.** Remove Gaussians with very low opacity (\(\alpha < \epsilon_\alpha\)). Also periodically reset opacities to a low value and let the optimization decide which Gaussians are truly needed.
+**Pruning.** Remove Gaussians with very low opacity (\\(\alpha < \epsilon_\alpha\\)). Also periodically reset opacities to a low value and let the optimization decide which Gaussians are truly needed.
 
 <svg viewBox="0 0 700 200" xmlns="http://www.w3.org/2000/svg" style="max-width: 700px; display: block; margin: 2em auto;">
   <text x="350" y="20" text-anchor="middle" font-size="13" font-weight="bold" fill="#d4d4d4">Adaptive Density Control</text>
@@ -380,7 +380,7 @@ The training loss combines an L1 photometric loss with a structural similarity t
 
 $$\mathcal{L} = (1 - \lambda) \|\hat{I} - I^*\|_1 + \lambda \cdot \mathcal{L}_{\text{D-SSIM}}(\hat{I}, I^*)$$
 
-where \(\lambda = 0.2\) typically. D-SSIM captures structural similarity at a perceptual level, preventing the optimizer from ignoring low-contrast regions.
+where \\(\lambda = 0.2\\) typically. D-SSIM captures structural similarity at a perceptual level, preventing the optimizer from ignoring low-contrast regions.
 
 ### Initialization
 
@@ -400,7 +400,7 @@ Static 3D Gaussian Splatting captures a frozen moment. For video, we need Gaussi
 
 ### Deformation Fields
 
-**4D Gaussian Splatting (Wu et al., 2023):** Add a neural deformation network \(D_\theta(t, \boldsymbol{\mu}_i) \to (\Delta \boldsymbol{\mu}, \Delta \mathbf{q}, \Delta \mathbf{s})\) that predicts per-Gaussian, per-timestep offsets to position, rotation, and scale. The canonical Gaussians live in a reference frame, and the deformation field warps them to each timestep.
+**4D Gaussian Splatting (Wu et al., 2023):** Add a neural deformation network \\(D_\theta(t, \boldsymbol{\mu}_i) \to (\Delta \boldsymbol{\mu}, \Delta \mathbf{q}, \Delta \mathbf{s})\\) that predicts per-Gaussian, per-timestep offsets to position, rotation, and scale. The canonical Gaussians live in a reference frame, and the deformation field warps them to each timestep.
 
 $$\boldsymbol{\mu}_i(t) = \boldsymbol{\mu}_i^{\text{canonical}} + \Delta \boldsymbol{\mu}_i(t)$$
 
@@ -412,7 +412,7 @@ An alternative: simply optimize independent Gaussians per timestep, with a tempo
 
 ### Gaussian Flows
 
-Attach a velocity field to each Gaussian: \(\mathbf{v}_i \in \mathbb{R}^3\). Between frames, Gaussians move according to \(\boldsymbol{\mu}_i(t + \Delta t) = \boldsymbol{\mu}_i(t) + \mathbf{v}_i \Delta t\). This enforces physically plausible motion and enables frame interpolation by evaluating at intermediate times.
+Attach a velocity field to each Gaussian: \\(\mathbf{v}_i \in \mathbb{R}^3\\). Between frames, Gaussians move according to \\(\boldsymbol{\mu}_i(t + \Delta t) = \boldsymbol{\mu}_i(t) + \mathbf{v}_i \Delta t\\). This enforces physically plausible motion and enables frame interpolation by evaluating at intermediate times.
 
 ---
 

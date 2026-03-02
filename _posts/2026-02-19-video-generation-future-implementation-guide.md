@@ -274,18 +274,18 @@ If we model this as exponential decay:
 
 $$C(t) = C_0 \cdot e^{-\lambda t}$$
 
-where \(C_0 \approx 1.0\) $/sec (Q1 2024 baseline), \(t\) is time in years from Q1 2024, and we fit to our three data points:
+where \\(C_0 \approx 1.0\\) $/sec (Q1 2024 baseline), \\(t\\) is time in years from Q1 2024, and we fit to our three data points:
 
-- \(C(0) = 1.00\): gives \(C_0 = 1.00\)
-- \(C(1) = 0.20\): gives \(\lambda = -\ln(0.20) \approx 1.61\)
-- \(C(2) = 0.04\): gives \(\lambda = -\ln(0.04)/2 \approx 1.61\)
+- \\(C(0) = 1.00\\): gives \\(C_0 = 1.00\\)
+- \\(C(1) = 0.20\\): gives \\(\lambda = -\ln(0.20) \approx 1.61\\)
+- \\(C(2) = 0.04\\): gives \\(\lambda = -\ln(0.04)/2 \approx 1.61\\)
 
-The consistency of \(\lambda \approx 1.6\) across both intervals is striking --- the cost decline rate has been remarkably steady. This corresponds to an approximately 80% year-over-year cost reduction.
+The consistency of \\(\lambda \approx 1.6\\) across both intervals is striking --- the cost decline rate has been remarkably steady. This corresponds to an approximately 80% year-over-year cost reduction.
 
 Projecting forward:
 
-- Q1 2027: \(C(3) \approx 1.00 \cdot e^{-4.83} \approx 0.008\) $/sec
-- Q1 2028: \(C(4) \approx 1.00 \cdot e^{-6.44} \approx 0.0016\) $/sec
+- Q1 2027: \\(C(3) \approx 1.00 \cdot e^{-4.83} \approx 0.008\\) $/sec
+- Q1 2028: \\(C(4) \approx 1.00 \cdot e^{-6.44} \approx 0.0016\\) $/sec
 
 At $0.008/sec, a 60-second 1080p video costs $0.48. We cross the "1 minute of HD video for less than $1" threshold by early 2027 on API-based models, and we are already there today for self-hosted open-source models.
 
@@ -377,11 +377,11 @@ These are approximate figures with standard inference optimizations (FP16/BF16, 
 
 ### The Break-Even Calculation
 
-Let us define break-even precisely. Suppose you generate \(V\) seconds of video per month using the Wan 2.6 model. The API cost (via fal.ai) is $0.05 per second:
+Let us define break-even precisely. Suppose you generate \\(V\\) seconds of video per month using the Wan 2.6 model. The API cost (via fal.ai) is $0.05 per second:
 
 $$\text{API cost} = 0.05V \text{ dollars/month}$$
 
-For self-hosting on an RTX 4090, you generate approximately 1 second of video per minute of GPU time, so you need \(V\) GPU-minutes per month. At $0.40/hr on-demand cloud:
+For self-hosting on an RTX 4090, you generate approximately 1 second of video per minute of GPU time, so you need \\(V\\) GPU-minutes per month. At $0.40/hr on-demand cloud:
 
 $$\text{Self-host cost (cloud)} = \frac{V}{60} \times 0.40 = 0.0067V \text{ dollars/month}$$
 
@@ -462,23 +462,23 @@ To understand why models differ in quality and speed, we need to understand the 
 
 Let us build this up from components.
 
-**Diffusion models** are a class of generative models that learn to reverse a noise-adding process. Start with a clean signal \(x_0\) (a video). Gradually add Gaussian noise over \(T\) steps to produce a sequence \(x_1, x_2, \ldots, x_T\), where \(x_T\) is essentially pure noise. Then train a neural network to predict the noise at each step, so you can run the process in reverse: start from noise, iteratively denoise, and recover a clean video.
+**Diffusion models** are a class of generative models that learn to reverse a noise-adding process. Start with a clean signal \\(x_0\\) (a video). Gradually add Gaussian noise over \\(T\\) steps to produce a sequence \\(x_1, x_2, \ldots, x_T\\), where \\(x_T\\) is essentially pure noise. Then train a neural network to predict the noise at each step, so you can run the process in reverse: start from noise, iteratively denoise, and recover a clean video.
 
 The forward (noise-adding) process is defined as:
 
 $$q(x_t | x_{t-1}) = \mathcal{N}(x_t; \sqrt{1-\beta_t} \, x_{t-1}, \beta_t I)$$
 
-where \(\beta_t\) is the noise schedule at step \(t\). The key property is that we can jump directly to any step \(t\) without iterating:
+where \\(\beta_t\\) is the noise schedule at step \\(t\\). The key property is that we can jump directly to any step \\(t\\) without iterating:
 
 $$q(x_t | x_0) = \mathcal{N}(x_t; \sqrt{\bar{\alpha}_t} \, x_0, (1-\bar{\alpha}_t) I)$$
 
-where \(\bar{\alpha}_t = \prod_{s=1}^{t}(1 - \beta_s)\).
+where \\(\bar{\alpha}_t = \prod_{s=1}^{t}(1 - \beta_s)\\).
 
-**Transformers** are neural network architectures based on self-attention. Given a sequence of tokens \((z_1, z_2, \ldots, z_N)\), each token attends to every other token via:
+**Transformers** are neural network architectures based on self-attention. Given a sequence of tokens \\((z_1, z_2, \ldots, z_N)\\), each token attends to every other token via:
 
 $$\text{Attention}(Q, K, V) = \text{softmax}\left(\frac{QK^T}{\sqrt{d_k}}\right) V$$
 
-where \(Q = z W_Q\), \(K = z W_K\), \(V = z W_V\) are linear projections. The computational cost of self-attention scales as \(O(N^2 d)\), where \(N\) is the sequence length and \(d\) is the dimension.
+where \\(Q = z W_Q\\), \\(K = z W_K\\), \\(V = z W_V\\) are linear projections. The computational cost of self-attention scales as \\(O(N^2 d)\\), where \\(N\\) is the sequence length and \\(d\\) is the dimension.
 
 A **Diffusion Transformer** combines these. The neural network that predicts noise at each denoising step is a transformer instead of the U-Net architecture used in earlier diffusion models (Stable Diffusion 1.x, 2.x). The reason for the switch: transformers scale more predictably with compute and data than U-Nets. The scaling laws that govern language model performance (loss decreases as a power law of compute) also apply to DiT models.
 
@@ -540,9 +540,9 @@ For video, the pipeline has four stages:
 
 **Step 1: Encoding.** The text prompt is encoded using a large language model (typically T5-XXL or CLIP). Image inputs (for image-to-video) are encoded by the VAE encoder into the same latent space as the video frames. The text embedding conditions the denoising process via cross-attention.
 
-**Step 2: Latent noise initialization.** For a video of \(T\) frames at resolution \(H \times W\), the VAE compresses to a latent representation of shape \((T, H/f, W/f, c)\) where \(f\) is the spatial downsample factor (typically 8 for most models, 16 for Wan 2.2's VAE) and \(c\) is the latent channel count (4-16). We start from pure Gaussian noise in this latent space.
+**Step 2: Latent noise initialization.** For a video of \\(T\\) frames at resolution \\(H \times W\\), the VAE compresses to a latent representation of shape \\((T, H/f, W/f, c)\\) where \\(f\\) is the spatial downsample factor (typically 8 for most models, 16 for Wan 2.2's VAE) and \\(c\\) is the latent channel count (4-16). We start from pure Gaussian noise in this latent space.
 
-**Step 3: Iterative denoising via the DiT backbone.** This is where all the compute goes. The latent volume is divided into spacetime patches. Each patch becomes a token. The transformer processes these tokens with alternating spatial attention (tokens within the same frame attend to each other) and temporal attention (tokens at the same spatial location across different frames attend to each other). This is repeated for \(N_{\text{steps}}\) denoising steps.
+**Step 3: Iterative denoising via the DiT backbone.** This is where all the compute goes. The latent volume is divided into spacetime patches. Each patch becomes a token. The transformer processes these tokens with alternating spatial attention (tokens within the same frame attend to each other) and temporal attention (tokens at the same spatial location across different frames attend to each other). This is repeated for \\(N_{\text{steps}}\\) denoising steps.
 
 **Step 4: VAE decoding.** The final denoised latent is decoded back to pixel space by the VAE decoder, producing the output video.
 
@@ -550,7 +550,7 @@ The computational cost is dominated by the DiT backbone in Step 3. Specifically,
 
 $$\text{FLOPs}_{\text{attention}} = O(N_{\text{tokens}}^2 \cdot d \cdot N_{\text{steps}} \cdot N_{\text{layers}})$$
 
-For a 5-second 1080p video with a typical DiT (24 layers, dimension 1536, 50 denoising steps, ~480K tokens), the total FLOPs are in the range of \(10^{16}\) to \(10^{17}\). This is why video generation takes 30-120 seconds even on H100 GPUs.
+For a 5-second 1080p video with a typical DiT (24 layers, dimension 1536, 50 denoising steps, ~480K tokens), the total FLOPs are in the range of \\(10^{16}\\) to \\(10^{17}\\). This is why video generation takes 30-120 seconds even on H100 GPUs.
 
 ### What Makes Some Models Faster
 
@@ -558,13 +558,13 @@ Three architectural innovations drive speed differences between models:
 
 **1. Rectified Flows (Wan 2.x, LTX-2)**
 
-Traditional diffusion models follow curved paths through the noise-to-signal space. The denoising trajectory from \(x_T\) (noise) to \(x_0\) (clean signal) is a stochastic, non-linear path that requires many steps to traverse accurately.
+Traditional diffusion models follow curved paths through the noise-to-signal space. The denoising trajectory from \\(x_T\\) (noise) to \\(x_0\\) (clean signal) is a stochastic, non-linear path that requires many steps to traverse accurately.
 
-**Rectified flows** replace these curved paths with straight lines. Instead of learning a noise prediction \(\epsilon_\theta\), the model learns a velocity field \(v_\theta\) that connects noise and data along the shortest path:
+**Rectified flows** replace these curved paths with straight lines. Instead of learning a noise prediction \\(\epsilon_\theta\\), the model learns a velocity field \\(v_\theta\\) that connects noise and data along the shortest path:
 
 $$v_\theta(x_t, t) = x_0 - x_1$$
 
-where \(x_t = (1-t) x_0 + t x_1\) is the linear interpolation between data \(x_0\) and noise \(x_1\). Because the path is straight, you need far fewer steps to traverse it. Models using rectified flows can achieve good quality in 10-25 denoising steps instead of 50-100.
+where \\(x_t = (1-t) x_0 + t x_1\\) is the linear interpolation between data \\(x_0\\) and noise \\(x_1\\). Because the path is straight, you need far fewer steps to traverse it. Models using rectified flows can achieve good quality in 10-25 denoising steps instead of 50-100.
 
 This is why Wan 2.6 and LTX-2 generate faster than their parameter count would suggest. They traverse latent space more efficiently.
 
@@ -583,7 +583,7 @@ where the student takes one step where the teacher takes two. After three rounds
 Instead of processing all tokens equally, these models use techniques to reduce the effective token count:
 
 - **Dynamic latent frame rate**: merge tokens in low-motion segments where adjacent frames are nearly identical. A static shot might collapse 120 frames into 20 effective tokens temporally, achieving up to 3x speedup with minimal quality degradation.
-- **Sparse attention patterns**: instead of full \(O(N^2)\) attention, use windowed or strided attention for spatial tokens and full attention only for temporal tokens (or vice versa). This reduces the quadratic cost.
+- **Sparse attention patterns**: instead of full \\(O(N^2)\\) attention, use windowed or strided attention for spatial tokens and full attention only for temporal tokens (or vice versa). This reduces the quadratic cost.
 - **Mixture of Experts (MoE)**: Hailuo 2.3 and Wan 2.6 use MoE architectures where only a subset of parameters are activated for each token. A 14B parameter MoE model with 4 experts and top-2 routing only activates ~7B parameters per token, giving the quality of a larger model at the inference cost of a smaller one.
 
 ### How Resolution and Duration Scale Compute
@@ -594,13 +594,13 @@ Token count scales as:
 
 $$N \propto T \times H \times W$$
 
-where \(T\) is frame count (proportional to duration), and \(H, W\) are resolution dimensions (after VAE compression). Attention cost scales as \(O(N^2)\), so:
+where \\(T\\) is frame count (proportional to duration), and \\(H, W\\) are resolution dimensions (after VAE compression). Attention cost scales as \\(O(N^2)\\), so:
 
 $$\text{Cost} \propto (T \times H \times W)^2$$
 
 Doubling the resolution (2x in each spatial dimension) increases the token count by 4x and the attention cost by 16x. Doubling the duration doubles the token count and quadruples the attention cost.
 
-In practice, models use approximations (sparse attention, factored spatial-temporal attention) that bring this closer to \(O(N^{1.5})\) or even \(O(N \log N)\), but the super-linear scaling remains. This is why a 10-second 4K video costs dramatically more than a 5-second 720p video.
+In practice, models use approximations (sparse attention, factored spatial-temporal attention) that bring this closer to \\(O(N^{1.5})\\) or even \\(O(N \log N)\\), but the super-linear scaling remains. This is why a 10-second 4K video costs dramatically more than a 5-second 720p video.
 
 | Spec | Relative Token Count | Relative Cost (quadratic) | Relative Cost (practical ~1.5x) |
 |------|---------------------|--------------------------|--------------------------------|
@@ -1547,7 +1547,7 @@ In this example, the first request (standard quality, $1 budget, no audio) would
 
 ## Cost Projections: When Does 1 Minute of HD Video Cost Less Than $1? {#cost-projections}
 
-We established earlier that API costs are declining at approximately 80% year-over-year, following \(C(t) = e^{-1.61t}\). Let us now compute specific milestones.
+We established earlier that API costs are declining at approximately 80% year-over-year, following \\(C(t) = e^{-1.61t}\\). Let us now compute specific milestones.
 
 ### The $1/Minute Threshold
 
