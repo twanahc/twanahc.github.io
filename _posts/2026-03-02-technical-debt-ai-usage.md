@@ -471,3 +471,13 @@ Maintain rough awareness of how much of your codebase is AI-generated versus hum
 The ratio tells you where to focus your audit effort, which modules to treat with extra caution during changes, and where an incident is most likely to reveal surprises. Teams that track this, even informally, make better decisions about where to invest review time. Teams that do not track it find out where the unreviewed code lives when it breaks in production.
 
 ---
+
+## Conclusion
+
+Technical debt is not a vibes thing. It has principal, interest, and a compounding rate determined by coupling. The dynamics are precise enough to formalize: debt that sits in foundational code compounds exponentially, debt in isolated utilities barely accrues at all. Treating it as a vague feeling rather than a quantifiable liability is how teams end up surprised when velocity collapses.
+
+AI tools multiply the debt creation side of the equation while leaving the paydown side untouched. Worse, they increase the debt density per line of code because the output lacks the architectural context that keeps structural quality high. The code looks clean. The formatting is perfect. The debt is semantic --- embedded in wrong abstractions, missing observability, and confident edge-case bugs that read identically to correct code. The surface has never been more polished. The foundation has never been harder to inspect.
+
+The solution is not to stop using AI tools. They are genuinely powerful, and the productivity gains on isolated, well-scoped work are real. The solution is to understand the debt equation, know which coupling curve you are on, and manage the trade-off deliberately. Speed without comprehension is a loan you will repay with interest.
+
+The best engineers using AI tools aren't the ones who ship the fastest. They're the ones who know exactly how much debt they're taking on and why.
