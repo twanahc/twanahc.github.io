@@ -125,3 +125,45 @@ So you are not just multiplying \\(\beta \cdot R(t)\\) by the throughput increas
 What are those patterns that drive \\(\beta\\) up? There are six that recur across every codebase built with AI assistance.
 
 ---
+
+## The Six Patterns of AI-Generated Debt
+
+These are not theoretical. They show up in every codebase where AI tools are used at volume without aggressive human review. Each one is a specific mechanism by which AI-generated code embeds structural debt that is invisible at the surface level.
+
+### 1. Plausible but Wrong Abstractions
+
+AI is very good at producing code that looks like good software design. You get well-named classes, clear separation of concerns, recognizable design patterns applied in textbook fashion. The problem is that the abstractions do not map to your actual domain. The model has no understanding of your business --- what changes frequently, what is stable, which components are coupled in practice, or what your team will need to extend six months from now. It pattern-matches from its training data, producing architecturally elegant solutions to the wrong problem.
+
+The class hierarchy looks right. The interface boundaries look clean. But your actual requirements do not fit the shape the model chose, so every real feature built on top of these abstractions requires forcing the domain into a mold that distorts it. The debt is invisible in code review because the code reads beautifully. You only discover it when modification costs start climbing and every change requires touching five files that should not be related.
+
+### 2. Cargo-Cult Error Handling
+
+Ask an AI to write robust code and you will get try/catch blocks wrapped around everything, error types defined for every conceivable failure, and generic messages logged at every boundary. It handles errors the way a student who has read about error handling but never been paged at 3 AM would: structurally correct, operationally useless. Exceptions get caught and re-thrown with less context than they started with. Error messages say "An error occurred" or "Failed to process request" with no indication of which input, which state, or which dependency caused the failure.
+
+The error handling exists to satisfy the *appearance* of robustness. When something actually breaks in production, you get a stack trace that tells you something went wrong and nothing about why. The code looks more resilient than code with no error handling at all, which makes it harder to flag in review --- but it is actively worse, because it destroys the diagnostic information you need.
+
+### 3. Dependency Hoarding
+
+AI reaches for libraries by default. A five-line string parsing task becomes an import of a 200KB package. Date formatting pulls in a heavyweight library when a built-in method would suffice. A simple HTTP call gets wrapped in a framework that abstracts away every knob you will eventually need to tune. Each individual dependency seems reasonable in isolation.
+
+Multiply across a codebase where AI generated most of the implementation and your dependency tree becomes a liability: every package is maintenance burden, security surface area, and a breaking-change risk you did not consciously accept. The model suggests dependencies because they appeared frequently in its training data, not because your project needs them. The cost is invisible until you try to upgrade a major version and discover that 40% of your dependency tree exists because an AI decided that parsing a query string required a package.
+
+### 4. Implicit Coupling Through Copy-Paste Evolution
+
+Each AI prompt is independent. The model does not remember that it generated a similar function in another file last week, or that your codebase already has a utility for the exact operation you are asking about. The result is similar-but-not-identical implementations of the same logic scattered across the codebase --- five slightly different ways to validate an email address, three almost-identical retry mechanisms with different backoff constants, two parsers for the same data format that diverge on edge cases.
+
+There are no shared abstractions because each generation was a standalone event. When the business rule changes, you have to find and update every copy. You will not find all of them. The ones you miss become silent inconsistencies that surface as bugs months later, in contexts far removed from the original logic.
+
+### 5. Missing Observability
+
+AI writes code that produces correct outputs for correct inputs. What it does not write is everything you need to operate that code in production. No structured logging with correlation IDs. No metrics emission at service boundaries. No distributed tracing context propagation. No health check endpoints that report meaningful status beyond "the process is running."
+
+The code satisfies the functional requirement --- given input X, produce output Y --- and is completely silent about everything else. When latency spikes, you have no breakdown of where time is spent. When errors increase, you have no dimensional data to slice by. When a downstream dependency degrades, the failure propagates invisibly because nobody instrumented the boundary. The model was never asked to make the code observable, and operational concerns are not part of a typical prompt.
+
+### 6. Confident Nonsense in Edge Cases
+
+AI handles the happy path with genuine competence. The primary flow works, the common cases are covered, and the code reads like it was written by someone who understood the problem. The edge cases are where it falls apart. Off-by-one errors wrapped in clean, confident syntax. Race conditions in code that reads like it was written by someone who understands concurrency but actually papers over the timing window with a structure that fails under load. Null checks that cover some paths but miss the one that matters. Boundary conditions handled with logic that is almost right and wrong in exactly the way that passes a test suite built from the same model's understanding of what to test.
+
+The style of the code communicates confidence. The logic does not earn it. These bugs are the hardest to find because nothing about the code signals uncertainty --- it all reads the same whether it is correct or subtly broken.
+
+---
