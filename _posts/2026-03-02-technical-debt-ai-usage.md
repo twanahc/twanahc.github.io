@@ -270,3 +270,160 @@ This is why the six patterns from the previous section are so dangerous. Every o
 The implication is uncomfortable but important: code review processes designed for human-written code are insufficient for AI-generated code. When a human writes bad code, it usually looks bad. When AI writes bad code, it looks great. You need to review for fundamentally different things --- domain fit, operational behavior, system-level coherence, failure modes --- and those reviews take longer and require deeper context than the surface-level scan that catches most human-introduced debt. The tooling and processes for doing this well are the subject of the next section.
 
 ---
+
+## Quantifying the Cost: When Debt Kills You
+
+Everything above is qualitative. This section puts numbers on it --- rough, model-level numbers, but enough to make the trade-offs concrete and the failure modes predictable.
+
+### Break-Even Analysis
+
+Define two quantities. \\(S\\) is the time saved per feature by using AI instead of writing the code manually. This is the upfront payoff --- the whole reason you adopted the tools. For most teams, \\(S\\) is somewhere between 2 and 20 hours per feature depending on complexity, and it is real. Nobody disputes this part.
+
+Now define \\(I(t)\\) as the cumulative interest paid on the debt embedded in that AI-generated code. This is the total extra time spent debugging, working around, extending, and explaining the code after it ships. \\(I(t)\\) starts at zero and grows monotonically because debt interest only accrues --- it never spontaneously reverses.
+
+The break-even condition is:
+
+$$I(t) = S$$
+
+Before this crossover, you are in the black. AI saved you net time. After it, you are in the red. Every additional hour spent fighting the code erases and then exceeds the original time savings.
+
+The critical insight is that the crossover time depends almost entirely on coupling. For isolated code --- utility functions, standalone scripts, one-off data transformations --- the interest rate is near zero. The code touches nothing else. Nobody extends it. If it breaks, it breaks locally. The crossover may never come, and AI is pure upside.
+
+For foundational code --- data models, authentication, core abstractions, anything that other code depends on --- the interest rate is brutal. Every downstream module inherits the embedded assumptions. Every new feature that touches the foundation pays the interest. For high-coupling code, crossover arrives in weeks, not months.
+
+### The 300-Line Threshold
+
+There is a simpler, less mathematical way to think about when you are in trouble. AI-generated code that nobody on the team has manually read line-by-line is a liability with unknown magnitude. You do not know what is in it. You do not know what assumptions it makes. You do not know how it will behave under conditions the model did not anticipate.
+
+When the volume of unreviewed AI code in your system exceeds the volume of code your team has actually read and understood, you have lost the ability to reason about your system. You cannot predict failure modes. You cannot estimate the cost of changes. You cannot debug with confidence. The codebase has become a black box that happens to be made of source code --- and the fact that you can read it does not mean you have.
+
+The threshold is not literally 300 lines. It is the point at which the unreviewed mass becomes load-bearing. For small teams, that point arrives fast.
+
+### Velocity Decay Under Three Scenarios
+
+The following visualization models how team velocity evolves over time under three debt management strategies. The curves are stylized but the qualitative shapes are consistent with what engineering teams report.
+
+```python
+import numpy as np
+import matplotlib.pyplot as plt
+
+plt.rcParams['text.usetex'] = False
+
+weeks = np.arange(0, 25, 0.1)
+
+# Scenario 1: No AI, steady management — slow growth, gentle decline
+v_no_ai = 1.0 * np.exp(-0.008 * weeks) + 0.02 * weeks * np.exp(-0.05 * weeks)
+v_no_ai = np.clip(v_no_ai, 0, None)
+
+# Scenario 2: AI + active review — faster start, moderate decay, sustainable
+v_ai_review = 1.8 * np.exp(-0.025 * weeks) + 0.3 * np.exp(-0.1 * weeks)
+v_ai_review = np.clip(v_ai_review, 0, None)
+
+# Scenario 3: AI + no management — massive spike, then cliff
+v_ai_no_mgmt = 3.0 * np.exp(-0.15 * weeks) + 0.2 * np.exp(-0.02 * weeks)
+v_ai_no_mgmt = np.clip(v_ai_no_mgmt, 0, None)
+
+fig, ax = plt.subplots(figsize=(10, 6))
+
+ax.plot(weeks, v_no_ai, label='No AI, steady management', color='#5b9bd5',
+        linewidth=2.5)
+ax.plot(weeks, v_ai_review, label='AI + active review', color='#6dc98c',
+        linewidth=2.5)
+ax.plot(weeks, v_ai_no_mgmt, label='AI + no management', color='#e06060',
+        linewidth=2.5, linestyle='--')
+
+ax.set_xlabel(r'Time (weeks)', fontsize=13)
+ax.set_ylabel(r'Team Velocity $V(t)$', fontsize=13)
+ax.set_title(r'Velocity Decay Under Three Debt Management Scenarios', fontsize=15)
+ax.legend(fontsize=11, loc='upper right')
+ax.grid(True, alpha=0.3)
+ax.set_xlim(0, 24)
+ax.set_ylim(0, 3.5)
+
+plt.tight_layout()
+plt.savefig('velocity_decay.png', dpi=150, bbox_inches='tight')
+plt.show()
+```
+
+<img src="/velocity_decay.png" alt="Velocity decay under three debt management scenarios" style="max-width: 100%; display: block; margin: 2em auto;">
+
+The red dashed curve is the shape that kills startups. Weeks one through four look miraculous --- output is three times the pre-AI baseline. Leadership sees the spike and accelerates hiring, makes commitments to customers, plans the roadmap around the new velocity. By week eight the velocity has cratered below where it was before AI, and by week twelve the team is spending more time debugging and working around AI-generated code than they are shipping features. The spike was real. So is the cliff.
+
+### Break-Even Crossover by Coupling Level
+
+This second visualization makes the break-even analysis concrete. Each curve represents cumulative debt interest \\(I(t)\\) for a different coupling level. The horizontal dashed line represents the time saved \\(S\\). Where a curve crosses the line, you have lost money.
+
+```python
+import numpy as np
+import matplotlib.pyplot as plt
+
+plt.rcParams['text.usetex'] = False
+
+months = np.linspace(0, 12, 200)
+
+# Time saved (hours) — constant, shown as horizontal line
+S = 16  # hours saved by using AI for the feature
+
+# Cumulative interest curves for different coupling levels
+# Low coupling (utility code) — logarithmic growth, slow
+I_low = 3.0 * np.log1p(months)
+
+# Medium coupling (feature code) — linear-ish growth
+I_med = 3.5 * months
+
+# High coupling (foundational code) — superlinear growth
+I_high = 2.0 * months**1.6
+
+fig, ax = plt.subplots(figsize=(10, 6))
+
+ax.axhline(y=S, color='#e8e8e8', linestyle='--', linewidth=2, label=r'Time saved $S$')
+
+ax.plot(months, I_low, label='Low coupling (utility code)', color='#5b9bd5',
+        linewidth=2.5)
+ax.plot(months, I_med, label='Medium coupling (feature code)', color='#d4944a',
+        linewidth=2.5)
+ax.plot(months, I_high, label='High coupling (foundational code)', color='#e06060',
+        linewidth=2.5)
+
+# Find and mark crossover points
+# Medium coupling crossover
+idx_med = np.argmin(np.abs(I_med - S))
+ax.plot(months[idx_med], S, 'o', color='#d4944a', markersize=10, zorder=5)
+ax.annotate(f'{months[idx_med]:.1f} months',
+            xy=(months[idx_med], S), xytext=(months[idx_med] + 1.0, S + 5),
+            fontsize=11, color='#d4944a',
+            arrowprops=dict(arrowstyle='->', color='#d4944a', lw=1.5))
+
+# High coupling crossover
+idx_high = np.argmin(np.abs(I_high - S))
+ax.plot(months[idx_high], S, 'o', color='#e06060', markersize=10, zorder=5)
+ax.annotate(f'{months[idx_high]:.1f} months',
+            xy=(months[idx_high], S), xytext=(months[idx_high] + 1.0, S + 8),
+            fontsize=11, color='#e06060',
+            arrowprops=dict(arrowstyle='->', color='#e06060', lw=1.5))
+
+# Low coupling — annotate that it never crosses
+ax.annotate('Never crosses', xy=(10, I_low[-1]),
+            fontsize=11, color='#5b9bd5', fontstyle='italic',
+            ha='center')
+
+ax.set_xlabel(r'Months After Shipping', fontsize=13)
+ax.set_ylabel(r'Cumulative Hours', fontsize=13)
+ax.set_title(r'Break-Even: Time Saved vs Cumulative Debt Interest', fontsize=15)
+ax.legend(fontsize=11, loc='upper left')
+ax.grid(True, alpha=0.3)
+ax.set_xlim(0, 12)
+ax.set_ylim(0, 50)
+
+plt.tight_layout()
+plt.savefig('breakeven.png', dpi=150, bbox_inches='tight')
+plt.show()
+```
+
+<img src="/breakeven.png" alt="Break-even crossover: time saved vs cumulative debt interest" style="max-width: 100%; display: block; margin: 2em auto;">
+
+The blue curve is why AI is genuinely excellent for utility code --- the interest never accumulates enough to matter. The orange curve is the typical feature-level code path, where the break-even arrives around four to five months. The red curve is the one that should make you cautious about letting AI generate your data models and authentication layers. The crossover happens in weeks, and after that, the curve accelerates away from you. Every month you wait to refactor costs more than the last.
+
+The takeaway is not "do not use AI." It is "know which curve you are on." Utility code and isolated scripts sit on the blue curve. Let AI write them freely. Core infrastructure sits on the red curve. Review every line, or write it yourself.
+
+---
