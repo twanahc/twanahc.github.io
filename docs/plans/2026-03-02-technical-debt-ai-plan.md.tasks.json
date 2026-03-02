@@ -1,0 +1,17 @@
+{
+  "planPath": "docs/plans/2026-03-02-technical-debt-ai-plan.md",
+  "tasks": [
+    {"id": 5, "subject": "Task 1: Create post file with front matter and TOC", "status": "pending"},
+    {"id": 6, "subject": "Task 2: Write opening and setup section", "status": "pending", "blockedBy": [5]},
+    {"id": 7, "subject": "Task 3: Write technical debt definitions section", "status": "pending", "blockedBy": [6]},
+    {"id": 8, "subject": "Task 4: Write debt accumulation math section", "status": "pending", "blockedBy": [7]},
+    {"id": 9, "subject": "Task 5: Write AI throughput multiplier section", "status": "pending", "blockedBy": [8]},
+    {"id": 10, "subject": "Task 6: Write six AI debt patterns section", "status": "pending", "blockedBy": [9]},
+    {"id": 11, "subject": "Task 7: Write detection problem section with SVG", "status": "pending", "blockedBy": [10]},
+    {"id": 12, "subject": "Task 8: Write cost quantification with matplotlib plots", "status": "pending", "blockedBy": [11]},
+    {"id": 13, "subject": "Task 9: Write debt management strategies section", "status": "pending", "blockedBy": [12]},
+    {"id": 14, "subject": "Task 10: Write conclusion", "status": "pending", "blockedBy": [13]},
+    {"id": 15, "subject": "Task 11: Final review, polish, and push", "status": "pending", "blockedBy": [14]}
+  ],
+  "lastUpdated": "2026-03-02T00:00:00Z"
+}
