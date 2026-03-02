@@ -345,8 +345,6 @@ plt.savefig('velocity_decay.png', dpi=150, bbox_inches='tight')
 plt.show()
 ```
 
-<img src="/velocity_decay.png" alt="Velocity decay under three debt management scenarios" style="max-width: 100%; display: block; margin: 2em auto;">
-
 The red dashed curve is the shape that kills startups. Weeks one through four look miraculous --- output is three times the pre-AI baseline. Leadership sees the spike and accelerates hiring, makes commitments to customers, plans the roadmap around the new velocity. By week eight the velocity has cratered below where it was before AI, and by week twelve the team is spending more time debugging and working around AI-generated code than they are shipping features. The spike was real. So is the cliff.
 
 ### Break-Even Crossover by Coupling Level
@@ -419,8 +417,6 @@ plt.tight_layout()
 plt.savefig('breakeven.png', dpi=150, bbox_inches='tight')
 plt.show()
 ```
-
-<img src="/breakeven.png" alt="Break-even crossover: time saved vs cumulative debt interest" style="max-width: 100%; display: block; margin: 2em auto;">
 
 The blue curve is why AI is genuinely excellent for utility code --- the interest never accumulates enough to matter. The orange curve is the typical feature-level code path, where the break-even arrives around four to five months. The red curve is the one that should make you cautious about letting AI generate your data models and authentication layers. The crossover happens in weeks, and after that, the curve accelerates away from you. Every month you wait to refactor costs more than the last.
 
