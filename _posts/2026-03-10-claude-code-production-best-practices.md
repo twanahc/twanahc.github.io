@@ -6,6 +6,8 @@ category: tools
 mathjax: false
 ---
 
+*This is Part 2 of a 3-part series. [Part 1: AI Research Assistant Landscape](/posts/2026-03-09-ai-research-assistant-landscape/) | **Part 2: Claude Code Best Practices** | [Part 3: Building the Assistant](/posts/2026-03-11-building-ai-research-assistant-claude-code/)*
+
 A developer ships a feature with Claude Code in an hour. The endpoint handles authentication, validates input with Zod schemas, queries the database, and returns a well-structured response. Tests pass. The TypeScript compiles without errors. The PR merges at 4 PM. Two months later, that endpoint is responsible for 30 percent of the team's production incidents. The retry logic retries on non-idempotent operations. The validation trusts client-provided user IDs without checking authorization. The database query does a sequential scan on a table that has grown to 2 million rows since launch. None of this is because Claude wrote bad code. The code is syntactically clean, well-typed, and follows every naming convention. The problem is that nobody told Claude about the retry semantics, the authorization model, or the table growth projections. The same tool that generated the code could have prevented every one of these issues --- if the project had been set up correctly.
 
 Claude Code is not autocomplete. It is not a fancy snippet generator. It is a development environment with access to your entire codebase, your terminal, your test suite, and any external tool you connect to it. That access makes it extraordinarily productive when configured correctly and extraordinarily dangerous when configured loosely. The difference is not in Claude's capabilities --- it is in the engineering discipline that the project configuration enforces.

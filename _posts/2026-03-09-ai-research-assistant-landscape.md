@@ -5,6 +5,8 @@ date: 2026-03-09
 category: landscape
 ---
 
+*This is Part 1 of a 3-part series. **Part 1: Landscape** | [Part 2: Claude Code Best Practices](/posts/2026-03-10-claude-code-production-best-practices/) | [Part 3: Building the Assistant](/posts/2026-03-11-building-ai-research-assistant-claude-code/)*
+
 A computational biologist at a mid-size research university opens her laptop on Monday morning. Over the weekend, 2,100 papers were posted to ArXiv across her areas of interest: machine learning, computational neuroscience, and statistical methods. She has five days before the next batch. If she reads deeply --- working through derivations, checking methodology, assessing whether results generalize to her own work --- she can absorb maybe four papers this week. Five if she skips lunch. That leaves 2,096 papers unread, any one of which might contain the technique that solves the problem she has been stuck on for three months.
 
 This is not a time management problem. It is not a search problem. Google Scholar, Semantic Scholar, and ArXiv search will find papers matching her keywords with reasonable precision. The problem is that keyword matching does not tell her which papers *matter* --- which ones introduce methodology shifts relevant to her work, which ones contradict the assumptions underlying her current approach, which ones apply techniques from adjacent fields that she has never thought to look at. The bottleneck is not access to information. It is the cognitive bandwidth to synthesize information across hundreds of papers and extract the patterns that drive research forward.

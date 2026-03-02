@@ -5,6 +5,8 @@ date: 2026-03-11
 category: infra
 ---
 
+*This is Part 3 of a 3-part series. [Part 1: AI Research Assistant Landscape](/posts/2026-03-09-ai-research-assistant-landscape/) | [Part 2: Claude Code Best Practices](/posts/2026-03-10-claude-code-production-best-practices/) | **Part 3: Building the Assistant***
+
 We defined what an AI research assistant needs: five capabilities spanning literature synthesis, hypothesis generation, experimental design, code execution, and knowledge management. We defined how to build production software with Claude Code: CLAUDE.md conventions, hook systems, test-driven development, and semantic code review. Now we build the thing.
 
 This article is a construction log. Every architectural decision maps to a best practice from the Claude Code guide. Every component is built test-first. Every failure mode is anticipated because the project's CLAUDE.md tells Claude to anticipate it. The goal is not a prototype --- it is a system designed to run in production, with observability, load testing, and clear boundaries between what the AI decides and what the human decides.
