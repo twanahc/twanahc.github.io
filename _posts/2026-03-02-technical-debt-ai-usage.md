@@ -427,3 +427,47 @@ The blue curve is why AI is genuinely excellent for utility code --- the interes
 The takeaway is not "do not use AI." It is "know which curve you are on." Utility code and isolated scripts sit on the blue curve. Let AI write them freely. Core infrastructure sits on the red curve. Review every line, or write it yourself.
 
 ---
+
+## Managing AI-Generated Debt
+
+The solution is not to stop using AI tools. The solution is to understand the debt equation and manage it deliberately.
+
+Everything in the previous sections describes what happens when AI-generated code enters a codebase without controls. The debt accumulates faster, hides better, and compounds harder. None of that is inevitable. It is the default outcome when teams adopt AI tools without changing their engineering processes to match. The six strategies below are not theoretical --- they are the minimum viable set of practices that keep the debt equation balanced.
+
+### 1. The Ownership Rule
+
+If you prompted AI to write it, you own it. Full stop. Ownership means you have read every line, you can explain why each decision was made, and you can modify the code without re-prompting. If you cannot do all three, you do not own the code --- you have a dependency with no maintainer.
+
+This is the single most important rule. It reframes the act of prompting from "I wrote this" to "I sourced this, and now I need to make it mine." Most of the debt patterns described earlier --- wrong abstractions, cargo-cult error handling, missing observability --- survive because nobody ever took ownership. The code went from AI output to merged PR with no human ever fully internalizing what it does.
+
+### 2. Prompt-Then-Rewrite
+
+Use AI for the first draft, then rewrite by hand. Not "edit" --- rewrite. Open a new buffer and reproduce the logic yourself, using the AI output as a reference for structure and approach. The code you commit is code you wrote, informed by what the model suggested.
+
+This sounds slow. It is slower than accepting AI output directly, roughly a 2x reduction from maximum AI throughput. That cost is paid back immediately in comprehension. You now understand every branch, every edge case handler, every implicit assumption --- because you made those decisions yourself. The rewrite is where ownership transfers from the model to you.
+
+### 3. Foundational Code Gets Human Supervision
+
+Simple rule: the more coupled the code, the less unsupervised AI generation it should receive. Utility functions, tests, data transformations, boilerplate --- let AI generate freely. These sit on the low-coupling curve where debt interest barely accrues. Data models, core abstractions, authentication, API contracts --- write these yourself, or treat AI output as a rough sketch that gets rewritten before it touches the codebase.
+
+The boundary is coupling. If other code will depend on it, a human needs to have designed it. If it stands alone, AI can handle it.
+
+### 4. Review for Semantics, Not Syntax
+
+AI-generated code changes what code review needs to be. Stop spending review cycles checking formatting, naming conventions, and structural patterns --- AI nails those every time. Start asking the questions that actually matter: Does this abstraction map to our domain? What happens when this fails at 3 AM? Where is the logging? What are the implicit assumptions about input shape, state, and ordering? What does this code do when the database is slow, the queue is full, or the downstream service returns garbage?
+
+Semantic review takes longer than syntactic review. That is the cost of adopting AI tools responsibly. If your review process does not change when the code generation process changes, you are accumulating debt at the new, accelerated rate with the old, insufficient controls.
+
+### 5. Scheduled Debt Audits
+
+Every few sprints, pick a module that was primarily AI-generated and do a full read-through. Not refactoring --- just reading. The entire team reads the code, builds a shared mental model of what it does and why, and documents the assumptions they find.
+
+The read-through itself is the value. It surfaces debt that pattern-matching review missed: the abstraction that does not map to the domain, the error handler that swallows context, the three nearly-identical implementations of the same business rule scattered across different files. You cannot fix what you have not noticed, and you will not notice it in a five-minute PR review. Dedicated reading time is the only reliable detection mechanism for semantic debt.
+
+### 6. Track the Ratio
+
+Maintain rough awareness of how much of your codebase is AI-generated versus human-written versus human-reviewed-AI code. You do not need precise numbers. A statement like "most of auth was hand-written, the API routes were AI-generated and reviewed, and the test suite was AI-generated and never carefully read" is enough to know where your risk is concentrated.
+
+The ratio tells you where to focus your audit effort, which modules to treat with extra caution during changes, and where an incident is most likely to reveal surprises. Teams that track this, even informally, make better decisions about where to invest review time. Teams that do not track it find out where the unreviewed code lives when it breaks in production.
+
+---
