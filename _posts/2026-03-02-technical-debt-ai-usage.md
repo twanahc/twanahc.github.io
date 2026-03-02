@@ -27,3 +27,59 @@ The thesis is straightforward. AI tools do not create a new kind of debt. They a
 8. [Conclusion](#conclusion)
 
 ---
+
+## What Technical Debt Actually Means
+
+Ward Cunningham coined the metaphor in 1992, and it is worth returning to what he actually said before the term got diluted into meaning "any code I don't like." Cunningham's point was specific: shipping code that reflects your current understanding of the problem, knowing that understanding will deepen, is like taking on debt. It is a *financing decision*. You borrow against future effort to deliver value now. That is rational. What makes debt dangerous is not its existence --- it is losing track of it, or never intending to pay it back.
+
+The metaphor maps cleanly to financial debt, and making this mapping explicit is the only way to reason about it quantitatively.
+
+**Principal** --- the shortcut itself. This is the gap between what you built and what you should have built, given what you know now. It is directly quantifiable: the cost to refactor the code into the design you would have chosen with more time or better understanding. Principal is a stock, not a flow. It sits on your balance sheet until you pay it down.
+
+**Interest** --- the ongoing cost of working around the shortcut. Every feature that touches the indebted code takes longer to implement. Every bug in that region takes longer to diagnose. Every new engineer who encounters it loses hours building a mental model of why it is the way it is. Interest is measured as velocity drag: the difference between how fast your team ships and how fast they *would* ship if the debt did not exist.
+
+**Interest rate** --- how fast the debt compounds. This is determined almost entirely by coupling. Debt that is isolated --- a messy utility function with a clean interface --- has a low interest rate. You pay a small, constant cost, and it never gets worse. Debt in foundational components --- your authentication layer, your core data models, your primary abstractions --- has a crushing interest rate, because every piece of code that depends on the foundation inherits the distortion.
+
+**Compounding** --- debt creates more debt. A bad abstraction forces workarounds. Those workarounds become load-bearing over time, because other code starts depending on them. Now you have two layers of debt: the original bad abstraction and the workarounds that encode assumptions about it. Removing the first layer means unwinding the second. This is how systems become unreformable.
+
+Martin Fowler extended Cunningham's metaphor into a useful taxonomy by splitting debt along two axes: whether you knew you were taking it on (deliberate vs. inadvertent) and whether you made a reasonable engineering judgment (prudent vs. reckless). The resulting quadrant looks like this:
+
+<svg viewBox="0 0 600 360" xmlns="http://www.w3.org/2000/svg" style="max-width:700px; display:block; margin:2em auto; font-family:Georgia,serif;">
+  <!-- Background -->
+  <rect width="600" height="360" rx="8" fill="#1a1a2e"/>
+  <!-- Title -->
+  <text x="300" y="30" text-anchor="middle" fill="#e8e8e8" font-size="16" font-weight="bold">Technical Debt Quadrant</text>
+  <!-- Column headers -->
+  <text x="250" y="60" text-anchor="middle" fill="#5b9bd5" font-size="14" font-weight="bold">Prudent</text>
+  <text x="450" y="60" text-anchor="middle" fill="#e06060" font-size="14" font-weight="bold">Reckless</text>
+  <!-- Row headers -->
+  <text x="60" y="150" text-anchor="middle" fill="#e8e8e8" font-size="14" font-weight="bold" transform="rotate(-90,60,150)">Deliberate</text>
+  <text x="60" y="290" text-anchor="middle" fill="#e8e8e8" font-size="14" font-weight="bold" transform="rotate(-90,60,290)">Inadvertent</text>
+  <!-- Grid lines -->
+  <line x1="100" y1="70" x2="100" y2="350" stroke="#444" stroke-width="1"/>
+  <line x1="350" y1="70" x2="350" y2="350" stroke="#444" stroke-width="1"/>
+  <line x1="100" y1="70" x2="600" y2="70" stroke="#444" stroke-width="1"/>
+  <line x1="100" y1="210" x2="600" y2="210" stroke="#444" stroke-width="1"/>
+  <line x1="100" y1="350" x2="600" y2="350" stroke="#444" stroke-width="1"/>
+  <line x1="600" y1="70" x2="600" y2="350" stroke="#444" stroke-width="1"/>
+  <!-- Deliberate + Prudent -->
+  <rect x="101" y="71" width="248" height="138" fill="#1e3a2a" opacity="0.7"/>
+  <text x="225" y="125" text-anchor="middle" fill="#6dc98c" font-size="12" font-style="italic">"We know this is a shortcut,</text>
+  <text x="225" y="143" text-anchor="middle" fill="#6dc98c" font-size="12" font-style="italic">ship now, refactor next sprint"</text>
+  <!-- Deliberate + Reckless -->
+  <rect x="351" y="71" width="248" height="138" fill="#3a1e1e" opacity="0.7"/>
+  <text x="475" y="134" text-anchor="middle" fill="#e06060" font-size="12" font-style="italic">"We don't have time for design"</text>
+  <!-- Inadvertent + Prudent -->
+  <rect x="101" y="211" width="248" height="138" fill="#1e2a3a" opacity="0.7"/>
+  <text x="225" y="265" text-anchor="middle" fill="#5b9bd5" font-size="12" font-style="italic">"Now we know how this</text>
+  <text x="225" y="283" text-anchor="middle" fill="#5b9bd5" font-size="12" font-style="italic">should have been built"</text>
+  <!-- Inadvertent + Reckless -->
+  <rect x="351" y="211" width="248" height="138" fill="#3a2a1e" opacity="0.7"/>
+  <text x="475" y="274" text-anchor="middle" fill="#d4944a" font-size="12" font-style="italic">"What's layering?"</text>
+</svg>
+
+Each quadrant carries different risk profiles and different remediation costs. The prudent-deliberate quadrant is the one Cunningham was actually talking about --- calculated, intentional, with a payback plan. The reckless-inadvertent quadrant is the one that kills codebases, because you do not know you are accumulating debt until the interest payments start drowning your sprint velocity.
+
+Here is the question that matters for the rest of this post: AI code generation tools interact with each of these four quadrants differently. They make some quadrants cheaper, some more dangerous, and they shift the default distribution of where new debt lands. Understanding which quadrant your AI-generated code falls into is the difference between leveraging the tools and being buried by them.
+
+---
