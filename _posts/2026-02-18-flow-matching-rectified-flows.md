@@ -458,7 +458,7 @@ The name "optimal transport" for the linear interpolation path is not accidental
 
 $$W_2(p_0, p_1)^2 = \inf_{\pi \in \Pi(p_0, p_1)} \int \|x_0 - x_1\|^2\,d\pi(x_0, x_1)$$
 
-where \\(\Pi(p_0, p_1)\\) is the set of all joint distributions (couplings) with marginals \\(p_0\\) and \\(p_1\\). The optimal coupling \\(\pi^*\\) minimizes the total squared transport distance.
+where \\(\Pi(p_0, p_1)\\) is the set of all joint distributions (couplings) with marginals \\(p_0\\) and \\(p_1\\). The optimal coupling \\(\pi^\*\\) minimizes the total squared transport distance.
 
 The displacement interpolation under the optimal coupling traces straight lines from each \\(x_0\\) to its matched \\(x_1\\), and these paths do not cross. The rectified flow procedure approximates this optimal transport coupling: each reflow step brings the coupling closer to the OT coupling, reducing path crossing and increasing straightness.
 

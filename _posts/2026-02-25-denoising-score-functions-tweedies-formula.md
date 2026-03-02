@@ -63,7 +63,7 @@ The score is simply the negative displacement from the mean, scaled by \\(1/\sig
 
 ### Why the Score?
 
-The score avoids the **normalizing constant problem**. The density \\(p(\mathbf{x})\\) requires computing the partition function \\(Z = \int p^*(\mathbf{x}) d\mathbf{x}\\) (where \\(p^* = p \cdot Z\\) is the unnormalized density), which is intractable in high dimensions. But the score:
+The score avoids the **normalizing constant problem**. The density \\(p(\mathbf{x})\\) requires computing the partition function \\(Z = \int p^\*(\mathbf{x}) d\mathbf{x}\\) (where \\(p^\* = p \cdot Z\\) is the unnormalized density), which is intractable in high dimensions. But the score:
 
 $$\nabla_\mathbf{x} \log p(\mathbf{x}) = \nabla_\mathbf{x} \log p^*(\mathbf{x}) - \nabla_\mathbf{x} \log Z = \nabla_\mathbf{x} \log p^*(\mathbf{x})$$
 

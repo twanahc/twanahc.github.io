@@ -304,7 +304,7 @@ The training loss is simply the mean squared error between rendered pixel colors
 
 $$\mathcal{L} = \sum_{\mathbf{r} \in \mathcal{R}} \left\| \hat{C}_c(\mathbf{r}) - C^*(\mathbf{r}) \right\|_2^2 + \left\| \hat{C}_f(\mathbf{r}) - C^*(\mathbf{r}) \right\|_2^2$$
 
-where \\(\mathcal{R}\\) is a batch of rays, \\(\hat{C}_c\\) and \\(\hat{C}_f\\) are the coarse and fine rendered colors, and \\(C^*\\) is the ground-truth pixel color.
+where \\(\mathcal{R}\\) is a batch of rays, \\(\hat{C}_c\\) and \\(\hat{C}_f\\) are the coarse and fine rendered colors, and \\(C^\*\\) is the ground-truth pixel color.
 
 That is it. No 3D supervision, no depth maps, no segmentation masks. Just photometric error. The 3D structure emerges because it is the only way to consistently explain the 2D observations from multiple viewpoints.
 

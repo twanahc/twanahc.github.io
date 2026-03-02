@@ -50,11 +50,11 @@ Here is the formal definition. A **tensor of type \\((p, q)\\)** is a **multilin
 
 $$T: \underbrace{V^* \times \cdots \times V^*}_{p \text{ copies}} \times \underbrace{V \times \cdots \times V}_{q \text{ copies}} \longrightarrow \mathbb{R}$$
 
-where \\(V\\) is a vector space and \\(V^*\\) is its **dual space** (the space of all linear maps from \\(V\\) to \\(\mathbb{R}\\), also called linear functionals or covectors).
+where \\(V\\) is a vector space and \\(V^\*\\) is its **dual space** (the space of all linear maps from \\(V\\) to \\(\mathbb{R}\\), also called linear functionals or covectors).
 
 Let us unpack this piece by piece.
 
-**Multilinear** means linear in each argument separately. If \\(T\\) is a \\((1,1)\\) tensor, then for vectors \\(u, v \in V\\), covectors \\(\alpha, \beta \in V^*\\), and scalars \\(a, b \in \mathbb{R}\\):
+**Multilinear** means linear in each argument separately. If \\(T\\) is a \\((1,1)\\) tensor, then for vectors \\(u, v \in V\\), covectors \\(\alpha, \beta \in V^\*\\), and scalars \\(a, b \in \mathbb{R}\\):
 
 $$T(a\alpha + b\beta, \, v) = a \, T(\alpha, v) + b \, T(\beta, v)$$
 
@@ -62,13 +62,13 @@ $$T(\alpha, \, au + bv) = a \, T(\alpha, u) + b \, T(\alpha, v)$$
 
 Linearity in each slot independently. This is weaker than full linearity (a bilinear map is not the same as a linear map on the product space).
 
-**The dual space \\(V^*\\)** consists of all linear functions \\(\varphi: V \rightarrow \mathbb{R}\\). If \\(V\\) has basis \\(\{e_1, \ldots, e_n\}\\), then \\(V^*\\) has a dual basis \\(\{e^1, \ldots, e^n\}\\) defined by:
+**The dual space \\(V^\*\\)** consists of all linear functions \\(\varphi: V \rightarrow \mathbb{R}\\). If \\(V\\) has basis \\(\{e_1, \ldots, e_n\}\\), then \\(V^\*\\) has a dual basis \\(\{e^1, \ldots, e^n\}\\) defined by:
 
 $$e^i(e_j) = \delta^i_j = \begin{cases} 1 & \text{if } i = j \\ 0 & \text{if } i \neq j \end{cases}$$
 
 This \\(\delta^i_j\\) is the **Kronecker delta** --- it picks out matching indices. The dual basis element \\(e^i\\) "extracts" the \\(i\\)-th component of any vector: \\(e^i(v) = v^i\\).
 
-Now, why do we need both \\(V\\) and \\(V^*\\)? Because vectors and covectors transform *differently* under change of basis. This distinction is invisible when you work in an orthonormal basis (where \\(V\\) and \\(V^*\\) can be identified), which is why most programmers never encounter it. But it is fundamental to the mathematics.
+Now, why do we need both \\(V\\) and \\(V^\*\\)? Because vectors and covectors transform *differently* under change of basis. This distinction is invisible when you work in an orthonormal basis (where \\(V\\) and \\(V^\*\\) can be identified), which is why most programmers never encounter it. But it is fundamental to the mathematics.
 
 Let us see some examples:
 
@@ -88,7 +88,7 @@ The **tensor product** is the fundamental operation that builds higher-rank tens
 
 $$(u \otimes w)(\alpha, \beta) = \alpha(u) \cdot \beta(w)$$
 
-for all \\(\alpha, \beta \in V^*\\). In components, if \\(u\\) has components \\(u^i\\) and \\(w\\) has components \\(w^j\\), then:
+for all \\(\alpha, \beta \in V^\*\\). In components, if \\(u\\) has components \\(u^i\\) and \\(w\\) has components \\(w^j\\), then:
 
 $$(u \otimes w)^{ij} = u^i w^j$$
 
@@ -189,7 +189,7 @@ $$v'^i = (M^{-1})^i{}_j \, v^j$$
 
 The components transform with the **inverse** of the basis change matrix. Components that transform this way are called **contravariant** and are written with **upper indices**: \\(v^i\\).
 
-Now consider a covector \\(\varphi \in V^*\\). Its components \\(\varphi_i\\) in the dual basis transform as:
+Now consider a covector \\(\varphi \in V^\*\\). Its components \\(\varphi_i\\) in the dual basis transform as:
 
 $$\varphi'_i = M^j{}_i \, \varphi_j$$
 

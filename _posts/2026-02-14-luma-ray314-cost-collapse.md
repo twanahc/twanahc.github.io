@@ -184,11 +184,11 @@ $$\{x_1, \ldots, x_T\} = \text{Denoise}(z_T, c) \quad \text{where } z_T \sim \ma
 
 The model has full freedom over all frames. This is maximally flexible but minimally controllable.
 
-Start frame conditioning converts this to a **constrained initial value problem**: given text \\(c\\) and a start frame \\(x_1^*\\), generate \\(\{x_1^*, x_2, \ldots, x_T\}\\) such that the first frame matches \\(x_1^*\\) exactly and subsequent frames are coherent.
+Start frame conditioning converts this to a **constrained initial value problem**: given text \\(c\\) and a start frame \\(x_1^\*\\), generate \\(\{x_1^\*, x_2, \ldots, x_T\}\\) such that the first frame matches \\(x_1^\*\\) exactly and subsequent frames are coherent.
 
 $$\{x_2, \ldots, x_T\} = \text{Denoise}(z_T, c, x_1^*) \quad \text{s.t. } x_1 = x_1^*$$
 
-Start+end frame conditioning converts this to a **boundary value problem** (BVP): given text \\(c\\), start frame \\(x_1^*\\), and end frame \\(x_T^*\\), generate \\(\{x_1^*, x_2, \ldots, x_{T-1}, x_T^*\}\\) such that both boundary frames are matched and the intermediate frames are coherent.
+Start+end frame conditioning converts this to a **boundary value problem** (BVP): given text \\(c\\), start frame \\(x_1^\*\\), and end frame \\(x_T^\*\\), generate \\(\{x_1^\*, x_2, \ldots, x_{T-1}, x_T^\*\}\\) such that both boundary frames are matched and the intermediate frames are coherent.
 
 $$\{x_2, \ldots, x_{T-1}\} = \text{Denoise}(z_T, c, x_1^*, x_T^*) \quad \text{s.t. } x_1 = x_1^* \text{ and } x_T = x_T^*$$
 
@@ -202,7 +202,7 @@ $$\text{Error}(x_T) = \sum_{t=1}^{T} \epsilon_t + \text{compounding terms}$$
 
 In the worst case, errors can drift the final frame arbitrarily far from the intended target. This is why long T2V generations often "drift" -- characters change appearance, camera angles shift unexpectedly, objects morph.
 
-With a BVP, the end frame is fixed. The model must find a trajectory that arrives at \\(x_T^*\\) exactly. The error at any intermediate frame \\(x_t\\) is bounded by:
+With a BVP, the end frame is fixed. The model must find a trajectory that arrives at \\(x_T^\*\\) exactly. The error at any intermediate frame \\(x_t\\) is bounded by:
 
 $$\text{Error}(x_t) \leq \min\left(\text{Error}_{\text{forward}}(x_1^* \to x_t), \text{Error}_{\text{backward}}(x_T^* \to x_t)\right)$$
 

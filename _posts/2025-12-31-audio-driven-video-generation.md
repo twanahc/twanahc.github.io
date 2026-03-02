@@ -267,7 +267,7 @@ Given the onset strength envelope \\(O[m]\\), the tempo can be estimated by find
 
 $$R[\tau] = \sum_{m} O[m] \cdot O[m + \tau]$$
 
-The autocorrelation \\(R[\tau]\\) peaks at lags \\(\tau\\) corresponding to periodic repetitions in the onset envelope. The dominant period \\(\tau^*\\) is:
+The autocorrelation \\(R[\tau]\\) peaks at lags \\(\tau\\) corresponding to periodic repetitions in the onset envelope. The dominant period \\(\tau^\*\\) is:
 
 $$\tau^* = \arg\max_{\tau \in [\tau_\min, \tau_\max]} R[\tau]$$
 
@@ -289,7 +289,7 @@ The state-of-the-art approach (Ellis 2007, used in librosa) formulates beat trac
 
 $$C(\{b_k\}) = \sum_{k=1}^{K} O[b_k] + \alpha \sum_{k=2}^{K} F(b_k - b_{k-1}, \tau^*)$$
 
-The first term rewards placing beats at frames with high onset strength. The second term penalizes deviations from the estimated tempo period \\(\tau^*\\) via a penalty function:
+The first term rewards placing beats at frames with high onset strength. The second term penalizes deviations from the estimated tempo period \\(\tau^\*\\) via a penalty function:
 
 $$F(\Delta, \tau^*) = -\left(\log \frac{\Delta}{\tau^*}\right)^2$$
 

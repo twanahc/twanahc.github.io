@@ -539,7 +539,7 @@ The cost savings are significant. A rough estimate of the multi-step audio pipel
 | Audio mixing/sync | $0.01 | Compute cost |
 | **Total** | **$0.62** | |
 
-Versus native audio with Veo 3.1 at \\(0.15/sec for 5 seconds: **\\)0.75** total. The native approach is actually slightly more expensive at Veo's standard pricing, but at Veo Fast pricing ($0.15/sec, so $0.75 for 5s) --- wait, let me recalculate.
+Versus native audio with Veo 3.1 at \\(0.15/sec for 5 seconds: \*\*\\)0.75** total. The native approach is actually slightly more expensive at Veo's standard pricing, but at Veo Fast pricing ($0.15/sec, so $0.75 for 5s) --- wait, let me recalculate.
 
 At Veo 3.1 Fast: $0.15/sec \\(\times\\) 5s = $0.75. At Sora 2: $0.10/sec \\(\times\\) 5s = $0.50.
 

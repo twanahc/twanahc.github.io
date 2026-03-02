@@ -364,7 +364,7 @@ This is more conservative than the simple LTV formula ($479 at 5% churn) because
 | Subscription revenue | $1,536K | $18,432K | 90% |
 | Overage/usage revenue | $125K | $1,500K | 7% |
 | Enterprise contracts | $50K | $600K | 3% |
-| **Total Revenue** | **\\(1,711K** | **\\)20,532K** | **100%** |
+| **Total Revenue** | **\\(1,711K\*\* | \*\*\\)20,532K** | **100%** |
 | | | | |
 | **COGS** | | | |
 | Video generation APIs | $340K | $4,080K | 19.9% |
@@ -373,9 +373,9 @@ This is more conservative than the simple LTV formula ($479 at 5% churn) because
 | Cloud storage | $15K | $180K | 0.9% |
 | CDN and bandwidth | $12K | $144K | 0.7% |
 | Encoding/transcoding | $8K | $96K | 0.5% |
-| **Total COGS** | **\\(417K** | **\\)5,004K** | **24.4%** |
+| **Total COGS** | **\\(417K\*\* | \*\*\\)5,004K** | **24.4%** |
 | | | | |
-| **Gross Profit** | **\\(1,294K** | **\\)15,528K** | **75.6%** |
+| **Gross Profit** | **\\(1,294K\*\* | \*\*\\)15,528K** | **75.6%** |
 | | | | |
 | **Operating Expenses** | | | |
 | Engineering (20 people) | $350K | $4,200K | 20.5% |
@@ -384,9 +384,9 @@ This is more conservative than the simple LTV formula ($479 at 5% churn) because
 | Customer support (5 people) | $50K | $600K | 2.9% |
 | G&A (legal, finance, ops) | $80K | $960K | 4.7% |
 | Infrastructure (non-COGS) | $40K | $480K | 2.3% |
-| **Total OpEx** | **\\(760K** | **\\)9,120K** | **44.4%** |
+| **Total OpEx** | **\\(760K\*\* | \*\*\\)9,120K** | **44.4%** |
 | | | | |
-| **Operating Income** | **\\(534K** | **\\)6,408K** | **31.2%** |
+| **Operating Income** | **\\(534K\*\* | \*\*\\)6,408K** | **31.2%** |
 
 At 50K paying users, this hypothetical platform achieves a 31% operating margin and a 76% gross margin. This is a healthy business. The challenge is getting to 50K paying users --- which requires either significant marketing spend (pushing operating margin negative during growth) or viral organic growth.
 
@@ -973,7 +973,7 @@ For a platform processing 1M generations/month:
 | Content moderation (enhanced) | $15,000 | $180,000 | Additional AI + human review |
 | Legal/compliance team | $25,000 | $300,000 | 2-3 FTEs |
 | Audit and certification | $5,000 | $60,000 | Third-party audits |
-| **Total** | **\\(50,000** | **\\)600,000** | |
+| **Total** | **\\(50,000\*\* | \*\*\\)600,000** | |
 
 At $600K/year for a platform generating $20M ARR, compliance costs represent 3% of revenue. Annoying but not existential.
 

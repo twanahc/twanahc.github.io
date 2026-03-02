@@ -233,7 +233,7 @@ Then for any estimator:
 
 $$\Delta \geq \Delta^*(d(p_G, p_X))$$
 
-where \\(\Delta^*\\) is a monotonically decreasing function. You cannot simultaneously minimize distortion and make the output distribution match the real distribution.
+where \\(\Delta^\*\\) is a monotonically decreasing function. You cannot simultaneously minimize distortion and make the output distribution match the real distribution.
 
 **Proof intuition:** The distortion-optimal estimator is the conditional mean \\(\mathbb{E}[\mathbf{x}|\mathbf{y}]\\), which is blurry (has a different distribution from real images). To make \\(p_G = p_X\\), you must add variability (randomness), which increases MSE. The tradeoff is fundamental --- it holds for any estimator, learned or not.
 

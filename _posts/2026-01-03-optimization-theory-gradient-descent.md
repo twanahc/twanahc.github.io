@@ -30,7 +30,7 @@ This post builds optimization theory from scratch. We define what optimization m
 
 ## What Optimization Means
 
-An **optimization problem** asks: given a function \\(f: \mathbb{R}^d \to \mathbb{R}\\), find the point \\(\theta^*\\) that minimizes it:
+An **optimization problem** asks: given a function \\(f: \mathbb{R}^d \to \mathbb{R}\\), find the point \\(\theta^\*\\) that minimizes it:
 
 $$\theta^* = \arg\min_{\theta \in \mathbb{R}^d} f(\theta)$$
 
@@ -40,8 +40,8 @@ We call \\(f(\theta)\\) the **objective function** or **loss landscape**. The wo
 
 A few important definitions:
 
-- **Global minimum**: \\(\theta^*\\) such that \\(f(\theta^*) \leq f(\theta)\\) for all \\(\theta\\). The absolute lowest point.
-- **Local minimum**: \\(\theta^*\\) such that \\(f(\theta^*) \leq f(\theta)\\) for all \\(\theta\\) in some neighborhood of \\(\theta^*\\). A valley that may not be the deepest.
+- **Global minimum**: \\(\theta^\*\\) such that \\(f(\theta^\*) \leq f(\theta)\\) for all \\(\theta\\). The absolute lowest point.
+- **Local minimum**: \\(\theta^\*\\) such that \\(f(\theta^\*) \leq f(\theta)\\) for all \\(\theta\\) in some neighborhood of \\(\theta^\*\\). A valley that may not be the deepest.
 - **Saddle point**: A point where the gradient is zero but the point is neither a local maximum nor a local minimum. Nearby, the function curves up in some directions and down in others. Think of a mountain pass.
 
 <svg viewBox="0 0 700 300" xmlns="http://www.w3.org/2000/svg" style="max-width: 700px; display: block; margin: 2em auto;">
@@ -97,31 +97,31 @@ This means the function is at least as curved as a quadratic with curvature \\(\
 
 ### First-Order Necessary Condition
 
-If \\(\theta^*\\) is a local minimum of a differentiable function \\(f\\), then:
+If \\(\theta^\*\\) is a local minimum of a differentiable function \\(f\\), then:
 
 $$\nabla f(\theta^*) = 0$$
 
 The gradient (vector of all partial derivatives) must vanish. This is the multivariable generalization of "set the derivative to zero and solve."
 
-Why? If \\(\nabla f(\theta^*) \neq 0\\), then the direction \\(-\nabla f(\theta^*)\\) is a **descent direction**: moving a small step in that direction decreases \\(f\\). So \\(\theta^*\\) could not be a minimum.
+Why? If \\(\nabla f(\theta^\*) \neq 0\\), then the direction \\(-\nabla f(\theta^\*)\\) is a **descent direction**: moving a small step in that direction decreases \\(f\\). So \\(\theta^\*\\) could not be a minimum.
 
-Formally: by Taylor expansion, \\(f(\theta^* + \epsilon d) \approx f(\theta^*) + \epsilon \nabla f(\theta^*)^T d\\). If we choose \\(d = -\nabla f(\theta^*)\\), the second term becomes \\(-\epsilon \|\nabla f(\theta^*)\|^2 < 0\\), so \\(f\\) decreases.
+Formally: by Taylor expansion, \\(f(\theta^\* + \epsilon d) \approx f(\theta^\*) + \epsilon \nabla f(\theta^\*)^T d\\). If we choose \\(d = -\nabla f(\theta^\*)\\), the second term becomes \\(-\epsilon \|\nabla f(\theta^\*)\|^2 < 0\\), so \\(f\\) decreases.
 
 Points where \\(\nabla f = 0\\) are called **critical points** or **stationary points**. But not all critical points are minima --- they could be maxima or saddle points.
 
 ### Second-Order Sufficient Conditions
 
-To distinguish, we look at the Hessian \\(H = \nabla^2 f(\theta^*)\\):
+To distinguish, we look at the Hessian \\(H = \nabla^2 f(\theta^\*)\\):
 
-- If \\(H\\) is **positive definite** (all eigenvalues strictly positive): \\(\theta^*\\) is a **strict local minimum**. The function curves upward in every direction.
-- If \\(H\\) is **negative definite** (all eigenvalues strictly negative): \\(\theta^*\\) is a **strict local maximum**.
-- If \\(H\\) has both positive and negative eigenvalues: \\(\theta^*\\) is a **saddle point**. The function curves up in some directions and down in others.
+- If \\(H\\) is **positive definite** (all eigenvalues strictly positive): \\(\theta^\*\\) is a **strict local minimum**. The function curves upward in every direction.
+- If \\(H\\) is **negative definite** (all eigenvalues strictly negative): \\(\theta^\*\\) is a **strict local maximum**.
+- If \\(H\\) has both positive and negative eigenvalues: \\(\theta^\*\\) is a **saddle point**. The function curves up in some directions and down in others.
 
 The derivation uses the second-order Taylor expansion:
 
 $$f(\theta^* + \delta) \approx f(\theta^*) + \underbrace{\nabla f(\theta^*)^T \delta}_{= 0} + \frac{1}{2}\delta^T H \delta$$
 
-Since the gradient is zero at a critical point, the behavior near \\(\theta^*\\) is determined by the quadratic form \\(\delta^T H \delta\\). If \\(H\\) is positive definite, this quadratic form is positive for all \\(\delta \neq 0\\), meaning \\(f(\theta^* + \delta) > f(\theta^*)\\) for all small perturbations --- a minimum.
+Since the gradient is zero at a critical point, the behavior near \\(\theta^\*\\) is determined by the quadratic form \\(\delta^T H \delta\\). If \\(H\\) is positive definite, this quadratic form is positive for all \\(\delta \neq 0\\), meaning \\(f(\theta^\* + \delta) > f(\theta^\*)\\) for all small perturbations --- a minimum.
 
 In high-dimensional non-convex optimization (like training neural networks), most critical points are saddle points, not local minima. At a random critical point in \\(d\\) dimensions, each Hessian eigenvalue is positive or negative with roughly equal probability, so the chance of all \\(d\\) eigenvalues being positive is approximately \\(2^{-d}\\) --- astronomically small. Gradient descent naturally escapes saddle points (it follows the negative gradient, which has a component along the negative curvature direction), which is one reason it works well in practice.
 
@@ -183,15 +183,15 @@ $$f(\theta_{t+1}) \leq f(\theta_t) - \frac{1}{L}\|\nabla f(\theta_t)\|^2 + \frac
 
 So each step decreases the function value by at least \\(\frac{1}{2L}\|\nabla f(\theta_t)\|^2\\). This is called **sufficient decrease**.
 
-By convexity: \\(f(\theta^*) \geq f(\theta_t) + \nabla f(\theta_t)^T(\theta^* - \theta_t)\\), which rearranges to:
+By convexity: \\(f(\theta^\*) \geq f(\theta_t) + \nabla f(\theta_t)^T(\theta^\* - \theta_t)\\), which rearranges to:
 
 $$\nabla f(\theta_t)^T(\theta_t - \theta^*) \leq f(\theta_t) - f(\theta^*)$$
 
-Combining and telescoping over \\(T\\) iterations (using the identity \\(\|\theta_{t+1} - \theta^*\|^2 = \|\theta_t - \theta^*\|^2 - 2\eta\nabla f(\theta_t)^T(\theta_t - \theta^*) + \eta^2\|\nabla f(\theta_t)\|^2\\)), we obtain:
+Combining and telescoping over \\(T\\) iterations (using the identity \\(\|\theta_{t+1} - \theta^\*\|^2 = \|\theta_t - \theta^\*\|^2 - 2\eta\nabla f(\theta_t)^T(\theta_t - \theta^\*) + \eta^2\|\nabla f(\theta_t)\|^2\\)), we obtain:
 
 $$\sum_{t=0}^{T-1}[f(\theta_t) - f(\theta^*)] \leq \frac{L\|\theta_0 - \theta^*\|^2}{2}$$
 
-Since \\(f(\theta_T) \leq f(\theta_t)\\) for all \\(t \leq T\\) (by sufficient decrease), we have \\(T[f(\theta_T) - f(\theta^*)] \leq \frac{L\|\theta_0 - \theta^*\|^2}{2}\\), giving the result. \\(\blacksquare\\)
+Since \\(f(\theta_T) \leq f(\theta_t)\\) for all \\(t \leq T\\) (by sufficient decrease), we have \\(T[f(\theta_T) - f(\theta^\*)] \leq \frac{L\|\theta_0 - \theta^\*\|^2}{2}\\), giving the result. \\(\blacksquare\\)
 
 For **strongly convex** functions with parameter \\(\mu\\), the convergence is exponential:
 

@@ -257,7 +257,7 @@ $$
 \text{H100-seconds} = \frac{4.43 \times 10^{24}}{312 \times 10^{12}} \approx 1.42 \times 10^{10} \text{ seconds} \approx 164{,}000 \text{ H100-days}
 $$
 
-This is clearly an overestimate (models use efficient attention, gradient checkpointing, variable-length sequences, etc.), but suggests the order of magnitude is tens of thousands of GPU-days. At ~\\(2/H100-hour, training cost is in the **\\)5M-$20M range** --- significant but within reach for Alibaba's compute budget.
+This is clearly an overestimate (models use efficient attention, gradient checkpointing, variable-length sequences, etc.), but suggests the order of magnitude is tens of thousands of GPU-days. At ~\\(2/H100-hour, training cost is in the \*\*\\)5M-$20M range** --- significant but within reach for Alibaba's compute budget.
 
 ### 3.4 Training Methodology
 
@@ -424,20 +424,20 @@ $$
 
 | Hardware | Provider | $/hr | Gen Time | Cost/Gen |
 |---|---|---|---|---|
-| A100 80GB | RunPod (on-demand) | \\(1.64 | 150s | **\\)0.068** |
-| A100 80GB | RunPod (spot) | \\(0.89 | 150s | **\\)0.037** |
-| A100 80GB | Vast.ai (spot) | \\(0.70 | 150s | **\\)0.029** |
-| H100 80GB | Lambda | \\(2.49 | 75s | **\\)0.052** |
-| H100 80GB | RunPod (spot) | \\(2.49 | 75s | **\\)0.052** |
-| H100 80GB | Vast.ai (spot) | \\(1.50 | 75s | **\\)0.031** |
+| A100 80GB | RunPod (on-demand) | \\(1.64 | 150s | \*\*\\)0.068** |
+| A100 80GB | RunPod (spot) | \\(0.89 | 150s | \*\*\\)0.037** |
+| A100 80GB | Vast.ai (spot) | \\(0.70 | 150s | \*\*\\)0.029** |
+| H100 80GB | Lambda | \\(2.49 | 75s | \*\*\\)0.052** |
+| H100 80GB | RunPod (spot) | \\(2.49 | 75s | \*\*\\)0.052** |
+| H100 80GB | Vast.ai (spot) | \\(1.50 | 75s | \*\*\\)0.031** |
 
 #### TI2V-5B at 720p
 
 | Hardware | Provider | $/hr | Gen Time | Cost/Gen |
 |---|---|---|---|---|
-| RTX 4090 | RunPod | \\(0.44 | 120s | **\\)0.015** |
-| RTX 4090 | Vast.ai | \\(0.35 | 120s | **\\)0.012** |
-| RTX 4090 | Self-owned | \\(0.10 | 120s | **\\)0.003** |
+| RTX 4090 | RunPod | \\(0.44 | 120s | \*\*\\)0.015** |
+| RTX 4090 | Vast.ai | \\(0.35 | 120s | \*\*\\)0.012** |
+| RTX 4090 | Self-owned | \\(0.10 | 120s | \*\*\\)0.003** |
 
 ### 5.3 Throughput Analysis
 
@@ -505,11 +505,11 @@ That is roughly **100 generations per day**. If your platform serves more than t
 
 | Monthly Volume | API Cost (Runway Turbo) | Self-Hosted Cost | Monthly Savings |
 |---|---|---|---|
-| 1,000 gen | $250 | $37 + $650 fixed = \\(687 | **-\\)437** (API cheaper) |
-| 5,000 gen | $1,250 | $185 + $650 = \\(835 | **+\\)415** |
-| 10,000 gen | $2,500 | $370 + $650 = \\(1,020 | **+\\)1,480** |
-| 50,000 gen | $12,500 | $1,850 + $650 = \\(2,500 | **+\\)10,000** |
-| 100,000 gen | $25,000 | $3,700 + $650 = \\(4,350 | **+\\)20,650** |
+| 1,000 gen | $250 | $37 + $650 fixed = \\(687 | \*\*-\\)437** (API cheaper) |
+| 5,000 gen | $1,250 | $185 + $650 = \\(835 | \*\*+\\)415** |
+| 10,000 gen | $2,500 | $370 + $650 = \\(1,020 | \*\*+\\)1,480** |
+| 50,000 gen | $12,500 | $1,850 + $650 = \\(2,500 | \*\*+\\)10,000** |
+| 100,000 gen | $25,000 | $3,700 + $650 = \\(4,350 | \*\*+\\)20,650** |
 
 The break-even point is around 3,000-5,000 generations per month. Above that, self-hosting is dramatically cheaper, with savings growing linearly.
 

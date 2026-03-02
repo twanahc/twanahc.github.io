@@ -59,13 +59,13 @@ The derivation of the Euler-Lagrange equation parallels the derivation of "set t
 
 ### The Derivation
 
-Let \\(y^*(x)\\) be the function that stationarizes \\(J[y]\\). Consider a **variation**: a nearby function \\(y(x) = y^*(x) + \epsilon \eta(x)\\), where \\(\eta(x)\\) is an arbitrary smooth function satisfying \\(\eta(a) = \eta(b) = 0\\) (so the endpoints remain fixed) and \\(\epsilon\\) is a small parameter.
+Let \\(y^\*(x)\\) be the function that stationarizes \\(J[y]\\). Consider a **variation**: a nearby function \\(y(x) = y^\*(x) + \epsilon \eta(x)\\), where \\(\eta(x)\\) is an arbitrary smooth function satisfying \\(\eta(a) = \eta(b) = 0\\) (so the endpoints remain fixed) and \\(\epsilon\\) is a small parameter.
 
 Substituting into the functional:
 
 $$J[y^* + \epsilon \eta] = \int_a^b L(x, y^* + \epsilon \eta, y^{*\prime} + \epsilon \eta') \, dx$$
 
-This is now an ordinary function of the single variable \\(\epsilon\\). For \\(y^*\\) to be a stationary point, we need:
+This is now an ordinary function of the single variable \\(\epsilon\\). For \\(y^\*\\) to be a stationary point, we need:
 
 $$\left.\frac{d}{d\epsilon}\right|_{\epsilon = 0} J[y^* + \epsilon \eta] = 0 \quad \text{for all admissible } \eta$$
 
@@ -161,7 +161,7 @@ The **action** is the functional:
 
 $$S[q] = \int_{t_1}^{t_2} \mathcal{L}(q(t), \dot{q}(t), t) \, dt$$
 
-The **principle of least action** (Hamilton's principle): the physical trajectory \\(q^*(t)\\) is the one that stationarizes the action: \\(\delta S = 0\\).
+The **principle of least action** (Hamilton's principle): the physical trajectory \\(q^\*(t)\\) is the one that stationarizes the action: \\(\delta S = 0\\).
 
 ### Deriving Newton's Second Law
 

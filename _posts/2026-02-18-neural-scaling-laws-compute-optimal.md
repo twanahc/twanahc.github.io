@@ -231,7 +231,7 @@ The practical consequence was stark: the 70-billion parameter Chinchilla model, 
 
 ## Deriving the Chinchilla Optimal Allocation
 
-Now for the main derivation. We want to find the compute-optimal model size \\(N^*\\) and dataset size \\(D^*\\) that minimize the loss for a given compute budget. This is a classic constrained optimization problem, and we solve it with **Lagrange multipliers**.
+Now for the main derivation. We want to find the compute-optimal model size \\(N^\*\\) and dataset size \\(D^\*\\) that minimize the loss for a given compute budget. This is a classic constrained optimization problem, and we solve it with **Lagrange multipliers**.
 
 ### The Setup
 
@@ -299,7 +299,7 @@ $$\frac{N^{\alpha}}{D^{\beta}} = \frac{\alpha A}{\beta B} \tag{3}$$
 
 This tells us the relationship between the optimal \\(N\\) and \\(D\\). Now we use the constraint \\(C = 6ND\\) to express everything in terms of \\(C\\).
 
-### Expressing \\(N^*\\) and \\(D^*\\) in Terms of \\(C\\)
+### Expressing \\(N^\*\\) and \\(D^\*\\) in Terms of \\(C\\)
 
 From the constraint: \\(D = C / (6N)\\). Substitute into equation (3):
 
@@ -325,15 +325,15 @@ With Chinchilla's values \\(\alpha \approx 0.34\\) and \\(\beta \approx 0.28\\):
 
 $$\frac{\beta}{\alpha + \beta} = \frac{0.28}{0.62} \approx 0.45, \quad \frac{\alpha}{\alpha + \beta} = \frac{0.34}{0.62} \approx 0.55$$
 
-So \\(N^* \propto C^{0.45}\\) and \\(D^* \propto C^{0.55}\\).
+So \\(N^\* \propto C^{0.45}\\) and \\(D^\* \propto C^{0.55}\\).
 
 These exponents are close to $0.5$ --- meaning **parameters and data should scale roughly equally with compute**. This is the Chinchilla result. For every doubling of parameters, you need approximately a doubling of data.
 
-Compare with Kaplan: \\(N^* \propto C^{0.73}\\), \\(D^* \propto C^{0.27}\\). Kaplan said scale parameters \\(2.7\times\\) faster than data. Chinchilla says scale them approximately equally.
+Compare with Kaplan: \\(N^\* \propto C^{0.73}\\), \\(D^\* \propto C^{0.27}\\). Kaplan said scale parameters \\(2.7\times\\) faster than data. Chinchilla says scale them approximately equally.
 
 ### The Optimal Token-to-Parameter Ratio
 
-We can derive the optimal ratio \\(D^*/N^*\\). Since \\(C = 6N^*D^*\\) and both scale as \\(\sim C^{0.5}\\), the ratio \\(D^*/N^*\\) is approximately constant --- it does not change with scale.
+We can derive the optimal ratio \\(D^\*/N^\*\\). Since \\(C = 6N^\*D^\*\\) and both scale as \\(\sim C^{0.5}\\), the ratio \\(D^\*/N^\*\\) is approximately constant --- it does not change with scale.
 
 Using the Chinchilla fits:
 
@@ -501,7 +501,7 @@ where \\(D\\) is the number of training tokens.
 
 ### The Chinchilla-Optimal Case
 
-At the Chinchilla-optimal point, \\(D^* \approx 20N\\), so:
+At the Chinchilla-optimal point, \\(D^\* \approx 20N\\), so:
 
 $$C_{train} = 6N \cdot 20N = 120N^2$$
 
@@ -509,13 +509,13 @@ $$C_{total} = 120N^2 + 2NT$$
 
 ### The Overtrained (Inference-Optimal) Case
 
-Now suppose we train a smaller model \\(N' < N^*\\) but on much more data \\(D' \gg 20N'\\), keeping the training budget the same: \\(6N'D' = 6N^*D^*\\). The model is "overtrained" --- past the Chinchilla-optimal point. Its loss will be slightly worse than the Chinchilla-optimal model (since we are not at the minimum of the loss surface for this compute budget). But inference is cheaper because the model is smaller.
+Now suppose we train a smaller model \\(N' < N^\*\\) but on much more data \\(D' \gg 20N'\\), keeping the training budget the same: \\(6N'D' = 6N^\*D^\*\\). The model is "overtrained" --- past the Chinchilla-optimal point. Its loss will be slightly worse than the Chinchilla-optimal model (since we are not at the minimum of the loss surface for this compute budget). But inference is cheaper because the model is smaller.
 
 The total cost becomes:
 
 $$C_{total}' = 6N'D' + 2N' \cdot T = C_{train} + 2N' \cdot T$$
 
-Since \\(N' < N^*\\), the inference term $2N'T$ is smaller. If \\(T\\) is large enough, the savings in inference outweigh the slight increase in loss.
+Since \\(N' < N^\*\\), the inference term $2N'T$ is smaller. If \\(T\\) is large enough, the savings in inference outweigh the slight increase in loss.
 
 ### The Llama Philosophy
 
@@ -527,7 +527,7 @@ The tradeoff calculation: for a model that will be served to millions of users, 
 
 ### The Breakeven Point
 
-We can compute the breakeven number of inference tokens \\(T^*\\) where overtaining becomes worth it. Suppose the overtrained model has loss \\(L' = L^* + \Delta L\\) (slightly worse) but uses a model of size \\(N' = N^*/k\\) for some factor \\(k > 1\\). The training cost is the same (\\(C_{train}\\) fixed), but inference savings are:
+We can compute the breakeven number of inference tokens \\(T^\*\\) where overtaining becomes worth it. Suppose the overtrained model has loss \\(L' = L^\* + \Delta L\\) (slightly worse) but uses a model of size \\(N' = N^\*/k\\) for some factor \\(k > 1\\). The training cost is the same (\\(C_{train}\\) fixed), but inference savings are:
 
 $$\Delta C_{inf} = 2(N^* - N'/k) \cdot T = 2N^*(1 - 1/k) \cdot T$$
 

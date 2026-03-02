@@ -601,7 +601,7 @@ For color-only transfer, we modify the content loss to operate only on the lumin
 
 $$\mathcal{L}_{\text{content}} = \frac{1}{2} \sum_{i,j} \left(L^*(\hat{x})_{ij} - L^*(x_c)_{ij}\right)^2$$
 
-where \\(L^*\\) is the lightness channel of the LAB representation and \\(x_c\\) is the content image.
+where \\(L^\*\\) is the lightness channel of the LAB representation and \\(x_c\\) is the content image.
 
 ```python
 import torch
@@ -1516,7 +1516,7 @@ The simplified Euclidean distance in LAB space is a reasonable first approximati
 
 ### The CIEDE2000 Formula
 
-Given two colors in LAB space: \\((L_1^*, a_1^*, b_1^*)\\) and \\((L_2^*, a_2^*, b_2^*)\\).
+Given two colors in LAB space: \\((L_1^\*, a_1^\*, b_1^\*)\\) and \\((L_2^\*, a_2^\*, b_2^\*)\\).
 
 **Step 1: Compute chroma and hue in CIELAB.**
 

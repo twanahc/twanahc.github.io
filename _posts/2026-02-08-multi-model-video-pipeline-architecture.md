@@ -1947,14 +1947,14 @@ User prompt --> [Generate Preview] --> [Show to User] --> [User Approves?]
 
 Assume 40% of previews get edited/rejected before the user is happy:
 
-- Without preview: 100 requests x \\(2.00 avg = **\\)200.00**
-- With preview: 100 previews x $0.25 = $25.00, plus 60 final renders x $2.00 = \\(120.00 = **\\)145.00**
+- Without preview: 100 requests x \\(2.00 avg = \*\*\\)200.00**
+- With preview: 100 previews x $0.25 = $25.00, plus 60 final renders x $2.00 = \\(120.00 = \*\*\\)145.00**
 - Savings: **27.5%**
 
 If the rejection rate is 60% (common for first-time users):
 
 - Without preview: 100 x $2.00 = $200.00
-- With preview: 100 x $0.25 = $25.00 + 40 x $2.00 = \\(80.00 = **\\)105.00**
+- With preview: 100 x $0.25 = $25.00 + 40 x $2.00 = \\(80.00 = \*\*\\)105.00**
 - Savings: **47.5%**
 
 ### Real-Time Cost Dashboard

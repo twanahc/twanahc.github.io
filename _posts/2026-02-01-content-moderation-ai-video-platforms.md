@@ -501,7 +501,7 @@ The asymmetry is stark. A single CSAM false negative can cost millions in legal 
 
 ### Optimal Threshold Derivation
 
-We want to find the threshold \\(t^*\\) that minimizes expected cost:
+We want to find the threshold \\(t^\*\\) that minimizes expected cost:
 
 $$t^* = \arg\min_t \; \mathbb{E}[\text{Cost}(t)]$$
 
@@ -562,7 +562,7 @@ Computing numerically (Beta PDF evaluation):
 | 0.50 | 0.03 | 1.93 | 64.3 | 16 | 1.56 | $812 |
 | 0.60 | 0.003 | 4.62 | 1540 | 3 | 3.12 | $1,566 |
 
-The minimum expected cost occurs around \\(t^* \approx 0.38\\). At this threshold:
+The minimum expected cost occurs around \\(t^\* \approx 0.38\\). At this threshold:
 - We block ~156 safe items per day (false positives) -- costing $312/day
 - We miss ~0.4 harmful items per day (false negatives) -- costing $190/day
 - Total expected cost: ~$502/day

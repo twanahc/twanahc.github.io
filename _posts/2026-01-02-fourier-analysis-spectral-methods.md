@@ -238,7 +238,7 @@ Operationally: you slide \\(g\\) across \\(f\\), multiply them pointwise at each
 
 ### Proof of the Convolution Theorem
 
-We want to show that \\(\widehat{f * g}(\xi) = \hat{f}(\xi) \cdot \hat{g}(\xi)\\).
+We want to show that \\(\widehat{f \* g}(\xi) = \hat{f}(\xi) \cdot \hat{g}(\xi)\\).
 
 Start by taking the Fourier transform of the convolution:
 

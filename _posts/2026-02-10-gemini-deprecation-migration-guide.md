@@ -524,7 +524,7 @@ $$\frac{dC}{dk} = -\frac{dP_{\text{error}}}{dk} \cdot C_{\text{error}}$$
 
 $$C_0 \cdot \beta = \gamma \cdot (1 - Q_0/Q_{\max}) \cdot e^{-\gamma k^*} \cdot C_{\text{error}}$$
 
-Solving for optimal \\(k^*\\):
+Solving for optimal \\(k^\*\\):
 
 $$k^* = \frac{1}{\gamma} \ln\left(\frac{\gamma \cdot (1 - Q_0/Q_{\max}) \cdot C_{\text{error}}}{C_0 \cdot \beta}\right)$$
 
@@ -1086,28 +1086,28 @@ Let's model the monthly cost for a platform processing generations at three scal
 
 | Model | Input Cost | Output Cost | Thinking Cost | Total/Month |
 |---|---|---|---|---|
-| 2.0 Flash | $30.35 | $15.20 | \\(0 | **\\)45.55** |
-| 2.5 Flash (with thinking) | $45.53 | $22.80 | \\(11.55 | **\\)79.88** |
-| 2.5 Flash (no thinking) | $45.53 | $22.80 | \\(0 | **\\)68.33** |
-| 2.5 Flash-Lite | $22.76 | $11.40 | \\(0 | **\\)34.16** |
+| 2.0 Flash | $30.35 | $15.20 | \\(0 | \*\*\\)45.55** |
+| 2.5 Flash (with thinking) | $45.53 | $22.80 | \\(11.55 | \*\*\\)79.88** |
+| 2.5 Flash (no thinking) | $45.53 | $22.80 | \\(0 | \*\*\\)68.33** |
+| 2.5 Flash-Lite | $22.76 | $11.40 | \\(0 | \*\*\\)34.16** |
 
 **Monthly cost at 100K generations/month**:
 
 | Model | Input Cost | Output Cost | Thinking Cost | Total/Month |
 |---|---|---|---|---|
-| 2.0 Flash | $303.50 | $152.00 | \\(0 | **\\)455.50** |
-| 2.5 Flash (with thinking) | $455.25 | $228.00 | \\(115.50 | **\\)798.75** |
-| 2.5 Flash (no thinking) | $455.25 | $228.00 | \\(0 | **\\)683.25** |
-| 2.5 Flash-Lite | $227.63 | $114.00 | \\(0 | **\\)341.63** |
+| 2.0 Flash | $303.50 | $152.00 | \\(0 | \*\*\\)455.50** |
+| 2.5 Flash (with thinking) | $455.25 | $228.00 | \\(115.50 | \*\*\\)798.75** |
+| 2.5 Flash (no thinking) | $455.25 | $228.00 | \\(0 | \*\*\\)683.25** |
+| 2.5 Flash-Lite | $227.63 | $114.00 | \\(0 | \*\*\\)341.63** |
 
 **Monthly cost at 1M generations/month**:
 
 | Model | Input Cost | Output Cost | Thinking Cost | Total/Month |
 |---|---|---|---|---|
-| 2.0 Flash | $3,035 | $1,520 | \\(0 | **\\)4,555** |
-| 2.5 Flash (with thinking) | $4,553 | $2,280 | \\(1,155 | **\\)7,988** |
-| 2.5 Flash (no thinking) | $4,553 | $2,280 | \\(0 | **\\)6,833** |
-| 2.5 Flash-Lite | $2,276 | $1,140 | \\(0 | **\\)3,416** |
+| 2.0 Flash | $3,035 | $1,520 | \\(0 | \*\*\\)4,555** |
+| 2.5 Flash (with thinking) | $4,553 | $2,280 | \\(1,155 | \*\*\\)7,988** |
+| 2.5 Flash (no thinking) | $4,553 | $2,280 | \\(0 | \*\*\\)6,833** |
+| 2.5 Flash-Lite | $2,276 | $1,140 | \\(0 | \*\*\\)3,416** |
 
 ### The True Cost: Including Quality Savings
 
@@ -1133,8 +1133,8 @@ Savings: $550/month from better moderation.
 
 | Model | Token Cost | Regeneration Waste | Review Cost | Effective Total |
 |---|---|---|---|---|
-| 2.0 Flash | $455.50 | $2,565 | \\(870 | **\\)3,890.50** |
-| 2.5 Flash (with thinking) | $798.75 | $1,620 | \\(320 | **\\)2,738.75** |
+| 2.0 Flash | $455.50 | $2,565 | \\(870 | \*\*\\)3,890.50** |
+| 2.5 Flash (with thinking) | $798.75 | $1,620 | \\(320 | \*\*\\)2,738.75** |
 
 **2.5 Flash with thinking is 30% cheaper in effective total cost**, despite being 75% more expensive in raw token cost. The quality improvement more than pays for itself.
 

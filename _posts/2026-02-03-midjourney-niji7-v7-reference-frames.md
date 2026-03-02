@@ -1361,7 +1361,7 @@ $$
 C_V \cdot \frac{(1 - p_{\text{single}})^{n-1} \cdot p_{\text{single}}}{p_{V|I}} > C_I
 $$
 
-Solving for the break-even \\(n^*\\):
+Solving for the break-even \\(n^\*\\):
 
 $$
 (1 - p_{\text{single}})^{n^* - 1} > \frac{C_I \cdot p_{V|I}}{C_V \cdot p_{\text{single}}}
@@ -1389,11 +1389,11 @@ For a single 5-second video generation:
 
 | Strategy | Image Cost | Video Cost | Expected Attempts | Total Cost |
 |---|---|---|---|---|
-| Direct T2V (Veo 3.1 Fast) | $0 | \\(0.75/attempt | 3.0 | **\\)2.27** |
-| Direct T2V (Kling 3.0) | $0 | \\(0.60/attempt | 3.0 | **\\)1.82** |
-| 8 Draft + I2V (Veo 3.1 Fast) | $0.08 | \\(0.75/attempt | 1.43 | **\\)1.15** |
-| 8 Draft + I2V (Kling 3.0) | $0.08 | \\(0.60/attempt | 1.43 | **\\)0.94** |
-| 8 Draft + I2V (Wan 2.2 self) | $0.08 | \\(0.04/attempt | 1.43 | **\\)0.14** |
+| Direct T2V (Veo 3.1 Fast) | $0 | \\(0.75/attempt | 3.0 | \*\*\\)2.27** |
+| Direct T2V (Kling 3.0) | $0 | \\(0.60/attempt | 3.0 | \*\*\\)1.82** |
+| 8 Draft + I2V (Veo 3.1 Fast) | $0.08 | \\(0.75/attempt | 1.43 | \*\*\\)1.15** |
+| 8 Draft + I2V (Kling 3.0) | $0.08 | \\(0.60/attempt | 1.43 | \*\*\\)0.94** |
+| 8 Draft + I2V (Wan 2.2 self) | $0.08 | \\(0.04/attempt | 1.43 | \*\*\\)0.14** |
 
 The preview-then-commit approach with self-hosted Wan 2.2 brings the cost to **$0.14 per accepted video** --- an order of magnitude cheaper than direct T2V with commercial APIs.
 
@@ -1954,7 +1954,7 @@ For a 6-shot, 30-second product demo:
 | **Total with Kling** | | **$3.78** |
 | **Total with Wan (self-hosted)** | | **$0.42** |
 
-A professional-quality 30-second multi-shot video for **\\(3.78** (Kling) or **\\)0.42** (self-hosted Wan). Compare to stock video licensing (\\(50-500) or traditional production (\\)5,000-50,000+).
+A professional-quality 30-second multi-shot video for **\\(3.78\*\* (Kling) or \*\*\\)0.42** (self-hosted Wan). Compare to stock video licensing (\\(50-500) or traditional production (\\)5,000-50,000+).
 
 ---
 

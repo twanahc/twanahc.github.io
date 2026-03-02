@@ -399,7 +399,7 @@ For a typical AI video SaaS processing 50,000 generations per month:
 | **Auth** (Firebase Auth / Clerk) | $50 | $0.001 |
 | **Background Jobs** (Cloud Run / Lambda) | $150 | $0.003 |
 | **Webhook Processing** | $30 | $0.001 |
-| **Total Infrastructure** | **\\(842** | **\\)0.017** |
+| **Total Infrastructure** | **\\(842\*\* | \*\*\\)0.017** |
 
 So \\(C_{\text{infra}} \approx \\)0.02$ per generation is a reasonable estimate at moderate scale. At higher scale (500K+ generations/month), this drops to ~$0.005-0.01 due to better amortization.
 
@@ -421,11 +421,11 @@ $$P_{\text{user}} = \frac{C_{\text{provider}} + 0.02 + 0.02}{1 - 0.55}$$
 
 | Model | Provider Cost | + Infra | + Support | Total Cost | / (1-0.55) | User Price |
 |---|---|---|---|---|---|---|
-| Luma Ray3.14 5s | $0.10 | $0.12 | $0.14 | $0.14 | \\(0.31 | **\\)0.35** |
-| Kling 2.1 Std 5s | $0.50 | $0.52 | $0.54 | $0.54 | \\(1.20 | **\\)1.25** |
-| Kling 2.1 Pro 5s | $1.60 | $1.62 | $1.64 | $1.64 | \\(3.64 | **\\)3.75** |
-| Veo 3 5s | $2.40 | $2.42 | $2.44 | $2.44 | \\(5.42 | **\\)5.50** |
-| Runway Gen-4 5s | $1.00 | $1.02 | $1.04 | $1.04 | \\(2.31 | **\\)2.50** |
+| Luma Ray3.14 5s | $0.10 | $0.12 | $0.14 | $0.14 | \\(0.31 | \*\*\\)0.35** |
+| Kling 2.1 Std 5s | $0.50 | $0.52 | $0.54 | $0.54 | \\(1.20 | \*\*\\)1.25** |
+| Kling 2.1 Pro 5s | $1.60 | $1.62 | $1.64 | $1.64 | \\(3.64 | \*\*\\)3.75** |
+| Veo 3 5s | $2.40 | $2.42 | $2.44 | $2.44 | \\(5.42 | \*\*\\)5.50** |
+| Runway Gen-4 5s | $1.00 | $1.02 | $1.04 | $1.04 | \\(2.31 | \*\*\\)2.50** |
 
 These are the per-generation prices at 55% gross margin. In a credit system, you convert these to credit amounts by dividing by your price-per-credit.
 

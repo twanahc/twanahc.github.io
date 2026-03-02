@@ -259,7 +259,7 @@ Putting it all together, here is the complete pipeline for rendering a single im
    - Evaluate the 2D Gaussian: \\(G_{2D}^{(i)}(\mathbf{p})\\)
    - Compute effective opacity: \\(\alpha_i = o_i \cdot G_{2D}^{(i)}(\mathbf{p})\\)
    - Evaluate view-dependent color: \\(\mathbf{c}_i = \text{SH}(\mathbf{d}_i)\\)
-   - Accumulate: \\(C \mathrel{+}= T \cdot \alpha_i \cdot \mathbf{c}_i\\), then \\(T \mathrel{*}= (1 - \alpha_i)\\)
+   - Accumulate: \\(C \mathrel{+}= T \cdot \alpha_i \cdot \mathbf{c}_i\\), then \\(T \mathrel{\*}= (1 - \alpha_i)\\)
    - Early termination: stop if \\(T < \epsilon\\)
 
 5. **Output pixel color** \\(C\\).
@@ -307,7 +307,7 @@ This entire pipeline runs on GPU. The tile-based approach avoids global sorting 
 
 ## Differentiable Rendering and Optimization
 
-The key innovation is that the entire rendering pipeline is **differentiable**. Given a rendered image \\(\hat{I}\\) and a ground-truth photograph \\(I^*\\), we can compute a loss \\(\mathcal{L}(\hat{I}, I^*)\\) and backpropagate gradients all the way to the Gaussian parameters.
+The key innovation is that the entire rendering pipeline is **differentiable**. Given a rendered image \\(\hat{I}\\) and a ground-truth photograph \\(I^\*\\), we can compute a loss \\(\mathcal{L}(\hat{I}, I^\*)\\) and backpropagate gradients all the way to the Gaussian parameters.
 
 ### Gradient Flow
 
