@@ -19,25 +19,27 @@ This is the **explore-exploit tradeoff**, and it is the problem that Amazon, Ube
 
 1. [The Explore-Exploit Tradeoff](#1-the-explore-exploit-tradeoff)
 2. [Multi-Armed Bandits: Formal Framework](#2-multi-armed-bandits-formal-framework)
-3. [Upper Confidence Bound (UCB)](#3-upper-confidence-bound-ucb)
-4. [Thompson Sampling](#4-thompson-sampling)
-5. [Contextual Bandits for Personalized Pricing](#5-contextual-bandits-for-personalized-pricing)
-6. [Continuous-Armed Bandits and Lipschitz Optimization](#6-continuous-armed-bandits-and-lipschitz-optimization)
-7. [Gaussian Process Bandits and Bayesian Optimization for Pricing](#7-gaussian-process-bandits-and-bayesian-optimization-for-pricing)
-8. [Non-Stationary Bandits — When Demand Shifts](#8-non-stationary-bandits--when-demand-shifts)
-9. [Adversarial Bandits — When Competitors Fight Back](#9-adversarial-bandits--when-competitors-fight-back)
-10. [Multi-Product Dynamic Pricing](#10-multi-product-dynamic-pricing)
-11. [Deep Reinforcement Learning for Pricing](#11-deep-reinforcement-learning-for-pricing)
-12. [Fairness Constraints in Algorithmic Pricing](#12-fairness-constraints-in-algorithmic-pricing)
-13. [Python — GP-Bandit and Non-Stationary Demand](#13-python--gp-bandit-and-non-stationary-demand)
-14. [The Pricing MDP: When Bandits Aren't Enough](#14-the-pricing-mdp-when-bandits-arent-enough)
-15. [Airline Revenue Management](#15-airline-revenue-management)
-16. [Uber's Surge Pricing](#16-ubers-surge-pricing)
-17. [Amazon's Pricing Engine](#17-amazons-pricing-engine)
-18. [The Buy Box Game](#18-the-buy-box-game)
-19. [Implementation at Scale](#19-implementation-at-scale)
-20. [Python Simulations](#20-python-simulations)
-21. [The Complete Stack](#21-the-complete-stack)
+3. [Upper Confidence Bound (UCB)](#3-upper-confidence-bound-ucb) — *with full proof of the regret bound*
+4. [Thompson Sampling](#4-thompson-sampling) — *with information-theoretic analysis (Russo & Van Roy)*
+5. [Bayesian Dynamic Pricing with Conjugate Demand Models](#45-bayesian-dynamic-pricing-with-conjugate-demand-models)
+6. [Contextual Bandits for Personalized Pricing](#5-contextual-bandits-for-personalized-pricing)
+7. [Continuous-Armed Bandits and Lipschitz Optimization](#6-continuous-armed-bandits-and-lipschitz-optimization)
+8. [Gaussian Process Bandits and Bayesian Optimization for Pricing](#7-gaussian-process-bandits-and-bayesian-optimization-for-pricing)
+9. [Non-Stationary Bandits — When Demand Shifts](#8-non-stationary-bandits--when-demand-shifts)
+10. [Adversarial Bandits — When Competitors Fight Back](#9-adversarial-bandits--when-competitors-fight-back)
+11. [Multi-Product Dynamic Pricing](#10-multi-product-dynamic-pricing)
+12. [Deep Reinforcement Learning for Pricing](#11-deep-reinforcement-learning-for-pricing)
+13. [Offline Reinforcement Learning for Pricing](#115-offline-reinforcement-learning-for-pricing)
+14. [Fairness Constraints in Algorithmic Pricing](#12-fairness-constraints-in-algorithmic-pricing)
+15. [Python — GP-Bandit and Non-Stationary Demand](#13-python--gp-bandit-and-non-stationary-demand)
+16. [The Pricing MDP: When Bandits Aren't Enough](#14-the-pricing-mdp-when-bandits-arent-enough)
+17. [Airline Revenue Management](#15-airline-revenue-management) — *with network revenue management*
+18. [Uber's Surge Pricing](#16-ubers-surge-pricing)
+19. [Amazon's Pricing Engine](#17-amazons-pricing-engine)
+20. [The Buy Box Game](#18-the-buy-box-game)
+21. [Implementation at Scale](#19-implementation-at-scale)
+22. [Python Simulations](#20-python-simulations) — *including Bayesian dynamic pricing simulation*
+23. [The Complete Stack](#21-the-complete-stack)
 
 ---
 
@@ -142,6 +144,122 @@ $$
 
 This is \(O(K \ln T)\), which matches the Lai-Robbins lower bound up to constants. UCB1 is essentially **optimal** in the minimax sense.
 
+### Full Proof of the UCB1 Regret Bound
+
+The statement above is clean, but the proof is where the real understanding lives. Let's walk through every step, because the argument reveals *why* optimism works and exactly where the logarithmic dependence on \(T\) comes from.
+
+**What we want to bound.** The regret is \(R_T = \sum_k \Delta_k \, \mathbb{E}[N_k(T)]\), so it suffices to bound \(\mathbb{E}[N_k(T)]\) — the expected number of times each suboptimal arm \(k\) is pulled.
+
+**Step 1: Decomposing the pulls of a suboptimal arm.** Fix a suboptimal arm \(k\) with gap \(\Delta_k = \mu^* - \mu_k > 0\). Choose a threshold:
+
+$$
+\ell = \left\lceil \frac{8 \ln T}{\Delta_k^2} \right\rceil
+$$
+
+We split the total pulls of arm \(k\) into "early" pulls (the first \(\ell\) times) and "late" pulls (every time after that):
+
+$$
+N_k(T) = \ell + \sum_{t=K+1}^{T} \mathbf{1}\{A_t = k, \; N_k(t-1) \geq \ell\}
+$$
+
+The first \(\ell\) pulls are "budgeted" — we accept them as the cost of gathering enough data about arm \(k\). The key is bounding the second term: how often does UCB1 pull arm \(k\) even after it has been tried \(\ell\) times?
+
+**Step 2: When does arm \(k\) beat the optimal arm?** Arm \(k\) is pulled at time \(t\) only if its UCB index exceeds the UCB index of the optimal arm \(k^*\):
+
+$$
+\hat{\mu}_k(t-1) + \sqrt{\frac{2 \ln t}{N_k(t-1)}} \geq \hat{\mu}_{k^*}(t-1) + \sqrt{\frac{2 \ln t}{N_{k^*}(t-1)}}
+$$
+
+For this to happen when \(N_k(t-1) \geq \ell\), at least one of the following "bad events" must occur:
+
+- **Event \(E_1\)**: The sample mean of arm \(k\) is inflated above its true mean plus the confidence width: \(\hat{\mu}_k \geq \mu_k + \sqrt{2 \ln t / N_k}\).
+- **Event \(E_2\)**: The sample mean of the optimal arm is deflated below its true mean minus the confidence width: \(\hat{\mu}_{k^*} \leq \mu^* - \sqrt{2 \ln t / N_{k^*}}\).
+- **Event \(E_3\)**: Both confidence intervals are correct (arm \(k\)'s true mean is within its CI, optimal arm's true mean is within its CI), but arm \(k\)'s inflated upper bound still beats the optimal arm's upper bound.
+
+**Step 3: Ruling out Event \(E_3\).** Suppose both confidence intervals hold:
+
+$$
+\hat{\mu}_k \leq \mu_k + \sqrt{\frac{2 \ln t}{N_k}}, \qquad \hat{\mu}_{k^*} \geq \mu^* - \sqrt{\frac{2 \ln t}{N_{k^*}}}
+$$
+
+Then the UCB of arm \(k\) is bounded above by:
+
+$$
+\text{UCB}_k = \hat{\mu}_k + \sqrt{\frac{2 \ln t}{N_k}} \leq \mu_k + 2\sqrt{\frac{2 \ln t}{N_k}}
+$$
+
+And the UCB of the optimal arm is bounded below by:
+
+$$
+\text{UCB}_{k^*} = \hat{\mu}_{k^*} + \sqrt{\frac{2 \ln t}{N_{k^*}}} \geq \mu^*
+$$
+
+For arm \(k\) to be pulled, we need \(\text{UCB}_k \geq \text{UCB}_{k^*}\), which requires:
+
+$$
+\mu_k + 2\sqrt{\frac{2 \ln t}{N_k}} \geq \mu^*
+$$
+
+Rearranging: \(2\sqrt{2 \ln t / N_k} \geq \Delta_k\), which means:
+
+$$
+N_k \leq \frac{8 \ln t}{\Delta_k^2} \leq \frac{8 \ln T}{\Delta_k^2} \leq \ell
+$$
+
+But we assumed \(N_k \geq \ell\). Contradiction! So when \(N_k \geq \ell\) and both confidence intervals hold, arm \(k\) *cannot* be pulled. Event \(E_3\) is impossible.
+
+This is the crux of the proof. The threshold \(\ell = \lceil 8 \ln T / \Delta_k^2 \rceil\) is chosen precisely so that after \(\ell\) observations, the exploration bonus of arm \(k\) is small enough that its optimistic estimate cannot exceed the true mean of the optimal arm — *provided* the confidence intervals haven't failed.
+
+**Step 4: Bounding the probability of confidence interval failure.** We need to bound the probability of events \(E_1\) and \(E_2\). By **Hoeffding's inequality**, for rewards bounded in \([0, 1]\):
+
+$$
+\Pr\left(\hat{\mu}_k - \mu_k \geq \sqrt{\frac{2 \ln t}{s}}\right) \leq \exp\left(-2s \cdot \frac{2 \ln t}{s}\right) = \exp(-4 \ln t) = t^{-4}
+$$
+
+where \(s = N_k\) is the number of observations. This is a one-sided bound. Similarly for the lower tail. So:
+
+$$
+\Pr(E_1 \text{ for a specific } (t, s) \text{ pair}) \leq t^{-4}
+$$
+
+$$
+\Pr(E_2 \text{ for a specific } (t, s') \text{ pair}) \leq t^{-4}
+$$
+
+**Step 5: The union bound over all time steps and sample sizes.** The indicator \(\mathbf{1}\{A_t = k, N_k(t-1) \geq \ell\}\) can only be 1 if \(E_1\) or \(E_2\) holds at time \(t\) for some sample sizes \(s \in \{\ell, \ldots, t-1\}\) for arm \(k\) and \(s' \in \{1, \ldots, t-1\}\) for the optimal arm. Taking a union bound:
+
+$$
+\sum_{t=K+1}^{T} \Pr(A_t = k, N_k(t-1) \geq \ell) \leq \sum_{t=1}^{T} \sum_{s=\ell}^{t-1} t^{-4} + \sum_{t=1}^{T} \sum_{s'=1}^{t-1} t^{-4}
+$$
+
+Each inner sum has at most \(t\) terms, so:
+
+$$
+\leq \sum_{t=1}^{T} t \cdot t^{-4} + \sum_{t=1}^{T} t \cdot t^{-4} = 2\sum_{t=1}^{T} t^{-3}
+$$
+
+The series \(\sum_{t=1}^{\infty} t^{-3}\) converges to \(\zeta(3) \approx 1.202\), and is bounded by \(\pi^2/6 \approx 1.645\). So:
+
+$$
+\sum_{t=K+1}^{T} \Pr(A_t = k, N_k(t-1) \geq \ell) \leq \frac{\pi^2}{3}
+$$
+
+**Step 6: Putting it all together.** Combining the early and late pulls:
+
+$$
+\mathbb{E}[N_k(T)] \leq \ell + \frac{\pi^2}{3} = \left\lceil \frac{8 \ln T}{\Delta_k^2} \right\rceil + \frac{\pi^2}{3} \leq \frac{8 \ln T}{\Delta_k^2} + 1 + \frac{\pi^2}{3}
+$$
+
+Multiplying by the gap \(\Delta_k\) and summing over all suboptimal arms:
+
+$$
+R_T = \sum_{k: \Delta_k > 0} \Delta_k \, \mathbb{E}[N_k(T)] \leq \sum_{k: \Delta_k > 0} \left(\frac{8 \ln T}{\Delta_k} + \left(1 + \frac{\pi^2}{3}\right) \Delta_k\right)
+$$
+
+This is the stated bound. The first term is the dominant one — it grows logarithmically with \(T\) and inversely with \(\Delta_k\). Arms that are nearly as good as the optimal arm (\(\Delta_k\) small) are harder to distinguish and contribute more regret. Arms that are clearly suboptimal (\(\Delta_k\) large) are quickly identified and contribute little regret. The second term is a constant that doesn't grow with \(T\) — it's the "price of admission" from the union bound.
+
+**The deep insight.** The proof reveals *why* the logarithmic bound works. The exploration bonus \(\sqrt{2 \ln t / N_k}\) decays as \(1/\sqrt{N_k}\), so after \(O(\ln T / \Delta_k^2)\) pulls, it's small enough that a suboptimal arm can no longer compete with the optimal arm (Step 3). The confidence intervals fail with probability \(O(t^{-4})\) per time step, and summing this geometric tail over all \(T\) rounds gives a convergent series (Step 5). The \(\ln T\) in the final bound comes from the \(\ln t\) in the exploration bonus — if we used a larger bonus (say \(\sqrt{\ln^2 t / N_k}\)), we'd get a worse regret bound; if we used a smaller one, the confidence intervals would fail too often.
+
 **For pricing**: discretize the price space into \(K\) prices (e.g., $9.99, $10.99, $11.99, ..., $29.99). Run UCB1, treating each price as an arm. The algorithm will initially try each price once, then gradually focus on the revenue-maximizing price while occasionally revisiting others to tighten its estimates.
 
 **Limitation**: UCB1 treats each price as an independent arm. It doesn't exploit the structure that nearby prices should have similar expected revenues — if $14.99 generates high revenue, $15.99 probably does too. This is wasteful. We'll address it with contextual bandits and parametric models later, but first, let's look at the Bayesian alternative.
@@ -176,6 +294,243 @@ Exploration happens *automatically*, proportional to uncertainty. No tuning of e
 **For pricing with revenue**: the reward from price \(p_k\) is not just the purchase probability — it's the **revenue** \(p_k \times \mathbb{1}[\text{sale}]\). If the purchase probability at price \(p_k\) follows a Beta posterior \(\text{Beta}(\alpha_k, \beta_k)\), then the expected revenue from sampling this arm is \(p_k \times \theta_k\) where \(\theta_k\) is the sampled purchase probability. You draw \(\theta_k \sim \text{Beta}(\alpha_k, \beta_k)\) for each arm, compute \(p_k \times \theta_k\), and choose the arm with the highest product.
 
 Thompson Sampling also provides a natural way to incorporate **prior knowledge**. If you have beliefs about the shape of the demand curve — perhaps from similar products or market research — you encode them in the prior. A strong prior (large \(\alpha\) and \(\beta\)) means you're confident in your initial estimate and the algorithm explores less. A weak prior (small \(\alpha\) and \(\beta\)) means you're uncertain and the algorithm explores more. This is exactly the Bayesian way to handle the cold-start problem.
+
+### Information-Theoretic Analysis: Why Thompson Sampling Works (Russo & Van Roy, 2016)
+
+The regret bound \(O(K \ln T)\) tells us Thompson Sampling performs well, but it doesn't explain *why*. The deepest insight into Thompson Sampling comes from an information-theoretic analysis by Russo and Van Roy (2016) that reveals the fundamental mechanism: Thompson Sampling achieves a near-optimal tradeoff between **regret incurred** and **information gained** at every single round.
+
+**The information ratio.** Define the **information ratio** at round \(t\) as:
+
+$$
+\Gamma_t = \frac{\left(\mathbb{E}[\Delta_{A_t} \mid \mathcal{H}_{t-1}]\right)^2}{I_t(k^*; (A_t, R_t) \mid \mathcal{H}_{t-1})}
+$$
+
+The numerator is the squared expected instantaneous regret — how much reward we expect to lose this round by not playing the optimal arm. The denominator is the **mutual information** between the identity of the optimal arm \(k^*\) and the observation \((A_t, R_t)\) at round \(t\), conditioned on the history \(\mathcal{H}_{t-1}\).
+
+Mutual information, if you haven't encountered it, measures how much observing one random variable reduces uncertainty about another. Formally, \(I(X; Y) = H(X) - H(X \mid Y)\), where \(H\) is Shannon entropy. In this context, \(I_t\) measures how much the observation at round \(t\) reduces our uncertainty about which arm is optimal.
+
+The information ratio captures the **efficiency of exploration**. A high \(\Gamma_t\) means the algorithm is incurring a lot of regret (numerator large) relative to how much it's learning (denominator small) — wasteful exploration. A low \(\Gamma_t\) means the algorithm is learning a lot per unit of regret incurred — efficient exploration.
+
+**The fundamental inequality.** If the information ratio is bounded — \(\Gamma_t \leq \Gamma\) for all \(t\) — then the Bayesian regret satisfies:
+
+$$
+\mathbb{E}[R_T] \leq \sqrt{\Gamma \cdot H(k^*) \cdot T}
+$$
+
+where \(H(k^*)\) is the entropy of the prior distribution over the identity of the optimal arm. The proof is elegant. By the chain rule of mutual information:
+
+$$
+\sum_{t=1}^{T} I_t(k^*; (A_t, R_t) \mid \mathcal{H}_{t-1}) = I(k^*; \mathcal{H}_T) \leq H(k^*)
+$$
+
+The total information gained over all \(T\) rounds is bounded by the entropy of the thing we're trying to learn. This is an information-theoretic budget constraint — you can't learn more about \(k^*\) than the entropy of \(k^*\).
+
+From the definition of \(\Gamma_t\):
+
+$$
+\left(\mathbb{E}[\Delta_{A_t} \mid \mathcal{H}_{t-1}]\right)^2 \leq \Gamma \cdot I_t
+$$
+
+By Jensen's inequality (square root is concave) and Cauchy-Schwarz:
+
+$$
+\mathbb{E}[R_T] = \sum_{t=1}^{T} \mathbb{E}[\Delta_{A_t}] \leq \sum_{t=1}^{T} \sqrt{\Gamma \cdot I_t} \leq \sqrt{\Gamma \cdot T \cdot \sum_{t=1}^{T} I_t} \leq \sqrt{\Gamma \cdot T \cdot H(k^*)}
+$$
+
+The second inequality is Cauchy-Schwarz applied to the vectors \((\sqrt{I_1}, \ldots, \sqrt{I_T})\) and \((1, \ldots, 1)\). That's the entire proof.
+
+**Thompson Sampling has a small information ratio.** For \(K\)-armed Bernoulli bandits, Russo and Van Roy show that Thompson Sampling has \(\Gamma \leq K/2\). With a uniform prior, \(H(k^*) = \ln K\). Substituting:
+
+$$
+\mathbb{E}[R_T] \leq \sqrt{\frac{K \ln K}{2} \cdot T}
+$$
+
+This is near-minimax-optimal — the lower bound for \(K\)-armed bandits is \(\Omega(\sqrt{KT})\), and Thompson Sampling matches it up to a \(\sqrt{\ln K}\) factor.
+
+**Why UCB can be less efficient.** UCB algorithms always play the arm with the highest upper confidence bound. Consider a situation where arm 3 has the highest UCB, but you're already fairly confident about arm 3's mean — the UCB is high only because of a lucky early observation, not because of genuine uncertainty. Playing arm 3 incurs regret (it's suboptimal) and provides little information (you already have many observations of arm 3). The information ratio is poor.
+
+Thompson Sampling avoids this because it samples from the posterior. Arms with narrow posteriors (low uncertainty) are sampled near their true mean — they're played frequently if they're genuinely good, rarely if they're genuinely bad. Arms with wide posteriors (high uncertainty) sometimes produce high samples, triggering exploration, but the exploration is *proportional to the remaining uncertainty*, which is exactly what minimizes the information ratio.
+
+**The deep interpretation.** Thompson Sampling is approximately the algorithm that minimizes the information ratio at each step. It achieves the best tradeoff between regret incurred and information gained — every exploratory pull is maximally informative about which arm is optimal, relative to the regret it costs. This is why Thompson Sampling consistently outperforms UCB in practice: not because its worst-case bound is better (it isn't — both are \(O(K \ln T)\)), but because it wastes less exploration on low-information pulls.
+
+---
+
+## 4.5. Bayesian Dynamic Pricing with Conjugate Demand Models
+
+Before we move to contextual bandits, let's develop the full Bayesian pricing framework that connects Thompson Sampling to parametric demand models. This is the bridge between the "model-free" bandit approach (treat each price as an independent arm) and the "model-based" approach (assume demand follows a parametric form and learn the parameters).
+
+### Setup: The Linear Demand Model
+
+Assume demand \(Q\) at price \(p\) follows a linear model with Gaussian noise:
+
+$$
+Q_t = \alpha + \beta p_t + \varepsilon_t, \qquad \varepsilon_t \sim \mathcal{N}(0, \sigma^2)
+$$
+
+Here \(\alpha > 0\) is the base demand (demand when price is zero — a theoretical quantity, but it anchors the intercept), \(\beta < 0\) is the **price sensitivity** (each dollar increase in price reduces demand by \(|\beta|\) units), and \(\sigma^2\) is the noise variance (which we assume is known, for analytic tractability — it can be estimated separately).
+
+The revenue at price \(p\) is:
+
+$$
+r(p) = p \cdot Q(p) = p(\alpha + \beta p) = \alpha p + \beta p^2
+$$
+
+This is a downward-opening parabola (since \(\beta < 0\)), with a unique maximum at:
+
+$$
+p^* = -\frac{\alpha}{2\beta}
+$$
+
+The challenge: \(\alpha\) and \(\beta\) are **unknown**. We need to learn them from data while simultaneously pricing well.
+
+### The Bayesian Approach: Prior and Posterior
+
+Define the parameter vector \(\boldsymbol{\theta} = (\alpha, \beta)^\top\) and the feature vector at time \(t\) as \(\mathbf{x}_t = (1, p_t)^\top\). The demand model is then:
+
+$$
+Q_t = \mathbf{x}_t^\top \boldsymbol{\theta} + \varepsilon_t
+$$
+
+This is a standard Bayesian linear regression. Place a **conjugate prior** on \(\boldsymbol{\theta}\):
+
+$$
+\boldsymbol{\theta} \sim \mathcal{N}(\boldsymbol{\mu}_0, \boldsymbol{\Sigma}_0)
+$$
+
+where \(\boldsymbol{\mu}_0 = (\mu_\alpha, \mu_\beta)^\top\) is our prior mean (best guess for the demand parameters before seeing any data) and \(\boldsymbol{\Sigma}_0\) is the prior covariance (how uncertain we are).
+
+For example, a reasonable prior might be \(\mu_\alpha = 40\) (we think demand at zero price would be about 40 units), \(\mu_\beta = -0.5\) (we think each dollar of price costs half a unit of demand), and a diagonal covariance with large variances (reflecting high uncertainty).
+
+**The conjugate posterior.** After observing \(T\) price-quantity pairs \(\{(p_1, Q_1), \ldots, (p_T, Q_T)\}\), the posterior is also Gaussian:
+
+$$
+\boldsymbol{\theta} \mid \text{data} \sim \mathcal{N}(\boldsymbol{\mu}_T, \boldsymbol{\Sigma}_T)
+$$
+
+Let's derive the posterior parameters. Collect the data into matrices: \(\mathbf{X} = [\mathbf{x}_1, \ldots, \mathbf{x}_T]^\top\) is \(T \times 2\), and \(\mathbf{Q} = (Q_1, \ldots, Q_T)^\top\) is \(T \times 1\). The likelihood is:
+
+$$
+p(\mathbf{Q} \mid \boldsymbol{\theta}) \propto \exp\left(-\frac{1}{2\sigma^2}(\mathbf{Q} - \mathbf{X}\boldsymbol{\theta})^\top(\mathbf{Q} - \mathbf{X}\boldsymbol{\theta})\right)
+$$
+
+The prior is:
+
+$$
+p(\boldsymbol{\theta}) \propto \exp\left(-\frac{1}{2}(\boldsymbol{\theta} - \boldsymbol{\mu}_0)^\top \boldsymbol{\Sigma}_0^{-1} (\boldsymbol{\theta} - \boldsymbol{\mu}_0)\right)
+$$
+
+By Bayes' theorem, the posterior is proportional to the product. Expanding the exponents and completing the square (the standard trick for Gaussian conjugacy):
+
+$$
+\boldsymbol{\Sigma}_T^{-1} = \boldsymbol{\Sigma}_0^{-1} + \frac{1}{\sigma^2}\mathbf{X}^\top\mathbf{X}
+$$
+
+$$
+\boldsymbol{\mu}_T = \boldsymbol{\Sigma}_T\left(\boldsymbol{\Sigma}_0^{-1}\boldsymbol{\mu}_0 + \frac{1}{\sigma^2}\mathbf{X}^\top\mathbf{Q}\right)
+$$
+
+The posterior precision (inverse covariance) is the sum of the prior precision and the data precision. The posterior mean is a precision-weighted average of the prior mean and the data-driven estimate. As \(T \to \infty\), the data term dominates, and \(\boldsymbol{\mu}_T \to (\mathbf{X}^\top\mathbf{X})^{-1}\mathbf{X}^\top\mathbf{Q}\) — the ordinary least squares estimate. The prior washes out with enough data, as it should.
+
+**Sequential update form.** In an online setting, we observe one data point at a time. After observing \((p_t, Q_t)\) with \(\mathbf{x}_t = (1, p_t)^\top\), the update from posterior at time \(t-1\) to posterior at time \(t\) is:
+
+$$
+\boldsymbol{\Sigma}_t^{-1} = \boldsymbol{\Sigma}_{t-1}^{-1} + \frac{1}{\sigma^2}\mathbf{x}_t\mathbf{x}_t^\top
+$$
+
+$$
+\boldsymbol{\mu}_t = \boldsymbol{\Sigma}_t\left(\boldsymbol{\Sigma}_{t-1}^{-1}\boldsymbol{\mu}_{t-1} + \frac{Q_t}{\sigma^2}\mathbf{x}_t\right)
+$$
+
+This is computationally cheap — a rank-1 update to a \(2 \times 2\) matrix at each step.
+
+### Myopic vs. Farsighted Pricing
+
+Given the current posterior \((\boldsymbol{\mu}_t, \boldsymbol{\Sigma}_t)\), how should we set the next price?
+
+**Myopic pricing** maximizes the expected immediate revenue given the current posterior mean:
+
+$$
+\mathbb{E}[r(p) \mid \boldsymbol{\mu}_t] = p \cdot (\mu_\alpha^t + \mu_\beta^t \cdot p) = \mu_\alpha^t \cdot p + \mu_\beta^t \cdot p^2
+$$
+
+Taking the first-order condition \(\partial / \partial p = \mu_\alpha^t + 2\mu_\beta^t \cdot p = 0\):
+
+$$
+p_{\text{myopic}}^* = -\frac{\mu_\alpha^t}{2\mu_\beta^t}
+$$
+
+This is the "certainty equivalent" price — the optimal price if the posterior mean were the true parameters. It completely ignores uncertainty and the value of information. If \(\mu_\beta^t\) is far from the true \(\beta\) (because we haven't gathered enough data yet), the myopic price can be very wrong.
+
+Worse, myopic pricing can get **stuck**. If the initial prior underestimates price sensitivity (|\(\mu_\beta\)| too small), the myopic price is too high. At that high price, demand is low and noisy, providing little information to correct the estimate. The posterior barely updates, and the algorithm stays stuck at a suboptimal price. This is the classic explore-exploit failure: pure exploitation with no exploration.
+
+**Farsighted pricing** accounts for how the current price choice affects the posterior (and hence future pricing decisions). The full solution is a dynamic program:
+
+$$
+V_t(\boldsymbol{\mu}_t, \boldsymbol{\Sigma}_t) = \max_{p} \left[\mathbb{E}[r(p)] + \gamma \cdot \mathbb{E}_{Q|p}\left[V_{t+1}(\boldsymbol{\mu}_{t+1}, \boldsymbol{\Sigma}_{t+1})\right]\right]
+$$
+
+where the expectation is over the demand \(Q\) that we'd observe at price \(p\), and the future value \(V_{t+1}\) depends on the updated posterior after observing \((p, Q)\). This is the **Gittins index** problem — the optimal solution balances the immediate revenue from price \(p\) against the information value of observing demand at \(p\).
+
+Solving this DP exactly is intractable for continuous state spaces (the posterior covariance \(\boldsymbol{\Sigma}_t\) lives in an infinite-dimensional space as \(T\) grows). Two practical approximations are widely used:
+
+### The Knowledge Gradient
+
+The **knowledge gradient** (KG) measures the value of a single additional observation at price \(p\):
+
+$$
+\text{KG}(p) = \mathbb{E}\left[\max_{p'} \mathbb{E}[r(p') \mid \boldsymbol{\mu}_{t+1}]\right] - \max_{p'} \mathbb{E}[r(p') \mid \boldsymbol{\mu}_t]
+$$
+
+This is the expected improvement in the optimal future revenue from learning at price \(p\). The first term is the best revenue we can achieve with the updated posterior (after observing demand at price \(p\)), averaged over the random observation. The second term is the best revenue under the current posterior. The difference is the **information value** of experimenting at price \(p\).
+
+For the Normal linear demand model, the posterior update after observing \(Q\) at price \(p\) gives a new posterior mean that is itself random (it depends on the noisy observation \(Q\)). The KG has a semi-closed form involving the standard normal CDF \(\Phi\) and PDF \(\phi\):
+
+$$
+\text{KG}(p) = \tilde{\sigma}(p) \cdot \nu\!\left(\frac{\tilde{\sigma}(p)}{\sigma_0}\right)
+$$
+
+where \(\tilde{\sigma}(p)\) measures how much the observation at price \(p\) reduces posterior uncertainty about the optimal price, and \(\nu(z) = z\Phi(z) + \phi(z)\) is the **knowledge gradient factor** — a function that captures the expected improvement from a Gaussian observation.
+
+The KG policy chooses price \(p\) to maximize:
+
+$$
+p_{\text{KG}} = \arg\max_p \left[r(p) + \nu_{\text{KG}} \cdot \text{KG}(p)\right]
+$$
+
+where \(\nu_{\text{KG}}\) is a parameter controlling the exploitation-exploration tradeoff. When \(\nu_{\text{KG}} = 0\), this reduces to myopic pricing; when \(\nu_{\text{KG}} \to \infty\), the algorithm explores purely for information.
+
+### Thompson Sampling for Bayesian Pricing
+
+Thompson Sampling provides a simpler and often equally effective alternative. At each round:
+
+1. Draw \(\boldsymbol{\theta}_{\text{sample}} = (\alpha_{\text{sample}}, \beta_{\text{sample}}) \sim \mathcal{N}(\boldsymbol{\mu}_t, \boldsymbol{\Sigma}_t)\)
+2. Compute the optimal price for the sampled parameters: \(p_t = -\alpha_{\text{sample}} / (2\beta_{\text{sample}})\)
+3. Observe demand \(Q_t\) at price \(p_t\)
+4. Update the posterior using the sequential update formulas
+
+This is elegant because it automatically explores in proportion to posterior uncertainty. When the posterior is wide (early rounds), the sampled parameters vary widely, producing diverse prices — exploration. As the posterior concentrates (later rounds), the sampled parameters cluster near the truth, and the prices cluster near the optimal — exploitation.
+
+The connection to the knowledge gradient: Thompson Sampling implicitly computes something close to the KG by sampling from the posterior. The KG explicitly evaluates information value; Thompson Sampling achieves a similar effect through randomization. In practice, Thompson Sampling is simpler to implement and performs nearly as well, making it the preferred choice for Bayesian dynamic pricing.
+
+### Worked Numerical Example
+
+Suppose the true parameters are \(\alpha = 50\), \(\beta = -1.2\), and \(\sigma = 5\). The true optimal price is:
+
+$$
+p^* = -\frac{50}{2 \times (-1.2)} = 20.83
+$$
+
+We start with a vague prior: \(\boldsymbol{\mu}_0 = (40, -0.5)^\top\), \(\boldsymbol{\Sigma}_0 = \text{diag}(100, 1)\). The prior thinks demand sensitivity is lower than it actually is (\(-0.5\) vs. \(-1.2\)), so the initial myopic price is \(-40/(2 \times (-0.5)) = 40\) — much too high.
+
+After 10 observations at various prices, suppose the data matrix is:
+
+$$
+\mathbf{X}^\top\mathbf{X} = \begin{pmatrix} 10 & \sum p_i \\ \sum p_i & \sum p_i^2 \end{pmatrix}, \qquad \mathbf{X}^\top\mathbf{Q} = \begin{pmatrix} \sum Q_i \\ \sum p_i Q_i \end{pmatrix}
+$$
+
+The posterior precision becomes \(\boldsymbol{\Sigma}_{10}^{-1} = \boldsymbol{\Sigma}_0^{-1} + \sigma^{-2}\mathbf{X}^\top\mathbf{X}\), and the posterior mean shifts toward the OLS estimate. With enough price variation, the posterior quickly concentrates around the true values, and the myopic/TS prices converge to \(p^* \approx 20.83\).
+
+The Simulation 4 in Section 20 implements this exact setup and visualizes the posterior learning process, price convergence, and regret dynamics.
 
 ---
 
@@ -734,6 +1089,89 @@ Deep RL is most valuable for complex, multi-product, multi-period problems where
 
 ---
 
+## 11.5. Offline Reinforcement Learning for Pricing
+
+The deep RL methods above assume you can explore — try different prices and observe outcomes in real time. But real-time exploration is expensive and risky. Every suboptimal price costs real revenue. Charging $5 to "explore" when the optimal price is $25 means you just lost $20 on that customer. For a retailer processing millions of transactions daily, even a small exploration rate can cost millions of dollars per year.
+
+**The question**: can we learn a good pricing policy from **historical data** — a log of past prices, customer features, and outcomes — without any further exploration?
+
+### The Offline RL Problem
+
+You have a historical dataset \(\mathcal{D} = \{(s_i, a_i, r_i, s_i')\}_{i=1}^n\) collected by a **behavior policy** \(\mu\) — the old pricing system (perhaps rule-based, perhaps a previous-generation algorithm, perhaps human analysts). Each record is a state (customer features, inventory, time), the action taken (price charged), the reward observed (revenue), and the next state. You want to learn a new policy \(\pi\) that achieves higher revenue, but you cannot deploy \(\pi\) to collect new data. You must evaluate and optimize \(\pi\) entirely from the historical data.
+
+This is fundamentally different from the online setting. In online RL, if your estimate of some state-action pair is wrong, the agent will eventually visit that pair and correct the error. In offline RL, if the historical data never contains a particular state-action pair (e.g., charging $99 for a product that was always priced at $20-$30), you have no information about it. Extrapolating to unseen actions is dangerous.
+
+### Off-Policy Evaluation (OPE)
+
+Before deploying a new policy, you need to estimate its expected revenue from historical data. This is **off-policy evaluation** — evaluating one policy (the new policy \(\pi\)) using data generated by a different policy (the behavior policy \(\mu\)).
+
+**Importance sampling (IS)** is the foundational technique. The key identity:
+
+$$
+V(\pi) = \mathbb{E}_\mu\left[\prod_{t=0}^{H-1} \frac{\pi(a_t \mid s_t)}{\mu(a_t \mid s_t)} \sum_{t=0}^{H-1} \gamma^t r_t\right]
+$$
+
+where the product \(\prod_t \pi(a_t|s_t)/\mu(a_t|s_t)\) is the **importance weight** (or likelihood ratio) that reweights trajectories from the behavior policy to "look like" trajectories from the target policy. For a single-step (bandit) setting, this simplifies to:
+
+$$
+\hat{V}_{\text{IS}}(\pi) = \frac{1}{n}\sum_{i=1}^{n} \frac{\pi(a_i \mid s_i)}{\mu(a_i \mid s_i)} \cdot r_i
+$$
+
+This estimator is **unbiased** — \(\mathbb{E}[\hat{V}_{\text{IS}}(\pi)] = V(\pi)\) — but it can have astronomical variance. If the new policy \(\pi\) frequently selects actions that the behavior policy \(\mu\) rarely took, the importance weight \(\pi(a|s)/\mu(a|s)\) is huge, amplifying noise. Over a multi-step horizon, these ratios multiply, and the product can be astronomically large for even a modest number of steps. This is the **curse of horizon** in off-policy evaluation.
+
+**The doubly robust (DR) estimator** combines a model-based estimate with an IS correction:
+
+$$
+\hat{V}_{\text{DR}}(\pi) = \frac{1}{n}\sum_{i=1}^{n}\left[\hat{V}_{\text{model}}(s_i) + \frac{\pi(a_i \mid s_i)}{\mu(a_i \mid s_i)}\left(r_i - \hat{Q}_{\text{model}}(s_i, a_i)\right)\right]
+$$
+
+where \(\hat{V}_{\text{model}}\) and \(\hat{Q}_{\text{model}}\) are model-based estimates of the value function and Q-function. The DR estimator is unbiased if either the model or the importance weights are correct (hence "doubly robust"), and it has lower variance than pure IS when the model is approximately correct. The IS correction term only activates when the model's prediction \(\hat{Q}_{\text{model}}(s_i, a_i)\) differs from the observed reward \(r_i\) — it corrects for model errors using the reweighting trick.
+
+### Conservative Q-Learning (CQL)
+
+The most dangerous failure mode of offline RL is **overestimation of out-of-distribution actions**. Standard Q-learning uses the Bellman update:
+
+$$
+Q(s, a) \leftarrow r + \gamma \max_{a'} Q(s', a')
+$$
+
+The \(\max\) operator is the problem. If the Q-values for actions not well-represented in the data are initialized randomly (or are poorly estimated), the \(\max\) selects the largest of these noisy estimates, biasing the value upward. The agent then tries to take these overestimated actions, which the historical data cannot validate. In pricing: the Q-function might estimate that charging $999 yields enormous revenue, simply because no data exists at that price to contradict the estimate.
+
+**Conservative Q-Learning** (CQL; Kumar et al., 2020) fixes this by adding a regularization term that pushes down Q-values for out-of-distribution actions:
+
+$$
+Q_{\text{CQL}} = \arg\min_Q \; \alpha \left(\mathbb{E}_{a \sim \pi}[Q(s, a)] - \mathbb{E}_{a \sim \mu}[Q(s, a)]\right) + \frac{1}{2}\mathbb{E}_{(s,a,r,s') \sim \mathcal{D}}\left[\left(Q(s, a) - \hat{\mathcal{B}}^\pi Q(s, a)\right)^2\right]
+$$
+
+The first term is the CQL penalty. It penalizes Q-values under the policy distribution \(\pi\) (which might query unseen actions) while rewarding Q-values under the data distribution \(\mu\) (which are well-supported). The net effect: actions that appear in the data retain their estimated value, while actions that don't appear get their Q-values pushed down. The parameter \(\alpha\) controls the conservatism — larger \(\alpha\) means more aggressive penalization.
+
+The result is a **lower bound** on the true Q-function for the learned policy. The deployed policy might underestimate the revenue from some prices, but it won't overestimate the revenue from prices it has never tried. This is exactly the right kind of conservatism for pricing — you'd rather underestimate the revenue from a novel price (and not try it) than overestimate it (and lose money).
+
+### Batch-Constrained Q-Learning (BCQ)
+
+An alternative approach is **BCQ** (Fujimoto, Meger, and Precup, 2019), which directly constrains the policy to only select actions that are "close" to actions observed in the data:
+
+$$
+\pi(s) = \arg\max_{a : G(s, a) > \tau} Q(s, a)
+$$
+
+where \(G(s, a)\) is a generative model (e.g., a VAE or conditional density estimator) trained on the data distribution, and \(\tau\) is a threshold. The policy only considers actions that \(G\) deems plausible given the state — actions that the behavior policy might have taken. If the historical data never charged above $50, BCQ won't consider prices above $50.
+
+### Application to Pricing
+
+Consider a retailer with 2 years of pricing data from a rule-based system. The data contains millions of transactions: for each, the product, customer features, time, the price that was charged, and whether a sale occurred. The retailer wants to deploy an ML-based pricing engine.
+
+The pipeline:
+
+1. **Estimate the behavior policy** \(\mu(a|s)\) from historical data — what price did the old system tend to charge in each context? This is needed for importance weighting.
+2. **Train an offline RL agent** (CQL or BCQ) on the historical data. The agent learns a Q-function and derives a new policy \(\pi\).
+3. **Evaluate \(\pi\) off-policy** using the DR estimator to estimate expected revenue improvement.
+4. **Deploy with guardrails**: start by deploying \(\pi\) on a small fraction of traffic (A/B test), compare against the old policy, and gradually roll out if performance matches the off-policy estimate.
+
+The key advantage: the retailer can train, evaluate, and iterate on the pricing policy *before* any customer sees a new price. The risk of catastrophic exploration is zero. The tradeoff: offline RL can only be as good as the data allows — if the historical data never explored a promising pricing region, the offline agent can't discover it either. This is why offline RL is typically used for the initial deployment, followed by cautious online fine-tuning (online RL with safety constraints) once the system is live.
+
+---
+
 ## 12. Fairness Constraints in Algorithmic Pricing
 
 Pricing algorithms optimize revenue. But unconstrained optimization can produce outcomes that society, regulators, and customers consider **unfair**. When an algorithm charges different prices to different people, the line between efficient personalized pricing and discriminatory exploitation becomes blurred.
@@ -1070,6 +1508,49 @@ The right-hand side is the **option value** of the seat — the expected revenue
 The generalization to multiple fare classes is the **EMSR** (Expected Marginal Seat Revenue) method. EMSR-b, the most common variant, computes protection levels for each fare class by comparing the fare of lower classes against the expected marginal revenue from higher classes.
 
 Modern airline revenue management goes far beyond these heuristics. The full problem is a **stochastic dynamic program** where the state is \((\tau, \mathbf{n})\) — time remaining and available seats by class — and the action is which fares to offer. Airlines estimate demand curves per route, per departure date, using historical booking data, controlling for seasonality, day-of-week, competition, and special events. This is exactly the **causal estimation** from Part 4 — demand for a specific flight depends on the prices offered (endogenous), on observable features (exogenous), and on unobservable shocks. Getting the causal effect right is critical: if you naively regress bookings on price, you get biased estimates because prices are set in response to demand signals.
+
+### Network Revenue Management: The Multi-Leg Problem
+
+A single flight is one "leg." But airlines sell **itineraries**: a customer flying New York to London to Paris uses two legs (JFK-LHR and LHR-CDG). Accepting this booking consumes one seat on *each* leg. The revenue management problem must consider the **network** of legs simultaneously — accepting a cheap connecting itinerary might block a more profitable direct booking on one of the legs.
+
+**The network LP.** Let \(i\) index itineraries (origin-destination pairs with routing) and \(j\) index legs. Define:
+
+- \(f_i\) — the fare for itinerary \(i\)
+- \(\mathbf{A}\) — the **incidence matrix** where \(A_{ji} = 1\) if itinerary \(i\) uses leg \(j\), and 0 otherwise
+- \(c_j\) — the capacity (seats) of leg \(j\)
+- \(d_i\) — the expected demand for itinerary \(i\)
+
+The **deterministic linear program** (DLP) for network revenue management is:
+
+$$
+\max_{\mathbf{x}} \sum_{i} f_i x_i
+$$
+
+$$
+\text{subject to:} \quad \sum_{i} A_{ji} x_i \leq c_j \quad \forall j, \qquad 0 \leq x_i \leq d_i \quad \forall i
+$$
+
+The decision variable \(x_i\) represents how many bookings to accept for itinerary \(i\). The first constraint says total bookings using leg \(j\) cannot exceed its capacity. The second says you can't sell more than the demand.
+
+**Bid prices from the dual.** The dual variables \(\pi_j\) of the capacity constraints are the **bid prices** — they represent the marginal value of one additional seat on leg \(j\). The economic interpretation is clean: \(\pi_j\) is the shadow price of capacity on leg \(j\), measuring how much the optimal revenue would increase if you had one more seat.
+
+The bid-price control rule is: **accept a booking request for itinerary \(i\) if and only if the fare exceeds the sum of bid prices for the legs used**:
+
+$$
+\text{Accept itinerary } i \iff f_i \geq \sum_{j} A_{ji} \pi_j
+$$
+
+The right-hand side, \(\sum_j A_{ji} \pi_j\), is the **displacement cost** — the opportunity cost of the seats consumed by itinerary \(i\) across all legs. A JFK-LHR-CDG booking at fare $800 should be accepted only if $800 exceeds the bid price for the JFK-LHR seat plus the bid price for the LHR-CDG seat. If those bid prices are $500 and $400 respectively (because both legs are scarce), the connecting booking should be rejected — those seats are worth more if sold separately to direct passengers.
+
+**Dynamic bid prices.** The LP gives static bid prices based on expected demand. But in reality, as bookings arrive stochastically and capacities change, the bid prices need updating. Airlines re-solve the LP periodically (every few hours, or after every booking) to get updated bid prices that reflect the current capacity situation.
+
+The DLP has a beautiful theoretical property: it provides an **upper bound** on the optimal revenue from the stochastic problem. The gap between DLP revenue and optimal revenue shrinks as capacity grows — a consequence of the law of large numbers. When capacities are large, the stochastic fluctuations in demand average out, and the deterministic approximation becomes tight.
+
+**Randomized LP.** Talluri and van Ryzin proposed a refinement: solve the DLP, then use the bid prices to decompose the network problem into independent single-leg problems. Each leg uses its bid price to decide which itineraries to accept. Randomization handles the integrality issue — the LP solution may say "accept 15.7 bookings for itinerary \(i\)," which isn't implementable. The randomized approach converts these fractional decisions into probabilistic accept/reject rules.
+
+**The computational scale.** A major airline like Delta or United operates roughly 5,000 flights per day, selling tickets on hundreds of thousands of itineraries (when you count all origin-destination pairs with connections). The incidence matrix \(\mathbf{A}\) has 5,000 rows (legs) and hundreds of thousands of columns (itineraries). The LP must be re-solved frequently as bookings arrive. Modern implementations use column generation and decomposition techniques to make this tractable — the full LP is too large to solve directly, but most itineraries are either clearly profitable or clearly unprofitable, so only a subset of "interesting" columns need to be actively managed.
+
+**Revenue impact.** Network revenue management typically generates 2-5% additional revenue compared to managing each leg independently, which translates to hundreds of millions of dollars annually for a major carrier. The insight is that single-leg management systematically undervalues connecting seats (because it doesn't account for the displacement cost on other legs) and overaccepts cheap connecting fares that consume scarce hub capacity.
 
 ---
 
@@ -1492,6 +1973,147 @@ plt.show()
 ```
 
 The dynamic pricing strategy — which adjusts prices optimally based on remaining inventory and time — consistently outperforms both the fixed-price and two-price strategies. The revenue distribution is shifted right and has lower variance. The dynamic policy charges low prices early (when inventory is plentiful and arrivals have low WTP) and ratchets up prices as departure approaches and seats become scarce. This is exactly Littlewood's rule in action: protect capacity for high-value late arrivals.
+
+### Simulation 4: Bayesian Dynamic Pricing with Posterior Updates
+
+This simulation implements the full Bayesian pricing framework from Section 4.5. We have a product with linear demand \(Q = \alpha + \beta p + \varepsilon\), where the true parameters \(\alpha = 50\) and \(\beta = -1.2\) are unknown. We start with a **deliberately wrong prior** — one that underestimates price sensitivity (\(\beta_{\text{prior}} = -0.5\) vs. the true \(-1.2\)). Thompson Sampling must learn the true parameters from pricing experiments while simultaneously earning revenue.
+
+```python
+import numpy as np
+import matplotlib.pyplot as plt
+from scipy import stats
+
+np.random.seed(2026)
+
+# True demand: Q = alpha + beta * P + noise
+alpha_true = 50.0
+beta_true = -1.2  # true price sensitivity
+sigma = 5.0       # demand noise
+
+# Prior on (alpha, beta)
+mu_prior = np.array([40.0, -0.5])  # vague prior, underestimates sensitivity
+Sigma_prior = np.array([[100.0, 0.0],
+                         [0.0, 1.0]])  # wide prior
+
+T = 200
+prices_history = np.zeros(T)
+quantities_history = np.zeros(T)
+revenues_history = np.zeros(T)
+mu_history = np.zeros((T + 1, 2))
+optimal_price_history = np.zeros(T)
+
+mu_t = mu_prior.copy()
+Sigma_t = Sigma_prior.copy()
+mu_history[0] = mu_t
+
+for t in range(T):
+    # Thompson Sampling: draw (alpha, beta) from posterior
+    theta_sample = np.random.multivariate_normal(mu_t, Sigma_t)
+    alpha_sample, beta_sample = theta_sample
+    
+    # Optimal price given sampled parameters: p* = -alpha / (2*beta)
+    if beta_sample < -0.01:  # ensure negative slope
+        p_optimal = -alpha_sample / (2 * beta_sample)
+    else:
+        p_optimal = 25.0  # fallback
+    
+    # Clip to reasonable range
+    p_t = np.clip(p_optimal, 5.0, 60.0)
+    prices_history[t] = p_t
+    
+    # Observe demand
+    Q_t = alpha_true + beta_true * p_t + np.random.normal(0, sigma)
+    Q_t = max(0, Q_t)
+    quantities_history[t] = Q_t
+    revenues_history[t] = p_t * Q_t
+    
+    # Bayesian update (Normal-Normal conjugate)
+    x_t = np.array([1.0, p_t])
+    Sigma_t_inv = np.linalg.inv(Sigma_t)
+    Sigma_new_inv = Sigma_t_inv + np.outer(x_t, x_t) / sigma**2
+    Sigma_t = np.linalg.inv(Sigma_new_inv)
+    mu_t = Sigma_t @ (Sigma_t_inv @ mu_t + x_t * Q_t / sigma**2)
+    mu_history[t + 1] = mu_t
+    
+    # Current best price given posterior mean
+    if mu_t[1] < -0.01:
+        optimal_price_history[t] = -mu_t[0] / (2 * mu_t[1])
+    else:
+        optimal_price_history[t] = 25.0
+
+# True optimal price
+p_star = -alpha_true / (2 * beta_true)
+
+# Plot
+fig, axes = plt.subplots(2, 2, figsize=(14, 10))
+
+# Top-left: posterior evolution of beta
+ax = axes[0, 0]
+ax.plot(mu_history[:, 1], color='#3498db', linewidth=1.5,
+        label=r'Posterior mean of $\beta$')
+ax.axhline(beta_true, color='#e74c3c', linewidth=2, linestyle='--',
+           label=rf'True $\beta = {beta_true}$')
+ax.set_xlabel(r'Round $t$', fontsize=12)
+ax.set_ylabel(r'$\beta$ (price sensitivity)', fontsize=12)
+ax.set_title(r'Learning $\beta$: Posterior Mean Over Time', fontsize=13)
+ax.legend(fontsize=10)
+ax.grid(True, alpha=0.3)
+
+# Top-right: price convergence
+ax = axes[0, 1]
+ax.plot(prices_history, alpha=0.4, color='#2ecc71', linewidth=0.8,
+        label='Chosen price')
+ax.plot(optimal_price_history, color='#3498db', linewidth=1.5,
+        label='Posterior-optimal price')
+ax.axhline(p_star, color='#e74c3c', linewidth=2, linestyle='--',
+           label=rf'True optimal $p^* = {p_star:.1f}$')
+ax.set_xlabel(r'Round $t$', fontsize=12)
+ax.set_ylabel(r'Price $p$', fontsize=12)
+ax.set_title('Price Convergence to Optimum', fontsize=13)
+ax.legend(fontsize=10)
+ax.grid(True, alpha=0.3)
+
+# Bottom-left: cumulative revenue vs oracle
+ax = axes[1, 0]
+oracle_revenue = p_star * (alpha_true + beta_true * p_star)
+cumrev = np.cumsum(revenues_history)
+oracle_cumrev = np.cumsum(np.full(T, oracle_revenue))
+ax.plot(cumrev, color='#3498db', linewidth=1.5, label='Bayesian TS')
+ax.plot(oracle_cumrev, color='#e74c3c', linewidth=1.5, linestyle='--',
+        label='Oracle')
+ax.set_xlabel(r'Round $t$', fontsize=12)
+ax.set_ylabel('Cumulative Revenue', fontsize=12)
+ax.set_title('Cumulative Revenue: Learner vs Oracle', fontsize=13)
+ax.legend(fontsize=10)
+ax.grid(True, alpha=0.3)
+
+# Bottom-right: cumulative regret
+ax = axes[1, 1]
+per_period_regret = oracle_revenue - revenues_history
+cumregret = np.cumsum(per_period_regret)
+ax.plot(cumregret, color='#e74c3c', linewidth=1.5)
+ax.set_xlabel(r'Round $t$', fontsize=12)
+ax.set_ylabel(r'Cumulative Regret $R_t$', fontsize=12)
+ax.set_title('Regret: Flattening as Learning Completes', fontsize=13)
+ax.grid(True, alpha=0.3)
+
+plt.suptitle('Bayesian Dynamic Pricing with Thompson Sampling\n'
+             rf'True: $Q = {alpha_true} + ({beta_true})P + \epsilon$, '
+             rf'$p^* = {p_star:.1f}$', fontsize=14, y=1.02)
+plt.tight_layout()
+plt.savefig('bayesian_pricing.png', dpi=150, bbox_inches='tight')
+plt.show()
+```
+
+The four panels reveal the full anatomy of Bayesian learning for pricing:
+
+**Top-left (learning \(\beta\))**: the posterior mean of the price sensitivity parameter \(\beta\) starts at the prior value \(-0.5\) and converges toward the true value \(-1.2\) over roughly 50 rounds. The learning is rapid initially — each observation provides a lot of information because the prior is vague — and then slows as the posterior concentrates. This is Bayesian learning in action: the posterior update weights new evidence against prior belief, and when the prior is wrong, the data overwhelms it.
+
+**Top-right (price convergence)**: because the prior underestimates price sensitivity, the algorithm initially overprices — it thinks demand isn't very sensitive to price, so it charges high prices. The green trace (individual prices from Thompson Sampling) is noisy early on because the posterior is wide, producing diverse parameter samples and diverse prices. As the posterior concentrates, the prices converge to the true optimum \(p^* \approx 20.8\). The blue line (posterior-optimal price, computed from the posterior mean) shows the smooth convergence of the algorithm's "best guess."
+
+**Bottom-left (cumulative revenue)**: the Bayesian TS revenue tracks below the oracle initially — the overpricing period costs revenue. But the gap narrows as the algorithm learns, and by the end of 200 rounds, the per-period revenue nearly matches the oracle. The total revenue loss (the gap between the curves) is the cumulative cost of learning — the "tuition" the algorithm pays to discover the demand curve.
+
+**Bottom-right (cumulative regret)**: the regret curve rises steeply in the first 20-30 rounds (the overpricing period) and then **flattens**. The flattening indicates that per-period regret has dropped to near zero — the algorithm has learned enough to price near-optimally. This is the hallmark of a good bandit algorithm: exploration cost is **front-loaded**. You pay the regret cost early, and it pays for itself many times over through better pricing in later rounds. The flattening regret curve is a visual confirmation of the sublinear regret guarantee — \(R_T = O(\sqrt{T})\) for Bayesian TS, where the slope of the cumulative regret curve decays toward zero.
 
 ---
 
