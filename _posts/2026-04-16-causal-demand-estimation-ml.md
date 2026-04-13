@@ -26,10 +26,15 @@ The problem has a name: **endogeneity**. The classical fix is instrumental varia
 7. [From Linear Models to Machine Learning](#from-linear-models-to-machine-learning)
 8. [Double Machine Learning (DML)](#double-machine-learning-dml)
 9. [Cross-Fitting and Sample Splitting](#cross-fitting-and-sample-splitting)
-10. [Demand Censoring](#demand-censoring)
-11. [Conjoint Analysis and Discrete Choice Models](#conjoint-analysis-and-discrete-choice-models)
-12. [Python Implementation](#python-implementation)
-13. [The State of the Art](#the-state-of-the-art)
+10. [The Interactive Model and Beyond Partial Linearity](#the-interactive-model-and-beyond-partial-linearity)
+11. [Causal Forests for Heterogeneous Price Sensitivity](#causal-forests-for-heterogeneous-price-sensitivity)
+12. [Difference-in-Differences for Pricing Policy Evaluation](#difference-in-differences-for-pricing-policy-evaluation)
+13. [The BLP Model --- Structural Demand Estimation at Scale](#the-blp-model--structural-demand-estimation-at-scale)
+14. [Python --- Causal Forest for Heterogeneous Elasticity](#python--causal-forest-for-heterogeneous-elasticity)
+15. [Demand Censoring](#demand-censoring)
+16. [Conjoint Analysis and Discrete Choice Models](#conjoint-analysis-and-discrete-choice-models)
+17. [Python Implementation](#python-implementation)
+18. [The State of the Art](#the-state-of-the-art)
 
 ---
 
@@ -368,6 +373,543 @@ The standard error is computed as:
 $$\hat{\sigma}^2 = \frac{1}{n} \sum_{i=1}^{n} (\tilde{Q}_i - \hat{\theta} \tilde{P}_i)^2 \cdot \tilde{P}_i^2 \bigg/ \left(\frac{1}{n} \sum_{i=1}^{n} \tilde{P}_i^2\right)^2$$
 
 Cross-fitting ensures that the ML predictions are genuinely out-of-sample, which prevents overfitting from polluting the causal estimate. Without cross-fitting, DML can fail badly. With it, the theoretical guarantees hold.
+
+---
+
+## The Interactive Model and Beyond Partial Linearity
+
+The partially linear model \\(Q = \theta P + g(X) + \varepsilon\\) we built in the DML section assumes something strong: the causal effect \\(\theta\\) is a **constant**. Every customer, every product, every context has the same price sensitivity. This is almost never true. A college student and a hedge fund manager do not react the same way to a $5 price increase. A price-sensitive shopper browsing discount sites and a brand-loyal repeat customer have fundamentally different elasticities. If you estimate a single average \\(\theta\\) and use it to set one price, you leave enormous surplus on the table.
+
+The **interactive model** generalizes the partially linear model by letting the treatment effect depend on covariates:
+
+$$Q = \theta(X) \cdot P + g(X) + \varepsilon$$
+
+Here \\(\theta(X)\\) is a function, not a number. It maps from the covariate space to the real line. For a customer with features \\(X = x\\), the price elasticity is \\(\theta(x)\\). This function is called the **Conditional Average Treatment Effect (CATE)** --- it tells you how the causal effect of price varies across observable segments.
+
+Why does this matter for pricing? Recall from Part 2 that third-degree price discrimination works by charging different prices to segments with different elasticities. The Lerner index says the optimal markup for segment \\(x\\) is:
+
+$$\text{markup}(x) = \frac{1}{|\theta(x)|}$$
+
+If \\(\theta(x)\\) is more negative (highly elastic customers), you set a small markup. If \\(\theta(x)\\) is close to zero (inelastic customers), you set a large markup. Estimating \\(\theta(X)\\) is therefore the statistical engine behind personalized pricing. The question is how to estimate a *function-valued* causal parameter from observational data.
+
+### The DR-Learner (Doubly Robust Learner)
+
+The DR-learner is a meta-algorithm for CATE estimation that inherits the doubly robust property from the semiparametric statistics literature. It proceeds in four steps.
+
+**Step 1: Estimate the generalized propensity score.** In the binary treatment case, the propensity score is \\(e(X) = \mathbb{E}[D \mid X]\\) --- the probability of receiving treatment given covariates. For our continuous treatment (price), the analog is the **conditional density** of price given covariates, or more practically, the conditional mean \\(e(X) = \mathbb{E}[P \mid X]\\). We estimate this with any flexible ML model:
+
+$$\hat{e}(X) = \hat{\mathbb{E}}[P \mid X]$$
+
+This is identical to the \\(\hat{m}(X)\\) from the DML procedure.
+
+**Step 2: Estimate the outcome model.** Fit a model for the full conditional expectation of the outcome:
+
+$$\hat{\mu}(X, P) = \hat{\mathbb{E}}[Q \mid X, P]$$
+
+This can be any flexible regression (random forest, gradient boosted trees, neural network) that takes both features and price as inputs.
+
+**Step 3: Construct the pseudo-outcome.** The key insight is the **augmented inverse propensity weighting (AIPW)** construction. For each observation, compute:
+
+$$\tilde{Y}_i = \hat{\mu}(X_i, P_i) + \frac{P_i - \hat{e}(X_i)}{\widehat{\text{Var}}(P \mid X_i)} \Big(Q_i - \hat{\mu}(X_i, P_i)\Big)$$
+
+This pseudo-outcome has a remarkable property: its conditional expectation, as a function of \\(X\\), equals the CATE \\(\theta(X)\\), *even if one of the two models (propensity or outcome) is misspecified*. This is the **doubly robust** property. If the outcome model \\(\hat{\mu}\\) is correct, the second term has conditional mean zero and the first term gives you the CATE. If the propensity model \\(\hat{e}\\) is correct, the reweighting corrects for the outcome model's error. The estimator is consistent if *either* model is correct (but not necessarily both).
+
+The derivation of double robustness proceeds as follows. Write the true conditional expectation:
+
+$$\mathbb{E}[\tilde{Y} \mid X] = \mathbb{E}\left[\hat{\mu}(X, P) + \frac{P - \hat{e}(X)}{\widehat{\text{Var}}(P \mid X)} \big(Q - \hat{\mu}(X, P)\big) \;\middle|\; X\right]$$
+
+If \\(\hat{\mu} = \mu\\) (the outcome model is correct), then \\(\mathbb{E}[Q - \mu(X, P) \mid X, P] = 0\\), so the second term vanishes in expectation, and \\(\mathbb{E}[\tilde{Y} \mid X] = \mathbb{E}[\mu(X, P) \mid X] = \theta(X) \cdot \mathbb{E}[P \mid X] + g(X)\\). After appropriate centering, this isolates \\(\theta(X)\\).
+
+Alternatively, if \\(\hat{e} = e\\) (the propensity model is correct), the reweighting by \\((P - e(X))/\text{Var}(P \mid X)\\) acts as a local instrumental variable, projecting the outcome residual onto the price residual conditional on \\(X\\). The expectation of the price residual times the demand shock is zero by conditional exogeneity, and what remains is \\(\theta(X)\\).
+
+**Step 4: Regress the pseudo-outcome on \\(X\\).** Fit a final ML model:
+
+$$\hat{\theta}(X) = \text{ML model fit of } \tilde{Y}_i \text{ on } X_i$$
+
+This final model directly estimates the CATE function. You can use any flexible regressor --- a random forest, a gradient-boosted model, or even a neural network.
+
+### The R-Learner (Robinson's Decomposition Extended)
+
+The R-learner takes a different approach, extending Robinson's (1988) partial residualization idea. Start from the interactive model:
+
+$$Q = \theta(X) \cdot P + g(X) + \varepsilon$$
+
+Take conditional expectations given \\(X\\):
+
+$$\mathbb{E}[Q \mid X] = \theta(X) \cdot \mathbb{E}[P \mid X] + g(X)$$
+
+Subtract to get:
+
+$$Q - \mathbb{E}[Q \mid X] = \theta(X) \cdot (P - \mathbb{E}[P \mid X]) + \varepsilon$$
+
+Define residuals \\(\tilde{Q} = Q - \hat{\ell}(X)\\) and \\(\tilde{P} = P - \hat{m}(X)\\), where \\(\hat{\ell}\\) and \\(\hat{m}\\) are ML estimates of the conditional means. Then:
+
+$$\tilde{Q} = \theta(X) \cdot \tilde{P} + \varepsilon$$
+
+The R-learner estimates \\(\theta(X)\\) by minimizing a weighted loss:
+
+$$\hat{\theta} = \arg\min_{\theta(\cdot)} \sum_{i=1}^{n} \left(\tilde{Q}_i - \theta(X_i) \cdot \tilde{P}_i\right)^2$$
+
+This is a weighted regression problem where the weights come from the price residuals. In regions of \\(X\\)-space where the price residual \\(\tilde{P}\\) is large (meaning there is substantial residual price variation after controlling for \\(X\\)), the estimate of \\(\theta(X)\\) is well-identified. Where \\(\tilde{P}\\) is small, identification is weak and the estimate is noisy.
+
+The practical implementation uses regularized regression or a local estimator. A common choice: parameterize \\(\theta(X) = f_w(X)\\) as a neural network or boosted tree model with parameters \\(w\\), and minimize the loss above with respect to \\(w\\). The `econml` package from Microsoft Research implements both the DR-learner and R-learner.
+
+### Connection to Optimal Pricing
+
+Once you have \\(\hat{\theta}(X)\\), pricing follows immediately. For customer segment \\(x\\), the estimated price elasticity of demand is \\(\hat{\theta}(x)\\), and the Lerner index gives the optimal markup:
+
+$$\frac{P^*(x) - MC}{P^*(x)} = \frac{1}{|\hat{\theta}(x)|}$$
+
+Customers with \\(\hat{\theta}(x) = -3\\) (highly elastic) get a markup of \\(1/3 \approx 33\%\\). Customers with \\(\hat{\theta}(x) = -1.2\\) (relatively inelastic) get a markup of \\(1/1.2 \approx 83\%\\). This is the statistical implementation of the price discrimination theory from Part 2, now grounded in causal estimates from observational data.
+
+---
+
+## Causal Forests for Heterogeneous Price Sensitivity
+
+The DR-learner and R-learner require you to choose an ML model for the final stage --- the model that maps \\(X\\) to \\(\theta(X)\\). Athey and Imbens (2018) proposed a purpose-built algorithm for this: the **Generalized Random Forest (GRF)**, and its special case, the **causal forest**.
+
+The key insight behind causal forests is that ordinary random forests solve the wrong problem for causal inference. A standard random forest predicts \\(\mathbb{E}[Q \mid X]\\) --- it finds neighborhoods in \\(X\\)-space where the *outcome* is locally homogeneous. But for CATE estimation, we need neighborhoods where the *treatment effect* is locally homogeneous. These are not the same thing. A region of \\(X\\)-space might have very similar average demand but very different price sensitivities.
+
+### The Splitting Criterion
+
+In a standard regression tree, each node is split by choosing the variable and threshold that maximizes the reduction in variance of the outcome \\(Q\\). In a causal tree, the goal is different: choose the split that maximizes **heterogeneity in the treatment effect** across the two child nodes.
+
+Formally, at a node containing observations \\(\{(Q_i, P_i, X_i)\}_{i \in \mathcal{N}}\\), consider a candidate split into left child \\(\mathcal{L}\\) and right child \\(\mathcal{R}\\). Estimate the treatment effect in each child using a simple IV-style estimator (regress \\(Q\\) on \\(P\\) within the node, or use residualized outcomes). Let \\(\hat{\theta}_\mathcal{L}\\) and \\(\hat{\theta}_\mathcal{R}\\) be these estimates. The causal tree chooses the split that maximizes:
+
+$$\Delta(\mathcal{L}, \mathcal{R}) = \frac{n_\mathcal{L} \cdot n_\mathcal{R}}{(n_\mathcal{L} + n_\mathcal{R})^2} \left(\hat{\theta}_\mathcal{L} - \hat{\theta}_\mathcal{R}\right)^2$$
+
+This criterion rewards splits where the treatment effect differs substantially between the two children, weighted by the sample sizes to avoid tiny leaves.
+
+### Honesty: Separate Construction from Estimation
+
+Here is a subtle but critical point. If you use the same data to determine the tree structure (where to split) and to estimate the treatment effect in each leaf, you get overfitting. The splits will chase noise in the treatment effect, and the leaf estimates will be biased.
+
+The solution is **honesty**. Split the available data into two halves:
+- The **structure sample**: used to determine the tree topology (which variables to split on, at what thresholds).
+- The **estimation sample**: used to estimate the treatment effect within each leaf.
+
+Because the estimation sample was not used to choose the splits, the treatment effect estimates are unbiased conditional on the tree structure. This separation is what gives causal forests valid confidence intervals --- a property that standard random forests lack for causal quantities.
+
+### The Forest Weighting Interpretation
+
+A single honest causal tree is noisy. A causal forest aggregates many such trees, each built on a bootstrap subsample. The aggregation produces a smooth estimate with a beautiful interpretation.
+
+For a query point \\(x\\), define the **adaptive kernel weight**:
+
+$$\alpha_i(x) = \frac{1}{B} \sum_{b=1}^{B} \frac{\mathbf{1}(X_i \in L_b(x))}{|L_b(x)|}$$
+
+where \\(B\\) is the number of trees, \\(L_b(x)\\) is the leaf of tree \\(b\\) that contains \\(x\\), and \\(|L_b(x)|\\) is the number of estimation-sample observations in that leaf. The weight \\(\alpha_i(x)\\) measures how often observation \\(i\\) lands in the same leaf as the query point \\(x\\), averaged across all trees. Observations with covariates similar to \\(x\\) (in the sense defined by the forest's splitting criteria) receive higher weights.
+
+The causal forest estimate at \\(x\\) is then a **locally weighted IV estimator**:
+
+$$\hat{\theta}(x) = \frac{\sum_{i=1}^{n} \alpha_i(x) \cdot (Q_i - \bar{Q}_\alpha)(P_i - \bar{P}_\alpha)}{\sum_{i=1}^{n} \alpha_i(x) \cdot (P_i - \bar{P}_\alpha)^2}$$
+
+where \\(\bar{Q}_\alpha = \sum_i \alpha_i(x) Q_i\\) and \\(\bar{P}_\alpha = \sum_i \alpha_i(x) P_i\\) are the weighted means. This is just the formula for a weighted regression coefficient of \\(Q\\) on \\(P\\), with weights determined by the forest. The forest has learned, from the data, which observations are "relevant" for estimating the treatment effect at point \\(x\\).
+
+### Asymptotic Normality and Confidence Intervals
+
+Under regularity conditions (the forest must be grown with sufficient randomness, the minimum leaf size must grow with \\(n\\), and the number of trees \\(B\\) must be large enough), the causal forest estimate is asymptotically normal:
+
+$$\frac{\hat{\theta}(x) - \theta(x)}{\hat{\sigma}(x)} \xrightarrow{d} \mathcal{N}(0, 1)$$
+
+where \\(\hat{\sigma}(x)\\) is a consistent variance estimate that can be computed from the forest itself using the infinitesimal jackknife or the bootstrap of little bags (half-sampling). This means you can construct pointwise confidence intervals:
+
+$$\hat{\theta}(x) \pm z_{\alpha/2} \cdot \hat{\sigma}(x)$$
+
+This is extraordinary for a nonparametric estimator. You get a flexible, data-adaptive estimate of a heterogeneous treatment effect *with valid statistical inference* at every point in the covariate space.
+
+### Practical Significance for Pricing
+
+With a causal forest, you can estimate a **different price elasticity for every customer segment**, along with a confidence interval for each. This enables:
+
+1. **Targeted pricing with quantified uncertainty.** For segment \\(x\\), the estimated elasticity is \\(\hat{\theta}(x) \pm 1.96 \cdot \hat{\sigma}(x)\\). If the confidence interval is tight (say \\(-2.5 \pm 0.3\\)), you can confidently set the optimal markup. If the interval is wide (say \\(-2.5 \pm 2.0\\)), the estimate is too uncertain for aggressive price discrimination --- you should price conservatively or gather more data for that segment.
+
+2. **Segment discovery.** The forest reveals *which covariates drive heterogeneity* in price sensitivity. By examining the splitting variables and their importance scores, you learn that, for example, customer tenure and geographic region are the primary drivers of elasticity differences --- information that guides marketing and product strategy.
+
+3. **Policy simulation.** With \\(\hat{\theta}(x)\\) in hand, you can simulate the revenue impact of any proposed pricing policy --- a 10% across-the-board increase, a targeted discount for high-elasticity segments, or a tiered pricing structure --- before implementing it.
+
+---
+
+## Difference-in-Differences for Pricing Policy Evaluation
+
+Everything so far has focused on estimating the *structural* relationship between price and demand: if I change the price for a specific product by 1%, how does demand respond? But there is a different and equally important question: **what was the causal effect of a pricing policy change?**
+
+Suppose a retailer switches from fixed markups to algorithmic dynamic pricing in 50 of its 200 stores, while the other 150 continue with the old system. Six months later, management wants to know: did the new pricing system increase revenue? By how much? This is a **policy evaluation** question, and the right tool is **difference-in-differences (DiD)**.
+
+### The Setup
+
+You observe units (stores, products, regions) indexed by \\(i\\), at times \\(t\\). Some units receive a treatment \\(D_{it} = 1\\) (the new pricing policy) starting at time \\(t^*\\), while others remain untreated \\(D_{it} = 0\\). You observe an outcome \\(Q_{it}\\) (revenue, quantity, or profit) for all units at all times, both before and after the policy change.
+
+The fundamental problem of causal inference: you cannot observe the treated stores' revenue *had they not been treated*. That counterfactual is missing. DiD constructs it using the control group.
+
+### The Parallel Trends Assumption
+
+DiD rests on one critical assumption: **absent the treatment, the treatment and control groups would have followed the same trend in outcomes.** Formally:
+
+$$\mathbb{E}[Q_{it}(0) - Q_{it'}(0) \mid D_i = 1] = \mathbb{E}[Q_{it}(0) - Q_{it'}(0) \mid D_i = 0]$$
+
+for all pre-treatment periods \\(t, t'\\) and the post-treatment period. Here \\(Q_{it}(0)\\) denotes the potential outcome under no treatment. The assumption says that the *change* in outcomes would have been the same in both groups, even though the *levels* may differ. The treatment and control groups do not need to start at the same revenue level --- they just need to have been moving in the same direction at the same rate.
+
+This is weaker than requiring the two groups to be identical. It allows for permanent differences (some stores are just bigger or in better locations) as long as those differences are *stable* over time.
+
+### The DiD Estimator
+
+The estimator is beautifully simple. Compute the average outcome for each group (treatment and control) in each period (before and after). Then take the difference of the differences:
+
+$$\hat{\theta}_{DiD} = \underbrace{(\bar{Q}_{treat,post} - \bar{Q}_{treat,pre})}_{\text{change in treated group}} - \underbrace{(\bar{Q}_{control,post} - \bar{Q}_{control,pre})}_{\text{change in control group}}$$
+
+The first difference removes time-invariant characteristics of the treated group (store size, location quality). The second difference removes common time trends (seasonal demand shifts, macroeconomic conditions). What remains is the causal effect of the treatment.
+
+Why does this work? Write the potential outcomes model:
+
+$$Q_{it} = \alpha_i + \gamma_t + \theta \cdot D_{it} + \varepsilon_{it}$$
+
+where \\(\alpha_i\\) is a **unit fixed effect** (captures all time-invariant differences between units), \\(\gamma_t\\) is a **time fixed effect** (captures all common temporal shocks), \\(\theta\\) is the treatment effect, and \\(\varepsilon_{it}\\) is idiosyncratic noise. Taking the double difference:
+
+$$\hat{\theta}_{DiD} = (\bar{Q}_{1,post} - \bar{Q}_{1,pre}) - (\bar{Q}_{0,post} - \bar{Q}_{0,pre})$$
+
+The \\(\alpha_i\\) terms cancel within each group (they are the same before and after). The \\(\gamma_t\\) terms cancel across groups (they are the same for treatment and control). What survives is \\(\theta\\).
+
+### Two-Way Fixed Effects Regression
+
+In practice, with panel data (multiple units observed over multiple time periods), the DiD estimator is implemented via **two-way fixed effects (TWFE)** regression:
+
+$$Q_{it} = \alpha_i + \gamma_t + \theta \cdot D_{it} + \varepsilon_{it}$$
+
+where \\(\alpha_i\\) are unit dummies (one per store) and \\(\gamma_t\\) are time dummies (one per period). OLS on this specification gives the TWFE estimate \\(\hat{\theta}_{TWFE}\\). In the simple 2-period, 2-group case, this is exactly the DiD estimator. With multiple periods and groups, it generalizes naturally.
+
+You can add time-varying covariates \\(X_{it}\\) (e.g., local advertising spend, weather, competitor actions):
+
+$$Q_{it} = \alpha_i + \gamma_t + \theta \cdot D_{it} + X_{it}'\beta + \varepsilon_{it}$$
+
+These covariates improve precision and help the parallel trends assumption hold conditionally.
+
+### The Staggered Adoption Problem
+
+The simple DiD story works cleanly when treatment happens to all treated units at the same time. In practice, rollouts are often **staggered**: different stores adopt the new pricing at different dates. Store A starts in January, Store B in March, Store C in June.
+
+The standard TWFE regression still includes unit and time fixed effects with \\(D_{it}\\) as the treatment indicator. For years, practitioners assumed this was fine. Then a series of papers --- Goodman-Bacon (2021), Callaway and Sant'Anna (2021), Sun and Abraham (2021), de Chaisemartin and D'Haultfoeuille (2020) --- showed that **TWFE is biased under staggered adoption when the treatment effect is heterogeneous**.
+
+The problem is subtle and important. TWFE with staggered adoption implicitly computes a weighted average of many 2x2 DiD comparisons. Some of those comparisons use **already-treated units as controls** --- for example, comparing stores treated in March to stores treated in January (which are already under treatment by March). If the treatment effect changes over time (e.g., the new pricing system works better as the algorithm learns), using already-treated units as controls introduces bias. Worse, some of the implicit weights can be **negative**, meaning that a positive treatment effect in one comparison can enter the overall estimate with a negative sign.
+
+Goodman-Bacon (2021) provided an exact decomposition: the TWFE estimator is a weighted average of all possible 2x2 DiD estimates from the data, with weights that depend on group sizes and treatment timing. When those weights are negative (which happens when treatment effects are heterogeneous over time), the TWFE estimate can even have the wrong sign.
+
+**Modern solutions:**
+
+- **Callaway and Sant'Anna (2021):** Estimate group-time-specific treatment effects \\(\text{ATT}(g, t)\\) --- the average effect for cohort \\(g\\) (units first treated at time \\(g\\)) at time \\(t\\). These building blocks are then aggregated with user-chosen (non-negative) weights to form summary measures.
+- **Sun and Abraham (2021):** An interaction-weighted estimator that avoids contamination from heterogeneous effects across cohorts.
+- **Synthetic DiD (Arkhangelsky et al., 2021):** Combines the synthetic control idea (reweight the control group to match the treated group's pre-treatment trajectory) with the DiD framework. This relaxes the parallel trends assumption by constructing a synthetic control that actually tracks the treated group's pre-treatment path.
+
+### Application to Pricing
+
+Consider our retailer rolling out dynamic pricing to stores in waves. The staggered DiD framework lets you:
+1. Estimate the revenue effect for each cohort (wave of stores) at each post-treatment time.
+2. Test whether the effect grows over time (as the algorithm learns) or fades (as competitors respond).
+3. Aggregate into an overall policy effect with proper statistical inference.
+
+<svg viewBox="0 0 720 420" xmlns="http://www.w3.org/2000/svg" style="max-width: 720px; display: block; margin: 2em auto;">
+  <defs>
+    <marker id="arrow-did" markerWidth="10" markerHeight="7" refX="10" refY="3.5" orient="auto">
+      <polygon points="0 0, 10 3.5, 0 7" fill="#d4d4d4"/>
+    </marker>
+  </defs>
+  <text x="360" y="25" text-anchor="middle" font-family="Arial, sans-serif" font-size="15" font-weight="bold" fill="#d4d4d4">Difference-in-Differences: Parallel Trends Logic</text>
+
+  <!-- Axes -->
+  <line x1="80" y1="370" x2="670" y2="370" stroke="#d4d4d4" stroke-width="1.5" marker-end="url(#arrow-did)"/>
+  <line x1="80" y1="370" x2="80" y2="40" stroke="#d4d4d4" stroke-width="1.5" marker-end="url(#arrow-did)"/>
+  <text x="375" y="405" text-anchor="middle" font-family="Arial, sans-serif" font-size="13" fill="#d4d4d4">Time</text>
+  <text x="30" y="205" text-anchor="middle" font-family="Arial, sans-serif" font-size="13" fill="#d4d4d4" transform="rotate(-90, 30, 205)">Revenue</text>
+
+  <!-- Treatment time marker -->
+  <line x1="370" y1="55" x2="370" y2="370" stroke="#ffd54f" stroke-width="1.5" stroke-dasharray="8,4"/>
+  <text x="370" y="48" text-anchor="middle" font-family="Arial, sans-serif" font-size="11" fill="#ffd54f">Policy Change</text>
+
+  <!-- Pre-period labels -->
+  <text x="220" y="390" text-anchor="middle" font-family="Arial, sans-serif" font-size="11" fill="#d4d4d4">Pre-treatment</text>
+  <text x="520" y="390" text-anchor="middle" font-family="Arial, sans-serif" font-size="11" fill="#d4d4d4">Post-treatment</text>
+
+  <!-- Control group (solid throughout) -->
+  <line x1="120" y1="280" x2="370" y2="220" stroke="#4fc3f7" stroke-width="2.5"/>
+  <line x1="370" y1="220" x2="630" y2="160" stroke="#4fc3f7" stroke-width="2.5"/>
+  <text x="640" y="160" font-family="Arial, sans-serif" font-size="12" fill="#4fc3f7" font-weight="bold">Control</text>
+
+  <!-- Treatment group pre-period -->
+  <line x1="120" y1="230" x2="370" y2="170" stroke="#e57373" stroke-width="2.5"/>
+
+  <!-- Treatment group post-period (actual, diverging upward) -->
+  <line x1="370" y1="170" x2="630" y2="80" stroke="#e57373" stroke-width="2.5"/>
+  <text x="640" y="80" font-family="Arial, sans-serif" font-size="12" fill="#e57373" font-weight="bold">Treated</text>
+
+  <!-- Counterfactual (dashed, parallel to control) -->
+  <line x1="370" y1="170" x2="630" y2="110" stroke="#e57373" stroke-width="1.5" stroke-dasharray="6,4"/>
+  <text x="640" y="115" font-family="Arial, sans-serif" font-size="11" fill="#e57373" font-style="italic">Counterfactual</text>
+
+  <!-- Treatment effect brace -->
+  <line x1="600" y1="83" x2="600" y2="108" stroke="#66bb6a" stroke-width="2.5"/>
+  <text x="615" y="100" font-family="Arial, sans-serif" font-size="12" fill="#66bb6a" font-weight="bold">&#x03B8;</text>
+
+  <!-- Dots at treatment time -->
+  <circle cx="370" cy="220" r="4" fill="#4fc3f7"/>
+  <circle cx="370" cy="170" r="4" fill="#e57373"/>
+</svg>
+
+The diagram captures the core logic. Before the policy change, both groups trend in parallel (same slope). After the policy change, the treated group diverges from the control group. The counterfactual (dashed red line) shows where the treated group would have been without the treatment, extrapolating the parallel pre-treatment trend. The treatment effect \\(\theta\\) is the gap between the actual treated outcome and this counterfactual.
+
+---
+
+## The BLP Model --- Structural Demand Estimation at Scale
+
+The Berry-Levinsohn-Pakes (1995) model --- universally known as BLP --- is the workhorse of demand estimation in industrial organization. If DML is the tool for estimating causal effects from observational data, BLP is the tool for estimating the entire demand system for a market with many differentiated products. It tells you not just your own-price elasticity, but the full matrix of own-price and cross-price elasticities for every product against every other product. This is what you need to optimally price a product portfolio.
+
+### The Setup
+
+Consider a market with \\(J\\) products. Consumer \\(i\\) can choose one of the \\(J\\) products or an outside option (buy nothing). Consumer \\(i\\)'s utility from product \\(j\\) is:
+
+$$u_{ij} = \delta_j + \mu_{ij} + \varepsilon_{ij}$$
+
+This utility has three components.
+
+**Mean utility** \\(\delta_j\\). This is common to all consumers and captures the "average" appeal of product \\(j\\):
+
+$$\delta_j = X_j'\bar{\beta} - \alpha p_j + \xi_j$$
+
+where \\(X_j\\) is a vector of observed product characteristics (horsepower, fuel efficiency, screen size --- whatever is relevant), \\(p_j\\) is price, \\(\alpha > 0\\) is the mean price sensitivity, and \\(\xi_j\\) is **unobserved product quality** --- the brand cachet, design quality, advertising effect, or any demand-relevant attribute not captured by \\(X_j\\). This unobserved quality is the source of the endogeneity problem: better products (higher \\(\xi_j\\)) tend to have higher prices.
+
+**Individual taste variation** \\(\mu_{ij}\\). This captures the fact that different consumers have different preferences over product characteristics:
+
+$$\mu_{ij} = X_j' \Sigma v_i + \sigma_\alpha \nu_i p_j$$
+
+where \\(v_i \sim \mathcal{N}(0, I)\\) and \\(\nu_i \sim \mathcal{N}(0, 1)\\) are consumer-specific taste shocks, and \\(\Sigma\\) and \\(\sigma_\alpha\\) are parameters governing the dispersion of preferences. The random coefficient on characteristics means that some consumers care more about feature A, others about feature B. The random coefficient on price means that some consumers are more price-sensitive than others.
+
+**Idiosyncratic shock** \\(\varepsilon_{ij}\\). This is i.i.d. Type I extreme value (Gumbel distributed). This distributional assumption gives the logit structure to the choice probabilities, which makes the model computationally tractable.
+
+### Market Shares
+
+The probability that consumer \\(i\\) chooses product \\(j\\) is (by the logit formula):
+
+$$\pi_{ij} = \frac{\exp(\delta_j + \mu_{ij})}{1 + \sum_{k=1}^{J} \exp(\delta_k + \mu_{ik})}$$
+
+The 1 in the denominator represents the outside option (utility normalized to zero). The **predicted market share** of product \\(j\\) is obtained by integrating over the distribution of consumer types:
+
+$$s_j(\delta, \Sigma, \sigma_\alpha) = \int \frac{\exp(\delta_j + \mu_{ij})}{1 + \sum_{k=1}^{J} \exp(\delta_k + \mu_{ik})} \; dF(v_i, \nu_i)$$
+
+This integral has no closed-form solution because the denominator depends on \\(v_i\\) and \\(\nu_i\\) through all \\(J\\) products simultaneously. It must be computed by **simulation**: draw \\(R\\) consumers from the distribution \\(F\\), compute each one's choice probability, and average:
+
+$$s_j \approx \frac{1}{R} \sum_{r=1}^{R} \frac{\exp(\delta_j + \mu_{rj})}{1 + \sum_{k=1}^{J} \exp(\delta_k + \mu_{rk})}$$
+
+Typical values of \\(R\\) range from 200 to 1000 simulation draws.
+
+### The Contraction Mapping (Berry 1994)
+
+Here is the computational heart of BLP. We observe actual market shares \\(S_j\\) (from sales data). We want to find the vector of mean utilities \\(\delta = (\delta_1, \ldots, \delta_J)\\) such that the model-predicted shares equal the observed shares: \\(s_j(\delta, \Sigma, \sigma_\alpha) = S_j\\) for all \\(j\\).
+
+This is a system of \\(J\\) nonlinear equations in \\(J\\) unknowns. Berry (1994) showed that the mapping:
+
+$$\delta_j^{(t+1)} = \delta_j^{(t)} + \ln S_j - \ln s_j(\delta^{(t)}, \Sigma, \sigma_\alpha)$$
+
+is a **contraction mapping** and converges to a unique fixed point \\(\delta^*(\Sigma, \sigma_\alpha)\\). The intuition: if the predicted share of product \\(j\\) is too low (\\(s_j < S_j\\)), increase its mean utility (\\(\delta_j\\) goes up). If predicted share is too high, decrease it. The logarithmic adjustment ensures convergence.
+
+This is remarkable because it means that for any given set of random coefficient parameters \\((\Sigma, \sigma_\alpha)\\), we can *invert* the observed market shares to recover the mean utilities. And from the mean utilities, we can back out the unobserved quality:
+
+$$\xi_j = \delta_j^* - X_j'\bar{\beta} + \alpha p_j$$
+
+### The Endogeneity Problem and Instruments
+
+The unobserved quality \\(\xi_j\\) is the econometric headache. Products with high \\(\xi_j\\) (think Apple products, luxury brands) tend to have high prices. So \\(p_j\\) and \\(\xi_j\\) are correlated, and naive estimation of \\(\alpha\\) (the price coefficient) is biased.
+
+The solution: instruments. The moment condition is:
+
+$$\mathbb{E}[Z_j' \xi_j] = 0$$
+
+where \\(Z_j\\) is a vector of instruments. BLP proposed using functions of other products' characteristics as instruments. The logic: the number and configuration of competing products affects firm \\(j\\)'s pricing (through competitive pressure), but the characteristics of competitors' products do not directly enter the demand for product \\(j\\) (conditional on \\(j\\)'s own characteristics). Common BLP instruments include:
+
+1. **Sum of characteristics of other products by the same firm:** \\(\sum_{k \neq j, k \in \mathcal{F}_j} X_k\\), where \\(\mathcal{F}_j\\) is the set of products made by \\(j\\)'s firm. These capture within-firm cannibalization effects on pricing.
+2. **Sum of characteristics of rival firms' products:** \\(\sum_{k \notin \mathcal{F}_j} X_k\\). These capture competitive pressure on pricing.
+
+### The GMM Objective
+
+Stack the moment conditions across products and markets:
+
+$$\hat{\xi}(\theta) = \delta^*(\Sigma, \sigma_\alpha) - X\bar{\beta} + \alpha p$$
+
+where \\(\theta = (\bar{\beta}, \alpha, \Sigma, \sigma_\alpha)\\). The GMM estimator minimizes:
+
+$$\hat{\theta}_{GMM} = \arg\min_\theta \; \hat{\xi}(\theta)' Z \, W \, Z' \hat{\xi}(\theta)$$
+
+where \\(W\\) is a weighting matrix (typically the optimal GMM weighting matrix \\(W = (\frac{1}{n} Z' \hat{\xi} \hat{\xi}' Z)^{-1}\\), estimated in a two-step procedure).
+
+The estimation proceeds by nested optimization: the outer loop searches over \\((\Sigma, \sigma_\alpha)\\), and for each candidate value, the inner loop runs the contraction mapping to solve for \\(\delta^*\\), then computes \\(\bar{\beta}\\) and \\(\alpha\\) by linear IV regression, then evaluates the GMM objective. This is computationally intensive --- a single evaluation requires multiple contraction mapping iterations, each requiring simulation of market shares --- but modern implementations handle markets with hundreds of products.
+
+### Elasticities from BLP
+
+Once the model is estimated, you can compute the full elasticity matrix. The own-price elasticity of product \\(j\\) is:
+
+$$\varepsilon_{jj} = -\frac{\alpha \, p_j}{s_j} \int \pi_{ij}(1 - \pi_{ij}) \, dF(v_i, \nu_i)$$
+
+The cross-price elasticity of product \\(j\\) with respect to the price of product \\(k\\) is:
+
+$$\varepsilon_{jk} = \frac{\alpha \, p_k}{s_j} \int \pi_{ij} \cdot \pi_{ik} \, dF(v_i, \nu_i)$$
+
+These elasticities depend on the distribution of consumer types through the integral, and they reflect realistic substitution patterns: products that are "close" in characteristic space (similar features, similar prices) have high cross-price elasticities, while dissimilar products have low cross-elasticities. This is a major improvement over the plain logit model, where the cross-price elasticities depend only on market shares (the "independence of irrelevant alternatives" property) and cannot capture the fact that a Honda Civic competes more with a Toyota Corolla than with a BMW 7 Series.
+
+### Why BLP Matters for Pricing
+
+BLP gives you the complete demand system. With the full elasticity matrix in hand, you can:
+
+1. **Optimize the prices of an entire product portfolio simultaneously.** The optimal price for product \\(j\\) depends on its own elasticity *and* on the cross-elasticities with all other products in the firm's portfolio. Raising the price of product \\(j\\) pushes some customers to substitute to product \\(k\\) (which may also be yours), and this cannibalization must be accounted for.
+
+2. **Simulate competitive responses.** If you know competitors' cost structures (or can estimate them from the first-order conditions of their profit maximization), you can predict how they will adjust prices in response to your changes.
+
+3. **Evaluate mergers and acquisitions.** Post-merger, a firm internalizes the cross-price effects between the merging firms' products. BLP is the standard tool for predicting post-merger price changes in antitrust analysis.
+
+---
+
+## Python --- Causal Forest for Heterogeneous Elasticity
+
+The following code demonstrates heterogeneous treatment effect estimation in the pricing context. We simulate a market where price sensitivity varies with customer income, then use an R-learner approach with DML-within-bins to recover the heterogeneous elasticity.
+
+```python
+import numpy as np
+import matplotlib.pyplot as plt
+from sklearn.ensemble import RandomForestRegressor
+from sklearn.model_selection import KFold
+
+np.random.seed(42)
+n = 6000
+
+# Customer features: income (main source of heterogeneity) + noise features
+income = np.random.uniform(20, 150, n)  # thousands of dollars
+x2 = np.random.normal(0, 1, n)
+x3 = np.random.normal(0, 1, n)
+X = np.column_stack([income, x2, x3])
+
+# True heterogeneous price effect: theta(X) depends on income
+# Low income -> more price sensitive (theta more negative)
+# High income -> less price sensitive (theta closer to zero)
+theta_true = -3.0 + 2.0 * (income / 150)  # ranges from ~ -2.73 to ~ -1.0
+
+# Confounders affect both price and demand
+g_X = 50 + 0.3 * income + 2.0 * np.sin(income / 20) + 1.5 * x2
+m_X = 10 + 0.05 * income + 0.8 * np.cos(income / 25) + 0.5 * x3
+
+# Price: function of confounders + noise
+V = np.random.normal(0, 2, n)
+P = m_X + V
+
+# Demand: heterogeneous effect of price + confounders + noise
+epsilon = np.random.normal(0, 3, n)
+Q = theta_true * P + g_X + epsilon
+
+# ================================================================
+# Method: DML within income quintiles (binned heterogeneity)
+# ================================================================
+n_bins = 10
+income_edges = np.percentile(income, np.linspace(0, 100, n_bins + 1))
+bin_indices = np.digitize(income, income_edges[1:-1])
+
+theta_hat_bins = np.zeros(n_bins)
+theta_true_bins = np.zeros(n_bins)
+se_bins = np.zeros(n_bins)
+income_midpoints = np.zeros(n_bins)
+
+for b in range(n_bins):
+    mask = bin_indices == b
+    n_b = mask.sum()
+    X_b, P_b, Q_b = X[mask], P[mask], Q[mask]
+    income_midpoints[b] = income[mask].mean()
+    theta_true_bins[b] = theta_true[mask].mean()
+
+    # DML with 5-fold cross-fitting within this bin
+    Q_tilde_b = np.zeros(n_b)
+    P_tilde_b = np.zeros(n_b)
+    kf = KFold(n_splits=5, shuffle=True, random_state=b)
+
+    for train_idx, test_idx in kf.split(X_b):
+        rf_q = RandomForestRegressor(
+            n_estimators=150, max_depth=8,
+            min_samples_leaf=10, random_state=42
+        )
+        rf_q.fit(X_b[train_idx], Q_b[train_idx])
+        Q_tilde_b[test_idx] = Q_b[test_idx] - rf_q.predict(X_b[test_idx])
+
+        rf_p = RandomForestRegressor(
+            n_estimators=150, max_depth=8,
+            min_samples_leaf=10, random_state=42
+        )
+        rf_p.fit(X_b[train_idx], P_b[train_idx])
+        P_tilde_b[test_idx] = P_b[test_idx] - rf_p.predict(X_b[test_idx])
+
+    # Estimate theta within this bin
+    theta_hat_bins[b] = (
+        np.sum(P_tilde_b * Q_tilde_b) / np.sum(P_tilde_b ** 2)
+    )
+
+    # Standard error
+    resid = Q_tilde_b - theta_hat_bins[b] * P_tilde_b
+    se_bins[b] = np.sqrt(
+        np.mean(resid ** 2 * P_tilde_b ** 2)
+        / (np.mean(P_tilde_b ** 2) ** 2 * n_b)
+    )
+
+# ================================================================
+# Visualization
+# ================================================================
+fig, axes = plt.subplots(1, 2, figsize=(14, 6))
+
+# --- Left panel: Estimated vs true theta(X) by income ---
+ax = axes[0]
+ax.plot(income_midpoints, theta_true_bins, 'g-o', linewidth=2,
+        markersize=7, label=r'True $\theta(X)$', zorder=3)
+ax.errorbar(income_midpoints, theta_hat_bins, yerr=1.96 * se_bins,
+            fmt='s-', color='#4fc3f7', linewidth=2, markersize=6,
+            capsize=4, capthick=1.5,
+            label=r'DML estimate $\hat{\theta}(X) \pm 1.96 \, SE$',
+            zorder=2)
+ax.axhline(y=0, color='#888888', linewidth=0.8, linestyle=':')
+ax.set_xlabel(r'Income (\$k)', fontsize=13)
+ax.set_ylabel(r'Price elasticity $\theta(X)$', fontsize=13)
+ax.set_title('Heterogeneous Price Sensitivity by Income', fontsize=14)
+ax.legend(fontsize=11)
+ax.grid(True, alpha=0.3)
+
+# --- Right panel: Implied optimal markup ---
+ax = axes[1]
+markup_true = 1.0 / np.abs(theta_true_bins)
+markup_hat = 1.0 / np.abs(theta_hat_bins)
+markup_upper = 1.0 / np.abs(theta_hat_bins + 1.96 * se_bins)
+markup_lower = 1.0 / np.abs(theta_hat_bins - 1.96 * se_bins)
+
+ax.plot(income_midpoints, markup_true, 'g-o', linewidth=2,
+        markersize=7, label=r'True optimal markup $1/|\theta|$', zorder=3)
+ax.fill_between(income_midpoints, markup_lower, markup_upper,
+                alpha=0.2, color='#4fc3f7', zorder=1)
+ax.plot(income_midpoints, markup_hat, 's-', color='#4fc3f7', linewidth=2,
+        markersize=6, label=r'Estimated markup $1/|\hat{\theta}|$',
+        zorder=2)
+ax.set_xlabel(r'Income (\$k)', fontsize=13)
+ax.set_ylabel(r'Lerner index $1/|\theta|$', fontsize=13)
+ax.set_title('Implied Optimal Markup by Income Segment', fontsize=14)
+ax.legend(fontsize=11)
+ax.grid(True, alpha=0.3)
+
+plt.tight_layout()
+plt.savefig('heterogeneous_elasticity.png', dpi=150, bbox_inches='tight')
+plt.show()
+
+# Print results table
+print(f"{'Income ($k)':>12} {'True θ':>8} {'Est θ':>8} {'SE':>8} "
+      f"{'True Markup':>12} {'Est Markup':>12}")
+print("-" * 68)
+for i in range(n_bins):
+    print(f"{income_midpoints[i]:>12.1f} {theta_true_bins[i]:>8.3f} "
+          f"{theta_hat_bins[i]:>8.3f} {se_bins[i]:>8.4f} "
+          f"{markup_true[i]:>12.3f} {markup_hat[i]:>12.3f}")
+```
+
+The left panel shows the estimated price elasticity \\(\hat{\theta}(X)\\) as a function of income, with 95% confidence intervals. Low-income customers (around $30k) have elasticities near \\(-2.6\\), while high-income customers (around $140k) have elasticities near \\(-1.1\\). The DML estimates track the true function closely.
+
+The right panel translates these elasticities into optimal markups via the Lerner index \\(1/|\theta|\\). The pattern is exactly what economic theory predicts: high-income, less price-sensitive customers should face markups of roughly 80--90%, while low-income, highly elastic customers should face markups of roughly 35--40%. This is the quantitative foundation for the third-degree price discrimination strategies discussed in Part 2 --- now estimated from observational data with proper causal identification and uncertainty quantification.
 
 ---
 

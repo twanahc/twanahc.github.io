@@ -22,14 +22,22 @@ This is the **explore-exploit tradeoff**, and it is the problem that Amazon, Ube
 3. [Upper Confidence Bound (UCB)](#3-upper-confidence-bound-ucb)
 4. [Thompson Sampling](#4-thompson-sampling)
 5. [Contextual Bandits for Personalized Pricing](#5-contextual-bandits-for-personalized-pricing)
-6. [The Pricing MDP: When Bandits Aren't Enough](#6-the-pricing-mdp-when-bandits-arent-enough)
-7. [Airline Revenue Management](#7-airline-revenue-management)
-8. [Uber's Surge Pricing](#8-ubers-surge-pricing)
-9. [Amazon's Pricing Engine](#9-amazons-pricing-engine)
-10. [The Buy Box Game](#10-the-buy-box-game)
-11. [Implementation at Scale](#11-implementation-at-scale)
-12. [Python Simulations](#12-python-simulations)
-13. [The Complete Stack](#13-the-complete-stack)
+6. [Continuous-Armed Bandits and Lipschitz Optimization](#6-continuous-armed-bandits-and-lipschitz-optimization)
+7. [Gaussian Process Bandits and Bayesian Optimization for Pricing](#7-gaussian-process-bandits-and-bayesian-optimization-for-pricing)
+8. [Non-Stationary Bandits — When Demand Shifts](#8-non-stationary-bandits--when-demand-shifts)
+9. [Adversarial Bandits — When Competitors Fight Back](#9-adversarial-bandits--when-competitors-fight-back)
+10. [Multi-Product Dynamic Pricing](#10-multi-product-dynamic-pricing)
+11. [Deep Reinforcement Learning for Pricing](#11-deep-reinforcement-learning-for-pricing)
+12. [Fairness Constraints in Algorithmic Pricing](#12-fairness-constraints-in-algorithmic-pricing)
+13. [Python — GP-Bandit and Non-Stationary Demand](#13-python--gp-bandit-and-non-stationary-demand)
+14. [The Pricing MDP: When Bandits Aren't Enough](#14-the-pricing-mdp-when-bandits-arent-enough)
+15. [Airline Revenue Management](#15-airline-revenue-management)
+16. [Uber's Surge Pricing](#16-ubers-surge-pricing)
+17. [Amazon's Pricing Engine](#17-amazons-pricing-engine)
+18. [The Buy Box Game](#18-the-buy-box-game)
+19. [Implementation at Scale](#19-implementation-at-scale)
+20. [Python Simulations](#20-python-simulations)
+21. [The Complete Stack](#21-the-complete-stack)
 
 ---
 
@@ -211,7 +219,805 @@ This is where **machine learning meets bandits**. The linear model is just the s
 
 ---
 
-## 6. The Pricing MDP: When Bandits Aren't Enough
+## 6. Continuous-Armed Bandits and Lipschitz Optimization
+
+Everything we've done so far discretizes the price space: pick 10 or 20 candidate prices, treat each as an arm, and run UCB or Thompson Sampling. But real pricing is **continuous**. You can charge $19.99, $20.00, $20.01, or anything in between. Discretizing throws away structure — it treats $20.00 and $20.01 as completely unrelated arms, even though they obviously generate nearly identical revenue. And it forces a tradeoff between resolution and sample efficiency: more price points give finer resolution but require more exploration rounds to learn about each one.
+
+The natural formulation is the **continuous-armed bandit**. The action space is a continuous interval \(\mathcal{A} = [p_{\min}, p_{\max}] \subset \mathbb{R}\) instead of a finite set. At each round \(t\), the learner chooses a price \(p_t \in [p_{\min}, p_{\max}]\) and observes a noisy reward \(r_t = \mu(p_t) + \epsilon_t\), where \(\mu: \mathcal{A} \to \mathbb{R}\) is the unknown expected revenue function and \(\epsilon_t\) is zero-mean noise. The goal, as before, is to minimize cumulative regret:
+
+$$
+R_T = \sum_{t=1}^{T} \left[\mu(p^*) - \mu(p_t)\right]
+$$
+
+where \(p^* = \arg\max_{p \in \mathcal{A}} \mu(p)\).
+
+The fundamental challenge is that the action space is **uncountably infinite**. You cannot try every price even once. Instead, you must exploit **structure** in the reward function to generalize from observed prices to unobserved ones. Without any assumptions on \(\mu\), the problem is hopeless — the revenue at $20.00 tells you nothing about the revenue at $20.01 if the function can be arbitrary.
+
+### Lipschitz Bandits
+
+The most natural structural assumption for pricing is **Lipschitz continuity** (Kleinberg, 2004; Bubeck, Munos, Stoltz, and Szepesvari, 2011). A function \(\mu\) is Lipschitz continuous with constant \(L > 0\) if:
+
+$$
+|\mu(p_1) - \mu(p_2)| \leq L |p_1 - p_2| \quad \forall \, p_1, p_2 \in \mathcal{A}
+$$
+
+This says that the revenue function cannot change faster than a linear rate. If you know the revenue at $20.00, then the revenue at $20.01 is within \(\pm L \times 0.01\) of that value. For pricing, this is entirely reasonable: if charging $20.00 generates expected revenue \(R\), then charging $20.01 generates revenue very close to \(R\). Customers don't exhibit wildly different behavior in response to a one-cent price difference.
+
+The Lipschitz constant \(L\) quantifies the **maximum sensitivity** of revenue to price changes. A large \(L\) means the revenue curve has steep slopes — small price changes cause big revenue swings. A small \(L\) means the curve is gentle. In practice, \(L\) depends on the product and market: luxury goods with status-signaling value might have very steep revenue curves (customers are sensitive around certain price thresholds), while commodities might have gentler curves.
+
+### The Zooming Algorithm
+
+A naive approach to Lipschitz bandits is **uniform discretization**: divide \([p_{\min}, p_{\max}]\) into \(N\) equally spaced price points and run a finite-armed bandit (like UCB1) on those \(N\) points. The discretization error at each point is at most \(L \cdot (p_{\max} - p_{\min}) / (2N)\), and the regret of UCB1 on \(N\) arms over \(T\) rounds is \(O(N \log T)\). Balancing the discretization error against the bandit regret by setting \(N \sim T^{1/3}\) gives a total regret of \(O(T^{2/3})\). This is already much better than linear regret, but it wastes effort: it explores uniformly even in regions that are clearly suboptimal.
+
+The **Zooming algorithm** (Kleinberg, Slivkins, and Upfal, 2008) does better by **adaptively discretizing** the price space. The core idea is:
+
+1. Start with a coarse covering of the price space.
+2. Maintain a UCB-style index for each "active" price point: \(\text{UCB}(p) = \hat{\mu}(p) + \text{confidence\_radius}(p) + \text{discretization\_radius}(p)\).
+3. At each round, play the price with the highest index.
+4. When a price point has been played enough times that its confidence radius shrinks below its discretization radius, **zoom in**: split that region into finer sub-regions and activate new price points.
+5. Crucially, only zoom in where the UCB is high — where the region is either genuinely promising or too uncertain to dismiss. Regions that are clearly suboptimal (low UCB) are left coarse and eventually ignored.
+
+The zooming algorithm concentrates its exploration where it matters most: near the optimum and in high-uncertainty regions. It achieves regret \(O(T^{(d+1)/(d+2)})\) for a \(d\)-dimensional action space, where \(d\) is the **zooming dimension** — a data-dependent quantity that can be much smaller than the ambient dimension when the near-optimal region is small. For \(d = 1\) (single price), the worst-case regret is \(O(T^{2/3})\), matching uniform discretization, but in favorable cases (a sharp peak in the revenue curve), the zooming dimension is small and the algorithm does better.
+
+### Hierarchical Optimistic Optimization (HOO)
+
+An alternative approach is **HOO** (Bubeck, Munos, Stoltz, and Szepesvari, 2011), which organizes the price space as a **binary tree**. The root node covers the entire interval \([p_{\min}, p_{\max}]\). Each internal node is split into two children covering the left and right halves of the parent's interval. The leaves of the tree represent increasingly fine partitions of the price space.
+
+HOO traverses this tree like a UCB algorithm:
+
+1. Start at the root.
+2. At each internal node, compute a UCB-style score: \(B(h, i) = \hat{\mu}(h, i) + \sqrt{2 \ln t / N(h, i)} + \nu \rho^h\), where \(h\) is the depth, \(i\) is the node index, \(N(h, i)\) is the visit count, and \(\nu \rho^h\) is a bonus that accounts for the Lipschitz variation within the node (shrinking with depth because finer nodes cover smaller intervals).
+3. Descend to the child with the higher score, continuing until reaching the current frontier (deepest expanded level).
+4. Play the price at the center of the frontier node, observe the reward, and propagate the update back up the tree.
+5. Expand the frontier node if it has been visited enough times.
+
+The tree structure means HOO automatically allocates exponentially more effort to promising regions. A branch of the tree that consistently yields low rewards is rarely visited, while branches near the optimum are expanded to finer and finer resolution. The regret bound is \(O(\sqrt{T \log T})\) under additional smoothness assumptions (e.g., the reward function has a unique maximum with a polynomial rate of decrease away from it), which is dramatically better than \(O(T^{2/3})\).
+
+For pricing, HOO is intuitive: start with a rough sense of whether the optimal price is in the low, medium, or high range. As data accumulates, zoom into the right neighborhood. Within that neighborhood, zoom in further. The tree automatically handles the exploration-exploitation tradeoff at every scale simultaneously.
+
+### The Regret Cost of Continuity
+
+It is worth pausing to appreciate the **price of continuity**. For finite-armed bandits with \(K\) arms, the Lai-Robbins lower bound gives \(\Omega(\log T)\) regret — essentially negligible compared to \(T\). But for continuous-armed bandits even with Lipschitz structure, the lower bound is \(\Omega(T^{2/3})\) for one-dimensional action spaces. This is a qualitative difference: going from finite to continuous arms makes the problem fundamentally harder.
+
+The reason is information-theoretic. With \(K\) finite arms, each observation directly reduces uncertainty about one arm's mean reward. After \(O(\log T)\) observations per arm, you've identified the best one with high probability. With a continuum of arms, each observation only reduces uncertainty in a neighborhood of the observed price (by Lipschitz continuity). To pin down the optimal price to within \(\epsilon\), you need to observe prices in an \(\epsilon\)-neighborhood of it, and finding that neighborhood requires coarse exploration first. This multi-scale search is what the zooming and HOO algorithms formalize.
+
+---
+
+## 7. Gaussian Process Bandits and Bayesian Optimization for Pricing
+
+Lipschitz bandits assume minimal structure — just that the revenue function doesn't change too fast. But in many pricing settings, you have stronger beliefs. You might believe the revenue curve is smooth (differentiable, not just Lipschitz), or that it has a single peak (unimodal), or that it roughly resembles revenue curves you've seen for similar products. **Gaussian Processes** provide a framework to encode these beliefs precisely and to quantify uncertainty over the *entire* revenue function, not just at discrete price points.
+
+### Gaussian Processes as Distributions Over Functions
+
+A **Gaussian Process** (GP) is a probability distribution over functions. Just as a Gaussian distribution describes uncertainty about a single number (with a mean and a variance), a GP describes uncertainty about an entire function (with a mean function and a covariance function).
+
+Formally, a GP is specified by:
+- A **mean function** \(m(p) = \mathbb{E}[f(p)]\), encoding the prior belief about the function's average value at each price \(p\). Often set to zero or a constant for simplicity.
+- A **kernel function** (or covariance function) \(k(p, p') = \text{Cov}[f(p), f(p')]\), encoding the prior belief about how function values at different prices are correlated.
+
+The kernel is the heart of the GP. It encodes your structural assumptions about the revenue function. The most common choice is the **squared exponential** (or RBF — Radial Basis Function) kernel:
+
+$$
+k(p, p') = \sigma_f^2 \exp\left(-\frac{|p - p'|^2}{2\ell^2}\right)
+$$
+
+Here, \(\sigma_f^2\) is the **signal variance** (how much the function varies overall) and \(\ell\) is the **length scale** (how quickly the function changes with price). A large \(\ell\) means the function is very smooth — prices far apart still have correlated revenues. A small \(\ell\) means the function can vary rapidly — only very nearby prices have correlated revenues.
+
+For pricing, the length scale has a direct economic interpretation. A long length scale means customers are relatively insensitive to small price changes — the revenue curve is smooth and broad. A short length scale means customers are very price-sensitive around certain thresholds — perhaps there's a psychological barrier at $50 or $100 that causes a sharp drop in demand.
+
+### The GP Posterior: Learning from Data
+
+The power of GPs is that conditioning on data gives a **closed-form posterior** that is also a GP. Suppose you've observed data \(\mathcal{D} = \{(p_1, r_1), \ldots, (p_n, r_n)\}\) where \(r_i = \mu(p_i) + \epsilon_i\) and \(\epsilon_i \sim \mathcal{N}(0, \sigma_{\text{noise}}^2)\). Then the posterior distribution over \(\mu(p)\) at any new price \(p\) is Gaussian with:
+
+$$
+\mu_n(p) = \mathbf{k}(p)^\top \left[\mathbf{K} + \sigma_{\text{noise}}^2 \mathbf{I}\right]^{-1} \mathbf{r}
+$$
+
+$$
+\sigma_n^2(p) = k(p, p) - \mathbf{k}(p)^\top \left[\mathbf{K} + \sigma_{\text{noise}}^2 \mathbf{I}\right]^{-1} \mathbf{k}(p)
+$$
+
+where \(\mathbf{K}\) is the \(n \times n\) kernel matrix with entries \(K_{ij} = k(p_i, p_j)\), \(\mathbf{k}(p)\) is the \(n\)-vector with entries \(k(p_i, p)\), and \(\mathbf{r} = (r_1, \ldots, r_n)^\top\).
+
+The posterior mean \(\mu_n(p)\) is the **best estimate** of revenue at price \(p\) given the data — it interpolates through observed data points and regresses toward the prior mean in unobserved regions. The posterior variance \(\sigma_n^2(p)\) quantifies **uncertainty** — it's small near observed data points (where the GP is confident) and large far from any observations (where the GP is uncertain). This is exactly what we need for pricing: a complete picture of where we know the revenue curve and where we don't.
+
+### GP-UCB: Optimistic Pricing with Gaussian Processes
+
+**GP-UCB** (Srinivas, Krause, Kakade, and Seeger, 2010) combines the GP posterior with the UCB principle. At each round \(t\), choose the price that maximizes:
+
+$$
+p_t = \arg\max_{p \in \mathcal{A}} \left[\mu_{t-1}(p) + \beta_t \, \sigma_{t-1}(p)\right]
+$$
+
+where \(\beta_t\) is an exploration parameter that grows as \(\beta_t = O(\sqrt{\log t})\). The first term exploits (choose prices with high predicted revenue) and the second term explores (choose prices where uncertainty is high).
+
+The regret bound for GP-UCB is:
+
+$$
+R_T = O^*\left(\sqrt{T \, \gamma_T}\right)
+$$
+
+where the \(O^*\) hides logarithmic factors and \(\gamma_T\) is the **maximum information gain** after \(T\) observations. The information gain measures how much information \(T\) observations can provide about the function \(\mu\) under the GP prior. It depends on the kernel:
+
+- For the **RBF kernel**: \(\gamma_T = O((\log T)^{d+1})\), where \(d\) is the input dimension. For one-dimensional pricing (\(d = 1\)), this gives \(\gamma_T = O((\log T)^2)\), and the regret bound becomes \(O^*(\sqrt{T (\log T)^2})\) — nearly \(O(\sqrt{T})\), which is dramatically better than the \(O(T^{2/3})\) of Lipschitz bandits.
+- For the **Matern kernel** with smoothness parameter \(\nu\): \(\gamma_T = O(T^{d(d+1)/(2\nu + d(d+1))} (\log T))\). Smoother kernels (larger \(\nu\)) give smaller information gain and better regret.
+
+The improvement over Lipschitz bandits comes from the stronger smoothness assumption encoded in the kernel. The RBF kernel assumes the function is infinitely differentiable, which constrains the function class much more than Lipschitz continuity alone.
+
+### Expected Improvement: An Alternative Acquisition Function
+
+GP-UCB is not the only way to select the next price. **Expected Improvement (EI)** is a classic acquisition function from the Bayesian optimization literature. Let \(r_{\text{best}} = \max_{i \leq t} r_i\) be the best observed revenue so far. The expected improvement at price \(p\) is:
+
+$$
+\text{EI}(p) = \mathbb{E}\left[\max\left(0, \, \mu(p) - r_{\text{best}}\right)\right]
+$$
+
+Under the GP posterior, this has a closed-form expression:
+
+$$
+\text{EI}(p) = (\mu_n(p) - r_{\text{best}}) \, \Phi(z) + \sigma_n(p) \, \phi(z)
+$$
+
+where \(z = (\mu_n(p) - r_{\text{best}}) / \sigma_n(p)\), \(\Phi\) is the standard normal CDF, and \(\phi\) is the standard normal PDF.
+
+The first term \((\mu_n(p) - r_{\text{best}}) \Phi(z)\) rewards exploitation — it's large when the predicted revenue exceeds the current best. The second term \(\sigma_n(p) \phi(z)\) rewards exploration — it's large when uncertainty is high. EI naturally balances these two objectives and tends to converge to the optimum more aggressively than UCB, which makes it well-suited for pricing where you want to find the best price quickly rather than uniformly reducing uncertainty everywhere.
+
+### Why GPs Are Perfect for Pricing
+
+The GP posterior gives you something that no other bandit algorithm provides: a **complete visualization** of what you know and don't know about the revenue curve. You can plot the posterior mean (your best estimate of revenue at every price) with shaded uncertainty bands (where you're confident vs. uncertain). This is invaluable for a pricing team that needs to understand and trust the algorithm.
+
+The kernel's length scale \(\ell\) encodes a key economic quantity: how quickly revenue changes with price. By fitting \(\ell\) from data (via marginal likelihood maximization), you're implicitly estimating price sensitivity — a short \(\ell\) means customers react sharply to small price changes, a long \(\ell\) means they don't. This connects directly to the elasticity concept from Part 1, but expressed in the function-space language of GPs rather than the point-estimate language of demand curves.
+
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 700 380" style="max-width:700px; width:100%; height:auto;">
+  <rect width="700" height="380" fill="#1a1a2e" rx="8"/>
+  <!-- Title -->
+  <text x="350" y="30" text-anchor="middle" fill="#d4d4d4" font-size="15" font-weight="bold">GP Posterior Over Revenue Curve</text>
+  <!-- Axes -->
+  <line x1="80" y1="320" x2="660" y2="320" stroke="#636e72" stroke-width="1.5"/>
+  <line x1="80" y1="50" x2="80" y2="320" stroke="#636e72" stroke-width="1.5"/>
+  <text x="370" y="355" text-anchor="middle" fill="#d4d4d4" font-size="12">Price p</text>
+  <text x="30" y="185" text-anchor="middle" fill="#d4d4d4" font-size="12" transform="rotate(-90, 30, 185)">Revenue μ(p)</text>
+  <!-- Uncertainty band (wide far from data, narrow near data) -->
+  <path d="M100,260 Q200,230 280,140 Q340,80 380,90 Q420,100 460,150 Q540,240 640,280" fill="none" stroke="none"/>
+  <!-- Upper band -->
+  <path d="M100,220 Q200,170 280,80 Q340,30 380,45 Q420,60 460,110 Q540,200 640,240
+           L640,310 Q540,280 460,200 Q420,150 380,140 Q340,130 280,200 Q200,270 100,290 Z"
+        fill="#3498db" fill-opacity="0.2" stroke="none"/>
+  <!-- Mean function -->
+  <path d="M100,255 Q200,220 280,140 Q340,85 380,92 Q420,105 460,155 Q540,240 640,275"
+        fill="none" stroke="#3498db" stroke-width="2.5"/>
+  <!-- True function (dashed) -->
+  <path d="M100,250 Q200,215 280,130 Q340,75 380,80 Q420,95 460,150 Q540,235 640,270"
+        fill="none" stroke="#e74c3c" stroke-width="2" stroke-dasharray="6,4"/>
+  <!-- Observed data points -->
+  <circle cx="150" cy="240" r="5" fill="#2ecc71" stroke="#fff" stroke-width="1"/>
+  <circle cx="250" cy="170" r="5" fill="#2ecc71" stroke="#fff" stroke-width="1"/>
+  <circle cx="320" cy="110" r="5" fill="#2ecc71" stroke="#fff" stroke-width="1"/>
+  <circle cx="370" cy="95" r="5" fill="#2ecc71" stroke="#fff" stroke-width="1"/>
+  <circle cx="400" cy="100" r="5" fill="#2ecc71" stroke="#fff" stroke-width="1"/>
+  <circle cx="500" cy="195" r="5" fill="#2ecc71" stroke="#fff" stroke-width="1"/>
+  <!-- Next query point (star) -->
+  <polygon points="570,255 574,243 586,243 576,236 580,224 570,231 560,224 564,236 554,243 566,243"
+           fill="#f1c40f" stroke="#f1c40f" stroke-width="1"/>
+  <text x="570" y="218" text-anchor="middle" fill="#f1c40f" font-size="10">next query</text>
+  <!-- Legend -->
+  <line x1="100" y1="365" x2="125" y2="365" stroke="#3498db" stroke-width="2.5"/>
+  <text x="130" y="369" fill="#d4d4d4" font-size="10">GP mean</text>
+  <line x1="210" y1="365" x2="235" y2="365" stroke="#e74c3c" stroke-width="2" stroke-dasharray="6,4"/>
+  <text x="240" y="369" fill="#d4d4d4" font-size="10">True revenue</text>
+  <circle cx="330" cy="365" r="4" fill="#2ecc71" stroke="#fff" stroke-width="1"/>
+  <text x="340" y="369" fill="#d4d4d4" font-size="10">Observed data</text>
+  <rect x="420" y="358" width="15" height="12" fill="#3498db" fill-opacity="0.2" stroke="#3498db" stroke-width="0.5"/>
+  <text x="440" y="369" fill="#d4d4d4" font-size="10">±2σ band</text>
+  <polygon points="540,365 543,359 549,359 544,355 546,349 540,353 534,349 536,355 531,359 537,359"
+           fill="#f1c40f" stroke="#f1c40f" stroke-width="0.5"/>
+  <text x="555" y="369" fill="#d4d4d4" font-size="10">Next query (UCB/EI)</text>
+</svg>
+
+The diagram above illustrates the GP posterior after a handful of observations. Near the data points, the uncertainty band is narrow — the GP is confident about the revenue. Far from data (at the right edge), the band is wide — the GP acknowledges its ignorance. The next query point is chosen where the UCB (mean + exploration bonus) is maximized, which in this case is in the under-explored region where the uncertainty band is wide but the mean is not yet obviously low.
+
+---
+
+## 8. Non-Stationary Bandits — When Demand Shifts
+
+Every bandit algorithm we've discussed so far assumes **stationarity**: the reward distribution of each arm doesn't change over time. The optimal price today is the optimal price tomorrow. In real pricing, this assumption is almost never true. Demand shifts due to seasonality (winter coats in July vs. January), competitor actions (a rival launches a cheaper alternative), trends (a product goes viral on social media), macroeconomic changes (recession reduces willingness to pay), and external shocks (a pandemic, a supply chain disruption).
+
+A pricing algorithm that ignores non-stationarity will converge to the optimal price for the *old* demand curve and then keep charging that price long after demand has shifted. The result is linear regret in the new regime — exactly the behavior we designed bandits to avoid.
+
+### Two Models of Non-Stationarity
+
+The literature distinguishes two fundamentally different types of change:
+
+**1. Abruptly changing (piecewise stationary)**: the reward distribution is constant for a period of time, then suddenly jumps to a new distribution at an unknown **changepoint**, stays constant again, then jumps again, and so on. There are \(M\) changepoints in \(T\) rounds. Example: a competitor launches a similar product on day 500, and your demand curve suddenly shifts downward. Or a raw material shortage doubles your production costs overnight, requiring a price adjustment.
+
+**2. Slowly drifting**: the reward distribution changes gradually every round. At each time \(t\), the mean reward of arm \(k\) is \(\mu_k(t)\), and the total variation is bounded: \(\sum_{t=1}^{T-1} \max_k |\mu_k(t+1) - \mu_k(t)| \leq V_T\). Example: seasonal demand gradually shifting over months, or a slow change in customer preferences as a product ages.
+
+### Discounted UCB
+
+The simplest approach to non-stationarity is to **discount old observations**. Instead of the standard sample mean, use an exponentially weighted average that gives more weight to recent data:
+
+$$
+\hat{\mu}_k^\gamma(t) = \frac{\sum_{s \leq t: A_s = k} \gamma^{t-s} \, r_s}{\sum_{s \leq t: A_s = k} \gamma^{t-s}}
+$$
+
+where \(\gamma \in (0, 1)\) is the **discount factor**. When \(\gamma\) is close to 1, old data is nearly as important as new data (the algorithm adapts slowly but has low variance). When \(\gamma\) is small, only very recent data matters (the algorithm adapts quickly but is noisy).
+
+The effective number of observations contributing to the estimate of arm \(k\) is:
+
+$$
+N_k^\gamma(t) = \sum_{s \leq t: A_s = k} \gamma^{t-s}
+$$
+
+This is a geometric series bounded by \(1/(1-\gamma)\), regardless of how many times the arm has been pulled. The discount factor creates an implicit **sliding window** of effective sample size.
+
+The **Discounted UCB** algorithm replaces the standard UCB with:
+
+$$
+\text{D-UCB}_k(t) = \hat{\mu}_k^\gamma(t) + c\sqrt{\frac{\ln t}{N_k^\gamma(t)}}
+$$
+
+The exploration bonus now depends on the *effective* sample size rather than the total count. Arms that haven't been pulled recently have a small \(N_k^\gamma(t)\) (because old observations are discounted), so they get a large exploration bonus and are revisited. This ensures the algorithm keeps re-exploring arms to detect changes.
+
+### Sliding Window UCB (SW-UCB)
+
+An even simpler approach: only use the **last \(W\) observations** for each arm, discarding everything older. The sliding-window sample mean for arm \(k\) at time \(t\) is:
+
+$$
+\hat{\mu}_k^W(t) = \frac{1}{N_k^W(t)} \sum_{\substack{s \in [t-W+1, t] \\ A_s = k}} r_s
+$$
+
+where \(N_k^W(t)\) is the number of times arm \(k\) was pulled in the last \(W\) rounds. SW-UCB then uses:
+
+$$
+\text{SW-UCB}_k(t) = \hat{\mu}_k^W(t) + c\sqrt{\frac{\ln t}{N_k^W(t)}}
+$$
+
+The window size \(W\) controls the speed-accuracy tradeoff. A small \(W\) adapts quickly to changes but has high variance (few observations per estimate). A large \(W\) is more stable but slow to adapt. The optimal window depends on the rate of change: if changes happen every \(\tau\) rounds, setting \(W \approx \tau\) is roughly optimal.
+
+### Sliding Window Thompson Sampling
+
+Thompson Sampling adapts to non-stationarity via the same sliding-window idea. For Bernoulli rewards (buy or don't buy), maintain the Beta posterior using only the last \(W\) observations:
+
+$$
+\alpha_k^W(t) = 1 + \sum_{\substack{s \in [t-W+1, t] \\ A_s = k}} r_s, \qquad \beta_k^W(t) = 1 + \sum_{\substack{s \in [t-W+1, t] \\ A_s = k}} (1 - r_s)
+$$
+
+At each round, sample \(\theta_k \sim \text{Beta}(\alpha_k^W, \beta_k^W)\) for each arm and play the arm with the highest \(p_k \times \theta_k\). The sliding window ensures the posterior reflects only recent demand, so the algorithm naturally forgets outdated information and adapts to the current environment.
+
+### Changepoint Detection + Restart
+
+A more sophisticated approach is to run a standard (stationary) bandit algorithm, but monitor the data stream for **changepoints**. When a change is detected, reset the algorithm and start fresh.
+
+Common changepoint detection methods include:
+
+- **CUSUM test**: maintain a running sum \(S_t = \max(0, S_{t-1} + r_t - \hat{\mu} - \delta)\). When \(S_t\) exceeds a threshold \(h\), declare a change. The parameters \(\delta\) (minimum detectable change) and \(h\) (sensitivity threshold) control the tradeoff between false alarms and detection delay.
+- **Bayesian changepoint detection**: maintain a posterior distribution over the location of the most recent changepoint. At each round, compute the posterior probability that a changepoint occurred in the last few rounds. If this probability exceeds a threshold, declare a change.
+- **Page-Hinkley test**: a variant of CUSUM that monitors the cumulative deviation from the running mean.
+
+The advantage of changepoint detection is that it combines the efficiency of stationary algorithms (when nothing changes, you get \(O(\log T)\) regret) with adaptivity when changes occur. The disadvantage is detection delay — there's an unavoidable gap between when the change happens and when you detect it, during which you're using the wrong model.
+
+### Regret Bounds for Non-Stationary Settings
+
+For the piecewise-stationary model with \(M\) changepoints in \(T\) rounds, the best algorithms achieve regret:
+
+$$
+R_T = O\left(\sqrt{M T \log T}\right)
+$$
+
+This is proportional to \(\sqrt{M}\) — more changepoints mean more regret, because each changepoint requires a period of re-exploration. Note that if \(M = 0\) (stationary), this recovers the \(O(\sqrt{T \log T})\) bound of standard bandits.
+
+For the slowly drifting model with total variation \(V_T\), the best algorithms achieve:
+
+$$
+R_T = O\left(V_T^{1/3} T^{2/3}\right)
+$$
+
+This degrades gracefully with the rate of change \(V_T\).
+
+### Practical Importance for Pricing
+
+A pricing algorithm that doesn't handle non-stationarity will keep charging last season's optimal price into the new season. If your competitor exits the market and demand surges, a stationary bandit will take a very long time to discover that higher prices are now optimal — it has already "converged" to the old optimum and barely explores anymore.
+
+Discounted Thompson Sampling is the industry standard for this reason: it adapts automatically, requires minimal tuning (just the discount factor or window size), and retains the strong empirical performance of Thompson Sampling. In practice, most production pricing systems use a discount factor of \(\gamma \in [0.99, 0.999]\), corresponding to an effective memory of 100 to 1000 observations.
+
+---
+
+## 9. Adversarial Bandits — When Competitors Fight Back
+
+Non-stationary bandits assume demand changes, but not *in response to your actions*. What if the environment is **adversarial** — what if a competitor observes your pricing behavior and deliberately undercuts you? This is worse than random drift or seasonal change: the environment is trying to make you lose.
+
+In an adversarial bandit model, the rewards are not drawn from fixed (or even smoothly changing) distributions. Instead, at each round \(t\), an **adversary** chooses a reward vector \(\mathbf{r}_t = (r_{t,1}, \ldots, r_{t,K})\) — one reward for each arm. The learner then chooses arm \(A_t\) and observes only \(r_{t, A_t}\) — the reward of the arm they pulled. The adversary can be **oblivious** (chooses all reward vectors before the game starts) or **adaptive** (chooses \(\mathbf{r}_t\) based on the learner's past actions \(A_1, \ldots, A_{t-1}\)).
+
+In pricing: imagine a competitor with a repricing bot that monitors your prices. When you charge $25, the competitor undercuts to $24. When you raise to $30, the competitor responds by pricing at $29. The competitor's strategy is a function of your past pricing, making it adaptive. Standard UCB or Thompson Sampling — designed for stochastic environments — will fail catastrophically because they assume rewards are drawn from fixed distributions.
+
+### The EXP3 Algorithm
+
+**EXP3** (Exponential-weight algorithm for Exploration and Exploitation; Auer, Cesa-Bianchi, Freund, and Schapire, 2002) is the foundational algorithm for adversarial bandits. Instead of maintaining mean estimates and confidence bounds, EXP3 maintains a **probability distribution** over arms and updates it using exponential weights.
+
+The algorithm proceeds as follows:
+
+**Initialize**: set weights \(w_k(1) = 1\) for all \(k = 1, \ldots, K\), giving a uniform distribution \(p_k(1) = 1/K\).
+
+**At each round \(t\)**:
+1. Compute the mixed strategy: \(p_k(t) = (1 - \gamma) \frac{w_k(t)}{\sum_{j=1}^K w_j(t)} + \frac{\gamma}{K}\) where \(\gamma \in (0, 1]\) mixes with the uniform distribution to ensure minimum exploration probability \(\gamma/K\) for every arm.
+2. Sample arm \(A_t\) from the distribution \(p(t) = (p_1(t), \ldots, p_K(t))\).
+3. Observe reward \(r_{t, A_t}\).
+4. Construct the **importance-weighted reward estimator**: for each arm \(k\),
+
+$$
+\hat{r}_{t,k} = \begin{cases} r_{t,k} / p_k(t) & \text{if } k = A_t \\ 0 & \text{otherwise} \end{cases}
+$$
+
+5. Update weights: \(w_k(t+1) = w_k(t) \cdot \exp\left(\eta \, \hat{r}_{t,k}\right)\) where \(\eta = \sqrt{\ln K / (TK)}\) is the learning rate.
+
+### Why Importance Weighting?
+
+The importance-weighted estimator is the key innovation. The problem is that you only observe the reward of the arm you pulled — you don't see the counterfactual rewards of the other arms. If you simply used \(r_{t, A_t}\) as the reward estimate for arm \(A_t\) and zero for others, your estimates would be **biased**: arms that you pull frequently would have artificially high estimated rewards (because you observe their actual rewards) while arms you rarely pull would have artificially low estimates (because you mostly assign them zeros).
+
+The correction \(\hat{r}_{t,k} = r_{t,k} / p_k(t)\) fixes this. The key property is:
+
+$$
+\mathbb{E}[\hat{r}_{t,k} | p(t)] = p_k(t) \cdot \frac{r_{t,k}}{p_k(t)} + (1 - p_k(t)) \cdot 0 = r_{t,k}
+$$
+
+The estimator is **unbiased**: its expected value equals the true reward, regardless of the probability with which the arm was played. Arms that are rarely played get their rewards amplified (divided by a small \(p_k(t)\)) to compensate for being observed infrequently. This is the same inverse propensity weighting used in causal inference (Part 4) — we're correcting for selection bias in which arm we chose to observe.
+
+The cost of unbiasedness is **variance**. When \(p_k(t)\) is small, \(\hat{r}_{t,k}\) can be very large (reward divided by a small number), introducing high variance. The mixing with the uniform distribution (the \(\gamma/K\) term) puts a floor on \(p_k(t)\), bounding the maximum variance. This is the exploration-exploitation tradeoff in adversarial settings: more uniform mixing (larger \(\gamma\)) reduces variance but wastes more reward on exploration.
+
+### Regret Guarantee
+
+EXP3 achieves the following regret bound against **any** adversary, including adaptive ones:
+
+$$
+R_T \leq O\left(\sqrt{TK \log K}\right)
+$$
+
+This is a **worst-case** guarantee: no matter what the adversary does — even if it's an omniscient competitor that sees your algorithm's internal state (minus the current random seed) — EXP3's cumulative regret is at most \(O(\sqrt{TK \log K})\). Over \(T = 10{,}000\) rounds with \(K = 10\) price points, this is roughly \(\sqrt{10{,}000 \times 10 \times \ln 10} \approx 480\), which means the per-round regret averages about 0.048 — less than 5% of what the best fixed arm earns.
+
+The comparison point for adversarial regret is the **best fixed arm in hindsight** — the single arm that, had you always played it, would have given the highest cumulative reward. EXP3 doesn't compete against the best *adaptive* strategy (that would require even stronger algorithms); it competes against the best constant action. But this is already remarkable: even against an adversary that's trying to make you lose, you're guaranteed to do almost as well as the best fixed price.
+
+### The Stochastic-Adversarial Tradeoff
+
+EXP3's guarantee comes at a cost. In a **stochastic** environment (where rewards are i.i.d.), UCB and Thompson Sampling achieve \(O(\log T)\) regret, while EXP3 achieves \(O(\sqrt{T})\) — exponentially worse. EXP3 explores more than necessary because it can't trust past data as much; it hedges against the possibility that the environment is adversarial.
+
+This creates a practical dilemma: if you use EXP3, you're robust to adversarial behavior but waste regret in benign environments. If you use UCB/Thompson Sampling, you're efficient in stochastic environments but vulnerable to adversarial ones.
+
+The solution is **best-of-both-worlds** algorithms (Bubeck and Slivkins, 2012) that adapt their behavior to the environment: they achieve \(O(\log T)\) regret in stochastic settings and \(O(\sqrt{T})\) regret in adversarial settings, without knowing which type of environment they face. These algorithms monitor statistical tests for stochasticity (e.g., checking if reward sequences are consistent with i.i.d. draws) and switch between UCB-style and EXP3-style updates accordingly. For pricing in competitive markets, this is the ideal approach: be efficient when competitors are stable, and robust when they're aggressive.
+
+---
+
+## 10. Multi-Product Dynamic Pricing
+
+Everything up to this point has been about pricing **one product**. But real firms sell portfolios. Amazon has millions of SKUs. A grocery store has tens of thousands. A SaaS company has multiple tiers and add-ons. The prices **interact**: raising the price of Product A might push customers toward substitute Product B, or it might reduce demand for complement Product C (because customers buy them together).
+
+Ignoring these interactions and pricing each product independently can leave significant money on the table — or worse, actively destroy value.
+
+### The Multi-Product Pricing Problem
+
+Consider a firm selling \(J\) products with price vector \(\mathbf{p} = (p_1, \ldots, p_J)\) and marginal cost vector \(\mathbf{c} = (c_1, \ldots, c_J)\). The demand for product \(j\) depends on **all** prices, not just \(p_j\):
+
+$$
+Q_j = Q_j(\mathbf{p}) = Q_j(p_1, p_2, \ldots, p_J)
+$$
+
+This is because customers make portfolio decisions — they consider the entire menu of prices when deciding what to buy. Total profit is:
+
+$$
+\pi(\mathbf{p}) = \sum_{j=1}^{J} (p_j - c_j) \, Q_j(\mathbf{p})
+$$
+
+The first-order condition for the optimal price of product \(j\) is obtained by differentiating with respect to \(p_j\):
+
+$$
+\frac{\partial \pi}{\partial p_j} = Q_j + \sum_{k=1}^{J} (p_k - c_k) \frac{\partial Q_k}{\partial p_j} = 0
+$$
+
+This equation has a profound structure. The first term, \(Q_j\), is the direct effect of raising \(p_j\) — you earn more per unit sold. The second term captures the **cross-effects**: the summation runs over *all* products \(k\), including \(k = j\) (own-price effect) and \(k \neq j\) (cross-price effects).
+
+The cross-price derivative \(\partial Q_k / \partial p_j\) classifies the relationship between products \(j\) and \(k\):
+
+- **Substitutes** (\(\partial Q_k / \partial p_j > 0\)): raising the price of product \(j\) increases demand for product \(k\). Customers switch from \(j\) to \(k\). Examples: Coke and Pepsi, iPhone and Samsung Galaxy, Standard and Premium SaaS tiers.
+- **Complements** (\(\partial Q_k / \partial p_j < 0\)): raising the price of product \(j\) decreases demand for product \(k\). Customers buy them together. Examples: printers and ink cartridges, razors and blades, game consoles and games.
+- **Independent** (\(\partial Q_k / \partial p_j = 0\)): the products don't interact. Pricing can be done independently.
+
+### Portfolio Effects on Optimal Prices
+
+The cross-effects have systematic consequences for pricing:
+
+**For substitutes**: when \(\partial Q_k / \partial p_j > 0\) for substitute \(k\), the term \((p_k - c_k) \partial Q_k / \partial p_j > 0\) in the FOC for product \(j\). This means the firm's marginal profit from raising \(p_j\) is *higher* than it would be for a single-product monopolist, because the diverted demand generates profit on the substitute. The optimal price of \(p_j\) is therefore **higher** than the single-product optimum. A multi-product firm internalizes the substitution effect and raises prices on substitutable products.
+
+**For complements**: when \(\partial Q_k / \partial p_j < 0\) for complement \(k\), the term \((p_k - c_k) \partial Q_k / \partial p_j < 0\). Raising \(p_j\) reduces demand for complement \(k\), destroying profit there. The firm internalizes this and sets \(p_j\) **lower** than the single-product optimum. This is why Amazon can sell Kindle e-readers at cost (or even a loss) — the reduced price increases demand for Kindle books, which have high margins. It's why printer manufacturers sell printers cheaply and charge premium prices for ink cartridges.
+
+### The Multi-Product Lerner Index
+
+The first-order conditions can be written in elegant matrix form. Define the \(J \times J\) **Jacobian matrix** of demand:
+
+$$
+\mathbf{J} = \frac{\partial \mathbf{Q}}{\partial \mathbf{p}^\top}, \quad J_{jk} = \frac{\partial Q_j}{\partial p_k}
+$$
+
+The first-order conditions become:
+
+$$
+\mathbf{Q} + \mathbf{J}^\top (\mathbf{p} - \mathbf{c}) = \mathbf{0}
+$$
+
+Solving for the optimal markup:
+
+$$
+\mathbf{p} - \mathbf{c} = -(\mathbf{J}^\top)^{-1} \mathbf{Q}
+$$
+
+This is the **multi-product Lerner index**. For a single product (\(J = 1\)), this reduces to \(p - c = -Q / (\partial Q / \partial p) = Q / |Q'|\), which is the familiar Lerner index \((p - c)/p = 1/|\varepsilon|\). For multiple products, the inverse Jacobian captures all the cross-elasticity effects simultaneously.
+
+### The Curse of Dimensionality
+
+The computational challenge is severe. With \(J\) products, the price vector lives in \(\mathbb{R}^J\), and the demand Jacobian has \(J^2\) entries — each an elasticity that must be estimated from data. For \(J = 100\) products, that's 10,000 elasticities. For \(J = 1{,}000\), it's a million. The bandit problem has a \(J\)-dimensional action space (each action is a complete price vector), and the number of rounds needed to explore grows exponentially with \(J\).
+
+Practical approaches to taming this curse:
+
+**Decomposition**: if the product catalog can be partitioned into groups with no significant cross-effects between groups (e.g., electronics and groceries), optimize each group independently. Within each group, the dimensionality is manageable.
+
+**Coordinate descent**: cycle through products one at a time, optimizing each price holding the others fixed. At each step, you solve a one-dimensional problem. Under mild conditions on the demand Jacobian (diagonal dominance — own-price effects dominate cross-price effects), coordinate descent converges to the global optimum.
+
+**Structured demand models**: instead of estimating \(J^2\) free elasticities, impose structure. A **nested logit** demand model, for instance, groups products into nests (substitution classes) and parameterizes cross-elasticities within and between nests using a few parameters. This reduces the estimation burden from \(J^2\) to \(O(J)\).
+
+**Neural bandits for portfolio pricing**: use a neural network to model the joint demand function \(\mathbf{Q}(\mathbf{p})\) and optimize the entire price vector using gradient-based methods (backpropagation through the network) with added exploration noise. The neural network can capture complex nonlinear interactions between prices that linear models miss.
+
+Amazon's approach is representative: it doesn't jointly optimize all millions of SKUs. Instead, it clusters products into competitive groups (substitutes within a category), identifies complementary pairs (frequently bought together), and optimizes within clusters while maintaining consistency constraints across the catalog. The cluster structure reduces the effective dimensionality from millions to hundreds of small, manageable problems.
+
+---
+
+## 11. Deep Reinforcement Learning for Pricing
+
+When the state space is large — many products, complex context, long time horizons with inventory dynamics — exact dynamic programming (the Bellman equation from Section 14) becomes computationally infeasible. The state space is too large to enumerate, and the transition dynamics are too complex to model analytically. **Deep reinforcement learning** (deep RL) provides scalable approximations by using neural networks to represent value functions and policies.
+
+### Deep Q-Networks (DQN) for Pricing
+
+Recall from the MDP framework that the **Q-function** \(Q(s, a)\) gives the expected cumulative discounted reward from being in state \(s\), taking action \(a\), and thereafter following the optimal policy. If you knew the Q-function, optimal pricing would be trivial: in every state, charge the price \(a^* = \arg\max_a Q(s, a)\).
+
+A **Deep Q-Network** (DQN; Mnih et al., 2015) approximates \(Q(s, a)\) with a neural network \(Q_\theta(s, a)\) parameterized by weights \(\theta\). The state \(s\) might include current inventory levels for all products, time features (day of week, month, season), recent demand signals (sales velocity, search volume), competitor prices, and macroeconomic indicators. The action \(a\) is the price (or price vector for multi-product settings), discretized into a manageable set.
+
+**Training** proceeds by minimizing the **Bellman error**. The target for a transition \((s, a, r, s')\) is \(y = r + \gamma \max_{a'} Q_{\theta^-}(s', a')\), where \(\theta^-\) are the weights of a **target network** — a slowly-updating copy of the Q-network that stabilizes training. The loss function is:
+
+$$
+\mathcal{L}(\theta) = \mathbb{E}\left[\left(Q_\theta(s, a) - \left[r + \gamma \max_{a'} Q_{\theta^-}(s', a')\right]\right)^2\right]
+$$
+
+Two key tricks make DQN work:
+1. **Experience replay**: store all observed transitions \((s, a, r, s')\) in a replay buffer and sample random minibatches for training. This breaks the temporal correlation between consecutive samples and improves data efficiency.
+2. **Target network**: update \(\theta^-\) only every \(C\) steps (by copying \(\theta\) to \(\theta^-\)). Without this, the target \(y\) changes with every gradient step, creating a moving-target problem that destabilizes learning.
+
+### Policy Gradient Methods
+
+DQN requires discretizing the action space, which is limiting for continuous pricing. **Policy gradient methods** directly parameterize the policy \(\pi_\theta(a | s)\) as a neural network that outputs a distribution over prices given the state. For continuous prices, the network might output the mean \(\mu_\theta(s)\) and standard deviation \(\sigma_\theta(s)\) of a Gaussian distribution: \(\pi_\theta(a | s) = \mathcal{N}(a; \mu_\theta(s), \sigma_\theta(s)^2)\).
+
+The objective is to maximize expected cumulative reward:
+
+$$
+J(\theta) = \mathbb{E}_{\pi_\theta}\left[\sum_{t=0}^{\infty} \gamma^t r_t\right]
+$$
+
+The **policy gradient theorem** (Sutton et al., 2000) gives the gradient:
+
+$$
+\nabla_\theta J(\theta) = \mathbb{E}_{\pi_\theta}\left[\nabla_\theta \log \pi_\theta(a_t | s_t) \, A(s_t, a_t)\right]
+$$
+
+where \(A(s_t, a_t) = Q(s_t, a_t) - V(s_t)\) is the **advantage function** — how much better action \(a_t\) is compared to the average action in state \(s_t\). If the advantage is positive (the price we chose was better than average), the gradient update increases the probability of choosing that price in similar states. If negative, it decreases the probability.
+
+The REINFORCE algorithm estimates the advantage using Monte Carlo returns (run full episodes and compute cumulative reward), but this has high variance. Modern algorithms like **PPO** (Proximal Policy Optimization; Schulman et al., 2017) use a learned value function to estimate the advantage with lower variance and clip the policy update to prevent catastrophically large steps.
+
+### Actor-Critic Architecture
+
+The **actor-critic** framework combines the best of both worlds:
+- The **actor** is the policy network \(\pi_\theta(a | s)\) that selects prices.
+- The **critic** is a value network \(V_\phi(s)\) that estimates the expected cumulative reward from state \(s\).
+
+The critic provides low-variance estimates of the advantage \(A(s, a) \approx r + \gamma V_\phi(s') - V_\phi(s)\), which stabilizes the policy gradient update. The actor and critic are trained simultaneously: the critic minimizes the TD error \((r + \gamma V_\phi(s') - V_\phi(s))^2\), and the actor maximizes the expected reward using the critic's advantage estimates.
+
+For pricing, the actor outputs a price distribution given the current state (inventory, demand signals, competitor prices, time), and the critic evaluates whether the resulting state trajectory leads to good cumulative revenue. Over time, the actor learns to charge high prices when inventory is scarce and demand is strong, and low prices when inventory is plentiful or demand is weak.
+
+### Practical Challenges
+
+**Simulation-to-real gap**: you typically train the RL agent in a simulated demand environment because exploration in the real market is expensive (every suboptimal price costs real revenue). But the simulated environment never perfectly matches reality. **Domain randomization** — randomly varying the simulator's parameters (elasticities, arrival rates, competitor behavior) during training — helps the agent learn a robust policy that works across a range of environments, not just the specific simulated one.
+
+**Safety constraints**: an unconstrained RL agent might explore dangerously low prices (giving products away for free to learn about demand at low prices) or dangerously high prices (alienating customers). **Constrained RL** adds penalties or hard constraints: the Lagrangian approach maximizes \(J(\theta) - \lambda \cdot g(\theta)\) where \(g(\theta)\) measures constraint violation (e.g., \(g = \mathbb{E}[\max(0, p_{\min} - a)] + \mathbb{E}[\max(0, a - p_{\max})]\)). The multiplier \(\lambda\) is updated via dual ascent to enforce feasibility.
+
+**Sample efficiency**: real pricing data is expensive. Each exploratory price change has a revenue opportunity cost. **Offline RL** (Levine et al., 2020) addresses this by learning a policy entirely from historical data — past pricing decisions and their outcomes — without any further exploration. The challenge is distribution shift: the historical data was generated by a different policy (the old pricing algorithm), and the new policy might query state-action pairs that are poorly represented in the data. Conservative algorithms like CQL (Conservative Q-Learning) address this by penalizing Q-values for out-of-distribution actions.
+
+### State of Practice
+
+Despite the theoretical appeal of deep RL for pricing, most production systems use simpler methods — contextual bandits, heuristic dynamic programming, or rule-based systems. The reasons are practical: simpler methods are easier to debug (when the price looks wrong, you can trace back to which feature or which confidence bound drove the decision), easier to explain to stakeholders (a neural network Q-function is a black box), and easier to constrain (business rules are straightforward to implement as hard constraints on bandit actions, but tricky to encode in a neural network's loss function).
+
+Deep RL is most valuable for complex, multi-product, multi-period problems where the state space is genuinely high-dimensional and the inter-temporal dynamics are too complex for tabular methods. Examples include managing pricing for a portfolio of 100+ SKUs with inventory interactions over a multi-week horizon — problems where the Bellman equation has billions of states and the transition dynamics involve complex substitution patterns.
+
+---
+
+## 12. Fairness Constraints in Algorithmic Pricing
+
+Pricing algorithms optimize revenue. But unconstrained optimization can produce outcomes that society, regulators, and customers consider **unfair**. When an algorithm charges different prices to different people, the line between efficient personalized pricing and discriminatory exploitation becomes blurred.
+
+### Price Discrimination and the Law
+
+As we discussed in Part 2, price discrimination — charging different prices to different customers for the same product — is economically efficient: it moves prices closer to each customer's willingness to pay, extracting more surplus and often serving customers who would be priced out of a uniform market. But legal and ethical frameworks place constraints on *which* customer characteristics can be used for pricing.
+
+In the United States, the Robinson-Patman Act (1936) prohibits price discrimination between *businesses* that harms competition, but generally does not apply to consumer pricing. However, charging different prices based on **protected attributes** — race, sex, religion, national origin, and in some jurisdictions age or disability — is illegal under various civil rights statutes.
+
+The subtlety is that algorithmic pricing systems can learn **proxies** for protected attributes from behavioral data without ever explicitly using the protected attribute. A contextual bandit that uses ZIP code as a feature may effectively discriminate by race due to residential segregation. An algorithm that uses browsing behavior (device type, time of browsing, website referrer) may indirectly infer income, age, or race. The algorithm doesn't "know" it's discriminating — it simply found that customers with certain behavioral patterns are less price-sensitive and charged them more.
+
+### Fairness Definitions for Pricing
+
+The machine learning fairness literature offers several definitions that can be adapted to pricing:
+
+**Demographic parity**: the price distribution should be the same across protected groups. Formally, for protected groups \(A\) and \(B\):
+
+$$
+\mathbb{E}[P \mid \text{group} = A] = \mathbb{E}[P \mid \text{group} = B]
+$$
+
+This is the simplest definition but also the most restrictive. It forbids *any* price difference between groups, even if the groups have genuinely different willingness to pay for legitimate reasons (e.g., different product usage patterns, different outside options).
+
+**Equalized welfare**: instead of equalizing prices, equalize **consumer surplus** — the welfare each customer derives from the transaction. A customer who pays a price close to their willingness to pay gets little surplus; one who pays much less gets a lot. Equalized welfare allows price differences that reflect cost-to-serve differences but prohibits price differences that disproportionately reduce one group's welfare.
+
+**Individual fairness** (Dwork, Hardt, Pitassi, Reingold, and Zemel, 2012): similar customers should receive similar prices. Formally:
+
+$$
+|P(\mathbf{x}) - P(\mathbf{x}')| \leq L \cdot d(\mathbf{x}, \mathbf{x}')
+$$
+
+for a task-specific metric \(d(\mathbf{x}, \mathbf{x}')\) that measures the "similarity" of customers \(\mathbf{x}\) and \(\mathbf{x}'\). If two customers have the same demand characteristics (same usage, same alternatives, same cost-to-serve), they should get the same price, regardless of their protected attributes. The metric \(d\) defines what "same demand characteristics" means — and choosing it well is the hard part.
+
+**Envy-freeness**: no customer should prefer another customer's price-product bundle to their own. Formally, customer \(i\) does not envy customer \(j\) if \(u_i(q_i, p_i) \geq u_i(q_j, p_j)\), where \(u_i\) is customer \(i\)'s utility and \((q_j, p_j)\) is the bundle offered to customer \(j\). Envy-freeness is a strong condition that's closely related to incentive compatibility in mechanism design — it ensures that customers don't want to "pretend" to be a different type to get a better deal.
+
+### Constrained Optimization: The Lagrangian Approach
+
+To incorporate fairness into a pricing algorithm, add fairness constraints to the optimization objective. The general framework is:
+
+$$
+\max_\pi \; \mathbb{E}[\text{Revenue}(\pi)] \quad \text{subject to} \quad g(\pi) \leq 0
+$$
+
+where \(g(\pi)\) is a fairness violation measure (e.g., \(g = |\mathbb{E}[P | A] - \mathbb{E}[P | B]|\) for demographic parity).
+
+The **Lagrangian relaxation** converts this to an unconstrained problem:
+
+$$
+\max_\pi \min_{\lambda \geq 0} \; \mathbb{E}[\text{Revenue}(\pi)] - \lambda \cdot g(\pi)
+$$
+
+Dual ascent alternates between:
+1. Fix \(\lambda\), optimize \(\pi\) (this is a modified bandit/MDP where the reward includes a penalty for unfairness).
+2. Fix \(\pi\), update \(\lambda \leftarrow \lambda + \eta \cdot g(\pi)\) (increase the penalty if the fairness constraint is violated, decrease it if satisfied).
+
+This converges to a policy that maximizes revenue subject to the fairness constraint. The Lagrange multiplier \(\lambda^*\) at convergence represents the **shadow price of fairness** — the marginal revenue cost of tightening the fairness constraint by one unit.
+
+### The Price of Fairness
+
+Imposing fairness constraints reduces achievable revenue. The gap between unconstrained optimal revenue and constrained optimal revenue is the **price of fairness** — the economic cost of being fair.
+
+Empirical studies (Kallus and Zhou, 2021; Cohen, Perakis, and Puspita, 2021) find that the Pareto frontier between revenue and fairness is typically **concave**: the first few percent of fairness improvement cost very little revenue, but strict equality can be very expensive. Intuitively, the most egregious price differences (charging a vulnerable group 3x more) are also the most inefficient (those customers have high elasticity at the inflated price), so eliminating them improves both fairness and revenue. It's only when you push toward strict equality across groups with genuinely different demand characteristics that the revenue cost becomes significant.
+
+This means firms often face a reasonable tradeoff: a modest fairness constraint eliminates the worst discriminatory outcomes with minimal revenue impact, making it a relatively cheap way to manage legal and reputational risk.
+
+### The Regulatory Landscape
+
+Regulation is catching up to algorithmic pricing:
+
+- The **EU AI Act** (2024) classifies AI-based pricing in certain high-risk domains (insurance, credit, essential services) as requiring transparency, human oversight, and bias auditing.
+- **California's Automated Decision Systems** regulations require businesses to explain how automated systems affect consumers, including pricing.
+- The **FTC** (US Federal Trade Commission) has investigated personalized pricing practices and has authority to challenge unfair or deceptive pricing under Section 5 of the FTC Act.
+- The **UK Competition and Markets Authority** has published guidance on algorithmic pricing and fairness, focusing on whether personalized pricing harms consumer welfare.
+
+The trend is clear: firms deploying algorithmic pricing systems will increasingly need to demonstrate that their algorithms do not unfairly discriminate, that customers can understand why they received a particular price, and that human oversight exists. Building fairness constraints into the algorithm from the start is both ethically sound and a smart regulatory strategy.
+
+---
+
+## 13. Python — GP-Bandit and Non-Stationary Demand
+
+### Part A: Gaussian Process Bandit for Continuous Pricing
+
+We implement GP-UCB from scratch to find the revenue-maximizing price on a continuous interval. The true revenue function is bell-shaped: \(\text{revenue}(p) = p \cdot \sigma(-0.15(p - 25))\), where \(\sigma\) is the sigmoid function. The GP learns this function from noisy observations, concentrating its exploration around the optimum.
+
+```python
+import numpy as np
+import matplotlib.pyplot as plt
+
+np.random.seed(42)
+
+# --- True revenue function ---
+def true_revenue(p):
+    """Revenue = price * sigmoid(-0.15 * (price - 25))"""
+    return p / (1.0 + np.exp(0.15 * (p - 25.0)))
+
+# Find true optimum on a fine grid
+p_fine = np.linspace(5, 50, 1000)
+r_fine = true_revenue(p_fine)
+p_star = p_fine[np.argmax(r_fine)]
+r_star = np.max(r_fine)
+
+# --- GP-UCB implementation ---
+# RBF kernel
+def rbf_kernel(p1, p2, sigma_f=10.0, length_scale=5.0):
+    """Squared exponential kernel."""
+    p1 = np.atleast_1d(p1)
+    p2 = np.atleast_1d(p2)
+    sqdist = (p1[:, None] - p2[None, :]) ** 2
+    return sigma_f**2 * np.exp(-sqdist / (2 * length_scale**2))
+
+# GP posterior
+def gp_posterior(X_obs, y_obs, X_pred, sigma_noise=1.0,
+                 sigma_f=10.0, length_scale=5.0):
+    """Compute GP posterior mean and variance at X_pred."""
+    K = rbf_kernel(X_obs, X_obs, sigma_f, length_scale)
+    K += sigma_noise**2 * np.eye(len(X_obs))
+    K_s = rbf_kernel(X_obs, X_pred, sigma_f, length_scale)
+    K_ss = rbf_kernel(X_pred, X_pred, sigma_f, length_scale)
+
+    L = np.linalg.cholesky(K)
+    alpha = np.linalg.solve(L.T, np.linalg.solve(L, y_obs))
+    mu = K_s.T @ alpha
+
+    v = np.linalg.solve(L, K_s)
+    var = np.diag(K_ss) - np.sum(v**2, axis=0)
+    var = np.maximum(var, 1e-10)  # numerical stability
+    return mu, var
+
+# --- Run GP-UCB ---
+n_rounds = 50
+sigma_noise = 2.0
+p_grid = np.linspace(5, 50, 200)  # grid for acquisition function
+
+X_obs = np.array([])
+y_obs = np.array([])
+
+# Initial observations: two endpoints
+for p_init in [10.0, 40.0]:
+    r_init = true_revenue(p_init) + np.random.randn() * sigma_noise
+    X_obs = np.append(X_obs, p_init)
+    y_obs = np.append(y_obs, r_init)
+
+for t in range(n_rounds):
+    mu, var = gp_posterior(X_obs, y_obs, p_grid,
+                           sigma_noise=sigma_noise)
+    sigma = np.sqrt(var)
+
+    # GP-UCB acquisition: beta_t = 2 * log(t+3)
+    beta_t = 2.0 * np.log(t + 3)
+    ucb = mu + np.sqrt(beta_t) * sigma
+    p_next = p_grid[np.argmax(ucb)]
+
+    # Observe noisy reward
+    r_next = true_revenue(p_next) + np.random.randn() * sigma_noise
+    X_obs = np.append(X_obs, p_next)
+    y_obs = np.append(y_obs, r_next)
+
+# --- Final posterior for plotting ---
+mu_final, var_final = gp_posterior(X_obs, y_obs, p_fine,
+                                    sigma_noise=sigma_noise)
+sigma_final = np.sqrt(var_final)
+
+# --- Part B: Non-stationary pricing ---
+np.random.seed(123)
+
+T_ns = 1500
+K_ns = 10
+prices_ns = np.linspace(5, 50, K_ns)
+
+def purchase_prob_ns(price, wtp):
+    return 1.0 / (1.0 + np.exp(0.2 * (price - wtp)))
+
+def get_optimal_arm(wtp):
+    rev = prices_ns * purchase_prob_ns(prices_ns, wtp)
+    return np.argmax(rev), np.max(rev)
+
+# WTP shifts at t=500: from 20 to 35
+wtp_schedule = np.where(np.arange(T_ns) < 500, 20.0, 35.0)
+
+# Standard Thompson Sampling
+ts_alpha = np.ones(K_ns)
+ts_beta = np.ones(K_ns)
+ts_regret = np.zeros(T_ns)
+
+for t in range(T_ns):
+    wtp = wtp_schedule[t]
+    opt_arm, opt_rev = get_optimal_arm(wtp)
+
+    sampled = np.random.beta(ts_alpha, ts_beta)
+    arm = np.argmax(prices_ns * sampled)
+
+    prob = purchase_prob_ns(prices_ns[arm], wtp)
+    sale = np.random.rand() < prob
+    reward = prices_ns[arm] * sale
+
+    if sale:
+        ts_alpha[arm] += 1
+    else:
+        ts_beta[arm] += 1
+
+    ts_regret[t] = opt_rev - prices_ns[arm] * prob
+
+# Sliding Window Thompson Sampling (W=100)
+W = 100
+sw_history = []  # list of (arm, sale)
+sw_regret = np.zeros(T_ns)
+
+for t in range(T_ns):
+    wtp = wtp_schedule[t]
+    opt_arm, opt_rev = get_optimal_arm(wtp)
+
+    # Compute posterior from last W observations
+    sw_alpha = np.ones(K_ns)
+    sw_beta = np.ones(K_ns)
+    window_start = max(0, len(sw_history) - W)
+    for arm_h, sale_h in sw_history[window_start:]:
+        if sale_h:
+            sw_alpha[arm_h] += 1
+        else:
+            sw_beta[arm_h] += 1
+
+    sampled = np.random.beta(sw_alpha, sw_beta)
+    arm = np.argmax(prices_ns * sampled)
+
+    prob = purchase_prob_ns(prices_ns[arm], wtp)
+    sale = np.random.rand() < prob
+    reward = prices_ns[arm] * sale
+
+    sw_history.append((arm, int(sale)))
+    sw_regret[t] = opt_rev - prices_ns[arm] * prob
+
+# --- Plot side by side ---
+fig, axes = plt.subplots(1, 2, figsize=(15, 5.5))
+
+# Left: GP posterior
+ax = axes[0]
+ax.fill_between(p_fine, mu_final - 2 * sigma_final,
+                mu_final + 2 * sigma_final,
+                alpha=0.25, color='#3498db', label=r'$\pm 2\sigma$ band')
+ax.plot(p_fine, r_fine, '--', color='#e74c3c', linewidth=2,
+        label='True revenue')
+ax.plot(p_fine, mu_final, color='#3498db', linewidth=2,
+        label='GP posterior mean')
+ax.scatter(X_obs, y_obs, c='#2ecc71', s=30, zorder=5,
+           edgecolors='white', linewidths=0.5, label='Observations')
+ax.axvline(p_star, color='gray', linestyle=':', alpha=0.5)
+ax.annotate(rf'$p^* = {p_star:.1f}$', xy=(p_star, r_star),
+            xytext=(p_star + 5, r_star + 2),
+            fontsize=10, color='#d4d4d4',
+            arrowprops=dict(arrowstyle='->', color='#d4d4d4'))
+ax.set_xlabel(r'Price $p$', fontsize=12)
+ax.set_ylabel(r'Revenue $\mu(p)$', fontsize=12)
+ax.set_title('GP-UCB for Continuous Pricing (50 rounds)', fontsize=13)
+ax.legend(fontsize=9, loc='upper right')
+ax.grid(True, alpha=0.3)
+
+# Right: Non-stationary regret
+ax = axes[1]
+ax.plot(np.cumsum(ts_regret), color='#e74c3c', linewidth=1.5,
+        label='Standard Thompson Sampling')
+ax.plot(np.cumsum(sw_regret), color='#2ecc71', linewidth=1.5,
+        label=f'Sliding Window TS ($W={W}$)')
+ax.axvline(500, color='#f1c40f', linestyle='--', alpha=0.7,
+           label='Demand shift at $t=500$')
+ax.set_xlabel(r'Round $t$', fontsize=12)
+ax.set_ylabel(r'Cumulative Regret $R_t$', fontsize=12)
+ax.set_title('Non-Stationary Demand: Standard vs Sliding-Window TS',
+             fontsize=13)
+ax.legend(fontsize=10)
+ax.grid(True, alpha=0.3)
+
+plt.tight_layout()
+plt.savefig('gp_bandit_nonstationary.png', dpi=150, bbox_inches='tight')
+plt.show()
+```
+
+**Left panel**: the GP posterior after 50 rounds of GP-UCB. The blue shaded band shows the uncertainty — narrow near observed data points, wider elsewhere. The GP mean closely tracks the true revenue curve (dashed red) in the region around the optimum. Most observations cluster near the peak, showing that GP-UCB efficiently focused its exploration on the revenue-maximizing region rather than wasting rounds at clearly suboptimal prices.
+
+**Right panel**: cumulative regret under a demand shift. At \(t = 500\), the optimal price jumps from ~$15 to ~$30 (due to a WTP shift from $20 to $35). Standard Thompson Sampling, which uses all historical data equally, is slow to adapt — its posterior is dominated by the 500 pre-shift observations, and it keeps charging the old optimal price, accumulating linear regret after the shift. Sliding-window Thompson Sampling (\(W = 100\)) quickly forgets the pre-shift data and re-learns the new optimal price, recovering within roughly 100 rounds. The divergence in cumulative regret after the shift clearly demonstrates why non-stationary methods are essential for production pricing systems.
+
+---
+
+## 14. The Pricing MDP: When Bandits Aren't Enough
 
 Bandits assume each round is **independent** — today's price choice doesn't affect tomorrow's state of the world. But in many pricing problems, this assumption breaks down:
 
@@ -245,7 +1051,7 @@ For **revenue management** with finite inventory: the state is \(s_t = (\tau, n)
 
 ---
 
-## 7. Airline Revenue Management
+## 15. Airline Revenue Management
 
 Airline revenue management is the original dynamic pricing problem — and arguably the most sophisticated. American Airlines pioneered it in the 1980s, and the practice is credited with generating hundreds of millions of dollars in additional annual revenue.
 
@@ -267,7 +1073,7 @@ Modern airline revenue management goes far beyond these heuristics. The full pro
 
 ---
 
-## 8. Uber's Surge Pricing
+## 16. Uber's Surge Pricing
 
 Uber operates a **two-sided market**: riders (demand) and drivers (supply). The price affects *both* sides simultaneously. When the price rises, some riders decide it's too expensive and cancel (demand decreases), while more drivers see the higher earnings and come online (supply increases). The price that balances the two is the **market-clearing price**, and Uber's surge pricing algorithm finds it in real time.
 
@@ -283,7 +1089,7 @@ Surge pricing is economically efficient — higher prices allocate rides to thos
 
 ---
 
-## 9. Amazon's Pricing Engine
+## 17. Amazon's Pricing Engine
 
 Amazon changes prices approximately **2.5 million times per day** across its catalog. This isn't a team of analysts making decisions — it's a fully automated system that ingests data, estimates demand, and sets prices at machine speed.
 
@@ -295,13 +1101,13 @@ For each SKU, the pipeline is roughly:
 2. **Forecast demand** given a candidate price, using time-series models that incorporate seasonality, trends, and external features.
 3. **Optimize price** using a combination of the Lerner-style markup (\(p^* = c / (1 + 1/\varepsilon)\), from Part 1) and competitive positioning relative to other sellers.
 
-**The inventory-price feedback loop** is particularly important. As inventory decreases, the algorithm incrementally raises prices to slow sales velocity and prevent stockouts — the opportunity cost of selling the last unit is high because a future customer might value it more. When inventory is replenished, prices decrease to stimulate demand and clear new stock. This is a direct application of the dynamic programming framework from Section 6: the state includes inventory, and the optimal price depends on how much stock remains.
+**The inventory-price feedback loop** is particularly important. As inventory decreases, the algorithm incrementally raises prices to slow sales velocity and prevent stockouts — the opportunity cost of selling the last unit is high because a future customer might value it more. When inventory is replenished, prices decrease to stimulate demand and clear new stock. This is a direct application of the dynamic programming framework from Section 14: the state includes inventory, and the optimal price depends on how much stock remains.
 
 **Loss leaders**: Amazon deliberately prices popular, highly elastic items at or below cost to drive traffic and Prime subscriptions. When customers come for the cheap electronics deal, they also buy Amazon Basics batteries, subscribe to Audible, and use AWS. Profit comes from **less elastic categories** where customers aren't price-comparing. This is the Lerner index in action at a strategic level: zero or negative markup on goods with \(|\varepsilon| \to \infty\) (perfectly elastic — customers will buy from whoever is cheapest), fat margins on goods with low \(|\varepsilon|\) (inelastic — customers buy from Amazon regardless of price).
 
 ---
 
-## 10. The Buy Box Game
+## 18. The Buy Box Game
 
 Most products on Amazon have **multiple sellers** offering the same item. The **Buy Box** — the prominent "Add to Cart" button — goes to one seller at a time. Winning the Buy Box is everything: it captures roughly 82% of Amazon's sales. If you don't have the Buy Box, your offer is buried in the "Other Sellers" section that almost nobody clicks.
 
@@ -317,7 +1123,7 @@ This is a live, large-scale example of the theoretical concern from Part 3: algo
 
 ---
 
-## 11. Implementation at Scale
+## 19. Implementation at Scale
 
 Building a production pricing system at Amazon-scale involves a full ML pipeline. Here's how the pieces fit together:
 
@@ -339,7 +1145,7 @@ Building a production pricing system at Amazon-scale involves a full ML pipeline
 
 ---
 
-## 12. Python Simulations
+## 20. Python Simulations
 
 ### Simulation 1: UCB vs Thompson Sampling for Pricing
 
@@ -689,7 +1495,7 @@ The dynamic pricing strategy — which adjusts prices optimally based on remaini
 
 ---
 
-## 13. The Complete Stack
+## 21. The Complete Stack
 
 Let's tie the entire five-part series together. We started with the most basic question — how should a firm set its price? — and built the answer layer by layer:
 
