@@ -7,7 +7,7 @@ category: math
 
 *This is Part 2 of a 5-part series on time series forecasting. [Part 1: Foundations](/2026/04/18/time-series-foundations-stationarity.html) | **Part 2: ARIMA & Box-Jenkins** | [Part 3: Exponential Smoothing, ETS & Theta](/2026/04/20/exponential-smoothing-ets-theta.html) | [Part 4: State-Space & Kalman](/2026/04/21/state-space-kalman-filtering.html) | [Part 5: Modern Forecasting](/2026/04/22/modern-forecasting-garch-gbm-nbeats-hierarchical.html)*
 
-In Part 1 we proved, via Wold's decomposition, that every weakly stationary process can be written as an infinite-order moving average of its own innovations. That result is beautiful and useless on its own — you cannot estimate infinitely many parameters from a finite sample. ARIMA is the practical engineering compromise: we approximate that MA(\(\infty\)) by a *ratio* of two finite-order polynomials in the lag operator, squeeze most of the useful memory into a handful of parameters, and close the loop with an estimator, a forecasting formula, and a diagnostic procedure.
+In Part 1 we proved, via Wold's decomposition, that every weakly stationary process can be written as an infinite-order moving average of its own innovations. That result is beautiful and useless on its own — you cannot estimate infinitely many parameters from a finite sample. ARIMA is the practical engineering compromise: we approximate that MA(\\(\infty\\)) by a *ratio* of two finite-order polynomials in the lag operator, squeeze most of the useful memory into a handful of parameters, and close the loop with an estimator, a forecasting formula, and a diagnostic procedure.
 
 ARIMA is still, despite forty years of subsequent development, the most consequential time series forecasting model in industry. It wins on short-to-medium series, on clean data, on series with modest nonlinearity, and — critically — on series where you need calibrated prediction intervals, not just point forecasts. It is the model the forecasting competitions use as a baseline, the model a manager wants you to compare a neural net against, and the model you will ship in quarter one of any new forecasting project. This post builds it from first principles.
 
@@ -34,11 +34,11 @@ We start with AR, MA, and ARMA processes — their definitions, stationarity con
 
 ## 1. AR, MA, and ARMA Processes
 
-Throughout, \(\varepsilon_t \sim \mathrm{WN}(0, \sigma^2)\) is white noise, and \(L\) is the lag operator (\(LX_t = X_{t-1}\)).
+Throughout, \\(\varepsilon_t \sim \mathrm{WN}(0, \sigma^2)\\) is white noise, and \\(L\\) is the lag operator (\\(LX_t = X_{t-1}\\)).
 
 ### Autoregressive AR(p)
 
-An **autoregressive process of order \(p\)** is defined by
+An **autoregressive process of order \\(p\\)** is defined by
 
 $$
 X_t = \phi_1 X_{t-1} + \phi_2 X_{t-2} + \ldots + \phi_p X_{t-p} + \varepsilon_t.
@@ -50,29 +50,29 @@ $$
 \phi(L) X_t = \varepsilon_t, \qquad \phi(L) = 1 - \phi_1 L - \phi_2 L^2 - \ldots - \phi_p L^p.
 $$
 
-The AR(\(p\)) model says: the current value is a linear combination of the previous \(p\) values plus an innovation. It captures persistence of arbitrary decay shape (within the family of mixtures of exponentials and oscillating terms), which is why it wins on most macroeconomic and operational forecasting problems.
+The AR(\\(p\\)) model says: the current value is a linear combination of the previous \\(p\\) values plus an innovation. It captures persistence of arbitrary decay shape (within the family of mixtures of exponentials and oscillating terms), which is why it wins on most macroeconomic and operational forecasting problems.
 
 ### Moving Average MA(q)
 
-A **moving average process of order \(q\)** is defined by
+A **moving average process of order \\(q\\)** is defined by
 
 $$
 X_t = \varepsilon_t + \theta_1 \varepsilon_{t-1} + \theta_2 \varepsilon_{t-2} + \ldots + \theta_q \varepsilon_{t-q}.
 $$
 
-In lag-operator form: \(X_t = \theta(L) \varepsilon_t\), with \(\theta(L) = 1 + \theta_1 L + \ldots + \theta_q L^q\). MA processes model short-run shocks that linger for exactly \(q\) periods and then vanish. Classic applications: reporting corrections, revisions, short-lived shocks.
+In lag-operator form: \\(X_t = \theta(L) \varepsilon_t\\), with \\(\theta(L) = 1 + \theta_1 L + \ldots + \theta_q L^q\\). MA processes model short-run shocks that linger for exactly \\(q\\) periods and then vanish. Classic applications: reporting corrections, revisions, short-lived shocks.
 
 ### ARMA(p,q)
 
-The combined **ARMA(\(p, q\))** process is
+The combined **ARMA(\\(p, q\\))** process is
 
 $$
 \phi(L) X_t = \theta(L) \varepsilon_t.
 $$
 
-Equivalently \(X_t = \phi_1 X_{t-1} + \ldots + \phi_p X_{t-p} + \varepsilon_t + \theta_1 \varepsilon_{t-1} + \ldots + \theta_q \varepsilon_{t-q}\).
+Equivalently \\(X_t = \phi_1 X_{t-1} + \ldots + \phi_p X_{t-p} + \varepsilon_t + \theta_1 \varepsilon_{t-1} + \ldots + \theta_q \varepsilon_{t-q}\\).
 
-ARMA is the practical workhorse. By appropriately choosing \(p\) and \(q\), it approximates any stationary linear process — Wold's MA(\(\infty\)) becomes a rational function \(\theta(L)/\phi(L)\) that can reproduce exponential decay, damped oscillation, and moving-window shock dynamics with a few parameters each.
+ARMA is the practical workhorse. By appropriately choosing \\(p\\) and \\(q\\), it approximates any stationary linear process — Wold's MA(\\(\infty\\)) becomes a rational function \\(\theta(L)/\phi(L)\\) that can reproduce exponential decay, damped oscillation, and moving-window shock dynamics with a few parameters each.
 
 ### Include a Mean
 
@@ -82,61 +82,61 @@ $$
 \phi(L)(X_t - \mu) = \theta(L) \varepsilon_t.
 $$
 
-Expanding, this is \(\phi(L) X_t = \phi(1) \mu + \theta(L) \varepsilon_t\), where \(\phi(1) \mu\) is an intercept term. Most software estimates \(\mu\) explicitly; conceptually, subtract the mean, model the centered series, add back.
+Expanding, this is \\(\phi(L) X_t = \phi(1) \mu + \theta(L) \varepsilon_t\\), where \\(\phi(1) \mu\\) is an intercept term. Most software estimates \\(\mu\\) explicitly; conceptually, subtract the mean, model the centered series, add back.
 
 ---
 
 ## 2. Stationarity, Invertibility, and the Characteristic Polynomial
 
-Writing down an ARMA model does not make the implied process stationary. The model \(X_t = 1.2 X_{t-1} + \varepsilon_t\) explodes. For forecasting we need two properties: **causal stationarity** (so the mean and variance are finite and constant) and **invertibility** (so the innovations can be recovered from the observables — critical for forecasting).
+Writing down an ARMA model does not make the implied process stationary. The model \\(X_t = 1.2 X_{t-1} + \varepsilon_t\\) explodes. For forecasting we need two properties: **causal stationarity** (so the mean and variance are finite and constant) and **invertibility** (so the innovations can be recovered from the observables — critical for forecasting).
 
 ### Causal Stationarity
 
-An ARMA process is **causal stationary** if it can be written as a one-sided MA(\(\infty\)) in past innovations:
+An ARMA process is **causal stationary** if it can be written as a one-sided MA(\\(\infty\\)) in past innovations:
 
 $$
 X_t = \sum_{j=0}^\infty \psi_j \varepsilon_{t-j}, \qquad \sum \psi_j^2 < \infty.
 $$
 
-Algebraically this amounts to being able to invert \(\phi(L)\): \(X_t = \phi(L)^{-1} \theta(L) \varepsilon_t\). The formal condition is on the roots of the AR polynomial:
+Algebraically this amounts to being able to invert \\(\phi(L)\\): \\(X_t = \phi(L)^{-1} \theta(L) \varepsilon_t\\). The formal condition is on the roots of the AR polynomial:
 
 $$
 \phi(z) = 1 - \phi_1 z - \phi_2 z^2 - \ldots - \phi_p z^p = 0 \quad\Rightarrow\quad |z| > 1 \text{ for all roots}.
 $$
 
-All roots of \(\phi(z)\) must lie **strictly outside the unit circle** in the complex plane. Some references equivalently state the condition on the reverse polynomial \(z^p \phi(1/z)\); in that formulation the roots must lie strictly inside the unit disk. Either way, the essential content is: the AR operator must be invertible as a convergent geometric series in \(L\).
+All roots of \\(\phi(z)\\) must lie **strictly outside the unit circle** in the complex plane. Some references equivalently state the condition on the reverse polynomial \\(z^p \phi(1/z)\\); in that formulation the roots must lie strictly inside the unit disk. Either way, the essential content is: the AR operator must be invertible as a convergent geometric series in \\(L\\).
 
-**AR(1) example.** For \(X_t = \phi X_{t-1} + \varepsilon_t\), the root of \(\phi(z) = 1 - \phi z\) is \(z = 1/\phi\). Stationarity requires \(|1/\phi| > 1\), i.e., \(|\phi| < 1\). When \(|\phi| < 1\):
+**AR(1) example.** For \\(X_t = \phi X_{t-1} + \varepsilon_t\\), the root of \\(\phi(z) = 1 - \phi z\\) is \\(z = 1/\phi\\). Stationarity requires \\(|1/\phi| > 1\\), i.e., \\(|\phi| < 1\\). When \\(|\phi| < 1\\):
 
 $$
 X_t = \sum_{j=0}^\infty \phi^j \varepsilon_{t-j}, \quad \mathbb{E}[X_t] = 0, \quad \mathrm{Var}(X_t) = \frac{\sigma^2}{1 - \phi^2}.
 $$
 
-**AR(2) example.** For \(X_t = \phi_1 X_{t-1} + \phi_2 X_{t-2} + \varepsilon_t\), stationarity requires the triangle
+**AR(2) example.** For \\(X_t = \phi_1 X_{t-1} + \phi_2 X_{t-2} + \varepsilon_t\\), stationarity requires the triangle
 
 $$
 \phi_1 + \phi_2 < 1, \quad \phi_2 - \phi_1 < 1, \quad |\phi_2| < 1.
 $$
 
-Equivalently, the roots of \(1 - \phi_1 z - \phi_2 z^2 = 0\) lie outside the unit circle. This triangular region in the \(\phi_1\)-\(\phi_2\) plane is one of the most plotted diagrams in time series textbooks — inside it, the process is stationary; outside it, explosive. Along the upper curve \(\phi_2 = 1 - \phi_1\) sits a unit root.
+Equivalently, the roots of \\(1 - \phi_1 z - \phi_2 z^2 = 0\\) lie outside the unit circle. This triangular region in the \\(\phi_1\\)-\\(\phi_2\\) plane is one of the most plotted diagrams in time series textbooks — inside it, the process is stationary; outside it, explosive. Along the upper curve \\(\phi_2 = 1 - \phi_1\\) sits a unit root.
 
 ### Invertibility
 
-By symmetry with stationarity, the MA operator \(\theta(L)\) is **invertible** if the roots of \(\theta(z) = 0\) lie strictly outside the unit circle. When this holds, we can write the process as an AR(\(\infty\)) in past observations:
+By symmetry with stationarity, the MA operator \\(\theta(L)\\) is **invertible** if the roots of \\(\theta(z) = 0\\) lie strictly outside the unit circle. When this holds, we can write the process as an AR(\\(\infty\\)) in past observations:
 
 $$
 \varepsilon_t = \theta(L)^{-1} \phi(L) X_t = \sum_{j=0}^\infty \pi_j X_{t-j},
 $$
 
-for some \(\pi_j\). Invertibility matters for *forecasting* because we need to recover \(\hat{\varepsilon}_t\) — the unobserved innovation — from observed \(X_t\)s to make forecasts. A non-invertible MA model is not identifiable from the second-moment structure alone: an MA(1) with parameter \(\theta\) and \(\sigma^2\) has the exact same ACF as an MA(1) with parameter \(1/\theta\) and \(\theta^2 \sigma^2\). We always pick the invertible representation.
+for some \\(\pi_j\\). Invertibility matters for *forecasting* because we need to recover \\(\hat{\varepsilon}_t\\) — the unobserved innovation — from observed \\(X_t\\)s to make forecasts. A non-invertible MA model is not identifiable from the second-moment structure alone: an MA(1) with parameter \\(\theta\\) and \\(\sigma^2\\) has the exact same ACF as an MA(1) with parameter \\(1/\theta\\) and \\(\theta^2 \sigma^2\\). We always pick the invertible representation.
 
 ### Summary of Parameter Space
 
-For a usable ARMA(\(p, q\)):
+For a usable ARMA(\\(p, q\\)):
 
-- Roots of \(\phi(z) = 0\) lie outside the unit circle ⇒ causal stationary.
-- Roots of \(\theta(z) = 0\) lie outside the unit circle ⇒ invertible.
-- \(\phi(z)\) and \(\theta(z)\) share no common roots ⇒ parameters are identified.
+- Roots of \\(\phi(z) = 0\\) lie outside the unit circle ⇒ causal stationary.
+- Roots of \\(\theta(z) = 0\\) lie outside the unit circle ⇒ invertible.
+- \\(\phi(z)\\) and \\(\theta(z)\\) share no common roots ⇒ parameters are identified.
 
 Software enforces these with reparameterizations (partial autocorrelation parameterization of Jones, 1980) so that optimizers cannot wander into non-stationary regions.
 
@@ -148,40 +148,40 @@ Box-Jenkins identification rests on one pattern: AR and MA leave complementary f
 
 ### MA(q) ACF
 
-For \(X_t = \varepsilon_t + \theta_1 \varepsilon_{t-1} + \ldots + \theta_q \varepsilon_{t-q}\):
+For \\(X_t = \varepsilon_t + \theta_1 \varepsilon_{t-1} + \ldots + \theta_q \varepsilon_{t-q}\\):
 
 $$
 \gamma(h) = \begin{cases} \sigma^2 \sum_{j=0}^{q-h} \theta_j \theta_{j+h} & |h| \le q \\ 0 & |h| > q \end{cases}
 $$
 
-(with \(\theta_0 = 1\)). The ACF **cuts off** sharply at lag \(q\): nonzero for \(h \le q\), exactly zero for \(h > q\). Visually, an MA(2) correlogram has two significant spikes at lags 1 and 2 and noise thereafter.
+(with \\(\theta_0 = 1\\)). The ACF **cuts off** sharply at lag \\(q\\): nonzero for \\(h \le q\\), exactly zero for \\(h > q\\). Visually, an MA(2) correlogram has two significant spikes at lags 1 and 2 and noise thereafter.
 
 ### AR(p) ACF
 
-The AR(\(p\)) ACF satisfies the **Yule-Walker equations**:
+The AR(\\(p\\)) ACF satisfies the **Yule-Walker equations**:
 
 $$
 \rho(h) = \phi_1 \rho(h-1) + \phi_2 \rho(h-2) + \ldots + \phi_p \rho(h-p), \quad h \ge 1.
 $$
 
-This is a linear difference equation whose solution is a mixture of exponentials and damped sinusoids — the roots of \(\phi(z)\) determine the decay. The ACF **decays** (possibly oscillating) without a clean cutoff. Visually: AR(1) with \(\phi = 0.7\) gives a geometric decay \(0.7^h\); AR(2) with complex roots gives damped oscillation.
+This is a linear difference equation whose solution is a mixture of exponentials and damped sinusoids — the roots of \\(\phi(z)\\) determine the decay. The ACF **decays** (possibly oscillating) without a clean cutoff. Visually: AR(1) with \\(\phi = 0.7\\) gives a geometric decay \\(0.7^h\\); AR(2) with complex roots gives damped oscillation.
 
 ### AR(p) PACF
 
-The PACF of an AR(\(p\)) **cuts off** at lag \(p\): \(\phi_{hh} = 0\) for \(h > p\). Intuition: once you condition on \(X_{t-1}, \ldots, X_{t-p}\), there is no residual linear information in deeper lags because the AR model *is* the best linear predictor from those.
+The PACF of an AR(\\(p\\)) **cuts off** at lag \\(p\\): \\(\phi_{hh} = 0\\) for \\(h > p\\). Intuition: once you condition on \\(X_{t-1}, \ldots, X_{t-p}\\), there is no residual linear information in deeper lags because the AR model *is* the best linear predictor from those.
 
 ### MA(q) PACF
 
-The PACF of an invertible MA(\(q\)) **decays** geometrically (and can oscillate) without cutting off. Symmetric to AR(\(p\)) ACF behavior.
+The PACF of an invertible MA(\\(q\\)) **decays** geometrically (and can oscillate) without cutting off. Symmetric to AR(\\(p\\)) ACF behavior.
 
 ### The Box-Jenkins Table
 
 | Process | ACF | PACF |
 |---|---|---|
-| White noise | zero at all lags \(h \ge 1\) | zero at all lags \(h \ge 1\) |
-| AR(\(p\)) | tails off | cuts off after lag \(p\) |
-| MA(\(q\)) | cuts off after lag \(q\) | tails off |
-| ARMA(\(p, q\)) | tails off | tails off |
+| White noise | zero at all lags \\(h \ge 1\\) | zero at all lags \\(h \ge 1\\) |
+| AR(\\(p\\)) | tails off | cuts off after lag \\(p\\) |
+| MA(\\(q\\)) | cuts off after lag \\(q\\) | tails off |
+| ARMA(\\(p, q\\)) | tails off | tails off |
 
 Knowing this table is the first half of model identification. The second half is *verifying* your identification by fitting candidate models and comparing AIC/BIC and residual diagnostics — never trust the correlogram alone.
 
@@ -267,42 +267,42 @@ Most real series are not stationary in level. Revenue grows, traffic trends, tem
 
 ### The I(d) Process
 
-A series \(X_t\) is **integrated of order \(d\)**, written \(I(d)\), if the \(d\)-th difference \(\Delta^d X_t\) is stationary, where \(\Delta = 1 - L\) and \(\Delta^d = (1 - L)^d\). Specifically:
+A series \\(X_t\\) is **integrated of order \\(d\\)**, written \\(I(d)\\), if the \\(d\\)-th difference \\(\Delta^d X_t\\) is stationary, where \\(\Delta = 1 - L\\) and \\(\Delta^d = (1 - L)^d\\). Specifically:
 
-- \(I(0)\): stationary as observed.
-- \(I(1)\): differencing once gives stationary. The prototypical example is the random walk.
-- \(I(2)\): differencing twice. Rare in practice — mostly arises with strong quadratic trends.
+- \\(I(0)\\): stationary as observed.
+- \\(I(1)\\): differencing once gives stationary. The prototypical example is the random walk.
+- \\(I(2)\\): differencing twice. Rare in practice — mostly arises with strong quadratic trends.
 
-Higher orders of integration are almost never needed. An \(I(3)\) hypothesis is a signal that you have the wrong model.
+Higher orders of integration are almost never needed. An \\(I(3)\\) hypothesis is a signal that you have the wrong model.
 
 ### ARIMA(p, d, q)
 
-An **ARIMA(\(p, d, q\))** model applies ARMA(\(p, q\)) to the \(d\)-th difference:
+An **ARIMA(\\(p, d, q\\))** model applies ARMA(\\(p, q\\)) to the \\(d\\)-th difference:
 
 $$
 \phi(L)(1 - L)^d X_t = \theta(L) \varepsilon_t.
 $$
 
-The differencing operator \(\left(1 - L\right)^d\) introduces \(d\) roots at \(z = 1\) — the unit circle. These are "unit roots," and their presence is what makes \(X_t\) non-stationary while \(\Delta^d X_t\) is stationary.
+The differencing operator \\(\left(1 - L\right)^d\\) introduces \\(d\\) roots at \\(z = 1\\) — the unit circle. These are "unit roots," and their presence is what makes \\(X_t\\) non-stationary while \\(\Delta^d X_t\\) is stationary.
 
 ### How to Choose d
 
 Two practical rules:
 
-1. **Plot \(X_t\), \(\Delta X_t\), \(\Delta^2 X_t\) with ACFs.** The correct \(d\) is the smallest one for which the ACF of \(\Delta^d X_t\) decays quickly (not linearly) to zero.
-2. **Use unit-root tests sequentially.** Test \(X_t\) with ADF; if it fails to reject, difference and test \(\Delta X_t\). Stop when ADF rejects. Cross-check with KPSS (Part 1).
+1. **Plot \\(X_t\\), \\(\Delta X_t\\), \\(\Delta^2 X_t\\) with ACFs.** The correct \\(d\\) is the smallest one for which the ACF of \\(\Delta^d X_t\\) decays quickly (not linearly) to zero.
+2. **Use unit-root tests sequentially.** Test \\(X_t\\) with ADF; if it fails to reject, difference and test \\(\Delta X_t\\). Stop when ADF rejects. Cross-check with KPSS (Part 1).
 
-Over-differencing is harmful: \(\Delta \varepsilon_t\) is an MA(1) with \(\theta = -1\), a non-invertible model. If you difference a stationary series, you inject a unit root into the MA side. So: *difference only if you must*.
+Over-differencing is harmful: \\(\Delta \varepsilon_t\\) is an MA(1) with \\(\theta = -1\\), a non-invertible model. If you difference a stationary series, you inject a unit root into the MA side. So: *difference only if you must*.
 
 ### ARIMA(p, 1, q) and Drift
 
-For an ARIMA(\(p, 1, q\)) with a constant term:
+For an ARIMA(\\(p, 1, q\\)) with a constant term:
 
 $$
 \phi(L)(1 - L)X_t = c + \theta(L)\varepsilon_t
 $$
 
-the constant \(c\) induces a deterministic linear trend in levels. This is the standard model for trending series. If the true trend is stochastic (i.e., truly \(I(1)\) with drift), leaving in a level-form constant gives a quadratic trend in levels — almost always wrong. Most software defaults to "no constant" when \(d \ge 1\); add one only when domain knowledge supports a deterministic drift.
+the constant \\(c\\) induces a deterministic linear trend in levels. This is the standard model for trending series. If the true trend is stochastic (i.e., truly \\(I(1)\\) with drift), leaving in a level-form constant gives a quadratic trend in levels — almost always wrong. Most software defaults to "no constant" when \\(d \ge 1\\); add one only when domain knowledge supports a deterministic drift.
 
 ---
 
@@ -314,32 +314,32 @@ $$
 \text{SARIMA}(p, d, q) \times (P, D, Q)_s,
 $$
 
-where \(s\) is the seasonal period and \(\left(P, D, Q\right)\) are the orders of the seasonal AR, seasonal differencing, and seasonal MA. The full model:
+where \\(s\\) is the seasonal period and \\(\left(P, D, Q\right)\\) are the orders of the seasonal AR, seasonal differencing, and seasonal MA. The full model:
 
 $$
 \phi(L)\Phi(L^s)(1 - L)^d (1 - L^s)^D X_t = \theta(L) \Theta(L^s) \varepsilon_t,
 $$
 
-where \(\Phi\) and \(\Theta\) are polynomials in \(L^s\). The operator \(\left(1 - L^s\right)\) is **seasonal differencing**: \(\Delta_s X_t = X_t - X_{t-s}\). It removes constant seasonal patterns and deterministic seasonal trends.
+where \\(\Phi\\) and \\(\Theta\\) are polynomials in \\(L^s\\). The operator \\(\left(1 - L^s\right)\\) is **seasonal differencing**: \\(\Delta_s X_t = X_t - X_{t-s}\\). It removes constant seasonal patterns and deterministic seasonal trends.
 
 ### Standard Choices
 
-For monthly data with annual seasonality (\(s = 12\)):
+For monthly data with annual seasonality (\\(s = 12\\)):
 
-- **Airline model: SARIMA(0,1,1)(0,1,1)\(_{12}\)**. The famous Box-Jenkins parameterization for Airline Passenger data, and still a default starting point for monthly seasonal series. Both a non-seasonal MA(1) and a seasonal MA(1), first-difference and seasonal-first-difference — six parameters in total including variance.
-- **Simple seasonal ARIMA: SARIMA(1,0,0)(1,1,0)\(_{12}\)** for series with a persistent but bounded seasonal pattern.
+- **Airline model: SARIMA(0,1,1)(0,1,1)\\(_{12}\\)**. The famous Box-Jenkins parameterization for Airline Passenger data, and still a default starting point for monthly seasonal series. Both a non-seasonal MA(1) and a seasonal MA(1), first-difference and seasonal-first-difference — six parameters in total including variance.
+- **Simple seasonal ARIMA: SARIMA(1,0,0)(1,1,0)\\(_{12}\\)** for series with a persistent but bounded seasonal pattern.
 
-For daily data with weekly seasonality (\(s = 7\)): substitute 7 for 12 in all of the above.
+For daily data with weekly seasonality (\\(s = 7\\)): substitute 7 for 12 in all of the above.
 
 ### Multiple Seasonalities
 
-When you have both weekly and annual patterns (daily data, \(s_1 = 7\), \(s_2 = 365\)), SARIMA with one \(s\) is insufficient. Options:
+When you have both weekly and annual patterns (daily data, \\(s_1 = 7\\), \\(s_2 = 365\\)), SARIMA with one \\(s\\) is insufficient. Options:
 
-- **SARIMA with Fourier regressors**: model weekly seasonality with SARIMA and annual seasonality with external \(\sin(2\pi k t / 365)\), \(\cos(2\pi k t / 365)\) regressors.
+- **SARIMA with Fourier regressors**: model weekly seasonality with SARIMA and annual seasonality with external \\(\sin(2\pi k t / 365)\\), \\(\cos(2\pi k t / 365)\\) regressors.
 - **TBATS** (Trigonometric Box-Cox ARMA with Trend and Seasonality): native multi-seasonal support.
 - **STL + ARIMA**: decompose seasonally via STL, model residual with ARIMA, recompose forecasts.
 
-Multi-seasonal SARIMA — e.g., SARIMA\(\left(p,d,q\right)\left(P_1, D_1, Q_1\right)_{s_1}\left(P_2, D_2, Q_2\right)_{s_2}\) — is possible but the parameter space balloons and estimation is unreliable.
+Multi-seasonal SARIMA — e.g., SARIMA\\(\left(p,d,q\right)\left(P_1, D_1, Q_1\right)_{s_1}\left(P_2, D_2, Q_2\right)_{s_2}\\) — is possible but the parameter space balloons and estimation is unreliable.
 
 ---
 
@@ -347,47 +347,47 @@ Multi-seasonal SARIMA — e.g., SARIMA\(\left(p,d,q\right)\left(P_1, D_1, Q_1\ri
 
 ### Maximum Likelihood Estimation
 
-For Gaussian \(\varepsilon_t\), the joint density of \(\left(X_1, \ldots, X_T\right)\) is multivariate normal with covariance matrix \(\Sigma(\boldsymbol{\eta})\) determined by the ARMA parameters \(\boldsymbol{\eta} = \left(\phi_1, \ldots, \phi_p, \theta_1, \ldots, \theta_q, \sigma^2\right)\). The log-likelihood is
+For Gaussian \\(\varepsilon_t\\), the joint density of \\(\left(X_1, \ldots, X_T\right)\\) is multivariate normal with covariance matrix \\(\Sigma(\boldsymbol{\eta})\\) determined by the ARMA parameters \\(\boldsymbol{\eta} = \left(\phi_1, \ldots, \phi_p, \theta_1, \ldots, \theta_q, \sigma^2\right)\\). The log-likelihood is
 
 $$
 \ell(\boldsymbol{\eta}) = -\frac{T}{2}\log(2\pi) - \frac{1}{2}\log|\Sigma| - \frac{1}{2} \mathbf{X}^\top \Sigma^{-1} \mathbf{X}.
 $$
 
-Direct evaluation is \(O(T^3)\), which is too expensive for long series. The trick is to compute \(\ell\) recursively via the **Kalman filter** (Part 4): ARMA models can be written in state-space form, and the filter produces one-step-ahead prediction errors and their variances in \(O(T(p+q)^2)\) time, from which \(\ell\) is built. This is how `statsmodels` and `arima` in R compute exact MLE.
+Direct evaluation is \\(O(T^3)\\), which is too expensive for long series. The trick is to compute \\(\ell\\) recursively via the **Kalman filter** (Part 4): ARMA models can be written in state-space form, and the filter produces one-step-ahead prediction errors and their variances in \\(O(T(p+q)^2)\\) time, from which \\(\ell\\) is built. This is how `statsmodels` and `arima` in R compute exact MLE.
 
-Under regularity conditions (stationarity, invertibility, identifiability), \(\hat{\boldsymbol{\eta}}_{\text{MLE}}\) is consistent and asymptotically normal:
+Under regularity conditions (stationarity, invertibility, identifiability), \\(\hat{\boldsymbol{\eta}}_{\text{MLE}}\\) is consistent and asymptotically normal:
 
 $$
 \sqrt{T}(\hat{\boldsymbol{\eta}} - \boldsymbol{\eta}) \xrightarrow{d} \mathcal{N}(0, I(\boldsymbol{\eta})^{-1}),
 $$
 
-where \(I\) is the information matrix. Standard errors in software output come from the observed Hessian.
+where \\(I\\) is the information matrix. Standard errors in software output come from the observed Hessian.
 
 ### Conditional Sum of Squares (CSS)
 
-A computationally lighter approximation: treat the first \(p\) observations (and the first \(q\) innovations, set to zero) as initial conditions, then minimize
+A computationally lighter approximation: treat the first \\(p\\) observations (and the first \\(q\\) innovations, set to zero) as initial conditions, then minimize
 
 $$
 S(\boldsymbol{\eta}) = \sum_{t=p+1}^T \hat{\varepsilon}_t^2,
 $$
 
-where \(\hat{\varepsilon}_t\) is computed recursively from the ARMA equation given current parameter estimates. This is asymptotically equivalent to MLE for large \(T\), cheaper per iteration, but loses information from the first \(p+q\) observations. Default for `auto.arima` when \(T\) is very large or MLE fails to converge.
+where \\(\hat{\varepsilon}_t\\) is computed recursively from the ARMA equation given current parameter estimates. This is asymptotically equivalent to MLE for large \\(T\\), cheaper per iteration, but loses information from the first \\(p+q\\) observations. Default for `auto.arima` when \\(T\\) is very large or MLE fails to converge.
 
 ### Yule-Walker (AR only)
 
-For pure AR(\(p\)), the Yule-Walker equations give closed-form estimates from sample autocorrelations:
+For pure AR(\\(p\\)), the Yule-Walker equations give closed-form estimates from sample autocorrelations:
 
 $$
 \begin{pmatrix} \hat{\rho}(0) & \hat{\rho}(1) & \ldots & \hat{\rho}(p-1) \\ \hat{\rho}(1) & \hat{\rho}(0) & \ldots & \hat{\rho}(p-2) \\ \vdots & & \ddots & \vdots \\ \hat{\rho}(p-1) & \ldots & & \hat{\rho}(0) \end{pmatrix} \begin{pmatrix} \hat{\phi}_1 \\ \hat{\phi}_2 \\ \vdots \\ \hat{\phi}_p \end{pmatrix} = \begin{pmatrix} \hat{\rho}(1) \\ \hat{\rho}(2) \\ \vdots \\ \hat{\rho}(p) \end{pmatrix}.
 $$
 
-Solve the Toeplitz system with Durbin-Levinson in \(O(p^2)\). Useful as a starting point for MLE and as a quick diagnostic for small-\(p\) models.
+Solve the Toeplitz system with Durbin-Levinson in \\(O(p^2)\\). Useful as a starting point for MLE and as a quick diagnostic for small-\\(p\\) models.
 
 ---
 
 ## 7. Model Selection: AIC, BIC, AICc
 
-Having fit multiple candidate ARMA(\(p, q\)) models, we pick one by minimizing an information criterion.
+Having fit multiple candidate ARMA(\\(p, q\\)) models, we pick one by minimizing an information criterion.
 
 ### AIC
 
@@ -397,7 +397,7 @@ $$
 \mathrm{AIC} = -2 \ell(\hat{\boldsymbol{\eta}}) + 2k,
 $$
 
-where \(k = p + q + 1\) (plus a constant if fitted). AIC estimates the Kullback-Leibler divergence between the fitted model and the true data-generating process, penalizing each added parameter by 2. Optimal in a predictive sense: asymptotically, AIC-selected models have minimum one-step-ahead prediction error.
+where \\(k = p + q + 1\\) (plus a constant if fitted). AIC estimates the Kullback-Leibler divergence between the fitted model and the true data-generating process, penalizing each added parameter by 2. Optimal in a predictive sense: asymptotically, AIC-selected models have minimum one-step-ahead prediction error.
 
 ### BIC
 
@@ -407,21 +407,21 @@ $$
 \mathrm{BIC} = -2 \ell(\hat{\boldsymbol{\eta}}) + k \log T.
 $$
 
-Penalty grows with \(T\). BIC is consistent for model selection when the true model is in the candidate set: as \(T \to \infty\), BIC selects the true model with probability 1. AIC is not consistent — it over-selects — but is often better for prediction in small samples.
+Penalty grows with \\(T\\). BIC is consistent for model selection when the true model is in the candidate set: as \\(T \to \infty\\), BIC selects the true model with probability 1. AIC is not consistent — it over-selects — but is often better for prediction in small samples.
 
 ### AICc
 
-**Corrected AIC** for small \(T\):
+**Corrected AIC** for small \\(T\\):
 
 $$
 \mathrm{AICc} = \mathrm{AIC} + \frac{2k(k+1)}{T - k - 1}.
 $$
 
-Hyndman's `forecast::auto.arima` and `pmdarima` default to AICc. When \(T / k > 40\), AIC ≈ AICc. For short series (T < 100), always use AICc.
+Hyndman's `forecast::auto.arima` and `pmdarima` default to AICc. When \\(T / k > 40\\), AIC ≈ AICc. For short series (T < 100), always use AICc.
 
 ### Practical Advice
 
-- Use **AICc** for short series (say \(T < 100\)).
+- Use **AICc** for short series (say \\(T < 100\\)).
 - Use **BIC** when parsimony matters and you expect the true model is relatively simple.
 - Use **AIC** or **AICc** when forecast accuracy matters more than recovering the true model.
 - Do not compare ICs across differences. An ARIMA(1,0,0) and an ARIMA(1,1,0) are fit to different data (levels vs. differences); their likelihoods are not comparable.
@@ -430,33 +430,33 @@ Hyndman's `forecast::auto.arima` and `pmdarima` default to AICc. When \(T / k > 
 
 ## 8. Forecasting: Point and Interval
 
-This is the part that matters. You have fit \(\hat{\phi}(L)\hat{\Delta}^d X_t = \hat{\theta}(L) \hat{\varepsilon}_t\). Now produce \(\hat{X}_{T+h|T}\) and a prediction interval.
+This is the part that matters. You have fit \\(\hat{\phi}(L)\hat{\Delta}^d X_t = \hat{\theta}(L) \hat{\varepsilon}_t\\). Now produce \\(\hat{X}_{T+h|T}\\) and a prediction interval.
 
 ### The Recursion
 
-Write the model in causal MA(\(\infty\)) form: \(X_t = \sum_j \psi_j \varepsilon_{t-j}\). Then
+Write the model in causal MA(\\(\infty\\)) form: \\(X_t = \sum_j \psi_j \varepsilon_{t-j}\\). Then
 
 $$
 X_{T+h} = \sum_{j=0}^{h-1} \psi_j \varepsilon_{T+h-j} + \sum_{j=h}^\infty \psi_j \varepsilon_{T+h-j}.
 $$
 
-The first sum involves future (unknown) innovations; its conditional expectation given \(\mathcal{F}_T\) is zero. The second sum uses past (observable) innovations. The **minimum MSE point forecast** is
+The first sum involves future (unknown) innovations; its conditional expectation given \\(\mathcal{F}_T\\) is zero. The second sum uses past (observable) innovations. The **minimum MSE point forecast** is
 
 $$
 \hat{X}_{T+h|T} = \mathbb{E}[X_{T+h} \mid \mathcal{F}_T] = \sum_{j=h}^\infty \psi_j \varepsilon_{T+h-j}.
 $$
 
-In practice we compute it recursively. For ARMA(\(p, q\)):
+In practice we compute it recursively. For ARMA(\\(p, q\\)):
 
 $$
 \hat{X}_{T+h|T} = \hat{\phi}_1 \hat{X}_{T+h-1|T} + \ldots + \hat{\phi}_p \hat{X}_{T+h-p|T} + \hat{\theta}_1 \hat{\varepsilon}_{T+h-1|T} + \ldots + \hat{\theta}_q \hat{\varepsilon}_{T+h-q|T},
 $$
 
-with the convention \(\hat{X}_{s|T} = X_s\) for \(s \le T\) and \(\hat{\varepsilon}_{s|T} = 0\) for \(s > T\) (future innovations are unpredictable, expectation zero) and \(\hat{\varepsilon}_{s|T} = \hat{\varepsilon}_s\) for \(s \le T\).
+with the convention \\(\hat{X}_{s|T} = X_s\\) for \\(s \le T\\) and \\(\hat{\varepsilon}_{s|T} = 0\\) for \\(s > T\\) (future innovations are unpredictable, expectation zero) and \\(\hat{\varepsilon}_{s|T} = \hat{\varepsilon}_s\\) for \\(s \le T\\).
 
 ### Forecast Error Variance
 
-The \(h\)-step-ahead forecast error is
+The \\(h\\)-step-ahead forecast error is
 
 $$
 e_{T+h|T} = X_{T+h} - \hat{X}_{T+h|T} = \sum_{j=0}^{h-1} \psi_j \varepsilon_{T+h-j},
@@ -468,19 +468,19 @@ $$
 \mathrm{Var}(e_{T+h|T}) = \sigma^2 \sum_{j=0}^{h-1} \psi_j^2.
 $$
 
-This variance **grows with \(h\)**. It converges to \(\mathrm{Var}(X_t) = \sigma^2 \sum_{j=0}^\infty \psi_j^2\) for stationary ARMA, meaning uncertainty grows until it reaches the unconditional variance, then plateaus. For ARIMA with \(d \ge 1\), the \(\psi_j\) do not decay and the variance grows without bound — *the point forecast becomes uninformative at long horizons*. This is the mathematical reason you cannot forecast a random walk 100 steps ahead with useful precision.
+This variance **grows with \\(h\\)**. It converges to \\(\mathrm{Var}(X_t) = \sigma^2 \sum_{j=0}^\infty \psi_j^2\\) for stationary ARMA, meaning uncertainty grows until it reaches the unconditional variance, then plateaus. For ARIMA with \\(d \ge 1\\), the \\(\psi_j\\) do not decay and the variance grows without bound — *the point forecast becomes uninformative at long horizons*. This is the mathematical reason you cannot forecast a random walk 100 steps ahead with useful precision.
 
 ### Prediction Intervals
 
-Under Gaussian innovations, the \(1 - \alpha\) prediction interval is
+Under Gaussian innovations, the \\(1 - \alpha\\) prediction interval is
 
 $$
 \hat{X}_{T+h|T} \pm z_{1-\alpha/2} \sqrt{\hat{\sigma}^2 \sum_{j=0}^{h-1} \hat{\psi}_j^2}.
 $$
 
-A textbook 80% interval uses \(z = 1.28\); 95% uses 1.96. These are *nominal* levels. Three sources of miscalibration in practice:
+A textbook 80% interval uses \\(z = 1.28\\); 95% uses 1.96. These are *nominal* levels. Three sources of miscalibration in practice:
 
-1. **Parameter uncertainty** ignored: true variance is larger because \(\hat{\boldsymbol{\eta}}\) has estimation error. Correction: simulate parameter draws, compute forecast for each, report quantiles.
+1. **Parameter uncertainty** ignored: true variance is larger because \\(\hat{\boldsymbol{\eta}}\\) has estimation error. Correction: simulate parameter draws, compute forecast for each, report quantiles.
 2. **Non-Gaussian innovations**: heavy tails widen real intervals. Use bootstrap intervals instead of Gaussian.
 3. **Model misspecification**: nothing fixes this except trying alternative models and picking the one whose intervals actually cover.
 
@@ -488,10 +488,10 @@ A textbook 80% interval uses \(z = 1.28\); 95% uses 1.96. These are *nominal* le
 
 For robust intervals without assuming Gaussian innovations:
 
-1. Fit ARIMA, obtain residuals \(\lbrace \hat{\varepsilon}_t\rbrace\).
+1. Fit ARIMA, obtain residuals \\(\lbrace \hat{\varepsilon}_t\rbrace\\).
 2. Sample residuals with replacement to build a bootstrap innovation sequence.
-3. Feed through the fitted recursion to simulate \(X_{T+1}^*, \ldots, X_{T+h}^*\).
-4. Repeat \(B\) times; quantiles of \(\lbrace X_{T+h}^{*(b)}\rbrace\) give a bootstrap interval.
+3. Feed through the fitted recursion to simulate \\(X_{T+1}^*, \ldots, X_{T+h}^*\\).
+4. Repeat \\(B\\) times; quantiles of \\(\lbrace X_{T+h}^{*(b)}\rbrace\\) give a bootstrap interval.
 
 This is the `simulate` + quantile pattern, and it is the correct default for finance, where returns have fat tails.
 
@@ -525,9 +525,9 @@ Box and Jenkins (1970) proposed a three-stage iterative cycle that remains the d
 
 1. **Plot the series**. Look for trend, seasonality, variance changes, outliers.
 2. **Stabilize variance** if needed (log, Box-Cox).
-3. **Choose \(d\)**. Apply differencing until the series looks stationary; confirm with ADF/KPSS.
-4. **Examine ACF/PACF of the differenced series**. Use the table in Section 3 to propose candidate orders \(p\) and \(q\).
-5. For seasonal data, examine the ACF/PACF at multiples of \(s\) to choose \(P\), \(Q\) and \(D\).
+3. **Choose \\(d\\)**. Apply differencing until the series looks stationary; confirm with ADF/KPSS.
+4. **Examine ACF/PACF of the differenced series**. Use the table in Section 3 to propose candidate orders \\(p\\) and \\(q\\).
+5. For seasonal data, examine the ACF/PACF at multiples of \\(s\\) to choose \\(P\\), \\(Q\\) and \\(D\\).
 
 ### Stage 2: Estimation
 
@@ -538,7 +538,7 @@ Fit candidate models by MLE. Check parameter estimates are well inside stationar
 After fitting, examine residuals:
 
 - **ACF/PACF of residuals**: should look like white noise.
-- **Ljung-Box test** on residuals at lags 10–20 (adjusted for \(p + q\) parameters). If \(Q\) is significant, the model is inadequate.
+- **Ljung-Box test** on residuals at lags 10–20 (adjusted for \\(p + q\\) parameters). If \\(Q\\) is significant, the model is inadequate.
 - **Residual plot**: any systematic pattern (trend, heteroskedasticity, regime changes) indicates misspecification.
 - **Residual histogram and Q-Q plot**: check for approximate normality. Heavy tails indicate you should use bootstrap intervals or a different innovation distribution.
 - **Check over-fitting**: fit a larger model; if coefficients of additional lags are insignificant, stick with the smaller.
@@ -549,8 +549,8 @@ If diagnostics fail, return to Stage 1 with a revised identification. Iterate un
 
 Hyndman's `auto.arima` and the `pmdarima` Python port automate the search:
 
-1. Determine \(d\) and \(D\) via KPSS/seasonal strength tests.
-2. Grid-search \(\left(p, q, P, Q\right)\) up to specified maxima, using stepwise search to control combinatorial explosion.
+1. Determine \\(d\\) and \\(D\\) via KPSS/seasonal strength tests.
+2. Grid-search \\(\left(p, q, P, Q\right)\\) up to specified maxima, using stepwise search to control combinatorial explosion.
 3. Return the AICc-minimizing model.
 
 It is fast, reasonable, and wrong about 10–20% of the time. Use it as a starting point and always run residual diagnostics yourself. Do not ship a model just because `auto.arima` picked it.
@@ -567,7 +567,7 @@ $$
 \phi(L)(1 - L)^d X_t = \boldsymbol{\beta}^\top \mathbf{z}_t + \theta(L) \varepsilon_t,
 $$
 
-where \(\mathbf{z}_t\) are covariates. Equivalently, regress differenced \(X\) on differenced \(z\) with ARMA errors. **Problem:** the covariates enter inside the \(\phi(L)\) operator, so their coefficients \(\boldsymbol{\beta}\) are not easily interpretable as partial effects.
+where \\(\mathbf{z}_t\\) are covariates. Equivalently, regress differenced \\(X\\) on differenced \\(z\\) with ARMA errors. **Problem:** the covariates enter inside the \\(\phi(L)\\) operator, so their coefficients \\(\boldsymbol{\beta}\\) are not easily interpretable as partial effects.
 
 ### Regression with ARIMA Errors (Preferred)
 
@@ -575,7 +575,7 @@ $$
 X_t = \boldsymbol{\beta}^\top \mathbf{z}_t + \eta_t, \qquad \phi(L)(1 - L)^d \eta_t = \theta(L) \varepsilon_t.
 $$
 
-The covariates explain a deterministic part; the residual follows ARIMA. Now \(\boldsymbol{\beta}\) has the clean interpretation "effect of \(z\) on \(X\), with the autocorrelation structure absorbed in \(\eta\)."
+The covariates explain a deterministic part; the residual follows ARIMA. Now \\(\boldsymbol{\beta}\\) has the clean interpretation "effect of \\(z\\) on \\(X\\), with the autocorrelation structure absorbed in \\(\eta\\)."
 
 Both are identifiable and can be fit via MLE in state-space form. `statsmodels.tsa.SARIMAX` implements the latter when you pass `exog=` and set `trend='n'`.
 
@@ -584,7 +584,7 @@ Both are identifiable and can be fit via MLE in state-space form. `statsmodels.t
 Typical operational regressors:
 
 - **Calendar**: day-of-week, month, holiday indicators. Use one-hot encoded dummies.
-- **Fourier terms**: for multiple seasonalities, \(\sin(2\pi k t / s), \cos(2\pi k t / s)\) for \(k = 1, \ldots, K\) where \(K\) controls smoothness.
+- **Fourier terms**: for multiple seasonalities, \\(\sin(2\pi k t / s), \cos(2\pi k t / s)\\) for \\(k = 1, \ldots, K\\) where \\(K\\) controls smoothness.
 - **Promotions / interventions**: binary indicators with lag/lead effects.
 - **Temperature, competitor price**: continuous regressors in many applied problems.
 
@@ -652,7 +652,7 @@ for name, s in [('levels', train), ('first diff', d1), ('both diffs', d12)]:
     print(f"{name:12s}  ADF p={adf_p:.3f}   KPSS p={kpss_p:.3f}")
 ```
 
-Expected: ADF fails to reject on levels (\(p\) high), KPSS rejects (\(p\) low) — non-stationary. After \(\Delta\), still rejects KPSS at the seasonal frequency. After \(\Delta \Delta_{12}\), stationary.
+Expected: ADF fails to reject on levels (\\(p\\) high), KPSS rejects (\\(p\\) low) — non-stationary. After \\(\Delta\\), still rejects KPSS at the seasonal frequency. After \\(\Delta \Delta_{12}\\), stationary.
 
 ### Fit SARIMA
 
@@ -667,7 +667,7 @@ res = model.fit(disp=False)
 print(res.summary())
 ```
 
-Reading the output: check that all AR/MA coefficients have \(|z|\)-statistics > 2 (statistically significant), that the Ljung-Box p-value on residuals is > 0.05, and that AIC/BIC are lower than simpler alternatives.
+Reading the output: check that all AR/MA coefficients have \\(|z|\\)-statistics > 2 (statistically significant), that the Ljung-Box p-value on residuals is > 0.05, and that AIC/BIC are lower than simpler alternatives.
 
 ### Model Selection by Grid Search (AICc)
 
@@ -819,11 +819,11 @@ MAE grows with horizon — the fan chart is not lying. This is the real quantity
 
 ### 12.1 Always Fit a Benchmark
 
-Fit seasonal naive, simple exponential smoothing, and auto-ARIMA at minimum. Report MASE against seasonal naive. If your fancy ARIMA has MASE \(\ge\) 1, revisit the model — you are not beating the benchmark. Large MASE variance across items in a panel indicates some items are structurally easier than others and deserves investigation.
+Fit seasonal naive, simple exponential smoothing, and auto-ARIMA at minimum. Report MASE against seasonal naive. If your fancy ARIMA has MASE \\(\ge\\) 1, revisit the model — you are not beating the benchmark. Large MASE variance across items in a panel indicates some items are structurally easier than others and deserves investigation.
 
 ### 12.2 Use Rolling-Origin Evaluation
 
-Static train/test split is a *single* realization of the evaluation noise. Rolling origin with step size 1–\(s\) gives you the distribution of errors across many test points. Report median, 80th percentile, and worst-case of the error distribution — not just the mean. Stakeholders care about tail performance, not average.
+Static train/test split is a *single* realization of the evaluation noise. Rolling origin with step size 1–\\(s\\) gives you the distribution of errors across many test points. Report median, 80th percentile, and worst-case of the error distribution — not just the mean. Stakeholders care about tail performance, not average.
 
 ### 12.3 Fit At the Cadence You Will Forecast
 
@@ -835,15 +835,15 @@ ARIMAX confounds covariate effects with autoregressive dynamics. Regression-with
 
 ### 12.5 Do Not Over-Difference
 
-Each additional differencing operation injects a unit root on the MA side if the series did not actually need it. A bloated model fits the training set but forecasts poorly because the inflated \(\psi_j\) weights amplify innovation noise. Test the necessity of \(d\) and \(D\) with KPSS.
+Each additional differencing operation injects a unit root on the MA side if the series did not actually need it. A bloated model fits the training set but forecasts poorly because the inflated \\(\psi_j\\) weights amplify innovation noise. Test the necessity of \\(d\\) and \\(D\\) with KPSS.
 
 ### 12.6 Watch Out for Seasonal Unit Roots
 
-Seasonal differencing \(\left(1 - L^s\right)\) is much less robust to misspecification than ordinary differencing. Applied when not needed, it absorbs the intercept and produces odd trending behavior. Use the **OCSB** or **HEGY** seasonal unit-root tests if you are unsure. Most software defaults (including `auto.arima`) apply seasonal differencing aggressively, often more than is warranted.
+Seasonal differencing \\(\left(1 - L^s\right)\\) is much less robust to misspecification than ordinary differencing. Applied when not needed, it absorbs the intercept and produces odd trending behavior. Use the **OCSB** or **HEGY** seasonal unit-root tests if you are unsure. Most software defaults (including `auto.arima`) apply seasonal differencing aggressively, often more than is warranted.
 
 ### 12.7 Cap Maximum Order Search
 
-Grid-searching over \(\left(p, q, P, Q\right) \in [0, 5]^4\) on short data almost always selects an overparameterized model with spurious estimates. Cap \(p, q \le 3\) and \(P, Q \le 2\) for monthly data unless you have strong domain evidence for longer memory.
+Grid-searching over \\(\left(p, q, P, Q\right) \in [0, 5]^4\\) on short data almost always selects an overparameterized model with spurious estimates. Cap \\(p, q \le 3\\) and \\(P, Q \le 2\\) for monthly data unless you have strong domain evidence for longer memory.
 
 ### 12.8 Refit on a Schedule
 
@@ -851,21 +851,21 @@ ARIMA parameters drift. A model fit once and deployed forever will have degradin
 
 ### 12.9 Report Intervals, Not Just Points
 
-A point forecast is a distribution summary that hides the uncertainty you care about. Retailers make ordering decisions on the 95th percentile, not the mean. Service level agreements are written against a tail quantile. Always provide \(P(X_{T+h} \le x)\) or a wide interval, and monitor coverage in production. Under-coverage is a five-alarm fire in any forecasting system.
+A point forecast is a distribution summary that hides the uncertainty you care about. Retailers make ordering decisions on the 95th percentile, not the mean. Service level agreements are written against a tail quantile. Always provide \\(P(X_{T+h} \le x)\\) or a wide interval, and monitor coverage in production. Under-coverage is a five-alarm fire in any forecasting system.
 
 ### 12.10 Log-Transform for Positive Multiplicative Series
 
-Revenue, demand, page views — all are multiplicatively seasonal, strictly positive, and heteroskedastic. Fit ARIMA to \(\log X_t\); back-transform at forecast time, correcting the Jensen gap:
+Revenue, demand, page views — all are multiplicatively seasonal, strictly positive, and heteroskedastic. Fit ARIMA to \\(\log X_t\\); back-transform at forecast time, correcting the Jensen gap:
 
 $$
 \hat{X}_{T+h|T}^{\text{back}} \approx \exp(\hat{Y}_{T+h|T}) \cdot \exp(\hat{\sigma}_h^2 / 2),
 $$
 
-where \(\hat{\sigma}_h^2\) is the variance of the log-scale forecast. Without this correction your point forecast is systematically biased low by 1–5% at long horizons.
+where \\(\hat{\sigma}_h^2\\) is the variance of the log-scale forecast. Without this correction your point forecast is systematically biased low by 1–5% at long horizons.
 
 ### 12.11 Do Not Trust auto.arima Blindly
 
-`auto.arima` is a great baseline, not a decision. Review the selected model: are the orders sensible given your data? Do the coefficients pass significance? Does the residual ACF look white? Has it selected a near-non-invertible MA order because of over-differencing? Log the selected \(\left(p, d, q, P, D, Q\right)\) over time — if it keeps changing, your series is not stationary in a deeper sense and ARIMA is the wrong tool.
+`auto.arima` is a great baseline, not a decision. Review the selected model: are the orders sensible given your data? Do the coefficients pass significance? Does the residual ACF look white? Has it selected a near-non-invertible MA order because of over-differencing? Log the selected \\(\left(p, d, q, P, D, Q\right)\\) over time — if it keeps changing, your series is not stationary in a deeper sense and ARIMA is the wrong tool.
 
 ### 12.12 For Many Related Series, Batch Carefully
 
@@ -883,7 +883,7 @@ The forecast is the output of a pipeline: clean → transform → difference →
 
 ## Summary and What's Next
 
-ARIMA is the finite-parameter realization of Wold's MA(\(\infty\)) theorem: a rational lag polynomial \(\theta(L)/\phi(L)\) approximating the innovation filter of any stationary process. We added differencing to handle unit roots, seasonal blocks for periodic structure, exogenous regressors for covariates, and MLE + AICc for estimation + selection. The forecasting formulas are recursive; prediction intervals are built from the \(\psi_j\) weights; and the whole thing is held together by the Box-Jenkins identify-estimate-diagnose loop.
+ARIMA is the finite-parameter realization of Wold's MA(\\(\infty\\)) theorem: a rational lag polynomial \\(\theta(L)/\phi(L)\\) approximating the innovation filter of any stationary process. We added differencing to handle unit roots, seasonal blocks for periodic structure, exogenous regressors for covariates, and MLE + AICc for estimation + selection. The forecasting formulas are recursive; prediction intervals are built from the \\(\psi_j\\) weights; and the whole thing is held together by the Box-Jenkins identify-estimate-diagnose loop.
 
 What ARIMA is good at: short-to-medium horizon forecasts on series with modest nonlinearity and clean seasonality; calibrated prediction intervals under Gaussianity; interpretable coefficients; cheap to fit.
 

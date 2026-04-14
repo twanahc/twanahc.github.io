@@ -39,15 +39,15 @@ $$
 \{X_t : t \in \mathcal{T}\}
 $$
 
-all defined on a common probability space with sample space \(\Omega\), event \(\sigma\)-algebra \(\mathcal{F}\), and probability measure \(\mathbb{P}\). The index set \(\mathcal{T}\) is typically \(\mathbb{Z}\) (discrete time) or \(\mathbb{R}\) (continuous time). We will focus on discrete time, so \(t \in \mathbb{Z}\) or \(t \in \lbrace 1, 2, \ldots, T\rbrace\).
+all defined on a common probability space with sample space \\(\Omega\\), event \\(\sigma\\)-algebra \\(\mathcal{F}\\), and probability measure \\(\mathbb{P}\\). The index set \\(\mathcal{T}\\) is typically \\(\mathbb{Z}\\) (discrete time) or \\(\mathbb{R}\\) (continuous time). We will focus on discrete time, so \\(t \in \mathbb{Z}\\) or \\(t \in \lbrace 1, 2, \ldots, T\rbrace\\).
 
-Two things are worth pausing on. First, \(X_t\) is a *random variable*, not a number. When you look at a time plot — say, daily closing prices for AAPL over 2020–2025 — you are looking at *one realization* \(\lbrace x_t(\omega^*)\rbrace\) of the underlying process, for a single outcome \(\omega^* \in \Omega\). Different "outcomes" \(\omega\) produce different possible histories. In the real world we only get to see one history, and the central methodological problem of time series is how to infer properties of the distribution \(\mathbb{P}\) from a single path.
+Two things are worth pausing on. First, \\(X_t\\) is a *random variable*, not a number. When you look at a time plot — say, daily closing prices for AAPL over 2020–2025 — you are looking at *one realization* \\(\lbrace x_t(\omega^*)\rbrace\\) of the underlying process, for a single outcome \\(\omega^* \in \Omega\\). Different "outcomes" \\(\omega\\) produce different possible histories. In the real world we only get to see one history, and the central methodological problem of time series is how to infer properties of the distribution \\(\mathbb{P}\\) from a single path.
 
-Second, the process is really a function \(X : \mathbb{Z} \times \Omega \to \mathbb{R}\). For fixed \(t\), \(X_t(\cdot)\) is a random variable. For fixed \(\omega\), \(X_\cdot(\omega)\) is a deterministic sequence called a **sample path** or **realization**. The distinction matters because statistical inference is almost always about averages over \(\omega\) (expectations), but we only have data that averages over \(t\). The bridge between these two is *ergodicity*, which we treat in Section 7.
+Second, the process is really a function \\(X : \mathbb{Z} \times \Omega \to \mathbb{R}\\). For fixed \\(t\\), \\(X_t(\cdot)\\) is a random variable. For fixed \\(\omega\\), \\(X_\cdot(\omega)\\) is a deterministic sequence called a **sample path** or **realization**. The distinction matters because statistical inference is almost always about averages over \\(\omega\\) (expectations), but we only have data that averages over \\(t\\). The bridge between these two is *ergodicity*, which we treat in Section 7.
 
 ### Finite-Dimensional Distributions
 
-A stochastic process is specified by its **finite-dimensional distributions**: for every finite collection of times \(t_1 < t_2 < \ldots < t_n\), the joint distribution
+A stochastic process is specified by its **finite-dimensional distributions**: for every finite collection of times \\(t_1 < t_2 < \ldots < t_n\\), the joint distribution
 
 $$
 F_{t_1, \ldots, t_n}(x_1, \ldots, x_n) = \mathbb{P}(X_{t_1} \le x_1, \ldots, X_{t_n} \le x_n).
@@ -57,7 +57,7 @@ $$
 
 ### Why One Realization Is Enough (Sometimes)
 
-Consider the question: what is \(\mathbb{E}[X_t]\)? In principle you would average over many independent realizations: \(\hat{\mu} = (1/N) \sum_{i=1}^N X_t^{(i)}\). But we only have one realization. The natural alternative is the **time average** \(\bar{X}_T = (1/T) \sum_{t=1}^T X_t\). These two averages estimate different things in general — the first estimates \(\mathbb{E}[X_t]\), the second estimates something like an orbit average along the realization. They coincide *only* when the process is stationary and ergodic, as Birkhoff's theorem (1931) makes precise. Every applied piece of time series inference implicitly uses this equivalence.
+Consider the question: what is \\(\mathbb{E}[X_t]\\)? In principle you would average over many independent realizations: \\(\hat{\mu} = (1/N) \sum_{i=1}^N X_t^{(i)}\\). But we only have one realization. The natural alternative is the **time average** \\(\bar{X}_T = (1/T) \sum_{t=1}^T X_t\\). These two averages estimate different things in general — the first estimates \\(\mathbb{E}[X_t]\\), the second estimates something like an orbit average along the realization. They coincide *only* when the process is stationary and ergodic, as Birkhoff's theorem (1931) makes precise. Every applied piece of time series inference implicitly uses this equivalence.
 
 ---
 
@@ -67,7 +67,7 @@ Stationarity is the time-series version of i.i.d. — it is the condition that m
 
 ### Strict Stationarity
 
-A process \(\lbrace X_t\rbrace\) is **strictly stationary** if for every \(n \ge 1\), every \(t_1 < \ldots < t_n\), and every \(h \in \mathbb{Z}\),
+A process \\(\lbrace X_t\rbrace\\) is **strictly stationary** if for every \\(n \ge 1\\), every \\(t_1 < \ldots < t_n\\), and every \\(h \in \mathbb{Z}\\),
 
 $$
 (X_{t_1}, \ldots, X_{t_n}) \stackrel{d}{=} (X_{t_1 + h}, \ldots, X_{t_n + h}).
@@ -79,9 +79,9 @@ Shifting time does not change the joint distribution. This is a very strong cond
 
 A process is **weakly stationary** or **covariance stationary** if:
 
-1. \(\mathbb{E}[X_t^2] < \infty\) for all \(t\) (second moments exist),
-2. \(\mathbb{E}[X_t] = \mu\) for all \(t\) (constant mean),
-3. \(\mathrm{Cov}(X_t, X_{t+h}) = \gamma(h)\) depends only on \(h\), not on \(t\).
+1. \\(\mathbb{E}[X_t^2] < \infty\\) for all \\(t\\) (second moments exist),
+2. \\(\mathbb{E}[X_t] = \mu\\) for all \\(t\\) (constant mean),
+3. \\(\mathrm{Cov}(X_t, X_{t+h}) = \gamma(h)\\) depends only on \\(h\\), not on \\(t\\).
 
 Weak stationarity is what classical time series assumes. Note two things:
 
@@ -91,7 +91,7 @@ Weak stationarity is what classical time series assumes. Note two things:
 
 ### Why Stationarity Matters
 
-Consider what happens without stationarity. Suppose \(\mathbb{E}[X_t] = \mu_t\) changes over time. Then any estimator we build by averaging — say the sample mean — is estimating some weighted average of the \(\mu_t\)s, which has no clean interpretation. Forecasting becomes impossible in principle: the future may be drawn from a different distribution than anything we have seen. Stationarity is the condition under which the future resembles the past in a statistical sense, and therefore the past can inform the future.
+Consider what happens without stationarity. Suppose \\(\mathbb{E}[X_t] = \mu_t\\) changes over time. Then any estimator we build by averaging — say the sample mean — is estimating some weighted average of the \\(\mu_t\\)s, which has no clean interpretation. Forecasting becomes impossible in principle: the future may be drawn from a different distribution than anything we have seen. Stationarity is the condition under which the future resembles the past in a statistical sense, and therefore the past can inform the future.
 
 In practice, most real-world series are *not* stationary as observed. Stock prices drift; GDP grows; temperature has seasonal cycles. The first step of classical time series analysis is almost always to *transform* the observed series into something approximately stationary — via differencing, log transforms, or explicit trend removal. The entire apparatus of ARIMA (Part 2) is organized around this preprocessing step.
 
@@ -115,17 +115,17 @@ In practice, most real-world series are *not* stationary as observed. Stock pric
 
 ## 3. Autocovariance and Autocorrelation
 
-For a weakly stationary process, the **autocovariance function** at lag \(h\) is
+For a weakly stationary process, the **autocovariance function** at lag \\(h\\) is
 
 $$
 \gamma(h) = \mathrm{Cov}(X_t, X_{t+h}) = \mathbb{E}[(X_t - \mu)(X_{t+h} - \mu)].
 $$
 
-It quantifies the linear relationship between the process at two times separated by \(h\) units. By stationarity this depends only on \(h\), not on the absolute time \(t\). The autocovariance has three immediate properties:
+It quantifies the linear relationship between the process at two times separated by \\(h\\) units. By stationarity this depends only on \\(h\\), not on the absolute time \\(t\\). The autocovariance has three immediate properties:
 
-- **Symmetry**: \(\gamma(h) = \gamma(-h)\), because \(\mathrm{Cov}(X_t, X_{t+h}) = \mathrm{Cov}(X_{t+h}, X_t)\).
-- **Bound**: \(|\gamma(h)| \le \gamma(0) = \mathrm{Var}(X_t)\), by Cauchy-Schwarz.
-- **Positive semi-definiteness**: for any \(n\), any times \(t_1, \ldots, t_n\), and any real \(a_1, \ldots, a_n\),
+- **Symmetry**: \\(\gamma(h) = \gamma(-h)\\), because \\(\mathrm{Cov}(X_t, X_{t+h}) = \mathrm{Cov}(X_{t+h}, X_t)\\).
+- **Bound**: \\(|\gamma(h)| \le \gamma(0) = \mathrm{Var}(X_t)\\), by Cauchy-Schwarz.
+- **Positive semi-definiteness**: for any \\(n\\), any times \\(t_1, \ldots, t_n\\), and any real \\(a_1, \ldots, a_n\\),
 
 $$
 \sum_{i,j=1}^n a_i a_j \gamma(t_i - t_j) \ge 0.
@@ -141,25 +141,25 @@ $$
 \rho(h) = \frac{\gamma(h)}{\gamma(0)}.
 $$
 
-So \(\rho(0) = 1\) and \(|\rho(h)| \le 1\) for all \(h\). The ACF at lag \(h\) is the correlation coefficient between \(X_t\) and \(X_{t+h}\). It is scale-free, so two series with the same autocorrelation structure but different variances have the same ACF.
+So \\(\rho(0) = 1\\) and \\(|\rho(h)| \le 1\\) for all \\(h\\). The ACF at lag \\(h\\) is the correlation coefficient between \\(X_t\\) and \\(X_{t+h}\\). It is scale-free, so two series with the same autocorrelation structure but different variances have the same ACF.
 
 ### Sample Autocovariance and ACF
 
-Given a realization \(x_1, \ldots, x_T\), the natural estimators are
+Given a realization \\(x_1, \ldots, x_T\\), the natural estimators are
 
 $$
 \hat{\gamma}(h) = \frac{1}{T} \sum_{t=1}^{T-h} (x_t - \bar{x})(x_{t+h} - \bar{x}), \qquad \hat{\rho}(h) = \frac{\hat{\gamma}(h)}{\hat{\gamma}(0)}.
 $$
 
-A few subtleties. Notice we divide by \(T\), not \(T - h\). Dividing by \(T\) makes the estimator biased but guarantees that \(\hat{\gamma}\) is a valid positive semi-definite function — critical for downstream uses like computing spectral estimates. Dividing by \(T - h\) gives an unbiased estimator but it can fail to be positive semi-definite. Most software (including `statsmodels.tsa`) uses the \(T\)-normalization by default.
+A few subtleties. Notice we divide by \\(T\\), not \\(T - h\\). Dividing by \\(T\\) makes the estimator biased but guarantees that \\(\hat{\gamma}\\) is a valid positive semi-definite function — critical for downstream uses like computing spectral estimates. Dividing by \\(T - h\\) gives an unbiased estimator but it can fail to be positive semi-definite. Most software (including `statsmodels.tsa`) uses the \\(T\\)-normalization by default.
 
-For large \(T\) and under mild conditions (linear process, finite fourth moments), Bartlett's formula gives the asymptotic variance of \(\hat{\rho}(h)\):
+For large \\(T\\) and under mild conditions (linear process, finite fourth moments), Bartlett's formula gives the asymptotic variance of \\(\hat{\rho}(h)\\):
 
 $$
 \mathrm{Var}(\hat{\rho}(h)) \approx \frac{1}{T} \sum_{k=-\infty}^{\infty} \left[\rho(k)^2 + \rho(k-h)\rho(k+h) - 4\rho(h)\rho(k)\rho(k-h) + 2\rho(h)^2 \rho(k)^2\right].
 $$
 
-For a white noise process (\(\rho(k) = 0\) for \(k \ne 0\)), this collapses to \(1/T\), giving the familiar \(\pm 1.96/\sqrt{T}\) confidence bands on ACF plots. When you see blue dashed lines on a correlogram, that's what they are.
+For a white noise process (\\(\rho(k) = 0\\) for \\(k \ne 0\\)), this collapses to \\(1/T\\), giving the familiar \\(\pm 1.96/\sqrt{T}\\) confidence bands on ACF plots. When you see blue dashed lines on a correlogram, that's what they are.
 
 ---
 
@@ -169,19 +169,19 @@ Two processes play the role of the hydrogen atom in time series: white noise and
 
 ### White Noise
 
-A process \(\lbrace \varepsilon_t\rbrace\) is **white noise** if
+A process \\(\lbrace \varepsilon_t\rbrace\\) is **white noise** if
 
 $$
 \mathbb{E}[\varepsilon_t] = 0, \quad \mathbb{E}[\varepsilon_t^2] = \sigma^2, \quad \mathbb{E}[\varepsilon_t \varepsilon_s] = 0 \text{ for } t \ne s.
 $$
 
-We write \(\varepsilon_t \sim \mathrm{WN}(0, \sigma^2)\). Zero mean, constant variance, uncorrelated across time. Note: white noise is *not* required to be i.i.d. or Gaussian. A GARCH residual sequence is white noise but has dependent squares.
+We write \\(\varepsilon_t \sim \mathrm{WN}(0, \sigma^2)\\). Zero mean, constant variance, uncorrelated across time. Note: white noise is *not* required to be i.i.d. or Gaussian. A GARCH residual sequence is white noise but has dependent squares.
 
-- **Gaussian white noise**: \(\varepsilon_t \sim \mathcal{N}(0, \sigma^2)\) i.i.d. This is what most simulations use.
+- **Gaussian white noise**: \\(\varepsilon_t \sim \mathcal{N}(0, \sigma^2)\\) i.i.d. This is what most simulations use.
 - **i.i.d. white noise**: same distribution, independent — stronger than WN.
 - **Strong white noise**: usually synonymous with i.i.d. WN.
 
-The autocovariance is \(\gamma(0) = \sigma^2\), \(\gamma(h) = 0\) for \(h \ne 0\). In spectral terms (Part 3), its spectral density is constant: flat across all frequencies — hence the name "white," by analogy with white light.
+The autocovariance is \\(\gamma(0) = \sigma^2\\), \\(\gamma(h) = 0\\) for \\(h \ne 0\\). In spectral terms (Part 3), its spectral density is constant: flat across all frequencies — hence the name "white," by analogy with white light.
 
 ### The Random Walk
 
@@ -191,13 +191,13 @@ $$
 Y_t = Y_{t-1} + \varepsilon_t = Y_0 + \sum_{s=1}^t \varepsilon_s.
 $$
 
-With \(Y_0 = 0\) for concreteness, we get
+With \\(Y_0 = 0\\) for concreteness, we get
 
 $$
 \mathbb{E}[Y_t] = 0, \qquad \mathrm{Var}(Y_t) = t\sigma^2, \qquad \mathrm{Cov}(Y_t, Y_{t+h}) = t\sigma^2 \text{ for } h \ge 0.
 $$
 
-The variance grows linearly with time — the process is *not* stationary. Yet it is central to finance (log-returns), physics (diffusion), and ecology. The appropriate way to make it stationary is to take first differences: \(\Delta Y_t = Y_t - Y_{t-1} = \varepsilon_t\), which is white noise. This motivates the "I" (for "integrated") in ARIMA: an I(1) process becomes stationary after one differencing.
+The variance grows linearly with time — the process is *not* stationary. Yet it is central to finance (log-returns), physics (diffusion), and ecology. The appropriate way to make it stationary is to take first differences: \\(\Delta Y_t = Y_t - Y_{t-1} = \varepsilon_t\\), which is white noise. This motivates the "I" (for "integrated") in ARIMA: an I(1) process becomes stationary after one differencing.
 
 ### Random Walk with Drift
 
@@ -207,7 +207,7 @@ $$
 Y_t = \delta + Y_{t-1} + \varepsilon_t.
 $$
 
-By recursion, \(Y_t = Y_0 + \delta t + \sum \varepsilon_s\). The drift gives the series a deterministic linear trend, on top of the stochastic accumulation. Differencing still makes it stationary: \(\Delta Y_t = \delta + \varepsilon_t\).
+By recursion, \\(Y_t = Y_0 + \delta t + \sum \varepsilon_s\\). The drift gives the series a deterministic linear trend, on top of the stochastic accumulation. Differencing still makes it stationary: \\(\Delta Y_t = \delta + \varepsilon_t\\).
 
 ### The ACF Signature
 
@@ -215,7 +215,7 @@ The ACF is one of the most useful diagnostic tools. Different processes have ver
 
 - **White noise**: ACF is zero at all lags except lag 0.
 - **Random walk**: sample ACF decays very slowly and linearly — a classic fingerprint of non-stationarity.
-- **AR(1) with \(\phi = 0.8\)**: ACF decays geometrically as \(0.8^h\).
+- **AR(1) with \\(\phi = 0.8\\)**: ACF decays geometrically as \\(0.8^h\\).
 - **MA(1)**: ACF is nonzero only at lag 1.
 
 We build up this catalogue in Part 2.
@@ -224,9 +224,9 @@ We build up this catalogue in Part 2.
 
 ## 5. The Partial Autocorrelation Function
 
-The ACF at lag \(h\) measures total correlation between \(X_t\) and \(X_{t+h}\) — but some of that correlation is indirect, passing through the intermediate lags. The **partial autocorrelation function (PACF)** at lag \(h\) measures the correlation *after removing the linear effect* of the intermediate variables \(X_{t+1}, \ldots, X_{t+h-1}\).
+The ACF at lag \\(h\\) measures total correlation between \\(X_t\\) and \\(X_{t+h}\\) — but some of that correlation is indirect, passing through the intermediate lags. The **partial autocorrelation function (PACF)** at lag \\(h\\) measures the correlation *after removing the linear effect* of the intermediate variables \\(X_{t+1}, \ldots, X_{t+h-1}\\).
 
-Formally, the PACF at lag \(h\), denoted \(\phi_{hh}\), is the coefficient of \(X_{t-h}\) in the best linear predictor of \(X_t\) using \(X_{t-1}, \ldots, X_{t-h}\):
+Formally, the PACF at lag \\(h\\), denoted \\(\phi_{hh}\\), is the coefficient of \\(X_{t-h}\\) in the best linear predictor of \\(X_t\\) using \\(X_{t-1}, \ldots, X_{t-h}\\):
 
 $$
 X_t = \phi_{h1} X_{t-1} + \phi_{h2} X_{t-2} + \ldots + \phi_{hh} X_{t-h} + u_t.
@@ -234,14 +234,14 @@ $$
 
 This can be computed recursively via the **Yule-Walker equations** or the **Durbin-Levinson algorithm**. The key fact is:
 
-- For an **AR(p)** process, \(\phi_{hh} = 0\) for \(h > p\). The PACF "cuts off" at lag \(p\).
+- For an **AR(p)** process, \\(\phi_{hh} = 0\\) for \\(h > p\\). The PACF "cuts off" at lag \\(p\\).
 - For an **MA(q)** process, the PACF decays geometrically without cutting off.
 
 This complementarity is the backbone of the Box-Jenkins method (Part 2): look at ACF and PACF together to identify model orders.
 
 ### Computing the PACF: Durbin-Levinson
 
-Given autocorrelations \(\rho(1), \rho(2), \ldots\), the Durbin-Levinson recursion computes \(\phi_{hh}\) in \(O(h^2)\) time:
+Given autocorrelations \\(\rho(1), \rho(2), \ldots\\), the Durbin-Levinson recursion computes \\(\phi_{hh}\\) in \\(O(h^2)\\) time:
 
 $$
 \phi_{hh} = \frac{\rho(h) - \sum_{j=1}^{h-1} \phi_{h-1,j} \rho(h-j)}{1 - \sum_{j=1}^{h-1} \phi_{h-1,j} \rho(j)},
@@ -251,7 +251,7 @@ $$
 \phi_{h,j} = \phi_{h-1,j} - \phi_{hh} \phi_{h-1,h-j}, \quad j = 1, \ldots, h-1.
 $$
 
-You start from \(\phi_{11} = \rho(1)\) and iterate. This is how `statsmodels` computes the sample PACF internally (or via OLS on lagged regressors — equivalent asymptotically).
+You start from \\(\phi_{11} = \rho(1)\\) and iterate. This is how `statsmodels` computes the sample PACF internally (or via OLS on lagged regressors — equivalent asymptotically).
 
 ---
 
@@ -261,13 +261,13 @@ We now arrive at one of the most beautiful theorems in time series analysis. Inf
 
 ### Linear Processes
 
-A process \(\lbrace X_t\rbrace\) is called **linear** or a **moving average representation** if
+A process \\(\lbrace X_t\rbrace\\) is called **linear** or a **moving average representation** if
 
 $$
 X_t = \sum_{j=0}^\infty \psi_j \varepsilon_{t-j}, \qquad \sum_{j=0}^\infty \psi_j^2 < \infty,
 $$
 
-where \(\varepsilon_t \sim \mathrm{WN}(0, \sigma^2)\). The convergence of the series in mean square is guaranteed by the square-summability of \(\lbrace \psi_j\rbrace\). With \(\psi_0 = 1\), the autocovariance can be computed directly:
+where \\(\varepsilon_t \sim \mathrm{WN}(0, \sigma^2)\\). The convergence of the series in mean square is guaranteed by the square-summability of \\(\lbrace \psi_j\rbrace\\). With \\(\psi_0 = 1\\), the autocovariance can be computed directly:
 
 $$
 \gamma(h) = \sigma^2 \sum_{j=0}^\infty \psi_j \psi_{j+h}.
@@ -277,7 +277,7 @@ This formula will be used constantly.
 
 ### The Wold Decomposition Theorem
 
-**Theorem (Wold, 1938).** Any zero-mean weakly stationary process \(\lbrace X_t\rbrace\) can be written uniquely as
+**Theorem (Wold, 1938).** Any zero-mean weakly stationary process \\(\lbrace X_t\rbrace\\) can be written uniquely as
 
 $$
 X_t = \sum_{j=0}^\infty \psi_j \varepsilon_{t-j} + V_t,
@@ -285,48 +285,48 @@ $$
 
 where:
 
-1. \(\psi_0 = 1\) and \(\sum \psi_j^2 < \infty\);
-2. \(\lbrace \varepsilon_t\rbrace\) is white noise with variance \(\sigma^2\);
-3. \(\varepsilon_t\) is the one-step-ahead linear forecast error: \(\varepsilon_t = X_t - P_{t-1} X_t\), where \(P_{t-1}\) is the projection onto the closed linear span of past \(X_s\)s;
-4. \(V_t\) is a **deterministic** component — predictable from its own infinite past with zero error — and is uncorrelated with \(\varepsilon_s\) for all \(s\).
+1. \\(\psi_0 = 1\\) and \\(\sum \psi_j^2 < \infty\\);
+2. \\(\lbrace \varepsilon_t\rbrace\\) is white noise with variance \\(\sigma^2\\);
+3. \\(\varepsilon_t\\) is the one-step-ahead linear forecast error: \\(\varepsilon_t = X_t - P_{t-1} X_t\\), where \\(P_{t-1}\\) is the projection onto the closed linear span of past \\(X_s\\)s;
+4. \\(V_t\\) is a **deterministic** component — predictable from its own infinite past with zero error — and is uncorrelated with \\(\varepsilon_s\\) for all \\(s\\).
 
 ### Sketch of Proof
 
-Let \(\mathcal{H}_t\) be the closed linear span of \(\lbrace X_s : s \le t\rbrace\) in \(L^2\). Define the **innovation**
+Let \\(\mathcal{H}_t\\) be the closed linear span of \\(\lbrace X_s : s \le t\rbrace\\) in \\(L^2\\). Define the **innovation**
 
 $$
 \varepsilon_t = X_t - P_{\mathcal{H}_{t-1}} X_t,
 $$
 
-where \(P_{\mathcal{H}_{t-1}}\) is orthogonal projection. By construction \(\varepsilon_t \perp \mathcal{H}_{t-1}\), and by stationarity \(\mathbb{E}[\varepsilon_t^2] = \sigma^2\) is constant. The \(\varepsilon_t\) are mutually orthogonal (innovations at different times live in different orthogonal subspaces), hence white noise.
+where \\(P_{\mathcal{H}_{t-1}}\\) is orthogonal projection. By construction \\(\varepsilon_t \perp \mathcal{H}_{t-1}\\), and by stationarity \\(\mathbb{E}[\varepsilon_t^2] = \sigma^2\\) is constant. The \\(\varepsilon_t\\) are mutually orthogonal (innovations at different times live in different orthogonal subspaces), hence white noise.
 
-Now project \(X_t\) onto \(\overline{\mathrm{span}}\lbrace \varepsilon_s : s \le t\rbrace\):
+Now project \\(X_t\\) onto \\(\overline{\mathrm{span}}\lbrace \varepsilon_s : s \le t\rbrace\\):
 
 $$
 P_{\mathcal{H}^\varepsilon_t} X_t = \sum_{j=0}^\infty \psi_j \varepsilon_{t-j}, \qquad \psi_j = \frac{\langle X_t, \varepsilon_{t-j}\rangle}{\sigma^2}.
 $$
 
-The residual \(V_t = X_t - P_{\mathcal{H}^\varepsilon_t} X_t\) lies in \(\mathcal{H}_t\) but is orthogonal to every \(\varepsilon_s\), so it is in \(\bigcap_t \mathcal{H}_t\), the **remote past**. Any element of the remote past is perfectly predictable from its own past — hence deterministic. □
+The residual \\(V_t = X_t - P_{\mathcal{H}^\varepsilon_t} X_t\\) lies in \\(\mathcal{H}_t\\) but is orthogonal to every \\(\varepsilon_s\\), so it is in \\(\bigcap_t \mathcal{H}_t\\), the **remote past**. Any element of the remote past is perfectly predictable from its own past — hence deterministic. □
 
 ### What Wold Really Says — and Why Forecasters Care
 
 Three interpretations, all pointed at forecasting:
 
-1. **Every stationary process is AR(\(\infty\))/MA(\(\infty\))**: once you remove a possibly deterministic component, the rest is a moving average of white noise innovations. ARMA models (Part 2) are finite-parameter approximations to this infinite representation — and the quality of that approximation is exactly the forecast gain over the naive mean forecast.
-2. **Innovations are the forecast residuals, by construction**: \(\varepsilon_t = X_t - P_{\mathcal{H}_{t-1}} X_t\). This is not an assumption imposed on the data; it is what you *extract* by optimal one-step-ahead linear projection. "White residuals" is not an aesthetic preference, it is the guarantee that no further linear signal remains. A forecaster whose residuals still autocorrelate is, by Wold, leaving predictable variance on the table.
+1. **Every stationary process is AR(\\(\infty\\))/MA(\\(\infty\\))**: once you remove a possibly deterministic component, the rest is a moving average of white noise innovations. ARMA models (Part 2) are finite-parameter approximations to this infinite representation — and the quality of that approximation is exactly the forecast gain over the naive mean forecast.
+2. **Innovations are the forecast residuals, by construction**: \\(\varepsilon_t = X_t - P_{\mathcal{H}_{t-1}} X_t\\). This is not an assumption imposed on the data; it is what you *extract* by optimal one-step-ahead linear projection. "White residuals" is not an aesthetic preference, it is the guarantee that no further linear signal remains. A forecaster whose residuals still autocorrelate is, by Wold, leaving predictable variance on the table.
 3. **Linear forecasting is optimal for Gaussian processes**: the Wold innovations coincide with the best *nonlinear* forecast residuals when the joint distribution is Gaussian. Nonlinear models (Part 5) can only help when the joint distribution is non-Gaussian or conditional variance is time-varying.
 
-The deterministic component \(V_t\) is usually ignored in practice. In macroeconomics, where very long cycles or demographic trends exist, it can matter. In operational forecasting — demand, traffic, latency — \(V_t = 0\) is a safe default.
+The deterministic component \\(V_t\\) is usually ignored in practice. In macroeconomics, where very long cycles or demographic trends exist, it can matter. In operational forecasting — demand, traffic, latency — \\(V_t = 0\\) is a safe default.
 
 ### The Lag Operator and Polynomial Form
 
-Define the **lag operator** \(L\) by \(LX_t = X_{t-1}\), so \(L^j X_t = X_{t-j}\). A linear process can be written
+Define the **lag operator** \\(L\\) by \\(LX_t = X_{t-1}\\), so \\(L^j X_t = X_{t-j}\\). A linear process can be written
 
 $$
 X_t = \psi(L) \varepsilon_t, \qquad \psi(L) = \sum_{j=0}^\infty \psi_j L^j.
 $$
 
-This notation lets us manipulate time series algebraically. ARMA models are rational lag polynomials: \(\phi(L) X_t = \theta(L) \varepsilon_t\), where \(\phi\) and \(\theta\) are finite-order polynomials. Inverting \(\phi(L)\), when possible, yields the MA(\(\infty\)) representation directly:
+This notation lets us manipulate time series algebraically. ARMA models are rational lag polynomials: \\(\phi(L) X_t = \theta(L) \varepsilon_t\\), where \\(\phi\\) and \\(\theta\\) are finite-order polynomials. Inverting \\(\phi(L)\\), when possible, yields the MA(\\(\infty\\)) representation directly:
 
 $$
 X_t = \frac{\theta(L)}{\phi(L)} \varepsilon_t.
@@ -338,7 +338,7 @@ We will exploit this machinery heavily in Part 2.
 
 ## 7. Ergodicity: When Time Averages Equal Ensemble Averages
 
-Stationarity says the *distribution* does not change over time. But we still only have one realization. Can we estimate \(\mathbb{E}[X_t] = \mu\) from the time average \(\bar{X}_T = (1/T)\sum X_t\)? The answer depends on **ergodicity**.
+Stationarity says the *distribution* does not change over time. But we still only have one realization. Can we estimate \\(\mathbb{E}[X_t] = \mu\\) from the time average \\(\bar{X}_T = (1/T)\sum X_t\\)? The answer depends on **ergodicity**.
 
 ### Definition
 
@@ -348,21 +348,21 @@ $$
 \bar{X}_T \xrightarrow{\mathbb{P}} \mu \quad \text{as } T \to \infty.
 $$
 
-A sufficient (and intuitive) condition is that \(\sum_{h=-\infty}^\infty |\gamma(h)| < \infty\) — the autocovariances are summable. Then
+A sufficient (and intuitive) condition is that \\(\sum_{h=-\infty}^\infty |\gamma(h)| < \infty\\) — the autocovariances are summable. Then
 
 $$
 \mathrm{Var}(\bar{X}_T) = \frac{1}{T^2} \sum_{s,t=1}^T \gamma(s-t) \approx \frac{1}{T} \sum_{h=-\infty}^\infty \gamma(h) \to 0.
 $$
 
-The intuition: if memory decays fast enough, far-apart observations are nearly independent, so the time average satisfies something like a law of large numbers. A process that is *not* mean ergodic: let \(X_t = Z\) for all \(t\), where \(Z \sim \mathcal{N}(0, 1)\). This is stationary — every \(X_t\) has the same distribution, and autocovariances depend only on the lag — but the time average equals \(Z\), not \(0 = \mathbb{E}[Z]\).
+The intuition: if memory decays fast enough, far-apart observations are nearly independent, so the time average satisfies something like a law of large numbers. A process that is *not* mean ergodic: let \\(X_t = Z\\) for all \\(t\\), where \\(Z \sim \mathcal{N}(0, 1)\\). This is stationary — every \\(X_t\\) has the same distribution, and autocovariances depend only on the lag — but the time average equals \\(Z\\), not \\(0 = \mathbb{E}[Z]\\).
 
 ### Ergodicity for Second Moments
 
-For estimating autocovariances we need a stronger property: **covariance ergodicity**. It requires that \(\mathbb{E}[X_t X_{t+h}]\) can be consistently estimated by time averages. For linear processes driven by i.i.d. white noise with finite fourth moments, this holds automatically under summability of \(\gamma\). For nonlinear processes (GARCH, stochastic volatility) the conditions are more delicate.
+For estimating autocovariances we need a stronger property: **covariance ergodicity**. It requires that \\(\mathbb{E}[X_t X_{t+h}]\\) can be consistently estimated by time averages. For linear processes driven by i.i.d. white noise with finite fourth moments, this holds automatically under summability of \\(\gamma\\). For nonlinear processes (GARCH, stochastic volatility) the conditions are more delicate.
 
 ### Birkhoff's Ergodic Theorem
 
-The deepest statement is **Birkhoff's ergodic theorem** (1931): for any strictly stationary, ergodic process and any measurable \(f\) with \(\mathbb{E}|f(X_t)| < \infty\),
+The deepest statement is **Birkhoff's ergodic theorem** (1931): for any strictly stationary, ergodic process and any measurable \\(f\\) with \\(\mathbb{E}|f(X_t)| < \infty\\),
 
 $$
 \frac{1}{T} \sum_{t=1}^T f(X_t) \xrightarrow{\text{a.s.}} \mathbb{E}[f(X_0)].
@@ -384,14 +384,14 @@ $$
 X_t = T_t + S_t + R_t,
 $$
 
-where \(T_t\) is a slowly-varying **trend**, \(S_t\) is a **seasonal** component with period \(s\) (e.g., \(s = 12\) for monthly data with annual seasonality), and \(R_t\) is a stationary **remainder**. The statistical task is to estimate and remove \(T_t\) and \(S_t\), leaving a stationary residual to model.
+where \\(T_t\\) is a slowly-varying **trend**, \\(S_t\\) is a **seasonal** component with period \\(s\\) (e.g., \\(s = 12\\) for monthly data with annual seasonality), and \\(R_t\\) is a stationary **remainder**. The statistical task is to estimate and remove \\(T_t\\) and \\(S_t\\), leaving a stationary residual to model.
 
 ### Removing the Trend
 
 Two approaches:
 
 1. **Detrending**: fit a deterministic trend (linear, polynomial, or smoother like a Hodrick-Prescott or LOESS) and subtract. This assumes the trend is a smooth deterministic function.
-2. **Differencing**: take \(\Delta X_t = X_t - X_{t-1}\). This removes a linear trend exactly; applied \(d\) times, it removes a polynomial trend of degree \(d\).
+2. **Differencing**: take \\(\Delta X_t = X_t - X_{t-1}\\). This removes a linear trend exactly; applied \\(d\\) times, it removes a polynomial trend of degree \\(d\\).
 
 The fundamental question: is the trend *deterministic* (best removed by detrending) or *stochastic* (best removed by differencing)? Mistaking one for the other produces biased inference. A stochastic trend (unit root) detrended linearly produces spurious persistence in residuals; a deterministic trend differenced produces a non-invertible MA component with unusual error dynamics.
 
@@ -405,7 +405,7 @@ $$
 \Delta_{12} X_t = X_t - X_{t-12}.
 $$
 
-This removes a constant seasonal pattern. Combined with first differencing, the common transformation is \(\Delta \Delta_{12} X_t = (X_t - X_{t-1}) - (X_{t-12} - X_{t-13})\), which is the backbone of SARIMA (Part 2).
+This removes a constant seasonal pattern. Combined with first differencing, the common transformation is \\(\Delta \Delta_{12} X_t = (X_t - X_{t-1}) - (X_{t-12} - X_{t-13})\\), which is the backbone of SARIMA (Part 2).
 
 ### STL Decomposition
 
@@ -437,13 +437,13 @@ Three tests together cover the diagnostic workflow.
 
 ### Ljung-Box Test
 
-Tests the null that the first \(h\) autocorrelations are jointly zero — i.e., the series is white noise through lag \(h\). The statistic is
+Tests the null that the first \\(h\\) autocorrelations are jointly zero — i.e., the series is white noise through lag \\(h\\). The statistic is
 
 $$
 Q_h = T(T+2) \sum_{k=1}^{h} \frac{\hat{\rho}(k)^2}{T - k},
 $$
 
-which is asymptotically \(\chi^2_{h}\) under white noise (or \(\chi^2_{h - p - q}\) when applied to residuals of an ARMA(\(p,q\)) fit). You use it on residuals after model fitting: if the model has captured the dynamics, residuals should be white, and \(Q_h\) should not reject.
+which is asymptotically \\(\chi^2_{h}\\) under white noise (or \\(\chi^2_{h - p - q}\\) when applied to residuals of an ARMA(\\(p,q\\)) fit). You use it on residuals after model fitting: if the model has captured the dynamics, residuals should be white, and \\(Q_h\\) should not reject.
 
 ### Augmented Dickey-Fuller (ADF)
 
@@ -453,7 +453,7 @@ $$
 \Delta X_t = \alpha + \beta t + \rho X_{t-1} + \sum_{i=1}^p \gamma_i \Delta X_{t-i} + \varepsilon_t
 $$
 
-has the null \(\rho = 0\) (unit root) versus \(\rho < 0\) (stationary). Critical values are non-standard (Dickey-Fuller distribution) because the OLS \(t\)-statistic does not have a \(t\) distribution under the null. The test has notoriously low power when \(\rho\) is close to but below zero — near-unit-root processes can look indistinguishable from true random walks.
+has the null \\(\rho = 0\\) (unit root) versus \\(\rho < 0\\) (stationary). Critical values are non-standard (Dickey-Fuller distribution) because the OLS \\(t\\)-statistic does not have a \\(t\\) distribution under the null. The test has notoriously low power when \\(\rho\\) is close to but below zero — near-unit-root processes can look indistinguishable from true random walks.
 
 ### KPSS
 
@@ -539,7 +539,7 @@ fig.tight_layout()
 Expected patterns:
 - **White noise**: ACF and PACF all inside the band at non-zero lags.
 - **Random walk**: ACF decays linearly and very slowly — close to 1 for many lags.
-- **AR(1) with \(\phi=0.8\)**: ACF decays geometrically as \(0.8^h\); PACF cuts off sharply after lag 1.
+- **AR(1) with \\(\phi=0.8\\)**: ACF decays geometrically as \\(0.8^h\\); PACF cuts off sharply after lag 1.
 
 ### The Three Tests
 
@@ -592,17 +592,17 @@ fig.suptitle('STL decomposition of simulated trend + seasonal + noise')
 fig.tight_layout()
 ```
 
-The residual component \(\hat{R}_t\) should look approximately like white noise. Run Ljung-Box on it to check.
+The residual component \\(\hat{R}_t\\) should look approximately like white noise. Run Ljung-Box on it to check.
 
 ### Estimating Mean and the Effective Sample Size
 
-A subtle point: if your process is autocorrelated, the variance of the sample mean is not \(\sigma^2 / T\) but
+A subtle point: if your process is autocorrelated, the variance of the sample mean is not \\(\sigma^2 / T\\) but
 
 $$
 \mathrm{Var}(\bar{X}_T) \approx \frac{\sigma^2}{T} \cdot \underbrace{\sum_{h=-\infty}^\infty \rho(h)}_{\text{long-run variance factor}} = \frac{\sigma^2}{T_{\mathrm{eff}}}.
 $$
 
-The **effective sample size** \(T_{\mathrm{eff}}\) can be much smaller than \(T\) for persistent processes. For AR(1) with \(\phi = 0.8\), \(\sum \rho(h) = (1+\phi)/(1-\phi) = 9\), so \(T_{\mathrm{eff}} = T/9\). Ignoring this effectively makes your confidence intervals 3x too narrow.
+The **effective sample size** \\(T_{\mathrm{eff}}\\) can be much smaller than \\(T\\) for persistent processes. For AR(1) with \\(\phi = 0.8\\), \\(\sum \rho(h) = (1+\phi)/(1-\phi) = 9\\), so \\(T_{\mathrm{eff}} = T/9\\). Ignoring this effectively makes your confidence intervals 3x too narrow.
 
 ```python
 from statsmodels.tsa.stattools import acf
@@ -618,7 +618,7 @@ def effective_n(x, max_lag=None):
 print(f"AR(1) phi=0.8: T = {T}, T_eff ~ {effective_n(ar1):.0f}")
 ```
 
-You should see \(T_{\mathrm{eff}} \approx 100\) for \(T = 1000\), matching the theoretical factor of 9.
+You should see \\(T_{\mathrm{eff}} \approx 100\\) for \\(T = 1000\\), matching the theoretical factor of 9.
 
 ---
 
@@ -631,7 +631,7 @@ The machinery in this post looks academic, but every item below is something a p
 Before any test or model:
 
 1. **Levels**: the raw series. Look for trend, level shifts, outliers, gaps, changes in volatility.
-2. **Differences** \(\Delta X_t\): often reveals heteroskedasticity and event days that hide at the level.
+2. **Differences** \\(\Delta X_t\\): often reveals heteroskedasticity and event days that hide at the level.
 3. **ACF/PACF**: on levels *and* on residuals after any transformation. If ACF of the raw series decays very slowly, you likely have a unit root.
 4. **Rolling mean and rolling standard deviation**: a cheap visual stationarity check. Expanding windows are misleading; use rolling windows of a full seasonal period.
 
@@ -649,9 +649,9 @@ A surprising amount of forecasting failure comes from not looking at the data. S
 
 No model is "good" in isolation — it is good relative to something naive. Standard benchmarks:
 
-- **Naive-1**: \(\hat{X}_{T+h} = X_T\). Your model must beat this or it is not earning its complexity.
-- **Seasonal naive**: \(\hat{X}_{T+h} = X_{T+h-s}\). The relevant benchmark for seasonal series.
-- **Random walk with drift**: \(\hat{X}_{T+h} = X_T + h\hat{\delta}\). The benchmark for trending series.
+- **Naive-1**: \\(\hat{X}_{T+h} = X_T\\). Your model must beat this or it is not earning its complexity.
+- **Seasonal naive**: \\(\hat{X}_{T+h} = X_{T+h-s}\\). The relevant benchmark for seasonal series.
+- **Random walk with drift**: \\(\hat{X}_{T+h} = X_T + h\hat{\delta}\\). The benchmark for trending series.
 - **Historical mean / median**: for series that are truly stationary around a level.
 
 Report Mean Absolute Scaled Error (MASE) — the MAE of your model divided by the MAE of the seasonal naive on the training set. MASE < 1 means you beat the benchmark. This scales across heterogeneous items and is the metric M-competitions use.
@@ -660,7 +660,7 @@ Report Mean Absolute Scaled Error (MASE) — the MAE of your model divided by th
 
 *Never* use random K-fold on time series. It leaks the future into the past. Two correct schemes:
 
-- **Expanding window** (rolling origin): fit on \([1, t]\), forecast \([t+1, t+h]\), advance \(t\), repeat. This is the Hyndman-Athanasopoulos gold standard.
+- **Expanding window** (rolling origin): fit on \\([1, t]\\), forecast \\([t+1, t+h]\\), advance \\(t\\), repeat. This is the Hyndman-Athanasopoulos gold standard.
 - **Sliding window**: same but the training window slides forward with fixed length. Use when you suspect non-stationarity and want to discard old regimes.
 
 Always evaluate at the forecast horizon you care about. A one-step MAE tells you almost nothing about 30-step performance.
@@ -669,8 +669,8 @@ Always evaluate at the forecast horizon you care about. A one-step MAE tells you
 
 A production forecast has three distinct sources of error:
 
-1. **Innovation uncertainty** \(\sigma^2\) — the irreducible noise. Shows up in prediction intervals even if the model is perfectly specified.
-2. **Parameter uncertainty** — \(\hat{\phi}\) is not \(\phi\). Usually small for long series, large for short/seasonal ones.
+1. **Innovation uncertainty** \\(\sigma^2\\) — the irreducible noise. Shows up in prediction intervals even if the model is perfectly specified.
+2. **Parameter uncertainty** — \\(\hat{\phi}\\) is not \\(\phi\\). Usually small for long series, large for short/seasonal ones.
 3. **Model uncertainty** — the wrong family. The biggest of the three, and the one standard prediction intervals ignore entirely.
 
 Bayesian methods (Part 4) and ensembles (Part 5) are the two production-grade responses to model uncertainty. Most shops under-report intervals by a factor of 2–3× because they account only for (1).
@@ -690,13 +690,13 @@ Neither test has good power in samples under ~100, and neither handles level shi
 
 For strictly positive series with multiplicative seasonality (revenue, bookings, traffic), take logs *first*. Differencing stabilizes the mean; logging stabilizes the variance. Applied in the wrong order, you get an arithmetically-differenced series with exploding variance, which then requires more complicated models than the problem deserves.
 
-Box-Cox (\(\lambda\)) is the parametric generalization:
+Box-Cox (\\(\lambda\\)) is the parametric generalization:
 
 $$
 y(\lambda) = \begin{cases} (X^\lambda - 1)/\lambda & \lambda \ne 0 \\ \ln X & \lambda = 0 \end{cases}
 $$
 
-Guerrero's method picks \(\lambda\) to minimize the coefficient of variation across seasonal blocks; `forecast::BoxCox.lambda` in R and the `scipy.stats.boxcox` helper are the standard implementations. Remember to *back-transform* your forecasts and adjust for the Jensen gap: \(\mathbb{E}[\exp Y] > \exp(\mathbb{E} Y)\).
+Guerrero's method picks \\(\lambda\\) to minimize the coefficient of variation across seasonal blocks; `forecast::BoxCox.lambda` in R and the `scipy.stats.boxcox` helper are the standard implementations. Remember to *back-transform* your forecasts and adjust for the Jensen gap: \\(\mathbb{E}[\exp Y] > \exp(\mathbb{E} Y)\\).
 
 ### 11.8 Monitor Residuals in Production
 
@@ -704,7 +704,7 @@ A model that passes Ljung-Box on the training set can still fail on live data �
 
 - Log residuals at every forecast horizon.
 - Run a rolling Ljung-Box and report p-values weekly.
-- Track forecast bias: \(\text{mean}(\hat{X}_{t+h|t} - X_{t+h})\). If it drifts away from zero, something is wrong with the mean equation.
+- Track forecast bias: \\(\text{mean}(\hat{X}_{t+h|t} - X_{t+h})\\). If it drifts away from zero, something is wrong with the mean equation.
 - Track coverage: what fraction of realized values fall inside the nominal 80% / 95% prediction interval? For calibrated models, coverage should match the nominal level to within Monte Carlo error.
 
 Under-coverage in production is almost universal. The rolling CRPS (Part 5) is a more robust tracking metric than MAE because it reflects the entire predictive distribution rather than a point.
@@ -714,11 +714,11 @@ Under-coverage in production is almost universal. The rolling CRPS (Part 5) is a
 "Weekly seasonality" is not a property of the data. It is a *model* you impose. Real human and economic systems have multiple overlapping periodicities (daily, weekly, monthly billing cycles, quarterly business rhythms, annual holidays), and forcing a single seasonality into ARIMA is often wrong. Options:
 
 - **SARIMA** for a single period (Part 2).
-- **TBATS / Fourier regressors** for multiple seasonalities. You include pairs \(\sin(2\pi k t / s)\), \(\cos(2\pi k t / s)\) as exogenous regressors for each relevant period \(s\).
+- **TBATS / Fourier regressors** for multiple seasonalities. You include pairs \\(\sin(2\pi k t / s)\\), \\(\cos(2\pi k t / s)\\) as exogenous regressors for each relevant period \\(s\\).
 - **STL with multiple periods (MSTL)** for exploratory decomposition.
 - **Calendar features** (holiday dummies, payday effects, Black Friday) for known discrete events.
 
-Misspecifying seasonality shows up as residual autocorrelation at the missing frequency. Check the residual ACF at lag \(s\) for your candidate periods.
+Misspecifying seasonality shows up as residual autocorrelation at the missing frequency. Check the residual ACF at lag \\(s\\) for your candidate periods.
 
 ### 11.10 Keep Model Simplicity a Variable You Optimize
 
@@ -737,9 +737,9 @@ Complexity must be *earned* against the benchmark MASE on expanding-window CV. A
 
 We have built the first layer of forecasting vocabulary:
 
-- A time series is a collection of random variables indexed by time; we observe one realization, and the job of a forecaster is to push that realization one step (or \(h\) steps) into the future.
+- A time series is a collection of random variables indexed by time; we observe one realization, and the job of a forecaster is to push that realization one step (or \\(h\\) steps) into the future.
 - **Stationarity** (weak) means constant mean and lag-dependent-only autocovariance; it is the structural assumption under which past informs future and forecasts have a well-defined target.
-- The **autocovariance/autocorrelation** \(\gamma(h)/\rho(h)\) summarizes linear memory; sample versions are consistent under ergodicity and are the first quantities a forecaster reads off the data.
+- The **autocovariance/autocorrelation** \\(\gamma(h)/\rho(h)\\) summarizes linear memory; sample versions are consistent under ergodicity and are the first quantities a forecaster reads off the data.
 - The **PACF** cleans autocorrelation of indirect effects via intermediate lags; combined with the ACF, it identifies the order of ARMA models.
 - **White noise** and the **random walk** are the two prototypes: white noise is the target shape of well-specified forecast residuals; the random walk is the benchmark every forecaster must beat.
 - **Wold decomposition** says every stationary process is a linear filter of its own innovations — the formal reason ARMA-type forecasting works.
@@ -747,4 +747,4 @@ We have built the first layer of forecasting vocabulary:
 - Real series have trends and seasonality; differencing, logs, and STL preprocess them into something a stationary model can consume; ADF and KPSS gate the transition.
 - **Industry practice** is a discipline, not a decoration: plot first, benchmark always, cross-validate on time, log coverage in production.
 
-In [Part 2](/2026/04/19/arima-box-jenkins-forecasting.html) we take finite-parameter approximations to Wold's MA(\(\infty\)) and build the ARIMA family — autoregressive, moving average, integrated, seasonal — together with the Box-Jenkins identification/estimation/diagnosis cycle, AIC/BIC model selection, forecasting formulas, and prediction intervals. [Part 3](/2026/04/20/exponential-smoothing-ets-theta.html) develops exponential smoothing and the state-space ETS family (Holt-Winters, damped trend, Theta), which win on shorter series. [Part 4](/2026/04/21/state-space-kalman-filtering.html) unifies everything under state-space representation and the Kalman filter/smoother. [Part 5](/2026/04/22/modern-forecasting-garch-gbm-nbeats-hierarchical.html) covers modern practice: GARCH for volatility forecasting, gradient-boosted trees with lag features, N-BEATS (a deep MLP architecture), hierarchical reconciliation, and the calibration / proper-scoring-rule framework for probabilistic forecasts.
+In [Part 2](/2026/04/19/arima-box-jenkins-forecasting.html) we take finite-parameter approximations to Wold's MA(\\(\infty\\)) and build the ARIMA family — autoregressive, moving average, integrated, seasonal — together with the Box-Jenkins identification/estimation/diagnosis cycle, AIC/BIC model selection, forecasting formulas, and prediction intervals. [Part 3](/2026/04/20/exponential-smoothing-ets-theta.html) develops exponential smoothing and the state-space ETS family (Holt-Winters, damped trend, Theta), which win on shorter series. [Part 4](/2026/04/21/state-space-kalman-filtering.html) unifies everything under state-space representation and the Kalman filter/smoother. [Part 5](/2026/04/22/modern-forecasting-garch-gbm-nbeats-hierarchical.html) covers modern practice: GARCH for volatility forecasting, gradient-boosted trees with lag features, N-BEATS (a deep MLP architecture), hierarchical reconciliation, and the calibration / proper-scoring-rule framework for probabilistic forecasts.

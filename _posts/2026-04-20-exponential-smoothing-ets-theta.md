@@ -33,26 +33,26 @@ This post covers four things. First, classical exponential smoothing — simple,
 
 ## 1. Simple Exponential Smoothing
 
-Start with the simplest case: a series with no trend and no seasonality, just local-level variation around a slowly-drifting mean. Call the latent level \(\ell_t\). **Simple exponential smoothing (SES)** estimates it as an exponentially weighted average of the observations:
+Start with the simplest case: a series with no trend and no seasonality, just local-level variation around a slowly-drifting mean. Call the latent level \\(\ell_t\\). **Simple exponential smoothing (SES)** estimates it as an exponentially weighted average of the observations:
 
 $$
 \ell_t = \alpha X_t + (1 - \alpha)\ell_{t-1},
 $$
 
-where \(\alpha \in [0, 1]\) is the **smoothing parameter**. Forecasts at all horizons are flat at the current level: \(\hat{X}_{T+h|T} = \ell_T\). Unrolling the recursion,
+where \\(\alpha \in [0, 1]\\) is the **smoothing parameter**. Forecasts at all horizons are flat at the current level: \\(\hat{X}_{T+h|T} = \ell_T\\). Unrolling the recursion,
 
 $$
 \ell_T = \alpha \sum_{j=0}^{T-1} (1 - \alpha)^j X_{T-j} + (1 - \alpha)^T \ell_0.
 $$
 
-The weights on past observations decay geometrically. With \(\alpha = 0.1\) the half-life is about 6.6 periods; with \(\alpha = 0.5\) it's roughly one period. This is exactly the IIR low-pass filter familiar from signal processing, and the reason for the name: the influence of past observations decays *exponentially* with their distance from now.
+The weights on past observations decay geometrically. With \\(\alpha = 0.1\\) the half-life is about 6.6 periods; with \\(\alpha = 0.5\\) it's roughly one period. This is exactly the IIR low-pass filter familiar from signal processing, and the reason for the name: the influence of past observations decays *exponentially* with their distance from now.
 
-### What \(\alpha\) Means
+### What \\(\alpha\\) Means
 
-- **\(\alpha \to 0\)**: pure mean, recent observations barely update the level. Appropriate when the series is nearly stationary and noise is high.
-- **\(\alpha \to 1\)**: level equals the latest observation. Appropriate when the series changes rapidly and the signal-to-noise ratio is high. At the limit, SES becomes the naive-1 forecast.
+- **\\(\alpha \to 0\\)**: pure mean, recent observations barely update the level. Appropriate when the series is nearly stationary and noise is high.
+- **\\(\alpha \to 1\\)**: level equals the latest observation. Appropriate when the series changes rapidly and the signal-to-noise ratio is high. At the limit, SES becomes the naive-1 forecast.
 
-The optimal \(\alpha\) is chosen to minimize one-step-ahead squared error, usually by numerical optimization. This is equivalent to MLE under Gaussian innovations in the state-space form (Section 5).
+The optimal \\(\alpha\\) is chosen to minimize one-step-ahead squared error, usually by numerical optimization. This is equivalent to MLE under Gaussian innovations in the state-space form (Section 5).
 
 ### Error-Correction Form
 
@@ -62,7 +62,7 @@ $$
 \ell_t = \ell_{t-1} + \alpha(X_t - \ell_{t-1}) = \ell_{t-1} + \alpha e_t,
 $$
 
-where \(e_t = X_t - \ell_{t-1}\) is the **one-step-ahead forecast error**. The smoothing parameter \(\alpha\) is the *learning rate* of the level — how aggressively it corrects toward the last observation. This formulation is the bridge to the state-space representation and also to gradient-descent intuitions: SES is an online SGD update on the level with learning rate \(\alpha\).
+where \\(e_t = X_t - \ell_{t-1}\\) is the **one-step-ahead forecast error**. The smoothing parameter \\(\alpha\\) is the *learning rate* of the level — how aggressively it corrects toward the last observation. This formulation is the bridge to the state-space representation and also to gradient-descent intuitions: SES is an online SGD update on the level with learning rate \\(\alpha\\).
 
 ### Model Implied by SES
 
@@ -84,23 +84,23 @@ $$
 \ell_t = \alpha X_t + (1 - \alpha)(\ell_{t-1} + b_{t-1}), \qquad b_t = \beta(\ell_t - \ell_{t-1}) + (1 - \beta) b_{t-1},
 $$
 
-where \(b_t\) is the **trend** (slope per period). The forecast is linear in horizon:
+where \\(b_t\\) is the **trend** (slope per period). The forecast is linear in horizon:
 
 $$
 \hat{X}_{T+h|T} = \ell_T + h \cdot b_T.
 $$
 
-Two smoothing parameters now: \(\alpha\) controls the level, \(\beta\) controls the trend. The error-correction form:
+Two smoothing parameters now: \\(\alpha\\) controls the level, \\(\beta\\) controls the trend. The error-correction form:
 
 $$
 \ell_t = \ell_{t-1} + b_{t-1} + \alpha e_t, \qquad b_t = b_{t-1} + \alpha\beta e_t.
 $$
 
-Both level and trend are driven by the same one-step-ahead error, just with different gains. If \(\beta\) is small, the trend is very stable; if \(\beta\) is near 1, the trend tracks the most recent two-period change closely.
+Both level and trend are driven by the same one-step-ahead error, just with different gains. If \\(\beta\\) is small, the trend is very stable; if \\(\beta\\) is near 1, the trend tracks the most recent two-period change closely.
 
 ### Why Holt Is Dangerous at Long Horizons
 
-The linear forecast \(\hat{X}_{T+h|T} = \ell_T + h b_T\) **grows without bound**. For a retail series, this will happily extrapolate next year's sales into the stratosphere if the recent trend was steep. Holt with untamed slope is the leading cause of "wildly optimistic revenue forecast" in automated forecasting systems. The cure is Section 3.
+The linear forecast \\(\hat{X}_{T+h|T} = \ell_T + h b_T\\) **grows without bound**. For a retail series, this will happily extrapolate next year's sales into the stratosphere if the recent trend was steep. Holt with untamed slope is the leading cause of "wildly optimistic revenue forecast" in automated forecasting systems. The cure is Section 3.
 
 ### Holt as ARIMA(0,2,2)
 
@@ -110,27 +110,27 @@ Holt's method is the optimal forecast for ARIMA(0,2,2) with specific parameter c
 
 ## 3. Damped Trend
 
-Gardner and McKenzie (1985) fixed Holt's long-horizon pathology with a **damping parameter** \(\phi \in (0, 1)\):
+Gardner and McKenzie (1985) fixed Holt's long-horizon pathology with a **damping parameter** \\(\phi \in (0, 1)\\):
 
 $$
 \ell_t = \alpha X_t + (1 - \alpha)(\ell_{t-1} + \phi b_{t-1}), \qquad b_t = \beta(\ell_t - \ell_{t-1}) + (1 - \beta)\phi b_{t-1}.
 $$
 
-The trend is multiplied by \(\phi\) at each step, so the \(h\)-step-ahead forecast becomes
+The trend is multiplied by \\(\phi\\) at each step, so the \\(h\\)-step-ahead forecast becomes
 
 $$
 \hat{X}_{T+h|T} = \ell_T + (\phi + \phi^2 + \ldots + \phi^h) b_T = \ell_T + \phi\, \frac{1 - \phi^h}{1 - \phi}\, b_T.
 $$
 
-As \(h \to \infty\), this converges to \(\ell_T + \frac{\phi}{1 - \phi} b_T\), a finite asymptote. The trend *decays* rather than persisting forever — which is what economic series actually do. Growth rates revert; consumer trends saturate; demand plateaus.
+As \\(h \to \infty\\), this converges to \\(\ell_T + \frac{\phi}{1 - \phi} b_T\\), a finite asymptote. The trend *decays* rather than persisting forever — which is what economic series actually do. Growth rates revert; consumer trends saturate; demand plateaus.
 
 ### Typical Damping Values
 
-- **\(\phi = 1\)**: standard Holt (no damping).
-- **\(\phi \in [0.8, 0.98]\)**: most production settings. The M3 competition found damped trend models systematically beat non-damped ones.
-- **\(\phi < 0.8\)**: rarely needed; usually indicates the trend component is not really useful and simple level smoothing is enough.
+- **\\(\phi = 1\\)**: standard Holt (no damping).
+- **\\(\phi \in [0.8, 0.98]\\)**: most production settings. The M3 competition found damped trend models systematically beat non-damped ones.
+- **\\(\phi < 0.8\\)**: rarely needed; usually indicates the trend component is not really useful and simple level smoothing is enough.
 
-The data selects \(\phi\) by MLE or AICc. In practice, one of the biggest accuracy lifts you can get on a large forecasting system is: switch Holt to damped Holt, and re-estimate \(\phi\) from data.
+The data selects \\(\phi\\) by MLE or AICc. In practice, one of the biggest accuracy lifts you can get on a large forecasting system is: switch Holt to damped Holt, and re-estimate \\(\phi\\) from data.
 
 <svg viewBox="0 0 680 300" xmlns="http://www.w3.org/2000/svg">
   <rect width="680" height="300" fill="#1a1a1a"/>
@@ -153,7 +153,7 @@ The data selects \(\phi\) by MLE or AICc. In practice, one of the biggest accura
 
 ## 4. Holt-Winters Seasonal Methods
 
-Add a seasonal component \(s_t\) with period \(m\) (12 for monthly, 4 for quarterly, 7 for daily with weekly cycle). There are two canonical variants, additive and multiplicative.
+Add a seasonal component \\(s_t\\) with period \\(m\\) (12 for monthly, 4 for quarterly, 7 for daily with weekly cycle). There are two canonical variants, additive and multiplicative.
 
 ### Additive Seasonality
 
@@ -168,7 +168,7 @@ s_t &= \gamma(X_t - \ell_{t-1} - b_{t-1}) + (1 - \gamma) s_{t-m}, \\
 \end{aligned}
 $$
 
-Three smoothing parameters: \(\alpha\) for level, \(\beta\) for trend, \(\gamma\) for seasonal. The seasonal component repeats every \(m\) periods, with slow updating.
+Three smoothing parameters: \\(\alpha\\) for level, \\(\beta\\) for trend, \\(\gamma\\) for seasonal. The seasonal component repeats every \\(m\\) periods, with slow updating.
 
 ### Multiplicative Seasonality
 
@@ -193,7 +193,7 @@ Multiplicative Holt-Winters with log pre-transform is often equivalent to additi
 
 ### Damped Seasonal Variants
 
-The damping parameter \(\phi\) extends naturally: \(b_{t-1}\) gets multiplied by \(\phi\) in the level update, \(\phi b_{t-1}\) in the trend inherited value. This gives the damped-Holt-Winters model used as a default in industry.
+The damping parameter \\(\phi\\) extends naturally: \\(b_{t-1}\\) gets multiplied by \\(\phi\\) in the level update, \\(\phi b_{t-1}\\) in the trend inherited value. This gives the damped-Holt-Winters model used as a default in industry.
 
 ---
 
@@ -203,7 +203,7 @@ The recursions above are heuristic. In 2002, Hyndman, Koehler, Snyder, and Grose
 
 ### Taxonomy
 
-ETS models are named by three letters: **Error \(\times\) Trend \(\times\) Seasonal**, each of which can be:
+ETS models are named by three letters: **Error \\(\times\\) Trend \\(\times\\) Seasonal**, each of which can be:
 
 - **N** — none
 - **A** — additive
@@ -221,7 +221,7 @@ $$
 X_t = w(\mathbf{x}_{t-1}) + r(\mathbf{x}_{t-1}) \varepsilon_t, \qquad \mathbf{x}_t = f(\mathbf{x}_{t-1}) + g(\mathbf{x}_{t-1}) \varepsilon_t,
 $$
 
-where \(\mathbf{x}_t\) is the state (level, trend, seasonal components), \(\varepsilon_t \sim \mathcal{N}(0, \sigma^2)\) is a single innovation, and \(w, r, f, g\) are known functions of the state and model choice. The "innovations" part means the same \(\varepsilon_t\) drives both the observation and the state — no separate measurement noise. This is the defining simplification vs. general state-space models (Part 4).
+where \\(\mathbf{x}_t\\) is the state (level, trend, seasonal components), \\(\varepsilon_t \sim \mathcal{N}(0, \sigma^2)\\) is a single innovation, and \\(w, r, f, g\\) are known functions of the state and model choice. The "innovations" part means the same \\(\varepsilon_t\\) drives both the observation and the state — no separate measurement noise. This is the defining simplification vs. general state-space models (Part 4).
 
 ### ETS(A, N, N) Worked Out
 
@@ -231,7 +231,7 @@ $$
 X_t = \ell_{t-1} + \varepsilon_t, \qquad \ell_t = \ell_{t-1} + \alpha \varepsilon_t.
 $$
 
-Observation equation: \(X_t\) equals the previous level plus innovation. State equation: the level updates by \(\alpha\) times the innovation. This is exactly the error-correction form of Section 1, with \(\varepsilon_t = X_t - \ell_{t-1}\) identified as the innovation.
+Observation equation: \\(X_t\\) equals the previous level plus innovation. State equation: the level updates by \\(\alpha\\) times the innovation. This is exactly the error-correction form of Section 1, with \\(\varepsilon_t = X_t - \ell_{t-1}\\) identified as the innovation.
 
 ### ETS(A, A, N) Worked Out
 
@@ -245,17 +245,17 @@ $$
 \ell_t = \ell_{t-1} + b_{t-1} + \alpha \varepsilon_t, \qquad b_t = b_{t-1} + \alpha\beta \varepsilon_t.
 $$
 
-The state vector is \(\mathbf{x}_t = (\ell_t, b_t)\). Innovation propagates to both components with gains \(\alpha\) and \(\alpha\beta\). Same structure extends to seasonal variants.
+The state vector is \\(\mathbf{x}_t = (\ell_t, b_t)\\). Innovation propagates to both components with gains \\(\alpha\\) and \\(\alpha\beta\\). Same structure extends to seasonal variants.
 
 ### ETS with Multiplicative Error
 
-ETS(M, N, N) has \(X_t = \ell_{t-1}(1 + \varepsilon_t)\), meaning error is proportional to level. For revenue/demand this is often more realistic: a \$1M company has noise ≈ \$100K, a \$100M company has noise ≈ \$10M; the *relative* noise is stable. Multiplicative-error models often have better coverage on heteroskedastic positive series than additive ones.
+ETS(M, N, N) has \\(X_t = \ell_{t-1}(1 + \varepsilon_t)\\), meaning error is proportional to level. For revenue/demand this is often more realistic: a \$1M company has noise ≈ \$100K, a \$100M company has noise ≈ \$10M; the *relative* noise is stable. Multiplicative-error models often have better coverage on heteroskedastic positive series than additive ones.
 
 ### Why ETS Is a Big Deal
 
 Three practical consequences of moving from heuristic smoothing to the state-space form:
 
-1. **Likelihood-based estimation** (Section 6): MLE of \(\alpha, \beta, \gamma, \phi, \sigma^2\) and initial state \(\mathbf{x}_0\).
+1. **Likelihood-based estimation** (Section 6): MLE of \\(\alpha, \beta, \gamma, \phi, \sigma^2\\) and initial state \\(\mathbf{x}_0\\).
 2. **Principled model selection**: AICc picks among thirty variants automatically.
 3. **Analytic forecast distributions**: for additive-error variants, exact Gaussian forecast distributions; for multiplicative-error variants, simulation-based forecast distributions. *No more back-of-envelope intervals*.
 
@@ -265,7 +265,7 @@ Three practical consequences of moving from heuristic smoothing to the state-spa
 
 ### Likelihood
 
-For additive-error ETS, the one-step-ahead prediction errors \(e_t = X_t - \hat{X}_{t|t-1}\) are i.i.d. \(\mathcal{N}(0, \sigma^2)\) under the model. The concentrated log-likelihood (with \(\sigma^2\) profiled out) becomes
+For additive-error ETS, the one-step-ahead prediction errors \\(e_t = X_t - \hat{X}_{t|t-1}\\) are i.i.d. \\(\mathcal{N}(0, \sigma^2)\\) under the model. The concentrated log-likelihood (with \\(\sigma^2\\) profiled out) becomes
 
 $$
 \ell_c(\boldsymbol{\eta}) = -\frac{T}{2} \log \left(\frac{1}{T} \sum_{t=1}^T e_t(\boldsymbol{\eta})^2 \right),
@@ -279,27 +279,27 @@ $$
 \ell(\boldsymbol{\eta}) = -\frac{T}{2}\log\sigma^2 - \frac{1}{2\sigma^2}\sum_t \varepsilon_t^2 - \sum_t \log|r(\mathbf{x}_{t-1})|.
 $$
 
-The last term is the log-Jacobian from the transformation between \(X_t\) and \(\varepsilon_t\). This term is what prevents multiplicative-error ETS from being compared to additive-error ETS by MSE alone.
+The last term is the log-Jacobian from the transformation between \\(X_t\\) and \\(\varepsilon_t\\). This term is what prevents multiplicative-error ETS from being compared to additive-error ETS by MSE alone.
 
 ### Initial State
 
-The recursion needs \(\mathbf{x}_0\). Three options:
+The recursion needs \\(\mathbf{x}_0\\). Three options:
 
-1. **Heuristic**: set \(\ell_0\) = first observation, \(b_0\) = average early slope, \(s_0\) = average deviations from a linear fit on the first \(2m\) observations.
-2. **MLE**: treat \(\mathbf{x}_0\) as parameters and optimize jointly. This is what `forecast::ets` and `statsmodels.ETS` do by default.
+1. **Heuristic**: set \\(\ell_0\\) = first observation, \\(b_0\\) = average early slope, \\(s_0\\) = average deviations from a linear fit on the first \\(2m\\) observations.
+2. **MLE**: treat \\(\mathbf{x}_0\\) as parameters and optimize jointly. This is what `forecast::ets` and `statsmodels.ETS` do by default.
 3. **Exact initialization**: diffuse or flat prior, integrated out analytically. Gives identical asymptotic behavior to MLE.
 
-For short series (\(T < 50\)), the choice of initial state materially affects forecasts. For longer series it matters less.
+For short series (\\(T < 50\\)), the choice of initial state materially affects forecasts. For longer series it matters less.
 
 ### AICc Selection Across Variants
 
-For each candidate ETS model \(m\), compute
+For each candidate ETS model \\(m\\), compute
 
 $$
 \mathrm{AICc}_m = -2\ell(\hat{\boldsymbol{\eta}}_m) + 2k_m + \frac{2k_m(k_m+1)}{T - k_m - 1}.
 $$
 
-Select the model with minimum AICc. Hyndman's `ets()` in R automates this: it tries all valid ETS variants given the data (if the series has zeros it disables multiplicative variants; if length \(< 2m\) it disables seasonal), fits each, picks minimum AICc. `statsmodels.ETSModel` with `auto=True` does the same. This is the standard workflow — not running an auto-ETS is leaving accuracy on the table.
+Select the model with minimum AICc. Hyndman's `ets()` in R automates this: it tries all valid ETS variants given the data (if the series has zeros it disables multiplicative variants; if length \\(< 2m\\) it disables seasonal), fits each, picks minimum AICc. `statsmodels.ETSModel` with `auto=True` does the same. This is the standard workflow — not running an auto-ETS is leaving accuracy on the table.
 
 ### Multiplicative vs. Additive: Which Wins
 
@@ -317,23 +317,23 @@ A reasonable default when AICc is unavailable: ETS(M, Ad, M) for revenue/volume;
 
 ### Point Forecasts
 
-For any ETS model, the point forecast \(\hat{X}_{T+h|T} = \mathbb{E}[X_{T+h} \mid \mathcal{F}_T]\) is computed by iterating the state equations forward with future innovations set to zero:
+For any ETS model, the point forecast \\(\hat{X}_{T+h|T} = \mathbb{E}[X_{T+h} \mid \mathcal{F}_T]\\) is computed by iterating the state equations forward with future innovations set to zero:
 
 $$
 \hat{\mathbf{x}}_{T+1} = f(\mathbf{x}_T), \quad \hat{\mathbf{x}}_{T+2} = f(\hat{\mathbf{x}}_{T+1}), \quad \ldots
 $$
 
-and applying the observation function \(w\) at each step. For additive-error models this is an exact conditional expectation; for multiplicative-error models it is an approximation (because the expectation of a product is not the product of expectations when the terms share noise), but the error is small.
+and applying the observation function \\(w\\) at each step. For additive-error models this is an exact conditional expectation; for multiplicative-error models it is an approximation (because the expectation of a product is not the product of expectations when the terms share noise), but the error is small.
 
 ### Prediction Interval Variance
 
-For additive-error models, the \(h\)-step forecast variance has a known analytic form. For ETS(A, N, N):
+For additive-error models, the \\(h\\)-step forecast variance has a known analytic form. For ETS(A, N, N):
 
 $$
 \mathrm{Var}(X_{T+h} - \hat{X}_{T+h|T}) = \sigma^2 \left[ 1 + (h-1) \alpha^2 \right].
 $$
 
-For ETS(A, A, N) (Holt) with damping \(\phi\):
+For ETS(A, A, N) (Holt) with damping \\(\phi\\):
 
 $$
 \mathrm{Var}(X_{T+h} - \hat{X}_{T+h|T}) = \sigma^2 \left[1 + \sum_{j=1}^{h-1} \left( \alpha + \alpha \beta \frac{\phi(1 - \phi^j)}{1 - \phi}\right)^2 \right].
@@ -345,8 +345,8 @@ These grow with horizon but often more slowly than ARIMA, because ETS damping re
 
 For multiplicative-error variants, the forecast distribution is non-Gaussian and skewed. Analytical PIs do not exist in closed form. The production pattern:
 
-1. Draw \(B\) independent simulations from the fitted model, each running the state-space equations forward with fresh i.i.d. Gaussian innovations.
-2. At each horizon, compute empirical quantiles across the \(B\) simulations.
+1. Draw \\(B\\) independent simulations from the fitted model, each running the state-space equations forward with fresh i.i.d. Gaussian innovations.
+2. At each horizon, compute empirical quantiles across the \\(B\\) simulations.
 
 ```python
 sims = res.simulate(nsimulations=horizon, repetitions=5000)
@@ -364,7 +364,7 @@ $$
 \mathrm{Coverage}(\alpha) = \frac{1}{H} \sum_{h=1}^H \mathbf{1}[Q^{(\alpha/2)}_h \le X_{T+h} \le Q^{(1-\alpha/2)}_h],
 $$
 
-where \(Q^{(p)}_h\) is the predicted \(p\)-quantile at horizon \(h\). For a nominal 80% PI, the realized coverage across a rolling-origin evaluation should be near 80%. Under-coverage (e.g., 65% realized) means the model's uncertainty is *too tight* — a silent failure mode common in production forecasts.
+where \\(Q^{(p)}_h\\) is the predicted \\(p\\)-quantile at horizon \\(h\\). For a nominal 80% PI, the realized coverage across a rolling-origin evaluation should be near 80%. Under-coverage (e.g., 65% realized) means the model's uncertainty is *too tight* — a silent failure mode common in production forecasts.
 
 ---
 
@@ -372,20 +372,20 @@ where \(Q^{(p)}_h\) is the predicted \(p\)-quantile at horizon \(h\). For a nomi
 
 In M3 (2000), a method no one had heard of from Assimakopoulos and Nikolopoulos beat every other entry in accuracy averaged over 3003 series. It is trivially simple:
 
-1. Deseasonalize the series (classical additive decomposition with period \(m\)).
-2. Fit two "theta lines": \(L_0\) is the linear regression of \(X\) on \(t\); \(L_2\) is the series \(X\) itself with curvature doubled (\(\theta = 2\)) — equivalently, \(X + (X - L_0)\).
-3. Forecast \(L_0\) by extending the linear regression, and \(L_2\) by simple exponential smoothing.
+1. Deseasonalize the series (classical additive decomposition with period \\(m\\)).
+2. Fit two "theta lines": \\(L_0\\) is the linear regression of \\(X\\) on \\(t\\); \\(L_2\\) is the series \\(X\\) itself with curvature doubled (\\(\theta = 2\\)) — equivalently, \\(X + (X - L_0)\\).
+3. Forecast \\(L_0\\) by extending the linear regression, and \\(L_2\\) by simple exponential smoothing.
 4. Average the two forecasts and re-seasonalize.
 
-That's it. Why does it work? Because it decomposes the series into "long-run linear trend" (\(L_0\)) and "short-run noise + local curvature" (\(L_2\)), extrapolates each with the right method (linear / SES), and averages — an implicit ensemble. The M3 winner, later M4 top performer, and persistent inclusion in production ensembles trace back to this idea.
+That's it. Why does it work? Because it decomposes the series into "long-run linear trend" (\\(L_0\\)) and "short-run noise + local curvature" (\\(L_2\\)), extrapolates each with the right method (linear / SES), and averages — an implicit ensemble. The M3 winner, later M4 top performer, and persistent inclusion in production ensembles trace back to this idea.
 
 ### Theta as a State-Space Model
 
-Hyndman and Billah (2003) showed that the Theta method is equivalent to a specific ETS model: ETS(A, N, N) applied to the \(\theta = 2\) line with drift added. This connects it back to the unified framework: Theta isn't magic, it's ETS + a deterministic trend.
+Hyndman and Billah (2003) showed that the Theta method is equivalent to a specific ETS model: ETS(A, N, N) applied to the \\(\theta = 2\\) line with drift added. This connects it back to the unified framework: Theta isn't magic, it's ETS + a deterministic trend.
 
 ### Generalized Theta
 
-Fiorucci et al. (2016) introduced a **dynamic optimized theta** (DOTM) model that lets \(\theta\) itself vary. This is what many modern production forecasting stacks actually use under the "theta" name. `nixtla/statsforecast` implements DOTM; on M4 it outperforms classical theta.
+Fiorucci et al. (2016) introduced a **dynamic optimized theta** (DOTM) model that lets \\(\theta\\) itself vary. This is what many modern production forecasting stacks actually use under the "theta" name. `nixtla/statsforecast` implements DOTM; on M4 it outperforms classical theta.
 
 ### Why Theta Is in Every Modern Ensemble
 
@@ -399,8 +399,8 @@ Both produce calibrated forecasts for stationary series; their strengths diverge
 
 | Scenario | Prefer |
 |---|---|
-| Short series (\(T < 50\)) | ETS |
-| Long series (\(T > 500\)) with memory | ARIMA |
+| Short series (\\(T < 50\\)) | ETS |
+| Long series (\\(T > 500\\)) with memory | ARIMA |
 | Strong multiplicative seasonality | ETS(*,*,M) |
 | Need exogenous regressors | ARIMAX (or regression + ARIMA errors) |
 | Need damped trend | ETS(A, Ad, *) |
@@ -626,7 +626,7 @@ If your series is strictly positive and has variance that scales with the level 
 
 ### 11.4 Prefer Simulation-Based PIs
 
-Analytical PI formulas exist for additive ETS variants, but not cleanly for multiplicative variants. Run simulations (\(\ge 2000\) paths) and compute empirical quantiles. This uniformizes the code path across model families and handles non-Gaussian forecast distributions correctly. The cost is negligible for ETS; the robustness gain is large.
+Analytical PI formulas exist for additive ETS variants, but not cleanly for multiplicative variants. Run simulations (\\(\ge 2000\\) paths) and compute empirical quantiles. This uniformizes the code path across model families and handles non-Gaussian forecast distributions correctly. The cost is negligible for ETS; the robustness gain is large.
 
 ### 11.5 Ensembles Beat Single Models on Average
 
@@ -634,7 +634,7 @@ Hard-won lesson from every M-competition: ensembles win. For batch forecasting a
 
 ### 11.6 Watch Out for Very Short Series
 
-ETS breaks (or silently returns nonsense) on series with fewer than \(2m\) observations (less than two seasons). For such series, fall back to:
+ETS breaks (or silently returns nonsense) on series with fewer than \\(2m\\) observations (less than two seasons). For such series, fall back to:
 
 - Naive-1 / seasonal naive as the primary
 - A pooled/hierarchical model using information from related series
@@ -647,19 +647,19 @@ Do not let an auto-ETS run loose on short series — you will ship random foreca
 The trick of "just log the series and use additive ETS" usually works, but:
 
 - Log of zero is undefined. Shift by a small constant, or use a different model.
-- Back-transforming the point forecast needs Jensen correction: \(\hat{X} = \exp(\hat{Y}) \exp(\hat{\sigma}^2 / 2)\).
+- Back-transforming the point forecast needs Jensen correction: \\(\hat{X} = \exp(\hat{Y}) \exp(\hat{\sigma}^2 / 2)\\).
 - Back-transforming PIs does *not* need correction: just exponentiate the quantiles of the log-scale PI.
-- The Jensen correction bias can be 1–5% on monthly data with \(\hat\sigma^2 / 2 \sim 0.01\)–0.05. Silent, persistent under-forecast.
+- The Jensen correction bias can be 1–5% on monthly data with \\(\hat\sigma^2 / 2 \sim 0.01\\)–0.05. Silent, persistent under-forecast.
 
 Multiplicative-error ETS handles all this natively.
 
 ### 11.8 Monitor Smoothing Parameter Drift
 
-Rolling refit with a schedule. Log \(\hat{\alpha}, \hat{\beta}, \hat{\gamma}, \hat{\phi}\) at each refit. Sudden large changes indicate regime shift — investigate before shipping. A stable system has \(\hat\alpha\) with CV < 20% across refits; \(\hat\phi\) usually stabilizes above 0.9 and below 0.98. Alert if any parameter jumps to an extreme (\(\hat\alpha \to 1\), \(\hat\phi \to 0\)) — usually means the model is fitting noise.
+Rolling refit with a schedule. Log \\(\hat{\alpha}, \hat{\beta}, \hat{\gamma}, \hat{\phi}\\) at each refit. Sudden large changes indicate regime shift — investigate before shipping. A stable system has \\(\hat\alpha\\) with CV < 20% across refits; \\(\hat\phi\\) usually stabilizes above 0.9 and below 0.98. Alert if any parameter jumps to an extreme (\\(\hat\alpha \to 1\\), \\(\hat\phi \to 0\\)) — usually means the model is fitting noise.
 
 ### 11.9 Do Not Mix Training and Forecast Seasonal Structure
 
-The most common seasonal-ETS bug: training used \(m = 12\) (monthly), forecasting uses daily. Or the seasonal period was detected wrong on cold items. Always assert that `seasonal_periods` matches the actual frequency of the data, and that \(T > 2m\), before training.
+The most common seasonal-ETS bug: training used \\(m = 12\\) (monthly), forecasting uses daily. Or the seasonal period was detected wrong on cold items. Always assert that `seasonal_periods` matches the actual frequency of the data, and that \\(T > 2m\\), before training.
 
 ### 11.10 Intermittent Demand Requires a Different Tool
 
@@ -682,11 +682,11 @@ Common pitfalls:
 
 ### 11.12 Benchmark Against Naive Before Shipping
 
-Every production forecast should have a MASE computed vs. seasonal naive on a rolling-origin CV *at the forecast horizon you actually use*. A MASE \(\ge 1\) means your complex model is not improving over a method that a spreadsheet can execute — ship the spreadsheet instead, reduce complexity debt, and move on.
+Every production forecast should have a MASE computed vs. seasonal naive on a rolling-origin CV *at the forecast horizon you actually use*. A MASE \\(\ge 1\\) means your complex model is not improving over a method that a spreadsheet can execute — ship the spreadsheet instead, reduce complexity debt, and move on.
 
 ### 11.13 Document the Full Specification
 
-"We use ETS" is not a spec. "We use ETS(M, Ad, M) with `seasonal_periods=12`, `damped_trend=True`, `initialization_method='estimated'`, refit monthly, PIs at 80% and 95% via 5000-path simulation, backtested on expanding-window rolling origin at horizon \(h = 1, 6, 12\)" is a spec. Write it down; make it a runnable configuration. Future-you, and every teammate, will thank you.
+"We use ETS" is not a spec. "We use ETS(M, Ad, M) with `seasonal_periods=12`, `damped_trend=True`, `initialization_method='estimated'`, refit monthly, PIs at 80% and 95% via 5000-path simulation, backtested on expanding-window rolling origin at horizon \\(h = 1, 6, 12\\)" is a spec. Write it down; make it a runnable configuration. Future-you, and every teammate, will thank you.
 
 ---
 
@@ -694,4 +694,4 @@ Every production forecast should have a MASE computed vs. seasonal naive on a ro
 
 Exponential smoothing started as a 1957 inventory heuristic and ended as the **ETS innovations state-space family** — a fully parametric, likelihood-based, auto-selectable collection of thirty variants with closed-form forecasts and (for additive-error variants) closed-form prediction intervals. We added the damped-trend fix for long-horizon sanity and the multiplicative-seasonality variant for positive heteroskedastic series; we covered the Theta method, a decomposition-plus-SES ensemble that won M3 and is still in every production forecaster's ensemble. ETS + ARIMA + Theta (equal-weight average) is the closest thing forecasting has to a default.
 
-In [Part 4](/2026/04/21/state-space-kalman-filtering.html) we unify ARIMA and ETS under the general state-space framework and derive the **Kalman filter** — the \(O(T)\) algorithm that underlies exact MLE in both, and the workhorse of modern structural time series models (trend + seasonal + cycle as explicit unobserved components). Part 5 finishes the series with modern practice: GARCH for volatility forecasting, gradient boosting with lag features, N-BEATS (deep MLP without attention), hierarchical reconciliation, and proper scoring rules for probabilistic forecast evaluation.
+In [Part 4](/2026/04/21/state-space-kalman-filtering.html) we unify ARIMA and ETS under the general state-space framework and derive the **Kalman filter** — the \\(O(T)\\) algorithm that underlies exact MLE in both, and the workhorse of modern structural time series models (trend + seasonal + cycle as explicit unobserved components). Part 5 finishes the series with modern practice: GARCH for volatility forecasting, gradient boosting with lag features, N-BEATS (deep MLP without attention), hierarchical reconciliation, and proper scoring rules for probabilistic forecast evaluation.
