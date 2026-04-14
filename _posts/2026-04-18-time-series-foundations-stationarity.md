@@ -39,9 +39,9 @@ $$
 \{X_t : t \in \mathcal{T}\}
 $$
 
-all defined on a common probability space \((\Omega, \mathcal{F}, \mathbb{P})\). The index set \(\mathcal{T}\) is typically \(\mathbb{Z}\) (discrete time) or \(\mathbb{R}\) (continuous time). We will focus on discrete time, so \(t \in \mathbb{Z}\) or \(t \in \{1, 2, \ldots, T\}\).
+all defined on a common probability space with sample space \(\Omega\), event \(\sigma\)-algebra \(\mathcal{F}\), and probability measure \(\mathbb{P}\). The index set \(\mathcal{T}\) is typically \(\mathbb{Z}\) (discrete time) or \(\mathbb{R}\) (continuous time). We will focus on discrete time, so \(t \in \mathbb{Z}\) or \(t \in \lbrace 1, 2, \ldots, T\rbrace\).
 
-Two things are worth pausing on. First, \(X_t\) is a *random variable*, not a number. When you look at a time plot — say, daily closing prices for AAPL over 2020–2025 — you are looking at *one realization* \(\{x_t(\omega^*)\}\) of the underlying process, for a single outcome \(\omega^* \in \Omega\). Different "outcomes" \(\omega\) produce different possible histories. In the real world we only get to see one history, and the central methodological problem of time series is how to infer properties of the distribution \(\mathbb{P}\) from a single path.
+Two things are worth pausing on. First, \(X_t\) is a *random variable*, not a number. When you look at a time plot — say, daily closing prices for AAPL over 2020–2025 — you are looking at *one realization* \(\lbrace x_t(\omega^*)\rbrace\) of the underlying process, for a single outcome \(\omega^* \in \Omega\). Different "outcomes" \(\omega\) produce different possible histories. In the real world we only get to see one history, and the central methodological problem of time series is how to infer properties of the distribution \(\mathbb{P}\) from a single path.
 
 Second, the process is really a function \(X : \mathbb{Z} \times \Omega \to \mathbb{R}\). For fixed \(t\), \(X_t(\cdot)\) is a random variable. For fixed \(\omega\), \(X_\cdot(\omega)\) is a deterministic sequence called a **sample path** or **realization**. The distinction matters because statistical inference is almost always about averages over \(\omega\) (expectations), but we only have data that averages over \(t\). The bridge between these two is *ergodicity*, which we treat in Section 7.
 
@@ -67,7 +67,7 @@ Stationarity is the time-series version of i.i.d. — it is the condition that m
 
 ### Strict Stationarity
 
-A process \(\{X_t\}\) is **strictly stationary** if for every \(n \ge 1\), every \(t_1 < \ldots < t_n\), and every \(h \in \mathbb{Z}\),
+A process \(\lbrace X_t\rbrace\) is **strictly stationary** if for every \(n \ge 1\), every \(t_1 < \ldots < t_n\), and every \(h \in \mathbb{Z}\),
 
 $$
 (X_{t_1}, \ldots, X_{t_n}) \stackrel{d}{=} (X_{t_1 + h}, \ldots, X_{t_n + h}).
@@ -169,7 +169,7 @@ Two processes play the role of the hydrogen atom in time series: white noise and
 
 ### White Noise
 
-A process \(\{\varepsilon_t\}\) is **white noise** if
+A process \(\lbrace \varepsilon_t\rbrace\) is **white noise** if
 
 $$
 \mathbb{E}[\varepsilon_t] = 0, \quad \mathbb{E}[\varepsilon_t^2] = \sigma^2, \quad \mathbb{E}[\varepsilon_t \varepsilon_s] = 0 \text{ for } t \ne s.
@@ -261,13 +261,13 @@ We now arrive at one of the most beautiful theorems in time series analysis. Inf
 
 ### Linear Processes
 
-A process \(\{X_t\}\) is called **linear** or a **moving average representation** if
+A process \(\lbrace X_t\rbrace\) is called **linear** or a **moving average representation** if
 
 $$
 X_t = \sum_{j=0}^\infty \psi_j \varepsilon_{t-j}, \qquad \sum_{j=0}^\infty \psi_j^2 < \infty,
 $$
 
-where \(\varepsilon_t \sim \mathrm{WN}(0, \sigma^2)\). The convergence of the series in mean square is guaranteed by the square-summability of \(\{\psi_j\}\). With \(\psi_0 = 1\), the autocovariance can be computed directly:
+where \(\varepsilon_t \sim \mathrm{WN}(0, \sigma^2)\). The convergence of the series in mean square is guaranteed by the square-summability of \(\lbrace \psi_j\rbrace\). With \(\psi_0 = 1\), the autocovariance can be computed directly:
 
 $$
 \gamma(h) = \sigma^2 \sum_{j=0}^\infty \psi_j \psi_{j+h}.
@@ -277,7 +277,7 @@ This formula will be used constantly.
 
 ### The Wold Decomposition Theorem
 
-**Theorem (Wold, 1938).** Any zero-mean weakly stationary process \(\{X_t\}\) can be written uniquely as
+**Theorem (Wold, 1938).** Any zero-mean weakly stationary process \(\lbrace X_t\rbrace\) can be written uniquely as
 
 $$
 X_t = \sum_{j=0}^\infty \psi_j \varepsilon_{t-j} + V_t,
@@ -286,13 +286,13 @@ $$
 where:
 
 1. \(\psi_0 = 1\) and \(\sum \psi_j^2 < \infty\);
-2. \(\{\varepsilon_t\}\) is white noise with variance \(\sigma^2\);
+2. \(\lbrace \varepsilon_t\rbrace\) is white noise with variance \(\sigma^2\);
 3. \(\varepsilon_t\) is the one-step-ahead linear forecast error: \(\varepsilon_t = X_t - P_{t-1} X_t\), where \(P_{t-1}\) is the projection onto the closed linear span of past \(X_s\)s;
 4. \(V_t\) is a **deterministic** component — predictable from its own infinite past with zero error — and is uncorrelated with \(\varepsilon_s\) for all \(s\).
 
 ### Sketch of Proof
 
-Let \(\mathcal{H}_t\) be the closed linear span of \(\{X_s : s \le t\}\) in \(L^2\). Define the **innovation**
+Let \(\mathcal{H}_t\) be the closed linear span of \(\lbrace X_s : s \le t\rbrace\) in \(L^2\). Define the **innovation**
 
 $$
 \varepsilon_t = X_t - P_{\mathcal{H}_{t-1}} X_t,
@@ -300,7 +300,7 @@ $$
 
 where \(P_{\mathcal{H}_{t-1}}\) is orthogonal projection. By construction \(\varepsilon_t \perp \mathcal{H}_{t-1}\), and by stationarity \(\mathbb{E}[\varepsilon_t^2] = \sigma^2\) is constant. The \(\varepsilon_t\) are mutually orthogonal (innovations at different times live in different orthogonal subspaces), hence white noise.
 
-Now project \(X_t\) onto \(\overline{\mathrm{span}}\{\varepsilon_s : s \le t\}\):
+Now project \(X_t\) onto \(\overline{\mathrm{span}}\lbrace \varepsilon_s : s \le t\rbrace\):
 
 $$
 P_{\mathcal{H}^\varepsilon_t} X_t = \sum_{j=0}^\infty \psi_j \varepsilon_{t-j}, \qquad \psi_j = \frac{\langle X_t, \varepsilon_{t-j}\rangle}{\sigma^2}.
