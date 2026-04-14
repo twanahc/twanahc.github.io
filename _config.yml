@@ -3,3 +3,9 @@ description: AI video, creative AI, and things that keep me up at night
 markdown: kramdown
 permalink: /posts/:year-:month-:day-:title/
 future: true
+
+kramdown:
+  input: GFM
+  math_engine: mathjax
+  syntax_highlighter: rouge
+  hard_wrap: false
