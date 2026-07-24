@@ -3,23 +3,18 @@ layout: default
 title: Home
 ---
 
-<div style="display:flex;justify-content:space-between;align-items:center;margin-bottom:24px">
-  <h2>Posts</h2>
-  <a href="/the-rabbit-hole/" style="font-size:.9em;padding:6px 14px;border:1px solid #ccc;border-radius:6px;">The Rabbit Hole &rarr;</a>
-</div>
+<h2>Posts</h2>
 
-<ul>
 {% for post in site.posts %}
   <article>
     <h3>
       <a href="{{ post.url }}">{{ post.title }}</a>
     </h3>
     <p><em>{{ post.date | date: "%B %d, %Y" }}</em>
-    {% if post.urgency %} &middot; <strong>{{ post.urgency }}</strong>{% endif %}
     {% if post.category %} &middot; {{ post.category }}{% endif %}
     </p>
     <hr>
   </article>
+{% else %}
+  <p><em>Nothing here yet.</em></p>
 {% endfor %}
-
-</ul>
